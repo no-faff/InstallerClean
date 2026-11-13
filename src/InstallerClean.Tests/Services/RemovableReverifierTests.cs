@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using NSubstitute;
@@ -372,6 +373,86 @@ public class RemovableReverifierTests
     // only where nothing on any product sharing it can be uninstalled and roll back
     // onto its file. So the re-read has to re-ask about the siblings, not only about
     // the batch's own pairings, or it does not re-check the fact the offer rests on.
+
+    // ---- Reads made again under the lease where one fails ----
+
+    private static (UnderLeaseRecheck Recheck, List<TimeSpan> Pauses) RecheckRecordingPauses(
+        RemovableReverifier svc, UnderLeaseClaims claims)
+    {
+        var pauses = new List<TimeSpan>();
+        var forTests = WalkRestarts.PauseForTests;
+        WalkRestarts.PauseForTests = pauses.Add;
+        try
+        {
+            return (svc.RecheckUnderLease(claims), pauses);
+        }
+        finally
+        {
+            WalkRestarts.PauseForTests = forTests;
+        }
+    }
+
+    [Theory]
+    [InlineData(PatchA, "State")]
+    [InlineData(PatchA, "Uninstallable")]
+    [InlineData(PatchB, "Uninstallable")]
+    public void A_read_under_the_lease_that_fails_once_lets_the_batch_through_as_a_clean_read_does(
+        string patchCode, string property)
+    {
+        // The batch's own pairing and a sibling on its product, both superseded and not
+        // removable, which passes; one read fails once.
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.Set(PatchB, ProductOne, state: "2", uninstallable: "0");
+        msi.FailPropertyOnce(patchCode, ProductOne, property);
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var (recheck, pauses) = RecheckRecordingPauses(svc, new UnderLeaseClaims(
+            new[] { Claim(path, PatchA, ProductOne) },
+            new[] { Claim(path, PatchA, ProductOne), Claim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne) }));
+
+        Assert.Empty(recheck.HeldBack);
+        Assert.Equal(new[] { TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(250) }, pauses);
+    }
+
+    [Fact]
+    public void A_read_under_the_lease_that_keeps_failing_holds_the_path_back_and_pauses_no_longer_than_the_limit()
+    {
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.Set(PatchB, ProductOne, state: "2", uninstallable: "0");
+        msi.FailProperty(PatchA, ProductOne, "State");
+        msi.FailProperty(PatchB, ProductOne, "Uninstallable");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var (recheck, pauses) = RecheckRecordingPauses(svc, new UnderLeaseClaims(
+            new[] { Claim(path, PatchA, ProductOne) },
+            new[] { Claim(path, PatchA, ProductOne), Claim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne) }));
+
+        // The first failing read is made again once, after the short pause; the long pause a
+        // second read would need, and the confirming one, are past the limit.
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        Assert.Equal(new[] { TimeSpan.FromMilliseconds(50) }, pauses);
+    }
+
+    [Theory]
+    [InlineData(1605u)]
+    public void A_record_under_the_lease_answering_that_it_has_gone_is_read_once_and_holds_the_path_back(uint code)
+    {
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.AbsentRecord(PatchA, ProductOne, "State", code);
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var (recheck, pauses) = RecheckRecordingPauses(svc, new UnderLeaseClaims(
+            new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) }));
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        Assert.Empty(pauses);
+    }
 
     [Fact]
     public void A_sibling_patch_turning_removable_holds_the_batch_path_back()
@@ -1016,6 +1097,15 @@ public class RemovableReverifierTests
         public void FailProperty(string patchCode, string productCode, string property) =>
             _failing.Add((patchCode, productCode, property));
 
+        private readonly Dictionary<(string, string, string), int> _failingOnce = new();
+
+        /// <summary>
+        /// An error that passes: the next <paramref name="calls"/> reads of this property fail,
+        /// and every read after them answers as scripted.
+        /// </summary>
+        public void FailPropertyOnce(string patchCode, string productCode, string property, int calls = 1) =>
+            _failingOnce[(patchCode, productCode, property)] = calls;
+
         /// <summary>
         /// Answers this property with a documented "no such record" code rather than
         /// with a value or an undocumented failure. Takes the code so a
@@ -1032,6 +1122,12 @@ public class RemovableReverifierTests
             char[]? value, ref uint valueLength)
         {
             if (value is null) Reads++;
+            if (value is null && _failingOnce.TryGetValue((patchCode, productCode, property), out var once) && once > 0)
+            {
+                _failingOnce[(patchCode, productCode, property)] = once - 1;
+                valueLength = 0;
+                return FunctionFailed;
+            }
             if (_failing.Contains((patchCode, productCode, property)))
             {
                 valueLength = 0;

@@ -2965,7 +2965,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // have been changing.
         var answered = InstallerQueryService.ReadSourceListProperty(
             _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.MediaPackagePath,
-            restarts: null);
+            WalkRestarts.ReadsOnce);
         if (answered.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var path = answered.Value.TrimEnd('\0');
@@ -3057,10 +3057,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // have been changing.
         var source = InstallerQueryService.ReadSourceListProperty(
             _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedSource,
-            restarts: null);
+            WalkRestarts.ReadsOnce);
         var type = InstallerQueryService.ReadSourceListProperty(
             _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedType,
-            restarts: null);
+            WalkRestarts.ReadsOnce);
         if (source.Unreadable || type.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = source.Value.TrimEnd('\0');
@@ -3142,7 +3142,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // read again after an error would be compared with keys read while the record may
         // have been changing.
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.InstallSource, restarts: null);
+            _msi, code, sid, context, MsiInstallProperty.InstallSource, WalkRestarts.ReadsOnce);
         if (read.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = read.Value.TrimEnd('\0');

@@ -19,10 +19,14 @@ namespace InstallerClean.Helpers;
 /// The reads of one property of one installation, patch or source list are made again the
 /// same way where an answer does not stand (<see cref="KeyedRead"/>).
 ///
-/// One of these serves one pass over the lists, on the thread that makes it.
+/// One of these serves one pass over the lists, or one check under a Move or Delete's lease,
+/// on the thread that makes it.
 /// </summary>
 /// <param name="pause">The wait before a restart.</param>
-internal sealed class WalkRestarts(Action<TimeSpan> pause)
+/// <param name="keyedPauseLimit">
+/// The longest the keyed restarts pause in all, <see cref="KeyedPauseLimit"/> where none is given.
+/// </param>
+internal sealed class WalkRestarts(Action<TimeSpan> pause, TimeSpan? keyedPauseLimit = null)
 {
     /// <summary>
     /// The pause the test suite has every scan make for its whole run, so that no test
@@ -36,8 +40,17 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     /// the scan ends the wait with OperationCanceledException
     /// (<see cref="RegistryNames.Pause"/>).
     /// </summary>
-    internal static WalkRestarts For(CancellationToken cancellationToken, Action<TimeSpan>? pause = null) =>
-        new(pause ?? PauseForTests ?? RegistryNames.Pause(cancellationToken));
+    internal static WalkRestarts For(
+        CancellationToken cancellationToken, Action<TimeSpan>? pause = null, TimeSpan? keyedPauseLimit = null) =>
+        new(pause ?? PauseForTests ?? RegistryNames.Pause(cancellationToken), keyedPauseLimit);
+
+    /// <summary>
+    /// Restarts that make no property read again (<see cref="KeyedRead"/>; never hand them to a
+    /// walk, which they still restart), for a read whose answer is
+    /// compared with what was read before it, so that one read made again after an error would be
+    /// compared with a record read while it may have been changing. Each ask makes a new one.
+    /// </summary>
+    internal static WalkRestarts ReadsOnce => new(_ => { }, TimeSpan.Zero);
 
     /// <summary>How many times one list is walked, in all, before the first walk is taken as it stands.</summary>
     internal const int Attempts = 3;
@@ -47,11 +60,13 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     private static readonly TimeSpan[] PauseBefore = [Durations.FromMilliseconds(50), Durations.FromMilliseconds(250)];
 
     /// <summary>
-    /// The longest the restarts made for one program or patch at a time pause, in all: the
-    /// lists walked for one (<see cref="KeyedWalk"/>) and the properties read for one
-    /// (<see cref="KeyedRead"/>) share it.
+    /// The longest the restarts made for one program or patch at a time pause, in all, where
+    /// no other limit is given: the lists walked for one (<see cref="KeyedWalk"/>) and the
+    /// properties read for one (<see cref="KeyedRead"/>) share it.
     /// </summary>
     internal static readonly TimeSpan KeyedPauseLimit = Durations.FromSeconds(2);
+
+    private readonly TimeSpan _keyedPauseLimit = keyedPauseLimit ?? KeyedPauseLimit;
 
     private TimeSpan _keyedPaused;
 
@@ -66,7 +81,7 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     /// A list the scan walks for one program or patch at a time, or one ask about one.
     /// Where Windows Installer
     /// refuses such a list for one program it can refuse it for every program recorded
-    /// under the same account, so these walks share <see cref="KeyedPauseLimit"/>: a
+    /// under the same account, so these walks share the keyed pause limit: a
     /// restart whose pause would take them past it is made at once, without the pause.
     /// </summary>
     internal T KeyedWalk<T>(Func<T> walk, Func<T, bool> stands) => Run(walk, stands, keyed: true);
@@ -78,7 +93,7 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     /// <summary>
     /// One read of one property of the installation, patch or source list that
     /// <paramref name="key"/> names, made again where its answer does not stand, with the
-    /// pauses keyed walks make and sharing <see cref="KeyedPauseLimit"/> with them.
+    /// pauses keyed walks make and sharing the keyed pause limit with them.
     /// <paramref name="stands"/> says which answers stand on the first read, and where none
     /// stands, the first read is the answer.
     ///
@@ -88,7 +103,7 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     /// Windows Installer answering while a transaction rewrites the record, and a read a
     /// moment later can then show what that transaction wrote and is about to undo. Where
     /// the two reads differ, or the pause between them cannot be made within
-    /// <see cref="KeyedPauseLimit"/>, the first read is the answer.
+    /// the keyed pause limit, the first read is the answer.
     ///
     /// A KEY WHOSE READS MADE AGAIN ANSWERED WITH NOTHING <paramref name="stands"/> ACCEPTS IS
     /// NOT READ AGAIN FOR THE REST OF THE PASS, and nor is any key whose
@@ -122,7 +137,7 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
         {
             // A read made again is taken only once the read after the longer pause agrees with
             // it, so where the limit cannot pay for both pauses nothing more is read.
-            if (_keyedPaused + PauseBefore[attempt - 1] + PauseBefore[^1] > KeyedPauseLimit) return first;
+            if (_keyedPaused + PauseBefore[attempt - 1] + PauseBefore[^1] > _keyedPauseLimit) return first;
 
             Wait(attempt - 1, keyed: true);
             var again = read();
@@ -161,11 +176,11 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     }
 
     // The pause PauseBefore[index] names, cut to nothing where keyed restarts would pass
-    // KeyedPauseLimit. False where it was cut.
+    // the limit. False where it was cut.
     private bool Wait(int index, bool keyed)
     {
         var wait = PauseBefore[index];
-        if (keyed && _keyedPaused + wait > KeyedPauseLimit) return false;
+        if (keyed && _keyedPaused + wait > _keyedPauseLimit) return false;
         if (keyed) _keyedPaused += wait;
 
         pause(wait);

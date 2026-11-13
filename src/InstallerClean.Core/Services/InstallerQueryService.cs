@@ -5332,6 +5332,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         internal static bool StandsWhereListedAsHeld(PropertyRead read) => !read.Unreadable;
 
         /// <summary>
+        /// The answers that stand for a read under the lease of a batch's own pairing: a value, a
+        /// property present and empty, a property not set, and the answer that the record is not
+        /// there (<see cref="NotRegistered"/>). That last is the finding that the registration has
+        /// gone, and it holds the file back. Every other answer is read again.
+        /// </summary>
+        internal static bool StandsUnderTheLease(PropertyRead read) => !read.Unreadable || read.NotRegistered;
+
+        /// <summary>
         /// The answers that stand for a read made after one that did not: a value, and
         /// nothing else. A record that a transaction is rewriting can read as absent for a
         /// moment, so an answer that the property is not set, is empty, or that the
@@ -5577,7 +5585,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// would read as ordinary on a string test.
     /// </summary>
     internal static InstanceReading ReadInstanceType(
-        IMsiApi msi, string productCode, string? userSid, MsiInstallContext context, WalkRestarts? restarts)
+        IMsiApi msi, string productCode, string? userSid, MsiInstallContext context, WalkRestarts restarts)
     {
         var read = ReadProductProperty(msi, productCode, userSid, context, MsiInstallProperty.InstanceType, restarts);
         if (read.Unreadable) return InstanceReading.Unreadable;
@@ -5595,7 +5603,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string? userSid,
         MsiInstallContext context,
         string propertyName,
-        WalkRestarts? restarts) =>
+        WalkRestarts restarts) =>
         ReadProductProperty(_msi, productCode, userSid, context, propertyName, restarts);
 
     /// <summary>
@@ -5610,8 +5618,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// A read whose answer does not stand is made again, the sizing call and the value
     /// call both, with <paramref name="restarts"/>' pauses (<see cref="ReadAgainWhereItFails"/>),
-    /// and where no read made again stands the first is the answer. A null
-    /// <paramref name="restarts"/> reads once. The reads of one installation share a key,
+    /// and where no read made again stands the first is the answer
+    /// (<see cref="WalkRestarts.ReadsOnce"/> makes none). The reads of one installation share a key,
     /// except its name's, which has its own: the name labels a row, so a name that will not
     /// read never stops the installation's other properties being read again.
     /// </summary>
@@ -5621,7 +5629,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string? userSid,
         MsiInstallContext context,
         string propertyName,
-        WalkRestarts? restarts) =>
+        WalkRestarts restarts) =>
         ReadAgainWhereItFails(
             restarts,
             () => ReadProductPropertyOnce(msi, productCode, userSid, context, propertyName),
@@ -5698,7 +5706,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string? userSid,
         MsiInstallContext context,
         string propertyName,
-        WalkRestarts? restarts,
+        WalkRestarts restarts,
         Func<PropertyRead, bool>? stands = null) =>
         ReadAgainWhereItFails(
             restarts,
@@ -5776,7 +5784,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         MsiInstallContext context,
         uint codeKind,
         string propertyName,
-        WalkRestarts? restarts) =>
+        WalkRestarts restarts) =>
         ReadAgainWhereItFails(
             restarts,
             () => ReadSourceListPropertyOnce(msi, code, userSid, context, codeKind, propertyName),
@@ -5784,23 +5792,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
             () => SourceListKey(code, userSid, context, codeKind));
 
     /// <summary>
-    /// One property read, made once where <paramref name="restarts"/> is null and otherwise
-    /// made again where its answer does not stand (<see cref="WalkRestarts.KeyedRead"/>).
+    /// One property read, made again where its answer does not stand
+    /// (<see cref="WalkRestarts.KeyedRead"/>).
     /// <paramref name="stands"/> says which first answers stand,
     /// <see cref="PropertyRead.StandsInTheScan"/> where none is given; after one that did
     /// not, only a value stands (<see cref="PropertyRead.StandsAfterAnError"/>).
     /// </summary>
     private static PropertyRead ReadAgainWhereItFails(
-        WalkRestarts? restarts,
+        WalkRestarts restarts,
         Func<PropertyRead> once,
         Func<PropertyRead, bool>? stands,
         Func<string> key,
         Func<string>? within = null,
         Func<PropertyRead, bool>? spendsWithin = null) =>
-        restarts is null
-            ? once()
-            : restarts.KeyedRead(key, once, stands ?? PropertyRead.StandsInTheScan,
-                PropertyRead.StandsAfterAnError, PropertyRead.Agree, within, spendsWithin);
+        restarts.KeyedRead(key, once, stands ?? PropertyRead.StandsInTheScan,
+            PropertyRead.StandsAfterAnError, PropertyRead.Agree, within, spendsWithin);
 
     /// <summary>
     /// The key one installation's reads share in <see cref="WalkRestarts.KeyedRead"/>:
