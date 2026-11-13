@@ -4,58 +4,45 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// Where the space goes for a Move through a share (<see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/>):
-/// the volume serial number the share's folder carries, against the cache root's. A scripted
-/// reader stands in for both reads, so nothing here reaches a network.
+/// Where the space goes for a Move through a share whose server is not this PC by name
+/// (<see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/>): the volume serial number the
+/// share's folder carries, against the cache root's. A scripted reader stands in for both
+/// reads, so nothing here reaches a network. A share this PC serves is asked through its
+/// server service, in <c>MoveSpaceCheckShareIntegrationTests</c>.
 /// </summary>
 public class MoveSpaceCheckShareTests
 {
     private const string CacheRoot = @"C:\Windows\Installer";
-    private const string ThroughTheShare = @"\\localhost\C$\ICProbe-moved";
+    private const string OtherPC = @"\\otherpc\C$\ICProbe-moved";
 
     [Fact]
-    public void A_share_folder_on_the_cache_volume_is_the_same_drive()
+    public void A_matching_serial_number_on_a_server_that_is_not_this_PC_is_not_settled()
     {
-        var reader = new Identities(FileIdentityRead.NamesNothing);
-        reader.Reads(CacheRoot, serial: 7);
-        reader.Reads(@"\\localhost\C$\", serial: 7);
-
-        Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            ThroughTheShare, CacheRoot, reader, Share(local: (_, _) => @"C:\ICProbe-moved")));
-        Assert.Equal([CacheRoot, ThroughTheShare, @"\\localhost\C$\"], reader.Asked);
-    }
-
-    [Fact]
-    public void A_matching_serial_number_whose_folder_does_not_open_here_is_not_settled()
-    {
-        var reader = new Identities(FileIdentityRead.NamesNothing);
-        reader.Reads(CacheRoot, serial: 7);
-        reader.Reads(ThroughTheShare, serial: 7);
-        var confirmedAgainst = new List<string>();
+        // Another computer imaged from the same disk, or this PC under an alias.
+        var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
+        reader.Reads(OtherPC, serial: 7);
+        var asked = new List<string>();
 
         Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            ThroughTheShare, CacheRoot, reader, Share(local: (share, roots) => { confirmedAgainst.AddRange(roots); return null; })));
-        Assert.Equal([CacheRoot], confirmedAgainst);
+            OtherPC, CacheRoot, reader, Share(names: server => { asked.Add(server); return false; })));
+        Assert.Equal(["otherpc"], asked);
     }
 
     [Fact]
     public void A_share_folder_on_another_volume_is_another_drive()
     {
-        var reader = new Identities(FileIdentityRead.NamesNothing);
-        reader.Reads(CacheRoot, serial: 7);
-        reader.Reads(ThroughTheShare, serial: 8);
+        var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
+        reader.Reads(OtherPC, serial: 8);
 
-        Assert.False(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            ThroughTheShare, CacheRoot, reader, Share(local: (_, _) => throw new InvalidOperationException("confirmed a serial that did not match"))));
+        Assert.False(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(OtherPC, CacheRoot, reader, Share()));
     }
 
     [Fact]
     public void A_share_that_gives_no_file_id_is_another_drive()
     {
-        var reader = new Identities(FileIdentityRead.IdentityUnavailable);
-        reader.Reads(CacheRoot, serial: 7);
+        var reader = WithRoot(new Identities(FileIdentityRead.IdentityUnavailable));
 
-        Assert.False(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(ThroughTheShare, CacheRoot, reader));
+        Assert.False(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(OtherPC, CacheRoot, reader, Share()));
     }
 
     [Theory]
@@ -63,10 +50,9 @@ public class MoveSpaceCheckShareTests
     [InlineData(FileIdentityRead.Faulted)]
     public void A_share_folder_that_will_not_read_is_not_settled(FileIdentityRead outcome)
     {
-        var reader = new Identities(outcome);
-        reader.Reads(CacheRoot, serial: 7);
+        var reader = WithRoot(new Identities(outcome));
 
-        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(ThroughTheShare, CacheRoot, reader));
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(OtherPC, CacheRoot, reader, Share()));
     }
 
     [Fact]
@@ -74,81 +60,74 @@ public class MoveSpaceCheckShareTests
     {
         var reader = new Identities(FileIdentityRead.NamesNothing);
         reader.Answers(CacheRoot, FileIdentityRead.OpenRefused);
-        reader.Reads(ThroughTheShare, serial: 7);
+        reader.Reads(OtherPC, serial: 8);
 
-        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(ThroughTheShare, CacheRoot, reader));
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(OtherPC, CacheRoot, reader, Share()));
     }
 
     [Theory]
-    [InlineData(@"\\localhost\C$\ICProbe-moved", @"\\localhost\C$\")]
-    [InlineData(@"\\?\UNC\localhost\C$\ICProbe-moved", @"\\?\UNC\localhost\C$\")]
+    [InlineData(@"\\otherpc\C$\ICProbe-moved", @"\\otherpc\C$\")]
+    [InlineData(@"\\?\UNC\otherpc\C$\ICProbe-moved", @"\\?\UNC\otherpc\C$\")]
     public void A_share_with_nothing_there_up_to_its_root_is_not_settled(string destination, string shareRoot)
     {
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
 
-        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination, CacheRoot, reader));
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination, CacheRoot, reader, Share()));
         Assert.Equal([CacheRoot, destination, shareRoot], reader.Asked);
     }
 
     [Theory]
-    [InlineData(@"\\localhost\C$")]
-    [InlineData(@"\\localhost\C$\")]
+    [InlineData(@"\\otherpc\C$")]
+    [InlineData(@"\\otherpc\C$\")]
+    [InlineData(@"//otherpc/C$")]
     public void A_share_root_given_as_the_destination_is_read_with_its_separator(string destination)
     {
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
-        reader.Reads(@"\\localhost\C$\", serial: 7);
+        reader.Reads(@"\\otherpc\C$\", serial: 8);
 
-        Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            destination, CacheRoot, reader, Share(local: (_, _) => @"C:\")));
-        Assert.Equal([CacheRoot, @"\\localhost\C$\"], reader.Asked);
+        Assert.False(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination, CacheRoot, reader, Share()));
+        Assert.Equal(2, reader.Asked.Count);
+        Assert.EndsWith("C$" + Path.DirectorySeparatorChar, reader.Asked[1]);
     }
 
     [Fact]
-    public void A_matching_serial_number_on_a_server_that_is_not_this_PC_is_not_settled()
+    public void A_server_this_PC_serves_is_asked_of_its_server_service_and_not_by_file_id()
     {
-        // Another computer imaged from the same disk: the same serial number, and its folder's
-        // id opens here as the folder of the same names.
-        const string imaged = @"\\otherpc\C$\ICProbe-moved";
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
-        reader.Reads(@"\\otherpc\C$\", serial: 7);
-        var asked = new List<string?>();
+        var shares = new List<string>();
 
         Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            imaged, CacheRoot, reader,
-            Share(names: server => { asked.Add(server); return false; }, local: (_, _) => @"C:\ICProbe-moved")));
-        Assert.Equal(["otherpc"], asked);
+            @"\\localhost\C$\ICProbe-moved", CacheRoot, reader,
+            Share(names: _ => true, local: name => { shares.Add(name); return null; })));
+        Assert.Equal(["C$"], shares);
+        Assert.Empty(reader.Asked);
     }
 
     [Fact]
-    public void A_share_is_confirmed_by_the_share_path_it_resolves_to()
+    public void A_destination_is_asked_by_its_share_spelling()
     {
         // As a drive mapped onto a share resolves to the share's own spelling.
-        const string alias = @"\\ic-alias\C$\ICProbe-moved";
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
-        reader.Reads(@"\\ic-alias\C$\", serial: 7);
-        var server = new List<string?>();
-        var confirmed = new List<string>();
-
-        Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            alias, CacheRoot, reader,
-            Share(
-                resolve: _ => ThroughTheShare,
-                names: name => { server.Add(name); return true; },
-                local: (share, _) => { confirmed.Add(share); return @"C:\ICProbe-moved"; })));
-        Assert.Equal(["localhost"], server);
-        Assert.Equal([ThroughTheShare], confirmed);
-    }
-
-    [Fact]
-    public void A_matching_serial_number_whose_destination_does_not_resolve_is_not_settled()
-    {
-        var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
-        reader.Reads(ThroughTheShare, serial: 7);
+        var servers = new List<string>();
+        var shares = new List<string>();
 
         Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            ThroughTheShare, CacheRoot, reader,
-            Share(resolve: _ => null, local: (_, _) => throw new InvalidOperationException("asked an unresolved path"))));
+            @"\\ic-alias\backup\ICProbe-moved", CacheRoot, reader,
+            Share(
+                toShare: _ => @"\\localhost\D$\ICProbe-moved",
+                names: name => { servers.Add(name); return true; },
+                local: name => { shares.Add(name); return null; })));
+        Assert.Equal(["localhost"], servers);
+        Assert.Equal(["D$"], shares);
     }
+
+    [Theory]
+    [InlineData(@"\\localhost\C$\Moved", @"\\localhost\C$\Moved")]
+    [InlineData(@"\\?\UNC\localhost\C$\Moved", @"\\localhost\C$\Moved")]
+    [InlineData(@"\\?\unc\localhost\C$\Moved", @"\\localhost\C$\Moved")]
+    [InlineData(@"//localhost/C$/Moved", @"\\localhost\C$\Moved")]
+    public void A_share_spelling_is_taken_as_written_with_backslashes(string destination, string sharePath) =>
+        Assert.Equal(sharePath, ShareReads.Production.ToSharePath(destination));
 
     [Fact]
     public void A_Move_through_a_share_on_the_cache_volume_still_copies_and_is_still_measured()
@@ -156,18 +135,19 @@ public class MoveSpaceCheckShareTests
         // Where the space ends up and whether the Move copies are two questions, and they
         // part here: the space stays on the cache's volume, and each file is still copied
         // through the share.
-        Assert.False(MoveSpaceCheck.RenamesOnInstallerCacheDrive(ThroughTheShare));
-        Assert.Equal(500L, MoveSpaceCheck.RefusalFreeSpace(ThroughTheShare, 1_000, 500));
+        const string throughTheShare = @"\\localhost\C$\ICProbe-moved";
+        Assert.False(MoveSpaceCheck.RenamesOnInstallerCacheDrive(throughTheShare));
+        Assert.Equal(500L, MoveSpaceCheck.RefusalFreeSpace(throughTheShare, 1_000, 500));
     }
 
     /// <summary>
-    /// Scripted share reads: the destination resolves to itself and its server is this PC
-    /// unless a test says otherwise.
+    /// Scripted share reads: the destination is its own share spelling, its server is not this
+    /// PC, and the server service knows no share, unless a test says otherwise.
     /// </summary>
     private static ShareReads Share(
-        Func<string, string?>? resolve = null, Func<string?, bool>? names = null, LocalPathReader? local = null) =>
-        new(resolve ?? (destination => destination), names ?? (_ => true),
-            local ?? ((_, _) => throw new InvalidOperationException("no local path scripted")));
+        Func<string, string?>? toShare = null, Func<string, bool>? names = null, Func<string, string?>? local = null) =>
+        new(toShare ?? (destination => destination), names ?? (_ => false),
+            local ?? (_ => throw new InvalidOperationException("the server service was asked")));
 
     private static Identities WithRoot(Identities reader)
     {

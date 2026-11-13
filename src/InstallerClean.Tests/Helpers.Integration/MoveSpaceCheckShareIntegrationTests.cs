@@ -6,9 +6,8 @@ namespace InstallerClean.Tests.Helpers.Integration;
 
 /// <summary>
 /// Where the space goes for a Move through this PC's own admin share, with nothing scripted:
-/// the destination's nearest folder is read through the share, its volume serial number is
-/// compared with the cache root's, and the match is confirmed by reopening the same id on the
-/// cache's volume.
+/// this PC's server service gives the share's local path, and that path is asked by its
+/// volume.
 /// </summary>
 public class MoveSpaceCheckShareIntegrationTests
 {
@@ -22,10 +21,8 @@ public class MoveSpaceCheckShareIntegrationTests
     }
 
     [Fact]
-    public void A_share_destination_whose_folders_are_not_there_is_read_at_the_share_root()
+    public void A_share_destination_whose_folders_are_not_there_is_the_cache_drive()
     {
-        // Neither folder is there, so the walk ends on the share's root, asked with its
-        // trailing separator. That root is the cache drive's own root through the share.
         var destination = Path.Combine(CacheDriveShare(), $"ic-not-there-{Guid.NewGuid():N}", "Moved");
 
         Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination));
@@ -33,7 +30,7 @@ public class MoveSpaceCheckShareIntegrationTests
     }
 
     [Fact]
-    public void A_share_destination_below_a_folder_that_is_there_is_read_at_that_folder()
+    public void A_share_destination_below_a_folder_that_is_there_is_the_cache_drive()
     {
         var windows = KnownFolders.GetPath(Environment.SpecialFolder.Windows);
         var throughTheShare = CacheDriveShare() + windows.Substring(3);
@@ -44,14 +41,26 @@ public class MoveSpaceCheckShareIntegrationTests
     }
 
     [Fact]
-    public void The_production_reads_resolve_a_share_to_its_share_path_and_a_local_folder_to_nothing()
+    public void This_PCs_server_service_gives_the_admin_share_its_drive_root()
     {
-        var throughTheShare = Path.Combine(CacheDriveShare(), $"ic-not-there-{Guid.NewGuid():N}");
-        var resolved = ShareReads.Production.Resolve(throughTheShare);
+        var root = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
-        Assert.NotNull(resolved);
-        Assert.Equal("localhost", ThisPCName.ServerOf(resolved!), ignoreCase: true);
-        Assert.True(ShareReads.Production.NamesThisPC(ThisPCName.ServerOf(resolved!)));
-        Assert.Null(ShareReads.Production.Resolve(KnownFolders.GetPath(Environment.SpecialFolder.Windows)));
+        Assert.Equal(root, ThisPCName.LocalPathOfShare(root.Substring(0, 1) + "$"), ignoreCase: true);
+        Assert.Null(ThisPCName.LocalPathOfShare("ic-not-a-share-0f3a"));
+    }
+
+    [Fact]
+    public void A_share_this_PC_serves_whose_local_path_is_on_no_volume_is_not_settled()
+    {
+        // The service gives the share's local path, and that path is asked by its volume.
+        var reads = new ShareReads(d => d, _ => true, _ => @"\\?\Volume{00000000-0000-0000-0000-000000000000}\");
+
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(@"\\localhost\ic-share\Moved", share: reads));
+    }
+
+    [Fact]
+    public void The_production_reads_give_a_mapped_spelling_nothing_where_it_is_no_share()
+    {
+        Assert.Null(ShareReads.Production.ToSharePath(KnownFolders.GetPath(Environment.SpecialFolder.Windows)));
     }
 }

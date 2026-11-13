@@ -1,45 +1,76 @@
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using InstallerClean.Interop.Native;
+using InstallerClean.Services;
 
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Whether a share's server name is this PC by one of its own names: <c>localhost</c>,
-/// <c>127.0.0.1</c> or <c>::1</c>, the computer name, the host name alone or with one of the
-/// PC's own DNS suffixes or <c>.local</c>, or one of the PC's own IP addresses. Any other
-/// name answers false, an alias of this PC made in a hosts file or in DNS included, so a
-/// caller treats false as "not established", never as "another computer".
+/// This PC as a share's server: whether a server name is this PC by one of its own names, and
+/// where one of this PC's shares is on its own disks.
 /// </summary>
 internal static class ThisPCName
 {
     private const string Ipv6LiteralSuffix = ".ipv6-literal.net";
 
+    /// <summary>
+    /// Whether <paramref name="server"/> is this PC by one of its own names: <c>localhost</c>,
+    /// <c>127.0.0.1</c>, the IPv6 loopback as a share path writes it (<c>--1.ipv6-literal.net</c>),
+    /// the computer name, the host name, or one of this PC's own addresses that is not
+    /// link-local, written as Windows writes it. Any other name answers false: one that
+    /// resolves through DNS, mDNS or a hosts file can reach another computer, and so can
+    /// another loopback address forwarded by a tunnel. So a caller treats false as "not
+    /// established", never as "another computer".
+    /// </summary>
     internal static bool Names(string? server)
     {
         if (string.IsNullOrWhiteSpace(server)) return false;
-        var name = server!.Trim().TrimEnd('.');
+        var name = server!.Trim();
 
         if (name.Equals("localhost", StringComparison.OrdinalIgnoreCase)) return true;
+        if (name == "127.0.0.1") return true;
+        if (name.Equals("--1" + Ipv6LiteralSuffix, StringComparison.OrdinalIgnoreCase)
+            || name.Equals("0--1" + Ipv6LiteralSuffix, StringComparison.OrdinalIgnoreCase))
+            return true;
         if (name.Equals(Environment.MachineName, StringComparison.OrdinalIgnoreCase)) return true;
-        if (NamesThisHost(name)) return true;
-
-        var address = AddressIn(name);
-        if (address is null) return false;
-
-        // 127.0.0.1 and ::1 alone: another loopback address can be forwarded to another
-        // computer, as a tunnel does.
-        if (address.Equals(IPAddress.Loopback) || address.Equals(IPAddress.IPv6Loopback)) return true;
 
         try
         {
-            var bytes = address.GetAddressBytes();
+            if (name.Equals(Dns.GetHostName(), StringComparison.OrdinalIgnoreCase)) return true;
+        }
+        catch (SocketException)
+        {
+        }
+
+        return IsOwnAddress(name);
+    }
+
+    /// <summary>
+    /// Whether <paramref name="name"/> is one of this PC's own unicast addresses that is not
+    /// link-local, as <see cref="IPAddress.ToString"/> writes it, or for IPv6 as a share path
+    /// writes it, its colons as dashes and with no zone.
+    /// </summary>
+    private static bool IsOwnAddress(string name)
+    {
+        try
+        {
             foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces())
                 foreach (var unicast in adapter.GetIPProperties().UnicastAddresses)
-                    if (unicast.Address.AddressFamily == address.AddressFamily
-                        && Enumerable.SequenceEqual(unicast.Address.GetAddressBytes(), bytes))
+                {
+                    var address = unicast.Address;
+                    if (address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        if (name == address.ToString()) return true;
+                    }
+                    else if (address.AddressFamily == AddressFamily.InterNetworkV6
+                        && !address.IsIPv6LinkLocal && address.ScopeId == 0
+                        && name.Equals(address.ToString().Replace(':', '-') + Ipv6LiteralSuffix, StringComparison.OrdinalIgnoreCase))
+                    {
                         return true;
+                    }
+                }
         }
         catch (NetworkInformationException)
         {
@@ -49,68 +80,43 @@ internal static class ThisPCName
     }
 
     /// <summary>
-    /// Whether <paramref name="name"/> is this PC's host name, alone or with its primary DNS
-    /// suffix, a suffix one of its network adapters has, or <c>.local</c>.
+    /// The local path of <paramref name="share"/>, one of this PC's own shares, as this PC's
+    /// server service records it (<c>C$</c> gives <c>C:\</c>); null where the service does not
+    /// know the share or will not say.
     /// </summary>
-    private static bool NamesThisHost(string name)
+    internal static string? LocalPathOfShare(string share)
     {
+        var buffer = IntPtr.Zero;
         try
         {
-            var host = Dns.GetHostName();
-            if (name.Equals(host, StringComparison.OrdinalIgnoreCase)) return true;
-            if (!name.StartsWith(host + ".", StringComparison.OrdinalIgnoreCase)) return false;
+            if (Netapi32.NetShareGetInfo(null, share, 2, out buffer) != Netapi32.NERR_Success || buffer == IntPtr.Zero)
+                return null;
 
-            var suffix = name.Substring(host.Length + 1);
-            if (suffix.Equals("local", StringComparison.OrdinalIgnoreCase)) return true;
-            if (suffix.Equals(IPGlobalProperties.GetIPGlobalProperties().DomainName.TrimEnd('.'), StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces())
-                if (suffix.Equals(adapter.GetIPProperties().DnsSuffix?.TrimEnd('.'), StringComparison.OrdinalIgnoreCase))
-                    return true;
+            var info = (Netapi32.SHARE_INFO_2)Marshal.PtrToStructure(buffer, typeof(Netapi32.SHARE_INFO_2))!;
+            var path = info.shi2_path == IntPtr.Zero ? null : Marshal.PtrToStringUni(info.shi2_path);
+            return string.IsNullOrEmpty(path) ? null : path;
         }
-        catch (Exception ex) when (ex is SocketException or NetworkInformationException)
+        finally
         {
+            if (buffer != IntPtr.Zero) Netapi32.NetApiBufferFree(buffer);
         }
-
-        return false;
     }
 
     /// <summary>
-    /// The IP address <paramref name="name"/> spells: a dotted IPv4 address, or an IPv6
-    /// address as a share path writes one, <c>fe80--1s4.ipv6-literal.net</c>, its colons
-    /// as dashes and its zone after an <c>s</c>. Null where it spells none.
+    /// The server and share of a share path spelled <c>\\server\share\...</c>, and the part
+    /// below the share; false for any other path, <c>\\?\</c> and <c>\\.\</c> paths included.
     /// </summary>
-    private static IPAddress? AddressIn(string name)
+    internal static bool TrySplit(string sharePath, out string server, out string share, out string below)
     {
-        if (name.EndsWith(Ipv6LiteralSuffix, StringComparison.OrdinalIgnoreCase))
-        {
-            var literal = name.Substring(0, name.Length - Ipv6LiteralSuffix.Length).Replace('-', ':');
-            var zone = literal.IndexOf('s');
-            if (zone >= 0) literal = literal.Substring(0, zone);
-            return IPAddress.TryParse(literal, out var v6) && v6.AddressFamily == AddressFamily.InterNetworkV6 ? v6 : null;
-        }
+        server = share = below = "";
+        if (!InstallerCacheHelpers.IsUncPath(sharePath)) return false;
 
-        return IPAddress.TryParse(name, out var address) && address.AddressFamily == AddressFamily.InterNetwork
-            ? address
-            : null;
-    }
+        var parts = sharePath.Substring(2).Split(['\\', '/'], 3);
+        if (parts.Length < 2 || parts[0].Length == 0 || parts[1].Length == 0) return false;
 
-    /// <summary>
-    /// The server of a share path spelled <c>\\server\share\...</c>, as the kernel's
-    /// resolution of a share or a drive mapped onto one spells it; null for any other path,
-    /// <c>\\?\</c> and <c>\\.\</c> paths included.
-    /// </summary>
-    internal static string? ServerOf(string sharePath)
-    {
-        if (sharePath.Length < 3
-            || !PathText.IsDirectorySeparator(sharePath[0]) || !PathText.IsDirectorySeparator(sharePath[1])
-            || sharePath.StartsWith(@"\\?\", StringComparison.Ordinal)
-            || sharePath.StartsWith(@"\\.\", StringComparison.Ordinal))
-            return null;
-
-        var end = sharePath.IndexOfAny(['\\', '/'], 2);
-        var server = end < 0 ? sharePath.Substring(2) : sharePath.Substring(2, end - 2);
-        return server.Length == 0 ? null : server;
+        server = parts[0];
+        share = parts[1];
+        below = parts.Length == 3 ? parts[2].Trim('\\', '/') : "";
+        return true;
     }
 }
