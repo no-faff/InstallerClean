@@ -1081,7 +1081,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // here means the database is corrupt or inaccessible; silently
         // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
+            throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty, Strings.Error_NothingRemoved);
 
         var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, restarts, ct);
 
@@ -1163,7 +1163,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // a loss from two counts that can differ for innocent reasons, which is
         // sound enough to withhold on and not to refuse on.
         if (unreadableProducts > 0 && fallback.Failures > 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
 
         // An enumeration that ends EARLY says nothing about itself: a
         // NoMoreItems at index 3 of 200 sets reachedEnd and leaves unreadableRows
@@ -4951,7 +4951,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             if (error == MsiError.AccessDenied)
-                return (results, unreadableRows, new LocalisedAccessException(Strings.Error_MsiAccessDenied), true);
+                return (results, unreadableRows, new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved), true);
 
             lastError = error;
 
@@ -5000,7 +5000,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (unreadableRows > 0)
             return (results, unreadableRows, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiNonSuccess, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count))), true);
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), true);
 
         // Hitting the index cap is not a clean end: the enumeration ran out of
         // budget rather than reporting NoMoreItems, so everything past the cap
@@ -5015,7 +5015,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (!reachedEnd)
             return (results, unreadableRows, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count))), false);
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), false);
 
         return (results, unreadableRows, null, false);
     }
@@ -5154,7 +5154,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // returns Incomplete, where a break would return with the flag
                 // still false. The scan command's catch routes this to a dialog
                 // and to crash.log.
-                return (results, incomplete, null, new LocalisedAccessException(Strings.Error_MsiAccessDenied), true);
+                return (results, incomplete, null, new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved), true);
 
             lastError = error;
 
@@ -5228,7 +5228,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (!reachedEnd)
             return (results, incomplete, null, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, MaxPatchIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count))), false);
+                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count)), Strings.Error_NothingRemoved), false);
 
         return (results, incomplete, null, null, incomplete);
     }

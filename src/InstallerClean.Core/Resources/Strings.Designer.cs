@@ -440,6 +440,8 @@ public static class Strings
     public static string Error_MsiPatchEnumerationNeverEnded => Get("Error.MsiPatchEnumerationNeverEnded");
     public static string Error_NotEnoughSpaceBody => Get("Error.NotEnoughSpaceBody");
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
+    public static string Error_NothingOfferedNothingRemoved => Get("Error.NothingOfferedNothingRemoved");
+    public static string Error_NothingRemoved => Get("Error.NothingRemoved");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
     public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");

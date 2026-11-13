@@ -57,7 +57,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, null, Path.Combine(_fakeInstallerDir, "absent")).ScanAsync());
 
-        Assert.Equal(Strings.Error_ScanInstallerFolderNotFound, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(Strings.Error_ScanInstallerFolderNotFound), ex.Message);
         Assert.IsAssignableFrom<DirectoryNotFoundException>(ex.InnerException);
         await query.DidNotReceive().GetRegisteredPackagesAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -89,7 +89,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
                 new FileSystemScanService(query, null, refused).ScanAsync());
 
-            Assert.Equal(Strings.Error_ScanInstallerFolderListFailed, ex.Message);
+            Assert.Equal(StopMessages.NothingOfferedNothingRemoved(Strings.Error_ScanInstallerFolderListFailed), ex.Message);
             Assert.IsType<UnauthorizedAccessException>(ex.InnerException);
             await query.DidNotReceive().GetRegisteredPackagesAsync(
                 Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -609,7 +609,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
                 new FileSystemScanService(query, null, link).ScanAsync());
 
-            Assert.Equal(string.Format(Strings.Error_ScanInstallerFolderElsewhere, root.Resolved), ex.Message);
+            Assert.Equal(StopMessages.NothingOfferedNothingRemoved(string.Format(Strings.Error_ScanInstallerFolderElsewhere, root.Resolved)), ex.Message);
             await query.DidNotReceiveWithAnyArgs().GetRegisteredPackagesAsync(default, default);
         }
         finally

@@ -4,6 +4,7 @@ using InstallerClean.Interop;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services;
 
@@ -792,7 +793,7 @@ public class InstallerQueryServiceUnitTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(
             () => Run(msi, fallbackFailures: 1));
 
-        Assert.Equal(Strings.Error_ScanRecordsUnreadable, ex.Message);
+        Assert.Equal(StopMessages.NothingRemoved(Strings.Error_ScanRecordsUnreadable), ex.Message);
     }
 
     [Fact]
@@ -1062,7 +1063,7 @@ public class InstallerQueryServiceUnitTests
 
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
-        Assert.Equal(Strings.Error_InstallerDbEmpty, ex.Message);
+        Assert.Equal(StopMessages.NothingRemoved(Strings.Error_InstallerDbEmpty), ex.Message);
     }
 
     [Fact]
@@ -1105,8 +1106,8 @@ public class InstallerQueryServiceUnitTests
         // the cap itself. That makes this assertion unable to tell the two apart, which
         // is what The_stop_message_says_how_many_products_were_read_before_it is for.
         Assert.Equal(
-            string.Format(Strings.Error_MsiEnumerationNeverEnded, 10_000, MsiError.Success,
-                10_000, DisplayHelpers.PluraliseProduct(10_000)),
+            StopMessages.NothingRemoved(string.Format(Strings.Error_MsiEnumerationNeverEnded, 10_000, MsiError.Success,
+                10_000, DisplayHelpers.PluraliseProduct(10_000))),
             ex.Message);
     }
 
@@ -1123,8 +1124,8 @@ public class InstallerQueryServiceUnitTests
         // this enumeration walks one program's patch list. Same coincidence as above,
         // every index answering with a patch.
         Assert.Equal(
-            string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, 10_000, MsiError.Success,
-                10_000, DisplayHelpers.PluralisePatch(10_000)),
+            StopMessages.NothingRemoved(string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, 10_000, MsiError.Success,
+                10_000, DisplayHelpers.PluralisePatch(10_000))),
             ex.Message);
     }
 
@@ -1145,7 +1146,7 @@ public class InstallerQueryServiceUnitTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
         Assert.Equal(
-            string.Format(Strings.Error_MsiNonSuccess, 1603u, 1, DisplayHelpers.PluraliseProduct(1)),
+            StopMessages.NothingRemoved(string.Format(Strings.Error_MsiNonSuccess, 1603u, 1, DisplayHelpers.PluraliseProduct(1))),
             ex.Message);
     }
 
@@ -1162,7 +1163,7 @@ public class InstallerQueryServiceUnitTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
         Assert.Equal(
-            string.Format(Strings.Error_MsiNonSuccess, MsiError.Success, 1, DisplayHelpers.PluraliseProduct(1)),
+            StopMessages.NothingRemoved(string.Format(Strings.Error_MsiNonSuccess, MsiError.Success, 1, DisplayHelpers.PluraliseProduct(1))),
             ex.Message);
     }
 
@@ -1181,7 +1182,7 @@ public class InstallerQueryServiceUnitTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
         Assert.Equal(
-            string.Format(Strings.Error_MsiNonSuccess, MoreData, 1, DisplayHelpers.PluraliseProduct(1)),
+            StopMessages.NothingRemoved(string.Format(Strings.Error_MsiNonSuccess, MoreData, 1, DisplayHelpers.PluraliseProduct(1))),
             ex.Message);
     }
 
@@ -1214,7 +1215,7 @@ public class InstallerQueryServiceUnitTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
         Assert.Equal(
-            string.Format(Strings.Error_MsiNonSuccess, 1603u, 3, DisplayHelpers.PluraliseProduct(3)),
+            StopMessages.NothingRemoved(string.Format(Strings.Error_MsiNonSuccess, 1603u, 3, DisplayHelpers.PluraliseProduct(3))),
             ex.Message);
     }
 
@@ -2187,7 +2188,7 @@ public class InstallerQueryServiceUnitTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(
             () => Run(msi, fallbackFailures: 1));
 
-        Assert.Equal(Strings.Error_ScanRecordsUnreadable, ex.Message);
+        Assert.Equal(StopMessages.NothingRemoved(Strings.Error_ScanRecordsUnreadable), ex.Message);
     }
 
     [Fact]
