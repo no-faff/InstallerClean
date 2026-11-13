@@ -209,7 +209,8 @@ public class ResultLogEntryTests
         Os: "Windows 11 (X64)",
         Machine: SampleMachine(),
         Scan: SampleScan(),
-        Operation: SampleOperation());
+        Operation: SampleOperation(),
+        ReportId: Guid.Parse("0b6e4d2a-91c3-4f58-a7e0-3d5c8b1f9a46"));
 
     [Fact]
     public void Serialises_bytesFreed_not_bytesCleared()
@@ -232,15 +233,15 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void Schema_version_is_twelve()
+    public void Schema_version_is_thirteen()
     {
         // The receiving Edge Function field-validates per version and holds each version a
         // release sends to its exact set of keys, every count in it required; a version it
         // does not know goes to its lenient v<n>-unknown/ path. So a key added to or taken
         // from what a version carries moves the version once a release sends it, and this
-        // pin makes that move a deliberate, reviewed act. Schema 12 is schema 11 with one key
-        // appended under scan.
-        Assert.Equal(12, ResultLogEntry.CurrentSchemaVersion);
+        // pin makes that move a deliberate, reviewed act. Schema 13 is schema 12 with reportId
+        // appended at the top level.
+        Assert.Equal(13, ResultLogEntry.CurrentSchemaVersion);
     }
 
     [Fact]
@@ -257,7 +258,7 @@ public class ResultLogEntryTests
         var root = doc.RootElement;
 
         Assert.Equal(
-            ["schemaVersion", "app", "os", "machine", "scan", "operation"],
+            ["schemaVersion", "app", "os", "machine", "scan", "operation", "reportId"],
             root.EnumerateObject().Select(p => p.Name));
 
         Assert.Equal(
@@ -1117,6 +1118,33 @@ public class ResultLogEntryTests
             Assert.Equal(expectedHost, entry.App.Host);
             Assert.Equal(expectedCopy, entry.App.CopyKind);
         }
+    }
+
+    // The receiver keeps one report per id, so each report the factories make gets its own,
+    // in the form the receiver takes: 36 characters, lower case.
+    [Fact]
+    public void Each_report_gets_its_own_report_id_in_the_receivers_form()
+    {
+        var scan = new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0);
+
+        var ids = new[]
+        {
+            ResultLogEntry.ForScanOnly(scan, 10, "GB", ReportHost.Window, AppCopyKind.Setup),
+            ResultLogEntry.ForScanOnly(scan, 10, "GB", ReportHost.Window, AppCopyKind.Setup),
+            ResultLogEntry.ForMove(
+                scan, 10, new MoveResult(0, Array.Empty<FileOperationError>()), 0, 20, "sameDrive",
+                new ReverifyResult([], []), "GB", ReportHost.Window, AppCopyKind.Setup),
+            ResultLogEntry.ForDelete(
+                scan, 10, new DeleteResult(0, Array.Empty<FileOperationError>()), 0, 20,
+                new ReverifyResult([], []), "GB", ReportHost.CommandLine, AppCopyKind.Setup),
+        }.Select(entry =>
+        {
+            using var doc = JsonDocument.Parse(ResultLogService.Serialize(entry));
+            return doc.RootElement.GetProperty("reportId").GetString()!;
+        }).ToList();
+
+        Assert.Equal(ids.Count, ids.Distinct().Count());
+        Assert.All(ids, id => Assert.Matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", id));
     }
 
     [Fact]

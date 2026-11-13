@@ -32,6 +32,8 @@ internal static class FixedReport
         next++;
         if (type == typeof(int))
             return next % 7 == 0 ? 0 : next % 11 == 0 ? -next : next % 13 == 0 ? int.MaxValue : next * 37;
+        if (type == typeof(Guid))
+            return Guid.Parse($"{next:x8}-0000-4000-8000-{next:x12}");
         if (type == typeof(long))
             return next % 5 == 0 ? long.MaxValue - next : next * 1_000_003_000L;
         if (type == typeof(string))
