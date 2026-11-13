@@ -11,8 +11,11 @@
 // USAGE  node scripts/gen-translation-table.mjs <code>       write one table
 //        node scripts/gen-translation-table.mjs --check      verify every table
 //        node scripts/gen-translation-table.mjs --check <code>
-//   <code> is a satellite code: zh-Hans, de, ko, es, it, ja, pt-BR, ru, fr, pl,
-//   tr, id, vi, uk, nl, zh-Hant.
+//   <code> is a satellite code, one of SupportedLanguages.CultureNames but the
+//   neutral. LANGS below gives each its English name and its own name for the page
+//   heading, and has to name exactly those satellites: a run stops with exit 2 where
+//   a satellite has no row or a row has no satellite, so a new language is never
+//   left without a page or left out of --check.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
 // key, and writes docs/translations/<code>.md (LF). The human-facing Cli.* keys are
 // translated and shown in their own group; the machine-contract Cli.EventLog*
@@ -29,6 +32,7 @@
 // quoting a string the app no longer has, on the very pages the project invites
 // native speakers to review.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { supportedLanguages } from './supported-languages.mjs';
 
 const LANGS = {
   'zh-Hans': { en: 'Simplified Chinese',    endo: '简体中文' },
@@ -48,6 +52,17 @@ const LANGS = {
   'nl':      { en: 'Dutch',                 endo: 'Nederlands' },
   'zh-Hant': { en: 'Traditional Chinese',   endo: '繁體中文' },
 };
+
+{
+  const { satellites } = supportedLanguages();
+  const unnamed = satellites.filter((c) => !LANGS[c]);
+  const unshipped = Object.keys(LANGS).filter((c) => !satellites.includes(c));
+  if (unnamed.length || unshipped.length) {
+    if (unnamed.length) console.error(`gen-translation-table: REFUSING: no LANGS row for ${unnamed.join(', ')}, which the app ships`);
+    if (unshipped.length) console.error(`gen-translation-table: REFUSING: LANGS has ${unshipped.join(', ')}, which the app does not ship`);
+    process.exit(2);
+  }
+}
 
 const args = process.argv.slice(2);
 const checkMode = args[0] === '--check';
