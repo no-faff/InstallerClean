@@ -163,7 +163,7 @@ public class MoveSpaceCheckMountPointTests(ITestOutputHelper output)
     [MountedVolumeFact]
     public void Row11_the_command_line_refuses_a_move_too_big_for_the_mounted_volume()
     {
-        // The command line's overload, which measures through the walk itself. The
+        // The command line's route, which measures through the walk itself. The
         // size is past the mounted volume's figure by more than it can drift.
         var size = MountedFreeBytes + 2 * FreeSpaceTolerance;
         var got = MoveSpaceCheck.MeasuredRefusalFreeSpace(UnderMount, size);

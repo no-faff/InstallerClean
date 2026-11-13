@@ -341,10 +341,10 @@ public class MoveSpaceCheckIntegrationTests
         // at. The cache root goes on an unmounted letter, so the temp folder is off
         // the cache's volume wherever it is, and the answer rests on the measurement
         // alone. Nothing has long.MaxValue bytes free, so a measurement that was
-        // taken refuses.
+        // taken refuses. A host with every letter in use fails here rather than passing
+        // on a test it could not run.
         var unmounted = TestHost.FirstUnmountedDriveLetter();
-        if (unmounted is null)
-            return; // every letter is in use on this host
+        Assert.True(unmounted is not null, "every drive letter from D to Z is in use on this host");
 
         Assert.NotNull(MoveSpaceCheck.AvailableFreeSpaceForDestination(Path.GetTempPath()));
         Assert.NotNull(MoveSpaceCheck.MeasuredRefusalFreeSpace(

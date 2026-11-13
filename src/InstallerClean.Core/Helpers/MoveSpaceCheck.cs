@@ -164,7 +164,9 @@ internal static class MoveSpaceCheck
     /// destination (a share whose caller lacks query rights) has established
     /// nothing, and the same rule covers it: no claim rather than a wrong one.
     /// </remarks>
-    /// <param name="installerCacheRoot">As <see cref="IsOnInstallerCacheDrive"/>'s.</param>
+    /// <param name="installerCacheRoot">
+    /// Test-only, null in production: as <see cref="IsOnInstallerCacheDrive"/>'s.
+    /// </param>
     internal static long? RefusalFreeSpace(
         string destination, long totalBytes, long? availableFreeSpace, string? installerCacheRoot = null)
     {
@@ -179,7 +181,9 @@ internal static class MoveSpaceCheck
     /// destination is validated before the scan and created by
     /// <c>MoveFilesService</c>, so nothing on the way has had reason to ask.
     /// </summary>
-    /// <param name="installerCacheRoot">As <see cref="IsOnInstallerCacheDrive"/>'s.</param>
+    /// <param name="installerCacheRoot">
+    /// Test-only, null in production: as <see cref="IsOnInstallerCacheDrive"/>'s.
+    /// </param>
     internal static long? MeasuredRefusalFreeSpace(
         string destination, long totalBytes, string? installerCacheRoot = null) =>
         RefusalFreeSpace(destination, totalBytes, AvailableFreeSpaceForDestination(destination), installerCacheRoot);
