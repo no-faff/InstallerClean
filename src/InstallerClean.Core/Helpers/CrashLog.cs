@@ -104,7 +104,7 @@ public static class CrashLog
     /// write failed (symlinked log file, read-only profile). The path is empty where it
     /// could not be worked out. Swallows every failure: a crash handler must not throw.
     /// </summary>
-    public static (string Path, bool Written) TryWrite(Exception ex)
+    public static CrashLogEntry TryWrite(Exception ex)
     {
         var path = string.Empty;
         try
@@ -129,7 +129,7 @@ public static class CrashLog
             // Returns null where the log file is a symlink; drop the entry rather than
             // append into the symlink's target.
             using var handle = StorageHelpers.OpenAtomicAppend(path);
-            if (handle is null) return (path, false);
+            if (handle is null) return new CrashLogEntry(path, false);
 
             // No buffering layer (StorageHelpers.UnbufferedWriter), so the single
             // Write below is a single write to the file. A StreamWriter over a
@@ -148,7 +148,7 @@ public static class CrashLog
             // for a later write.
             var writeHeader = fs.Length == 0;
             var header = writeHeader ? PrivacyHeaderOrNull() : string.Empty;
-            if (header is null) return (path, false);
+            if (header is null) return new CrashLogEntry(path, false);
 
             // Redundant on an append-only handle (Win32 ignores the offset), and
             // kept as the floor: were this handle ever opened plainly writable
@@ -167,12 +167,12 @@ public static class CrashLog
             ReadOnlySpan<byte> bom = writeHeader ? Encoding.UTF8.GetPreamble() : default;
             byte[] payload = [.. bom, .. Encoding.UTF8.GetBytes(header + entry)];
             fs.Write(payload, 0, payload.Length);
-            return (path, true);
+            return new CrashLogEntry(path, true);
         }
         catch
         {
             // Swallow: a crash handler must not itself throw.
-            return (path, false);
+            return new CrashLogEntry(path, false);
         }
     }
 
@@ -193,3 +193,13 @@ public static class CrashLog
         }
     }
 }
+
+/// <summary>
+/// What <see cref="CrashLog.TryWrite"/> answers: where crash.log is, empty where that could
+/// not be worked out, and whether the entry reached it.
+/// </summary>
+/// <remarks>
+/// A type of its own rather than a tuple: a copy started on .NET Framework 4.6.2 writes to
+/// crash.log on its way to the message saying it needs 4.8, and 4.6.2 has no ValueTuple.
+/// </remarks>
+public readonly record struct CrashLogEntry(string Path, bool Written);

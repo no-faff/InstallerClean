@@ -2412,7 +2412,7 @@ internal static class Program
     /// one. Safe to call after the console itself has failed (the stdout write is guarded,
     /// and <see cref="EventLogWriter"/> swallows its own IO).
     /// </summary>
-    private static int ReportUnexpectedError(string mode, Exception ex, (string Path, bool Written) crash)
+    private static int ReportUnexpectedError(string mode, Exception ex, CrashLogEntry crash)
     {
         var typeName = ex.GetType().Name;
         try

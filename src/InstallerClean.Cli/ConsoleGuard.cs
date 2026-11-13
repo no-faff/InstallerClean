@@ -62,7 +62,7 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
     public override void Write(char value) => Guard(value, static (w, v) => w.Write(v));
 
     public override void Write(char[] buffer, int index, int count) =>
-        Guard((buffer, index, count), static (w, v) => w.Write(v.buffer, v.index, v.count));
+        Guard(new Chars(buffer, index, count), static (w, v) => w.Write(v.Buffer, v.Index, v.Count));
 
     public override void Write(string? value) => Guard(value, static (w, v) => w.Write(v));
 
@@ -82,7 +82,7 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
     public override void WriteLine(char[]? buffer) => Guard(buffer, static (w, v) => w.WriteLine(v));
 
     public override void WriteLine(char[] buffer, int index, int count) =>
-        Guard((buffer, index, count), static (w, v) => w.WriteLine(v.buffer, v.index, v.count));
+        Guard(new Chars(buffer, index, count), static (w, v) => w.WriteLine(v.Buffer, v.Index, v.Count));
 
     public override void WriteLine(bool value) => Guard(value, static (w, v) => w.WriteLine(v));
 
@@ -113,6 +113,18 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
         {
             Record(ex);
         }
+    }
+
+    /// <summary>
+    /// The characters a write of part of an array takes. A type of its own rather than a
+    /// tuple: the refusal on a PC without .NET Framework 4.8 writes through this class, and
+    /// .NET Framework 4.6.2 has no ValueTuple.
+    /// </summary>
+    private readonly struct Chars(char[] buffer, int index, int count)
+    {
+        public char[] Buffer { get; } = buffer;
+        public int Index { get; } = index;
+        public int Count { get; } = count;
     }
 
     /// <summary>
@@ -159,4 +171,4 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
 /// A write to the run's output that failed: the exception it threw, and where crash.log
 /// recorded it, if it could.
 /// </summary>
-internal sealed record OutputFailure(Exception Exception, (string Path, bool Written) CrashLog);
+internal sealed record OutputFailure(Exception Exception, CrashLogEntry CrashLog);

@@ -62,15 +62,22 @@ internal static class RegistryData
         {
             var length = buffer.Length;
             var result = Advapi32.RegQueryValueEx(handle, name, IntPtr.Zero, out var type, buffer, ref length);
-            return (result, type, length);
+            return new Answer(result, type, length);
         }, doNotExpand);
     }
+
+    /// <summary>
+    /// What one RegQueryValueEx call answers: its result, the value's type and the length
+    /// written or needed. A type of its own rather than a tuple: the copy's .NET Framework
+    /// 4.8 check reads the registry through here, and .NET Framework 4.6.2 has no ValueTuple.
+    /// </summary>
+    internal readonly record struct Answer(int Result, int Type, int Length);
 
     /// <summary>
     /// The decoding, given the call: <paramref name="query"/> fills the buffer it is handed
     /// and answers the call's result, the value's type and the length written or needed.
     /// </summary>
-    internal static object? Decode(Func<byte[], (int Result, int Type, int Length)> query, bool doNotExpand)
+    internal static object? Decode(Func<byte[], Answer> query, bool doNotExpand)
     {
         var buffer = new byte[FirstBuffer];
         while (true)
