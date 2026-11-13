@@ -12,8 +12,8 @@ public static class AppCopyLabel
     /// command line's own download, Scoop's copy, a build from source, and a copy on a PC
     /// whose setup record could not say. A member this does not name throws, so a kind
     /// added to the enum cannot reach a report under another kind's label. The receiver
-    /// holds the field to a fixed set of values, these six and "slim", which copies of
-    /// earlier versions send for the slim download, so a label added here is sent only
+    /// holds the field to a fixed set of values, the labels here and "slim", which copies
+    /// of earlier versions send for the slim download, so a label added here is sent only
     /// once the receiver accepts it.
     /// </summary>
     public static string For(AppCopyKind kind) => kind switch

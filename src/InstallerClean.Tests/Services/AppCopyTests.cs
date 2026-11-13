@@ -166,7 +166,7 @@ public class AppCopyTests
         // exe is in, which alone would make it the setup's copy. Decide is called rather
         // than DetectRunning, which a Debug build lets an environment variable that
         // another test sets answer instead.
-        var record = RecordOf(ProgramFilesFolder + @"");
+        var record = RecordOf(ProgramFilesFolder + @"\");
 
         Assert.Equal(AppCopyKind.FromSource,
             AppCopy.Decide(AppCopy.IsOneFileBuild(), ProgramFilesFolder, record, NoFiles));

@@ -11,7 +11,9 @@
 #    app is left in a file beside it for an update to leave at the version it was.
 #
 # Every run also checks itself against the exe each merge started from, the project's own
-# Release build under bin, which is not one file: it has to report both faults. A missing
+# Release build, which is not one file: it has to report both faults. That build is at
+# bin/Release/net48/win-x64 where the SDK infers the win-x64 runtime identifier, as it does
+# on Windows, and at bin/Release/net48 where it infers none; each one there is checked. A missing
 # exe on either side, or a control that reports nothing, fails the step.
 #
 # Run from the repo root after the two merged builds: pwsh scripts/check-one-file.ps1
@@ -68,13 +70,13 @@ foreach ($label in $exes.Keys) {
   Write-Host "$($exe.Merged):"
   foreach ($fault in (Faults $exe.Merged)) { Fail "$($exe.Merged) $fault." }
 
-  $unmerged = @(Get-ChildItem -LiteralPath (Join-Path $exe.Project 'bin/Release') -Recurse -File -Filter $exe.Name -ErrorAction SilentlyContinue |
-    Where-Object { $_.Directory.Name -ne 'publish' })
-  if ($unmerged.Count -eq 0) { Fail "No Release build of $($exe.Name) under $($exe.Project)/bin to check this step against."; continue }
-  foreach ($control in $unmerged) {
-    Write-Host "$($control.FullName), the exe the merge started from:"
-    $faults = Faults $control.FullName
-    if ($faults.Count -lt 2) { Fail "$($control.FullName) is not one file and the step reported $($faults.Count) of its two faults: $($faults -join '; ')" }
+  $controls = @("bin/Release/net48/win-x64/$($exe.Name)", "bin/Release/net48/$($exe.Name)" |
+    ForEach-Object { Join-Path $exe.Project $_ } | Where-Object { Test-Path -LiteralPath $_ })
+  if ($controls.Count -eq 0) { Fail "No Release build of $($exe.Name) under $($exe.Project)/bin/Release/net48 to check this step against."; continue }
+  foreach ($control in $controls) {
+    Write-Host "$control, the exe the merge started from:"
+    $faults = Faults $control
+    if ($faults.Count -lt 2) { Fail "$control is not one file and the step reported $($faults.Count) of its two faults: $($faults -join '; ')" }
     else { Write-Host "  reported, as it has to be: $($faults -join '; ')" }
   }
 }
