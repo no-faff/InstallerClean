@@ -962,7 +962,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean 的版本、获取方式（setup、portable、slim、Scoop、单独的命令行工具、从源代码构建，或未知）、报告是由 InstallerClean 还是命令行工具发送的，以及其显示的语言</value>
+    <value>InstallerClean 的版本、获取方式（setup、portable、Scoop、单独的命令行工具、从源代码构建，或未知）、报告是由 InstallerClean 还是命令行工具发送的，以及其显示的语言</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">

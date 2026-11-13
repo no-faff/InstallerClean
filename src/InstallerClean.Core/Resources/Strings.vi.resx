@@ -962,7 +962,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>Phiên bản InstallerClean, cách bạn có được nó (setup, portable, slim, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), báo cáo được gửi từ InstallerClean hay từ công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị</value>
+    <value>Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), báo cáo được gửi từ InstallerClean hay từ công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">

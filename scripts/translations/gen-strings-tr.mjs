@@ -510,7 +510,7 @@ Ayrıntılar şuraya yazıldı:
   'Completion.ReportPanel.Records': `Windows'ta kaydı bulunan program ve yama sayısı`,
   'Completion.ReportPanel.ShortNames': `Windows'un hâlâ eski tarz kısa dosya adları oluşturup oluşturmadığı`,
   'Completion.ReportPanel.Windows': `Windows'un 10 mu 11 mi, x64 mü Arm mı olduğu ve hangi dile ve ülke veya bölgeye ayarlandığı`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean'in sürümü, nasıl edinildiği (setup, taşınabilir, slim, Scoop, tek başına komut satırı aracı, kaynaktan derlenmiş veya bilinmiyor), raporun InstallerClean'den mi yoksa komut satırı aracından mı gönderildiği ve gösterildiği dil`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean'in sürümü, nasıl edinildiği (setup, taşınabilir, Scoop, tek başına komut satırı aracı, kaynaktan derlenmiş veya bilinmiyor), raporun InstallerClean'den mi yoksa komut satırı aracından mı gönderildiği ve gösterildiği dil`,
   'Completion.ReportPanel.Errors': `Ters giden her şeyin sayısı`,
   'Completion.ReportPanel.Closing': `Bunların her biri bir sayı ya da etikettir. Raporda hiçbir şey sizi, bilgisayarınızı, dosyalarınızı veya programlarınızı tanımlamaz ve IP adresinizi asla görmem.`,
   'Automation.ReportInfo': `Raporun içeriği`,

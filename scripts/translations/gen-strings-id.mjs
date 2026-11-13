@@ -609,7 +609,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Berapa banyak program dan patch yang dicatat Windows`,
   'Completion.ReportPanel.ShortNames': `Apakah Windows masih membuat nama file pendek gaya lama`,
   'Completion.ReportPanel.Windows': `Apakah Windows versi 10 atau 11 dan x64 atau Arm, serta bahasa dan negara atau kawasan yang disetel di dalamnya`,
-  'Completion.ReportPanel.AppVersion': `Versi InstallerClean, cara Anda mendapatkannya (setup, portable, slim, Scoop, alat baris perintah yang berdiri sendiri, dibuat dari kode sumber, atau tidak diketahui), apakah laporan dikirim dari InstallerClean atau alat baris perintah, dan bahasa yang ditampilkannya`,
+  'Completion.ReportPanel.AppVersion': `Versi InstallerClean, cara Anda mendapatkannya (setup, portable, Scoop, alat baris perintah yang berdiri sendiri, dibuat dari kode sumber, atau tidak diketahui), apakah laporan dikirim dari InstallerClean atau alat baris perintah, dan bahasa yang ditampilkannya`,
   'Completion.ReportPanel.Errors': `Jumlah dari apa pun yang gagal`,
   'Completion.ReportPanel.Closing': `Masing-masing berupa angka atau label. Tidak ada di dalam laporan yang menyebut Anda, PC Anda, file Anda, atau program Anda, dan saya tidak pernah melihat alamat IP Anda.`,
   'Automation.ReportInfo': `Isi laporan`,

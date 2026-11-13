@@ -489,7 +489,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Windows 记录了多少个程序和补丁`,
   'Completion.ReportPanel.ShortNames': `Windows 是否仍在生成旧式短文件名`,
   'Completion.ReportPanel.Windows': `Windows 是 10 还是 11，是 x64 还是 Arm，以及设置的是哪种语言和哪个国家或地区`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean 的版本、获取方式（setup、portable、slim、Scoop、单独的命令行工具、从源代码构建，或未知）、报告是由 InstallerClean 还是命令行工具发送的，以及其显示的语言`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean 的版本、获取方式（setup、portable、Scoop、单独的命令行工具、从源代码构建，或未知）、报告是由 InstallerClean 还是命令行工具发送的，以及其显示的语言`,
   'Completion.ReportPanel.Errors': `所有出错情况的计数`,
   'Completion.ReportPanel.Closing': `这些内容都是数字或标签。报告中没有任何内容会指明您、您的电脑、文件或程序，我也永远看不到您的 IP 地址。`,
   'Automation.ReportInfo': `报告包含哪些内容`,

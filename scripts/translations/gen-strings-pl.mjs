@@ -625,7 +625,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `O ilu programach i poprawkach Windows ma zapis`,
   'Completion.ReportPanel.ShortNames': `Czy Windows nadal tworzy krótkie nazwy plików w starym stylu`,
   'Completion.ReportPanel.Windows': `Czy Windows to wersja 10 czy 11, x64 czy Arm, i jaki ma ustawiony język oraz kraj lub region`,
-  'Completion.ReportPanel.AppVersion': `Wersja InstallerClean, sposób jego uzyskania (setup, portable, slim, Scoop, samo narzędzie wiersza poleceń, kompilacja ze źródeł lub nieznany), informacja, czy raport wysłał InstallerClean, czy narzędzie wiersza poleceń, oraz język, w którym był wyświetlany`,
+  'Completion.ReportPanel.AppVersion': `Wersja InstallerClean, sposób jego uzyskania (setup, portable, Scoop, samo narzędzie wiersza poleceń, kompilacja ze źródeł lub nieznany), informacja, czy raport wysłał InstallerClean, czy narzędzie wiersza poleceń, oraz język, w którym był wyświetlany`,
   'Completion.ReportPanel.Errors': `Liczniki wszystkiego, co poszło nie tak`,
   'Completion.ReportPanel.Closing': `Każda z tych rzeczy jest liczbą albo etykietą. Nic w raporcie nie wskazuje ciebie, twojego komputera, twoich plików ani programów, a twojego adresu IP nigdy nie widzę.`,
   'Automation.ReportInfo': `Co zawiera raport`,

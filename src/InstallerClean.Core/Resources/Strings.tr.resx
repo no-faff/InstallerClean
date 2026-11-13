@@ -962,7 +962,7 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean'in sürümü, nasıl edinildiği (setup, taşınabilir, slim, Scoop, tek başına komut satırı aracı, kaynaktan derlenmiş veya bilinmiyor), raporun InstallerClean'den mi yoksa komut satırı aracından mı gönderildiği ve gösterildiği dil</value>
+    <value>InstallerClean'in sürümü, nasıl edinildiği (setup, taşınabilir, Scoop, tek başına komut satırı aracı, kaynaktan derlenmiş veya bilinmiyor), raporun InstallerClean'den mi yoksa komut satırı aracından mı gönderildiği ve gösterildiği dil</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">

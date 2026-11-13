@@ -649,7 +649,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `How many programs and patches Windows has a record of`,
   'Completion.ReportPanel.ShortNames': `Whether Windows still makes old-style short file names`,
   'Completion.ReportPanel.Windows': `Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean's version, how you got it (setup, portable, slim, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing`,
   'Completion.ReportPanel.Errors': `Counts of anything that went wrong`,
   'Completion.ReportPanel.Closing': `Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address.`,
   'Automation.ReportInfo': `What the report holds`,

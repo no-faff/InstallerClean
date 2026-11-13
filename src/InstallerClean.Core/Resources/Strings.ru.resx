@@ -962,7 +962,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>Версия InstallerClean, способ её получения (setup, portable, slim, Scoop, отдельная программа командной строки, сборка из исходного кода или неизвестно), откуда отправлен отчёт (из InstallerClean или из программы командной строки) и язык, на котором он отображался</value>
+    <value>Версия InstallerClean, способ её получения (setup, portable, Scoop, отдельная программа командной строки, сборка из исходного кода или неизвестно), откуда отправлен отчёт (из InstallerClean или из программы командной строки) и язык, на котором он отображался</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">

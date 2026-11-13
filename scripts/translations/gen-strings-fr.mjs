@@ -592,7 +592,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Le nombre de programmes et de correctifs dont Windows garde un enregistrement`,
   'Completion.ReportPanel.ShortNames': `Si Windows crée encore des noms de fichiers courts à l'ancienne`,
   'Completion.ReportPanel.Windows': `Si Windows est en version 10 ou 11, x64 ou Arm, et la langue et le pays ou la région qui y sont définis`,
-  'Completion.ReportPanel.AppVersion': `La version d'InstallerClean, la façon dont vous l'avez obtenu (setup, portable, slim, Scoop, l'outil en ligne de commande seul, compilé depuis les sources, ou inconnu), si le rapport a été envoyé depuis InstallerClean ou depuis l'outil en ligne de commande, et la langue dans laquelle il s'affichait`,
+  'Completion.ReportPanel.AppVersion': `La version d'InstallerClean, la façon dont vous l'avez obtenu (setup, portable, Scoop, l'outil en ligne de commande seul, compilé depuis les sources, ou inconnu), si le rapport a été envoyé depuis InstallerClean ou depuis l'outil en ligne de commande, et la langue dans laquelle il s'affichait`,
   'Completion.ReportPanel.Errors': `Le décompte de tout ce qui a échoué`,
   'Completion.ReportPanel.Closing': `Chacun de ces éléments est un nombre ou un libellé. Rien dans le rapport ne désigne ni vous, ni votre PC, ni vos fichiers, ni vos programmes, et je ne vois jamais votre adresse IP.`,
   'Automation.ReportInfo': `Ce que contient le rapport`,

@@ -12,7 +12,7 @@ There is never more than one report per PC, and it is from the first run. No lat
 
 **What it holds.** Numbers and fixed labels only:
 
-- InstallerClean's version, the language it was showing, how it was got (setup, portable, slim, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the version of the report's format.
+- InstallerClean's version, the language it was showing, how it was got (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the version of the report's format.
 - Windows 10 or 11, whether it's x64, Arm or 32-bit Windows, and the language and Country or region Windows is set to.
 - Whether the run was a scan, a Move or a Delete, whether it finished, how long the scan and the Move or Delete took, how many files it moved or deleted, how many it couldn't, and how much space it freed. For a Move, whether the files went to the same drive, another drive, a removable drive or a network share.
 - How many installer files Windows has a record of, how many are missing, how many were no longer needed, and how much space they take.

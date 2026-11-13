@@ -585,7 +585,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Windows에 기록이 있는 프로그램과 패치의 수`,
   'Completion.ReportPanel.ShortNames': `Windows가 아직도 예전 방식의 짧은 파일 이름을 만드는지 여부`,
   'Completion.ReportPanel.Windows': `Windows가 10인지 11인지, x64인지 Arm인지, 그리고 어떤 언어와 국가 또는 지역으로 설정되어 있는지`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean의 버전, 받은 방법(setup, portable, slim, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 보고서를 InstallerClean과 명령줄 도구 중 어느 쪽에서 보냈는지, 그리고 표시하던 언어`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean의 버전, 받은 방법(setup, portable, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 보고서를 InstallerClean과 명령줄 도구 중 어느 쪽에서 보냈는지, 그리고 표시하던 언어`,
   'Completion.ReportPanel.Errors': `문제가 생긴 일의 횟수`,
   'Completion.ReportPanel.Closing': `이 항목은 모두 수치 또는 라벨입니다. 보고서에는 사용자나 사용자의 PC, 파일, 프로그램을 가리키는 정보가 없으며, 저에게는 사용자의 IP 주소가 전혀 보이지 않습니다.`,
   'Automation.ReportInfo': `보고서에 담긴 내용`,

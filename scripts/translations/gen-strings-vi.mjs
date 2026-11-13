@@ -584,7 +584,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Windows có bản ghi về bao nhiêu chương trình và bản vá`,
   'Completion.ReportPanel.ShortNames': `Windows có còn tạo tên tệp ngắn kiểu cũ hay không`,
   'Completion.ReportPanel.Windows': `Windows là bản 10 hay 11, x64 hay Arm, và đang đặt ngôn ngữ cùng quốc gia hoặc khu vực nào`,
-  'Completion.ReportPanel.AppVersion': `Phiên bản InstallerClean, cách bạn có được nó (setup, portable, slim, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), báo cáo được gửi từ InstallerClean hay từ công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị`,
+  'Completion.ReportPanel.AppVersion': `Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), báo cáo được gửi từ InstallerClean hay từ công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị`,
   'Completion.ReportPanel.Errors': `Số lần xảy ra bất kỳ sự cố nào`,
   'Completion.ReportPanel.Closing': `Mỗi mục này là một con số hoặc một nhãn. Không có gì trong báo cáo nêu tên bạn, máy tính, tệp hay chương trình của bạn, và tôi không bao giờ thấy địa chỉ IP của bạn.`,
   'Automation.ReportInfo': `Báo cáo chứa những gì`,
