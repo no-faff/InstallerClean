@@ -2923,8 +2923,10 @@ public class DeclaredProductCheckTests
     [InlineData(@"\Windows\Installer\")]
     public void A_media_package_path_keeps_only_the_copy_the_package_could_be_by_its_name(string mediaPath)
     {
-        // Nothing at a media package path is read, on any drive.
+        // Nothing at a media package path is read, on any drive. The list holds no media disk,
+        // so the path alone keeps the copy named like the package.
         var f = TwoCopiesBesideAMediaPackagePath(mediaPath);
+        f.Msi.HoldsNoMediaDisk(ProductA, null, MsiInstallContext.Machine);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
             .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
@@ -2939,7 +2941,9 @@ public class DeclaredProductCheckTests
     [Fact]
     public void A_media_package_path_keeps_a_copy_its_package_name_could_be_by_the_copy_s_short_name()
     {
+        // The list holds no media disk, so the path alone keeps the copy.
         var f = TwoCopiesBesideAMediaPackagePath(@"\sub\");
+        f.Msi.HoldsNoMediaDisk(ProductA, null, MsiInstallContext.Machine);
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "SETUP~1.MSI", SetupFolder);
         f.Files.Answers(SetupFolder + "SETUP~1.MSI", FileIdentityRead.NamesNothing);
 
@@ -3405,10 +3409,12 @@ public class DeclaredProductCheckTests
     public void A_disc_in_the_drive_lets_every_copy_through_but_the_one_named_like_the_package()
     {
         // Installed from the disc, whose package gives no file id, with a media package path;
-        // the second copy carries the package's own name.
+        // the second copy carries the package's own name. The list holds no media disk, so the
+        // media package path alone keeps that copy.
         var f = ACopyBesideADiscInTheDrive("list", "c.msi", FileIdentityRead.IdentityUnavailable, DiscVolume, InstallerVolume);
         f.Msi.ListProperty(ProductA, isPatch: false, null, MsiInstallContext.Machine,
             MsiInstallProperty.MediaPackagePath, @"\sub\");
+        f.Msi.HoldsNoMediaDisk(ProductA, null, MsiInstallContext.Machine);
         AddSecondCandidate(f);
 
         var screening = CheckWithDriveE(f, DriveType.CDRom)
@@ -10084,6 +10090,14 @@ internal sealed class ScriptedMsiProducts : IMsiApi
     public void HoldsMediaDisk(string code, string? sid, MsiInstallContext context) =>
         _mediaDisks[(code, sid, context)] = MsiError.Success;
 
+    /// <summary>
+    /// The product's source list holds no media source although it names a media package path:
+    /// its <c>Media</c> key holds the path alone, and <see cref="EnumMediaDisks"/> answers the
+    /// end of the list at the first index.
+    /// </summary>
+    public void HoldsNoMediaDisk(string code, string? sid, MsiInstallContext context) =>
+        _mediaDisks[(code, sid, context)] = MsiError.NoMoreItems;
+
     /// <summary>What <see cref="EnumMediaDisks"/> answers at the first index for the product, in place of a disk.</summary>
     public void MediaDisksAnswer(string code, string? sid, MsiInstallContext context, uint error) =>
         _mediaDisks[(code, sid, context)] = error;
@@ -10234,8 +10248,9 @@ internal sealed class ScriptedMsiProducts : IMsiApi
     /// last as a REG_EXPAND_SZ holding its type, the index 1 and its text, each followed
     /// by a ';' but the last; each network entry as a REG_EXPAND_SZ named by its number
     /// from 1, and each URL entry the same way, a key with none being absent; and a
-    /// <c>Media</c> key holding the REG_SZ "1" and the media package path where there is
-    /// one. An installation's <c>InstallProperties</c> key holds its InstallSource as a
+    /// <c>Media</c> key holding the REG_SZ "1" where the list holds a media disk
+    /// (<see cref="HasAMediaDisk"/>) and the media package path where there is one, a key
+    /// with neither being absent. An installation's <c>InstallProperties</c> key holds its InstallSource as a
     /// REG_SZ where it has one, and the cached package it records as a REG_SZ named
     /// <c>LocalPackage</c> where it records one. A product's key holds the package code its
     /// record answers, packed, as a REG_SZ named <c>PackageCode</c> where the record answers
@@ -10306,11 +10321,14 @@ internal sealed class ScriptedMsiProducts : IMsiApi
                     : Array.Empty<string>());
             case "Media":
             {
-                if (isPatch || !HasAMediaDisk(code, sid, context)) return new RegistryKeyValues(RegistryKeyPresence.Absent, null);
-                var media = new List<RegistryValue> { new("1", RegistryValueKind.String, ";") };
+                if (isPatch) return new RegistryKeyValues(RegistryKeyPresence.Absent, null);
                 var packagePath = ListPropertyOf(code, isPatch, sid, context, MsiInstallProperty.MediaPackagePath);
-                if (packagePath.Error == MsiError.Success && packagePath.Value.Length > 0)
-                    media.Add(new RegistryValue("MediaPackage", RegistryValueKind.String, packagePath.Value));
+                var hasPath = packagePath.Error == MsiError.Success && packagePath.Value.Length > 0;
+                var hasDisk = HasAMediaDisk(code, sid, context);
+                if (!hasPath && !hasDisk) return new RegistryKeyValues(RegistryKeyPresence.Absent, null);
+                var media = new List<RegistryValue>();
+                if (hasDisk) media.Add(new RegistryValue("1", RegistryValueKind.String, ";"));
+                if (hasPath) media.Add(new RegistryValue("MediaPackage", RegistryValueKind.String, packagePath.Value));
                 return new RegistryKeyValues(RegistryKeyPresence.Present, media);
             }
             default:
