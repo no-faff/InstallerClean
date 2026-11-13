@@ -48,9 +48,10 @@ internal static class ThisPCName
     }
 
     /// <summary>
-    /// Whether <paramref name="name"/> is one of this PC's own unicast addresses: an IPv4 one as
-    /// <see cref="IPAddress.ToString"/> writes it, and an IPv6 one that is not link-local as a
-    /// share path writes it, its colons as dashes and with no zone. A link-local IPv6 address
+    /// Whether <paramref name="name"/> is one of the unicast addresses this PC holds on an
+    /// adapter that is up: an IPv4 one as <see cref="IPAddress.ToString"/> writes it, and an
+    /// IPv6 one that is not link-local as a share path writes it, its colons as dashes and with
+    /// no zone. A link-local IPv6 address
     /// names a different computer on each link, so without its zone it is not this PC's alone.
     /// </summary>
     private static bool IsOwnAddress(string name)
@@ -58,8 +59,14 @@ internal static class ThisPCName
         try
         {
             foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                // An address counts only where this PC holds it: its adapter up, and the address
+                // not found in use by another computer on the link.
+                if (adapter.OperationalStatus != OperationalStatus.Up) continue;
+
                 foreach (var unicast in adapter.GetIPProperties().UnicastAddresses)
                 {
+                    if (unicast.DuplicateAddressDetectionState != DuplicateAddressDetectionState.Preferred) continue;
                     var address = unicast.Address;
                     if (address.AddressFamily == AddressFamily.InterNetwork)
                     {
@@ -72,6 +79,7 @@ internal static class ThisPCName
                         return true;
                     }
                 }
+            }
         }
         catch (NetworkInformationException)
         {

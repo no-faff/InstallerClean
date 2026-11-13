@@ -81,7 +81,7 @@ public class MoveSpaceCheckShareTests
     [Theory]
     [InlineData(@"\\otherpc\C$", @"\\otherpc\C$\")]
     [InlineData(@"\\otherpc\C$\", @"\\otherpc\C$\")]
-    [InlineData(@"//otherpc/C$", @"//otherpc\C$\")]
+    [InlineData(@"//otherpc/C$", @"\\otherpc\C$\")]
     public void A_share_root_given_as_the_destination_is_read_with_its_separator(string destination, string readAs)
     {
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
@@ -128,7 +128,7 @@ public class MoveSpaceCheckShareTests
     [InlineData(@"\\?\unc\localhost\C$\Moved", @"\\localhost\C$\Moved")]
     [InlineData(@"\\.\UNC\localhost\C$\Moved", @"\\localhost\C$\Moved")]
     [InlineData(@"//localhost/C$/Moved", @"\\localhost\C$\Moved")]
-    public void A_share_spelling_is_taken_as_written_with_backslashes(string destination, string sharePath) =>
+    public void A_share_spelling_is_read_with_backslashes_and_no_device_prefix(string destination, string sharePath) =>
         Assert.Equal(sharePath, ShareReads.Production.ToSharePath(destination));
 
     [Theory]
@@ -151,20 +151,24 @@ public class MoveSpaceCheckShareTests
     [InlineData(@"C:\Data\", "Moved", @"C:\Data\Moved")]
     [InlineData(@"C:\Data", @"..\Moved", null)]
     [InlineData(@"C:\Data", @"Moved\.\Sub", null)]
-    [InlineData(@"E:\Data", @"C:\Moved", @"E:\Data\C:\Moved")]
+    [InlineData(@"E:\Data", @"C:\Moved", null)]
     public void The_part_below_a_share_goes_on_its_local_path_and_never_above_it(string shareFolder, string below, string? expected) =>
         Assert.Equal(expected, MoveSpaceCheck.OnShareFolder(shareFolder, below));
 
     [Fact]
     public void A_share_path_still_climbing_above_its_share_is_not_settled()
     {
-        // As a \\?\UNC\ spelling keeps its "..": nothing below the share is asked about.
+        // A \\?\UNC\ spelling keeps its "..", as Windows does: nothing below the share is
+        // asked about.
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
         var shares = new List<string>();
 
         Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            @"\\localhost\Data\..\Other\Moved", CacheRoot, reader,
-            Share(names: _ => true, local: name => { shares.Add(name); return @"C:\Data"; })));
+            @"\\?\UNC\localhost\Data\..\Other\Moved", CacheRoot, reader,
+            Share(
+                toShare: ShareReads.Production.ToSharePath,
+                names: _ => true,
+                local: name => { shares.Add(name); return @"C:\Data"; })));
         Assert.Equal(["Data"], shares);
         Assert.Empty(reader.Asked);
     }

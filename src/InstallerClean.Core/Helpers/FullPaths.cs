@@ -83,7 +83,9 @@ internal static class FullPaths
     /// <see cref="ArgumentException"/> naming <c>path</c>; a failure in Windows is the
     /// exception <see cref="Win32Marshal"/> gives for its error, naming the path.
     /// </summary>
-    public static string GetFullPath(string path)
+    public static string GetFullPath(string path) => GetFullPath(path, expandShortNames: true);
+
+    private static string GetFullPath(string path, bool expandShortNames)
     {
         if (path is null) throw new ArgumentNullException(nameof(path));
 
@@ -98,21 +100,15 @@ internal static class FullPaths
         if (PathText.IsExtended(path))
             return path;
 
-        return Normalize(path);
+        return Normalize(path, expandShortNames);
     }
 
     /// <summary>
     /// <see cref="GetFullPath"/> without its short names expanded, so nothing is asked of the
-    /// folders the path names: Windows' own reading of the path's text, <c>.</c> and <c>..</c>
-    /// taken out as it takes them out when it opens the path.
+    /// folders the path names: the path's text as Windows reads it when it opens the path, its
+    /// <c>.</c> and <c>..</c> taken out.
     /// </summary>
-    internal static string GetFullPathAsText(string path)
-    {
-        if (path is null) throw new ArgumentNullException(nameof(path));
-        if (PathText.IsEffectivelyEmpty(path)) throw new ArgumentException("The path is empty.", nameof(path));
-        if (path.IndexOf('\0') >= 0) throw new ArgumentException("Null character in path.", nameof(path));
-        return PathText.IsExtended(path) ? path : Normalize(path, expandShortNames: false);
-    }
+    internal static string GetFullPathAsText(string path) => GetFullPath(path, expandShortNames: false);
 
     /// <summary>
     /// <paramref name="path"/> relative to the folder <paramref name="relativeTo"/>, both made
