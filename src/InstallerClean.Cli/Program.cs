@@ -38,20 +38,14 @@ internal static class Program
         // ends, before it reads its arguments. The download carries no config naming the
         // runtime, so .NET Framework starts it on any 4.x.
         if (NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: true) is { } needsNetFramework48)
-        {
-            Console.Error.WriteLine(needsNetFramework48);
-            return ExitError;
-        }
+            return Refuse(needsNetFramework48);
 
         // A .exe.config beside the command line that says more than the build's own is a
         // file somebody else wrote, which on .NET Framework the runtime would read. Refuse
         // before anything else runs, printing the message and ending; a config beside the
         // setup's copy is not refused. Read here, never in a module initializer.
         if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
-        {
-            Console.Error.WriteLine(plantedConfig);
-            return ExitError;
-        }
+            return Refuse(plantedConfig);
 
         // A newer version a copy downloaded, started to put itself at that copy's path once
         // the copy has ended, does that and nothing else, printing nothing: it runs with no
@@ -156,6 +150,31 @@ internal static class Program
         s_copyHeld?.Dispose();
         s_copyHeld = null;
         return exitCode;
+    }
+
+    /// <summary>
+    /// Prints <paramref name="message"/> on the error stream and gives the code for a run
+    /// that did nothing: a refusal at the start, ahead of the run's own output. The message
+    /// goes out in UTF-8, as the run's output does, and the console's code page is given
+    /// back after it. A write that fails loses its text and throws nothing.
+    /// </summary>
+    /// <param name="message">What the refusal says.</param>
+    /// <param name="error">
+    /// The error stream, or null for the console's, which is read once the code page is set:
+    /// setting it replaces the console's own writers.
+    /// </param>
+    internal static int Refuse(string message, TextWriter? error = null)
+    {
+        var previousOutputEncoding = TrySetUtf8Output();
+        try
+        {
+            new ConsoleGuard(error ?? Console.Error).WriteLine(message);
+        }
+        finally
+        {
+            RestoreOutputEncoding(previousOutputEncoding);
+        }
+        return ExitError;
     }
 
     /// <summary>
