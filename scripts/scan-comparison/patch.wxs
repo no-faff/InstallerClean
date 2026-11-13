@@ -1,0 +1,29 @@
+<!-- A patch for the scan comparison's test programs. The job passes PatchId, Tag, Family,
+     FamilyVersion, Supersede (yes or no), Ext (wixpdb or msi) and, for each program the patch
+     targets, BaseX and UpdX with X its tag (A, B, M or S): the file names of the baseline build
+     and the updated build, without the extension. Within one family a later version sequences
+     after an earlier one, and one built with Supersede="yes" supersedes the earlier ones on the
+     programs both target. -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Patch Id="$(PatchId)" AllowRemoval="yes"
+         DisplayName="InstallerClean scan comparison patch $(Tag)" Description="InstallerClean scan comparison patch $(Tag)"
+         Manufacturer="No Faff test" Classification="Update">
+    <Media Id="1" Cabinet="patch$(Tag).cab">
+<?ifdef BaseA ?>
+      <PatchBaseline Id="BaselineA" BaselineFile="$(BaseA).$(Ext)" UpdateFile="$(UpdA).$(Ext)" />
+<?endif?>
+<?ifdef BaseB ?>
+      <PatchBaseline Id="BaselineB" BaselineFile="$(BaseB).$(Ext)" UpdateFile="$(UpdB).$(Ext)" />
+<?endif?>
+<?ifdef BaseM ?>
+      <PatchBaseline Id="BaselineM" BaselineFile="$(BaseM).$(Ext)" UpdateFile="$(UpdM).$(Ext)" />
+<?endif?>
+<?ifdef BaseS ?>
+      <PatchBaseline Id="BaselineS" BaselineFile="$(BaseS).$(Ext)" UpdateFile="$(UpdS).$(Ext)" />
+<?endif?>
+    </Media>
+    <PatchFamily Id="$(Family)" Version="$(FamilyVersion)" Supersede="$(Supersede)">
+      <ComponentRef Id="C_Payload" />
+    </PatchFamily>
+  </Patch>
+</Wix>
