@@ -3643,7 +3643,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);
-            using var udKey = hklm.OpenSubKey(
+            using var udKey = hklm.OpenSubKeyEarned(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {
@@ -3794,7 +3794,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         try
         {
-            using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
+            using var productsKey = udKey.OpenSubKeyEarned($@"{sidName}\Products");
             if (productsKey is not null)
             {
                 foreach (var prodGuid in RegistryNames.SubKeysOf(productsKey, ct))
@@ -3827,8 +3827,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     // The per-product patch set, read here because this loop is
                     // already standing on the key it lives one level below, so it
-                    // costs one OpenSubKey per product and no second walk of
-                    // UserData. Its own try/catch and its own cause: a product whose
+                    // costs one key open per product, two where the key is absent,
+                    // and no second walk of UserData. Its own try/catch and its own cause: a product whose
                     // patch list will not read is a different diagnosis from one
                     // whose InstallProperties will not, and the budget keys on the
                     // cause string.
@@ -3877,7 +3877,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     try
                     {
-                        using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
+                        using var ipKey = productsKey.OpenSubKeyEarned($@"{prodGuid}\InstallProperties");
                         hasInstallProperties = ipKey is not null;
 
                         // Both names are read, and each one present is claimed: see
@@ -3936,7 +3936,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         try
         {
-            using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
+            using var patchesKey = udKey.OpenSubKeyEarned($@"{sidName}\Patches");
             if (patchesKey is not null)
             {
                 foreach (var patchGuid in RegistryNames.SubKeysOf(patchesKey, ct))
@@ -3972,7 +3972,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     try
                     {
-                        using var patchKey = patchesKey.OpenSubKey(patchGuid);
+                        using var patchKey = patchesKey.OpenSubKeyEarned(patchGuid);
                         var anyValueNamesNoPath = false;
                         var unclaimedFileHere = false;
                         foreach (var valueName in CachedPackageValueNames)
@@ -4478,7 +4478,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         patchCodes = null;
         patchesKeyPresent = false;
 
-        using var patchesKey = productsKey.OpenSubKey($@"{packedProductCode}\Patches");
+        using var patchesKey = productsKey.OpenSubKeyEarned($@"{packedProductCode}\Patches");
 
         // AN ABSENT KEY IS AN ANSWER AND NOT AN INABILITY, and the difference decides
         // whether a file is offered. A product with no Patches key holds no registered
@@ -4560,8 +4560,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unestablished = false;
         foreach (var patchName in patchNames)
         {
-            using var patchKey = patchesKey.OpenSubKey(patchName);
-            if (patchKey is null) { unestablished = true; continue; }
+            // A key that will not open leaves the product unestablished and the code list
+            // built from the listing standing. A key no longer there is a patch no longer
+            // registered, which holds nothing.
+            Microsoft.Win32.RegistryKey? patchKey;
+            try
+            {
+                patchKey = patchesKey.OpenSubKeyEarned(patchName);
+            }
+            catch (Exception ex) when (ex is IOException or System.Security.SecurityException)
+            {
+                unestablished = true;
+                continue;
+            }
+
+            using var opened = patchKey;
+            if (patchKey is null) continue;
 
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three
