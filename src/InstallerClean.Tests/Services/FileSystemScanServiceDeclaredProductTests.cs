@@ -545,12 +545,13 @@ public class FileSystemScanServiceDeclaredProductTests
         // having been a walk candidate, so the screen does not see it, and this
         // asserts that directly rather than through whatever the superseded branch
         // does with the row. It matters because the screen keeps a registered patch's
-        // own cached file: that patch's registrations record that very file. The
-        // reader throws on any path no test scripted, so a screen that reached for it
-        // would fail the run rather than quietly withhold.
+        // own cached file: that patch's registrations record that very file. The row
+        // is removable and on disk, so it reaches the branch that offers it, and the
+        // reader throws on any path no test scripted, so a screen put to it there
+        // would fail the run or keep the row off the offer.
         var registered = new List<RegisteredPackage>
         {
-            new($@"{Folder}\superseded.msp", "Test Product", ProductB, PatchState: 2),
+            new($@"{Folder}\superseded.msp", "Test Product", ProductB, PatchState: 2, IsRemovable: true),
         };
 
         var identities = new ScriptedPackageIdentities();
@@ -561,8 +562,9 @@ public class FileSystemScanServiceDeclaredProductTests
 
         var result = await Scan(new[] { $@"{Folder}\held.msi" }, msi, identities, registered);
 
-        Assert.Single(result.WithheldFiles!);
         Assert.Equal(new[] { $@"{Folder}\held.msi" }, identities.Reads);
+        Assert.Equal($@"{Folder}\held.msi", Assert.Single(result.WithheldFiles!).FullPath);
+        Assert.Equal($@"{Folder}\superseded.msp", Assert.Single(result.RemovableFiles).FullPath);
     }
 
     // ---- What a scan with no screen does, pinned rather than assumed ----
