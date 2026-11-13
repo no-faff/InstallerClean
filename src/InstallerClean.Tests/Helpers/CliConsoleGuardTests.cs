@@ -394,6 +394,7 @@ public class CliConsoleGuardTests
     [Fact]
     public void A_refusal_whose_error_stream_refuses_every_write_still_gives_the_error_code()
     {
+        using var _ = TestCrashLog.OwnFolder();
         var error = new ConsoleFailingAt("");
 
         Assert.Equal(CliExitCode.Error, Program.Refuse("refused here", error));

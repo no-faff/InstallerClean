@@ -40,7 +40,7 @@ public partial class App : Application
     /// The portable carries no config naming the runtime, so .NET Framework starts it on any
     /// 4.x. The runtime compiles a method whole the first time it runs, and a member the PC's
     /// .NET Framework lacks fails that compile, so the check runs here, in a method of its
-    /// own, ahead of every method WPF and the app's start compile. The message is in the
+    /// own, ahead of Application's constructor and every method the window's start compiles. The message is in the
     /// language Windows displays: the language picked in the app is read later.
     /// </remarks>
     static App()
@@ -57,8 +57,19 @@ public partial class App : Application
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
     private static void EndWithoutNetFramework48()
     {
-        if (NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: false) is not { } message) return;
-        MessageBox.Show(message, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
+        // A throw out of a type initializer reaches no handler the app has set, so a check or
+        // a box that fails lets the start go on, where the app's own handlers catch what follows.
+        string? message;
+        try
+        {
+            message = NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: false);
+            if (message is null) return;
+            MessageBox.Show(message, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Exception)
+        {
+            return;
+        }
         Environment.Exit(1);
     }
 
