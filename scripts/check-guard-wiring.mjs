@@ -58,6 +58,9 @@ const GUARDS = [
   {
     command: './scripts/check-report-bytes.ps1',
     workflows: ['.github/workflows/ci.yml'],
+  },  {
+    command: './scripts/check-update-download.ps1',
+    workflows: ['.github/workflows/ci.yml'],
   },
 ];
 

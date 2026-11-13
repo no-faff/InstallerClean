@@ -788,6 +788,15 @@ jobs:
         shell: pwsh
         run: ./scripts/check-report-bytes.ps1
 
+      # The merged command line's own UpdateDownloadService, on this runner's .NET Framework,
+      # downloading the v3.7.0 release's command line from GitHub as an update does.
+      - name: Check the merged command line downloads a release exe
+        if: success() || failure()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/check-update-download.ps1
+
       # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
       # command line prints. This reads that resource out of each merged exe against the file,
       # and each merge's input list against the file's table of merged packages, so a package
