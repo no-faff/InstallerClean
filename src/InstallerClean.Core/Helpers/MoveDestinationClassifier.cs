@@ -11,8 +11,8 @@ public static class MoveDestinationClassifier
     /// <summary>
     /// The volume question as the app asks it, and the value every reading of it falls
     /// back to. A wrapper rather than the method itself because
-    /// <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> carries an optional
-    /// second parameter, which no delegate of this shape can bind.
+    /// <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> carries optional
+    /// parameters, which no delegate of this shape can bind.
     /// </summary>
     public static bool? AskWhetherOnCacheVolume(string destination) =>
         MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination);
@@ -38,14 +38,14 @@ public static class MoveDestinationClassifier
     /// drive-letter root, and a mounted folder has no letter, so
     /// StorageHelpers.GetDriveKind takes the mount point instead.
     ///
-    /// THREE VOLUME QUERIES RATHER THAN TWO, ON PURPOSE. The same-drive answer comes
-    /// from MoveSpaceCheck so that this window and the command line cannot answer
-    /// it differently, which is the reason that decision lives in Core at all.
-    /// Two of the three are its own, one for the cache folder and one for the
-    /// destination; threading the destination's mount point out of it to save
-    /// the duplicate below would buy back one call per Move and put that back at
-    /// risk. This runs once per operation, inside the pre-flight, off the
-    /// dispatcher.
+    /// THE DESTINATION'S VOLUME IS ASKED AGAIN BELOW, ON PURPOSE. The same-drive answer
+    /// comes from MoveSpaceCheck so that this window and the command line cannot
+    /// answer it differently, which is the reason that decision lives in Core at all.
+    /// It asks for the cache folder's mount point and the destination's, and for a
+    /// drive mapped onto a share, the destination's drive kind and its folder's file
+    /// id as well; threading those out of it to save the repeat below would buy back
+    /// a call or two per Move and put that back at risk. This runs once per
+    /// operation, inside the pre-flight, off the dispatcher.
     /// </remarks>
     /// <param name="dest">The folder the move would write into.</param>
     /// <param name="resolveIsOnCacheVolume">
@@ -60,19 +60,23 @@ public static class MoveDestinationClassifier
     {
         if (string.IsNullOrWhiteSpace(dest)) return MoveDestinationKinds.Unknown;
 
-        // Answered from the spelling, before anything is asked of the network.
-        // The same test MoveSpaceCheck uses, so the two cannot disagree about
-        // what counts as a share.
-        if (StorageHelpers.IsRemotePath(dest)) return MoveDestinationKinds.UncShare;
-
         // Three-state for the same reason the tooltip is: this value goes into
         // the result log and the opt-in report, and it is read as an answer. A
         // volume question Windows would not settle is unknown, not another
         // drive, and calling it another drive is what would let the completion
         // card head a move with a freed count it had not established.
+        //
+        // ASKED FIRST, SHARES INCLUDED. A Move through this PC's own share, or a
+        // drive mapped onto it, lands on the cache's own volume and frees nothing,
+        // so a share is called a share only once the volume question has said it
+        // is somewhere else.
         var onCacheVolume = (resolveIsOnCacheVolume ?? AskWhetherOnCacheVolume)(dest);
         if (onCacheVolume is null) return MoveDestinationKinds.Unknown;
         if (onCacheVolume.Value) return MoveDestinationKinds.SameDrive;
+
+        // The same test MoveSpaceCheck uses, so the two cannot disagree about
+        // what counts as a share.
+        if (StorageHelpers.IsRemotePath(dest)) return MoveDestinationKinds.UncShare;
 
         try
         {

@@ -77,10 +77,11 @@ public sealed class MoveFilesService : IMoveFilesService
             // The destination gates are inside the worker, not on the
             // caller's thread, which for the GUI is the dispatcher: two of them
             // resolve a user-chosen path through CreateFile and
-            // GetFinalPathNameByHandle, twice over, and a mapped drive or a UNC
-            // share that has gone away stalls each one for the SMB timeout with
-            // the operating overlay already up and its Cancel button
-            // unpressable.
+            // GetFinalPathNameByHandle, twice over, and for a share path open its
+            // nearest folder through the share again to read its file id, and a
+            // mapped drive or a UNC share that has gone away stalls each one for
+            // the SMB timeout with the operating overlay already up and its
+            // Cancel button unpressable.
 
             // Reject relative destinations: FullPaths.GetFullPath would otherwise
             // resolve them against the process CWD, and the CLI host's CWD
@@ -297,10 +298,10 @@ public sealed class MoveFilesService : IMoveFilesService
             //
             // The per-file check in the loop is what holds each later resolution of
             // destinationFolder to this capture.
-            if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination))
+            if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination, canonicalProven))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
-            if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination))
+            if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination, canonicalProven))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
 
