@@ -102,6 +102,19 @@ internal static class FullPaths
     }
 
     /// <summary>
+    /// <see cref="GetFullPath"/> without its short names expanded, so nothing is asked of the
+    /// folders the path names: Windows' own reading of the path's text, <c>.</c> and <c>..</c>
+    /// taken out as it takes them out when it opens the path.
+    /// </summary>
+    internal static string GetFullPathAsText(string path)
+    {
+        if (path is null) throw new ArgumentNullException(nameof(path));
+        if (PathText.IsEffectivelyEmpty(path)) throw new ArgumentException("The path is empty.", nameof(path));
+        if (path.IndexOf('\0') >= 0) throw new ArgumentException("Null character in path.", nameof(path));
+        return PathText.IsExtended(path) ? path : Normalize(path, expandShortNames: false);
+    }
+
+    /// <summary>
     /// <paramref name="path"/> relative to the folder <paramref name="relativeTo"/>, both made
     /// full paths first and compared ignoring case: <c>.</c> where they are the same folder,
     /// and <paramref name="path"/>'s full path where the two have different roots. A trailing

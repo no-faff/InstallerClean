@@ -201,8 +201,7 @@ internal static class MoveSpaceCheck
         string destination, string? installerCacheRoot, IFileIdentityReader? identities,
         ShareReads share)
     {
-        // Windows takes a share path's ".." no higher than the share, and so does GetFullPath.
-        var sharePath = share.ToSharePath(destination) is { } spelled ? FullPaths.GetFullPath(spelled) : null;
+        var sharePath = share.ToSharePath(destination);
         if (sharePath is not null
             && ThisPCName.TrySplit(sharePath, out var server, out var shareName, out var below)
             && share.NamesThisPC(server))
@@ -210,7 +209,14 @@ internal static class MoveSpaceCheck
             var local = share.ShareLocalPath(shareName);
             if (local is null) return null;
             var onThisPC = OnShareFolder(local, below);
-            return onThisPC is null ? null : LocalVolumeMatch(onThisPC, installerCacheRoot, out _);
+            if (onThisPC is null) return null;
+
+            // A junction or link inside the share's folder takes the path to where it leads,
+            // which the kernel's resolution follows. One leading to a share is not settled here.
+            if (!InstallerCacheHelpers.TryResolveFinalPath(onThisPC, out var followed)
+                || InstallerCacheHelpers.IsUncPath(followed))
+                return null;
+            return LocalVolumeMatch(followed, installerCacheRoot, out _);
         }
 
         identities ??= Identities;
@@ -246,14 +252,15 @@ internal static class MoveSpaceCheck
     /// <summary>
     /// <paramref name="below"/>, the part of a share path below its share, put on the share's
     /// local path <paramref name="shareFolder"/>; null where a part of it is <c>.</c> or
-    /// <c>..</c>, which would name a folder off the share's own.
+    /// <c>..</c>, which would name a folder off the share's own, as a <c>\\?\UNC\</c>
+    /// spelling keeps them.
     /// </summary>
     internal static string? OnShareFolder(string shareFolder, string below)
     {
         if (below.Length == 0) return shareFolder;
         foreach (var part in below.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries))
             if (part is "." or "..") return null;
-        return PathText.Combine(shareFolder, below);
+        return PathText.Join(shareFolder, below);
     }
 
     /// <summary>
@@ -370,7 +377,9 @@ internal sealed record ShareReads(
     {
         if (StorageHelpers.IsRemotePath(destination))
         {
-            var spelled = destination.Replace('/', '\\');
+            // Windows' own reading of the text, as it opens the path: a ".." in a share path
+            // goes no higher than the share. A \\?\ spelling is left as written.
+            var spelled = FullPaths.GetFullPathAsText(destination).Replace('/', '\\');
             return spelled.StartsWith(@"\\?\UNC\", StringComparison.OrdinalIgnoreCase)
                 || spelled.StartsWith(@"\\.\UNC\", StringComparison.OrdinalIgnoreCase)
                     ? @"\\" + spelled.Substring(8)

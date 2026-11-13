@@ -151,20 +151,30 @@ public class MoveSpaceCheckShareTests
     [InlineData(@"C:\Data\", "Moved", @"C:\Data\Moved")]
     [InlineData(@"C:\Data", @"..\Moved", null)]
     [InlineData(@"C:\Data", @"Moved\.\Sub", null)]
+    [InlineData(@"E:\Data", @"C:\Moved", @"E:\Data\C:\Moved")]
     public void The_part_below_a_share_goes_on_its_local_path_and_never_above_it(string shareFolder, string below, string? expected) =>
         Assert.Equal(expected, MoveSpaceCheck.OnShareFolder(shareFolder, below));
 
     [Fact]
-    public void A_share_path_climbing_above_its_share_is_asked_of_the_share_itself()
+    public void A_share_path_still_climbing_above_its_share_is_not_settled()
     {
+        // As a \\?\UNC\ spelling keeps its "..": nothing below the share is asked about.
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
         var shares = new List<string>();
 
-        MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            @"\\localhost\Data\..\..\Other\Moved", CacheRoot, reader,
-            Share(names: _ => true, local: name => { shares.Add(name); return null; }));
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
+            @"\\localhost\Data\..\Other\Moved", CacheRoot, reader,
+            Share(names: _ => true, local: name => { shares.Add(name); return @"C:\Data"; })));
         Assert.Equal(["Data"], shares);
+        Assert.Empty(reader.Asked);
     }
+
+    [Theory]
+    [InlineData(@"\\localhost\Data\..\..\Other\Moved", @"\\localhost\Data\Other\Moved")]
+    [InlineData(@"\\localhost\Data\.\Moved\", @"\\localhost\Data\Moved\")]
+    [InlineData(@"\\?\UNC\localhost\Data\..\Moved", @"\\localhost\Data\..\Moved")]
+    public void A_share_spelling_is_read_as_Windows_reads_it(string destination, string sharePath) =>
+        Assert.Equal(sharePath, ShareReads.Production.ToSharePath(destination));
 
     [Fact]
     public void A_Move_through_a_share_on_the_cache_volume_still_copies_and_is_still_measured()

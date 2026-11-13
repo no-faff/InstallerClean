@@ -18,8 +18,8 @@ internal static class ThisPCName
     /// <summary>
     /// Whether <paramref name="server"/> is this PC by one of its own names: <c>localhost</c>,
     /// <c>127.0.0.1</c>, the IPv6 loopback as a share path writes it (<c>--1.ipv6-literal.net</c>),
-    /// the computer name, the host name, or one of this PC's own addresses that is not
-    /// link-local, written as Windows writes it. Any other name answers false: one that
+    /// the computer name, the host name, or one of this PC's own addresses, written as Windows
+    /// writes it, an IPv6 one only where it is not link-local. Any other name answers false: one that
     /// resolves through DNS, mDNS or a hosts file can reach another computer, and so can
     /// another loopback address forwarded by a tunnel. So a caller treats false as "not
     /// established", never as "another computer".
@@ -48,9 +48,10 @@ internal static class ThisPCName
     }
 
     /// <summary>
-    /// Whether <paramref name="name"/> is one of this PC's own unicast addresses that is not
-    /// link-local, as <see cref="IPAddress.ToString"/> writes it, or for IPv6 as a share path
-    /// writes it, its colons as dashes and with no zone.
+    /// Whether <paramref name="name"/> is one of this PC's own unicast addresses: an IPv4 one as
+    /// <see cref="IPAddress.ToString"/> writes it, and an IPv6 one that is not link-local as a
+    /// share path writes it, its colons as dashes and with no zone. A link-local IPv6 address
+    /// names a different computer on each link, so without its zone it is not this PC's alone.
     /// </summary>
     private static bool IsOwnAddress(string name)
     {
@@ -62,8 +63,7 @@ internal static class ThisPCName
                     var address = unicast.Address;
                     if (address.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        var bytes = address.GetAddressBytes();
-                        if (!(bytes[0] == 169 && bytes[1] == 254) && name == address.ToString()) return true;
+                        if (name == address.ToString()) return true;
                     }
                     else if (address.AddressFamily == AddressFamily.InterNetworkV6
                         && !address.IsIPv6LinkLocal && address.ScopeId == 0
