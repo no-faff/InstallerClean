@@ -264,7 +264,7 @@ jobs:
           $v = (Get-Item $exe).VersionInfo.FileVersion
           "  $exe carries $v"
           if (-not $v.StartsWith("$env:OLD_VERSION.")) { throw "$exe carries $v, not $env:OLD_VERSION." }
-          if (Get-Process InstallerClean -ErrorAction SilentlyContinue) { throw "InstallerClean is already running." }
+          if (Get-Process InstallerClean, InstallerClean-portable, InstallerClean-slim -ErrorAction SilentlyContinue) { throw "InstallerClean is already running." }
           "WINDOW_EXE=$exe" | Add-Content $env:GITHUB_ENV
 
       # Windows PowerShell, where UI Automation's assemblies are part of the framework. The
@@ -354,7 +354,8 @@ jobs:
           $newer = $null
           $clock = [System.Diagnostics.Stopwatch]::StartNew()
           while (-not $newer -and $clock.Elapsed.TotalSeconds -lt 120) {
-            $newer = Get-Process InstallerClean -ErrorAction SilentlyContinue | Where-Object { $_.Path -and [string]::Equals($_.Path, $exe, 'OrdinalIgnoreCase') } | Select-Object -First 1
+            # By its path: a process is named for its file, which here is the portable's or the slim's.
+            $newer = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and [string]::Equals($_.Path, $exe, 'OrdinalIgnoreCase') } | Select-Object -First 1
             if (-not $newer) { Start-Sleep -Seconds 1 }
           }
           if ($newer) { "  process $($newer.Id) runs from $exe" } else { Fail "No InstallerClean runs from $exe 120 s after the staged exe ended." }
@@ -657,8 +658,14 @@ jobs:
           foreach ($log in (Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'), (Join-Path $env:LOCALAPPDATA 'NoFaff\InstallerClean\crash.log')) {
             if (Test-Path $log) { "$log holds:"; Get-Content $log } else { "No $log." }
           }
-          Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'InstallerClean' } -ErrorAction SilentlyContinue |
-            Sort-Object TimeCreated | ForEach-Object { "$($_.Id)  $($_.Message)" }
+          # Get-WinEvent refuses a provider no entry has registered, whatever its error action,
+          # which on a leg whose copy wrote no entry is the answer rather than a failure.
+          try {
+            Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'InstallerClean' } -ErrorAction Stop |
+              Sort-Object TimeCreated | ForEach-Object { "$($_.Id)  $($_.Message)" }
+          } catch {
+            "No Application log entries from InstallerClean: $($_.Exception.Message)"
+          }
 
       - name: Print the setup's log
         if: always() && matrix.route == 'setup'
