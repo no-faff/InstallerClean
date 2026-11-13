@@ -2391,8 +2391,14 @@ jobs:
         with:
           global-json-file: global.json
 
+      # The merge writes a config beside the exe naming .NET Framework 4.8, which the runtime
+      # would read and refuse on before any of the app's code runs. The command line download
+      # carries no config, so it is taken away and the exe run as it is downloaded.
       - name: Merge the command line into one file
-        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:EnableWindowsTargeting=true --nologo
+        run: |
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:EnableWindowsTargeting=true --nologo
+          test -f publish/cli/installerclean-cli.exe
+          rm publish/cli/installerclean-cli.exe.config
 
       - name: Install Wine and winetricks
         run: |
