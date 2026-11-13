@@ -19,7 +19,8 @@ namespace InstallerClean.Interop.Native;
 /// in the runtime's compatibility defaults for that unknown target: those of .NET Framework
 /// 4.0, among them legacy path handling and a 260-character limit, for the life of the
 /// process. So the decision here uses only the two module handles, and a refusal is kept
-/// and written to the crash log by <see cref="WriteWhatTheInitializerKept"/> once Main runs.
+/// and written to the crash log by <see cref="WriteWhatTheInitializerKept"/> once the
+/// .NET Framework 4.8 check has answered.
 /// The initializers' IL is checked for this in the tests.
 /// </remarks>
 internal static class SystemLibraries
@@ -99,9 +100,14 @@ internal static class SystemLibraries
 
     /// <summary>
     /// Writes to the crash log whatever <see cref="SearchSystem32For(Assembly)"/> kept, and
-    /// forgets it. Each exe calls this first thing once its Main runs: the command line's Main,
-    /// the window's App type initializer. Never throws.
+    /// forgets it. Each exe calls this once its .NET Framework 4.8 check has answered: the
+    /// command line from Main, the window from App's type initializer. Never throws.
     /// </summary>
+    /// <remarks>
+    /// Never compiled into the method calling it: the crash log's code uses what .NET Framework
+    /// below 4.6 lacks, and the check has to answer before any of it is compiled.
+    /// </remarks>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
     internal static void WriteWhatTheInitializerKept()
     {
         // The module initializer and Main run on the one thread that starts the process.
