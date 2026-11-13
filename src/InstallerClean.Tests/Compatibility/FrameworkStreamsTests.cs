@@ -131,68 +131,80 @@ public class FrameworkStreamsTests
     [Fact]
     public async Task A_response_body_hands_back_the_same_stream_on_every_call()
     {
-        using var server = StallingServer.Start(bodyLength: 4, sent: 4);
-        using var client = new HttpClient();
-        using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+        await WithinServerBound(async () =>
+        {
+            using var server = StallingServer.Start(bodyLength: 4, sent: 4);
+            using var client = new HttpClient();
+            using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
 
-        var first = await response.Content.ReadAsStreamAsync(CancellationToken.None);
-        var second = await response.Content.ReadAsStreamAsync(CancellationToken.None);
+            var first = await response.Content.ReadAsStreamAsync(CancellationToken.None);
+            var second = await response.Content.ReadAsStreamAsync(CancellationToken.None);
 
-        Assert.Same(first, second);
+            Assert.Same(first, second);
+        });
     }
 
     [Fact]
     public async Task A_response_body_reads_what_the_server_sends()
     {
-        using var server = StallingServer.Start(bodyLength: 4, sent: 4);
-        using var client = new HttpClient();
-        using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
-        using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
-        var buffer = new byte[16];
+        await WithinServerBound(async () =>
+        {
+            using var server = StallingServer.Start(bodyLength: 4, sent: 4);
+            using var client = new HttpClient();
+            using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+            using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
+            var buffer = new byte[16];
 
-        var total = 0;
-        int read;
-        while ((read = await body.ReadAsync(buffer.AsMemory(total), CancellationToken.None)) > 0)
-            total += read;
+            var total = 0;
+            int read;
+            while ((read = await body.ReadAsync(buffer.AsMemory(total), CancellationToken.None)) > 0)
+                total += read;
 
-        Assert.Equal("MZab", Encoding.ASCII.GetString(buffer, 0, total));
+            Assert.Equal("MZab", Encoding.ASCII.GetString(buffer, 0, total));
+        });
     }
 
     [Fact]
     public async Task A_response_body_read_the_server_stops_answering_ends_when_its_token_is_cancelled()
     {
-        using var server = StallingServer.Start(bodyLength: 1_000_000, sent: 4);
-        using var client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
-        using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
-        using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
-        var buffer = new byte[4096];
-        var got = 0;
-        while (got < 4)
-            got += await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
-        using var stall = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
+        await WithinServerBound(async () =>
+        {
+            using var server = StallingServer.Start(bodyLength: 1_000_000, sent: 4);
+            using var client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+            using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
+            var buffer = new byte[4096];
+            var got = 0;
+            while (got < 4)
+                got += await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
+            using var stall = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
 
-        var read = body.ReadAsync(buffer, stall.Token).AsTask();
-        var finished = await Task.WhenAny(read, Task.Delay(TimeSpan.FromSeconds(10)));
+            var read = body.ReadAsync(buffer, stall.Token).AsTask();
+            var finished = await Task.WhenAny(read, Task.Delay(TimeSpan.FromSeconds(10)));
 
-        Assert.Same(read, finished);
-        var thrown = await Assert.ThrowsAsync<TaskCanceledException>(() => read);
-        Assert.Equal(stall.Token, thrown.CancellationToken);
-        Assert.Equal("The operation was canceled.", thrown.Message);
+            Assert.Same(read, finished);
+            var thrown = await Assert.ThrowsAsync<TaskCanceledException>(() => read);
+            Assert.Equal(stall.Token, thrown.CancellationToken);
+            Assert.Equal("The operation was canceled.", thrown.Message);
+        });
     }
 
     [Fact]
     public async Task A_response_body_read_given_a_cancelled_token_fails_before_it_reads()
     {
-        using var server = StallingServer.Start(bodyLength: 4, sent: 4);
-        using var client = new HttpClient();
-        using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
-        using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
+        await WithinServerBound(async () =>
+        {
+            using var server = StallingServer.Start(bodyLength: 4, sent: 4);
+            using var client = new HttpClient();
+            using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+            using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
 
-        var thrown = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => body.ReadAsync(new byte[4], cts.Token).AsTask());
+            var thrown = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => body.ReadAsync(new byte[4], cts.Token).AsTask());
 
-        Assert.Equal(cts.Token, thrown.CancellationToken);
+            Assert.Equal(cts.Token, thrown.CancellationToken);
+        });
     }
 
     [Fact]
@@ -449,6 +461,22 @@ public class FrameworkStreamsTests
         }
 
         protected override void Dispose(bool disposing) => System.Runtime.InteropServices.Marshal.FreeHGlobal(_pointer);
+    }
+
+    /// <summary>
+    /// How long a test talking to a <see cref="StallingServer"/> may take, its own waits
+    /// included. Their requests and reads wait on a real connection, and only some of them
+    /// with a timeout of their own, so each test runs under this bound: a read or a dispose
+    /// that never returns fails that test rather than holding the test run.
+    /// </summary>
+    private static readonly TimeSpan ServerBound = TimeSpan.FromSeconds(30);
+
+    private static async Task WithinServerBound(Func<Task> test)
+    {
+        var run = Task.Run(test);
+        var finished = await Task.WhenAny(run, Task.Delay(ServerBound));
+        Assert.True(finished == run, $"The test had not finished after {ServerBound.TotalSeconds} s.");
+        await run;
     }
 
     /// <summary>
