@@ -174,6 +174,7 @@ public class NativeDeclarationTests
         [typeof(Kernel32.FILETIME)] = 8,
         [typeof(Kernel32.BY_HANDLE_FILE_INFORMATION)] = 52,
         [typeof(Kernel32.FILE_ID_INFO)] = 24,
+        [typeof(Kernel32.FILE_ID_DESCRIPTOR)] = 24,
         [typeof(Kernel32.FILE_BASIC_INFO)] = 40,
         [typeof(Kernel32.SECURITY_ATTRIBUTES)] = 24,
         [typeof(Kernel32.FILE_DISPOSITION_INFO_EX)] = 4,

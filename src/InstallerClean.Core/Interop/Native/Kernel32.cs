@@ -533,6 +533,39 @@ internal static class Kernel32
     public const uint FileIdInfo = 18;
 
     /// <summary>
+    /// Opens the file or folder whose id <paramref name="lpFileId"/> holds, on the volume
+    /// <paramref name="hVolumeHint"/> is a handle on. The id is the 128-bit one
+    /// <see cref="FILE_ID_INFO"/> carries, given as <see cref="ExtendedFileIdType"/>, so one read
+    /// off a folder through a share opens that same folder on the volume that holds it.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "OpenFileById", ExactSpelling = true, SetLastError = true)]
+    public static extern SafeFileHandle OpenFileById(
+        SafeFileHandle hVolumeHint,
+        ref FILE_ID_DESCRIPTOR lpFileId,
+        uint dwDesiredAccess,
+        uint dwShareMode,
+        IntPtr lpSecurityAttributes,
+        uint dwFlagsAndAttributes);
+
+    /// <summary>
+    /// FILE_ID_DESCRIPTOR with its union as the 16-byte FILE_ID_128, laid out as
+    /// <see cref="FILE_ID_INFO"/> lays out the id: two ulongs, byte for byte the FILE_ID_128,
+    /// copied and never interpreted. The union starts at offset 8, the alignment of its
+    /// LARGE_INTEGER member, which is where sequential layout puts the first ulong.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILE_ID_DESCRIPTOR
+    {
+        public uint dwSize;
+        public int Type;
+        public ulong FileIdLow;
+        public ulong FileIdHigh;
+    }
+
+    /// <summary>ExtendedFileIdType of FILE_ID_TYPE: the id is a FILE_ID_128.</summary>
+    public const int ExtendedFileIdType = 2;
+
+    /// <summary>
     /// The same call as <see cref="GetFileInformationByHandleEx"/>, declared a second
     /// time for <see cref="FILE_BASIC_INFO"/>, because the API writes a different
     /// struct for each class and an out-parameter has one type.
