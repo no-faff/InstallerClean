@@ -173,6 +173,7 @@ public class FrameworkStreamsTests
             using var client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
             step.To("the request");
             using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+            server.ReleaseBody();
             step.To("the response stream");
             using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
             var buffer = new byte[4096];
@@ -539,20 +540,24 @@ public class FrameworkStreamsTests
     /// <c>sent</c> ("MZab" and on) and then stops, holding the connection open.
     /// </summary>
     /// <remarks>
-    /// It runs on a thread of its own and writes the head and the bytes it sends in one
-    /// write, so what it sends never waits on a thread-pool thread: a test under
-    /// <see cref="ServerBound"/> held by a starved pool is held in the client, and
-    /// <see cref="Reached"/> says how far the server got.
+    /// It runs on a thread of its own with blocking calls, so what it sends never waits on a
+    /// thread-pool thread, and <see cref="Reached"/> says how far it got. A whole body goes
+    /// out in one write with the head. A body cut short goes out after the head only once
+    /// the test calls <see cref="ReleaseBody"/>.
     /// </remarks>
     private sealed class StallingServer : IDisposable
     {
         private readonly TcpListener _listener;
         private readonly ManualResetEventSlim _stop = new();
+        private readonly ManualResetEventSlim _bodyReleased = new();
         private string _reached = "not accepted";
 
         private StallingServer(TcpListener listener) => _listener = listener;
 
         public Uri Address => new($"http://127.0.0.1:{((IPEndPoint)_listener.LocalEndpoint).Port}/");
+
+        /// <summary>Lets a body cut short go out; the server holds it until this is called.</summary>
+        public void ReleaseBody() => _bodyReleased.Set();
 
         /// <summary>How far the server has got with its one request.</summary>
         public string Reached => Volatile.Read(ref _reached);
@@ -576,10 +581,27 @@ public class FrameworkStreamsTests
                 Volatile.Write(ref _reached, "accepted");
                 var request = new byte[4096];
                 _ = connection.Read(request, 0, request.Length);
-                var answer = Encoding.ASCII.GetBytes(
-                    $"HTTP/1.1 200 OK\r\nContent-Length: {bodyLength}\r\nContent-Type: application/octet-stream\r\n\r\n"
-                    + "MZab".PadRight(sent, 'c').Substring(0, sent));
-                connection.Write(answer, 0, answer.Length);
+                var head = Encoding.ASCII.GetBytes(
+                    $"HTTP/1.1 200 OK\r\nContent-Length: {bodyLength}\r\nContent-Type: application/octet-stream\r\n\r\n");
+                var body = Encoding.ASCII.GetBytes("MZab".PadRight(sent, 'c').Substring(0, sent));
+                if (sent < bodyLength)
+                {
+                    // A body cut short goes out once the client has its response, so its
+                    // bytes reach the client as a read of their own and not beside the head.
+                    connection.Write(head, 0, head.Length);
+                    connection.Flush();
+                    Volatile.Write(ref _reached, "sent the head");
+                    WaitHandle.WaitAny([_bodyReleased.WaitHandle, _stop.WaitHandle]);
+                    if (_stop.IsSet) return;
+                    connection.Write(body, 0, body.Length);
+                }
+                else
+                {
+                    var answer = new byte[head.Length + body.Length];
+                    head.CopyTo(answer, 0);
+                    body.CopyTo(answer, head.Length);
+                    connection.Write(answer, 0, answer.Length);
+                }
                 connection.Flush();
                 Volatile.Write(ref _reached, $"sent the head and {sent} bytes");
                 _stop.Wait();
