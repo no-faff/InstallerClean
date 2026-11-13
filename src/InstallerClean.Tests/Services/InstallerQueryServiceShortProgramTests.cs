@@ -5,6 +5,7 @@ using InstallerClean.Services;
 using AccountCode = InstallerClean.Services.InstallerQueryService.AccountCode;
 using EstablishedPatchReach = InstallerClean.Services.InstallerQueryService.EstablishedPatchReach;
 using RegistryPackageRecord = InstallerClean.Services.InstallerQueryService.RegistryPackageRecord;
+using RegistryProductEntry = InstallerClean.Services.InstallerQueryService.RegistryProductEntry;
 
 namespace InstallerClean.Tests.Services;
 
@@ -36,6 +37,8 @@ public class InstallerQueryServiceShortProgramTests
     private const string Superseded = "{CCCCCCCC-0000-0000-0000-00000000000C}";
     private const string OtherPatch = "{DDDDDDDD-0000-0000-0000-00000000000D}";
     private const string ThirdPatch = "{FFFFFFFF-0000-0000-0000-00000000000F}";
+
+    private const string EndlessPatch = FakeMsiApi.EndlessPatch;
 
     private const string SupersededFile = @"C:\Windows\Installer\short-program-superseded.msp";
     private const string OtherPatchFile = @"C:\Windows\Installer\short-program-other.msp";
@@ -112,6 +115,28 @@ public class InstallerQueryServiceShortProgramTests
         var result = await Scan(msi, Fallback(listings: listedUnder is null
             ? new()
             : new() { [new AccountCode(listedUnder, Short)] = listing! }));
+
+        AssertCounted(result, unsettled);
+    }
+
+    /// <summary>
+    /// The patch list stops at its first row, which will not read, so it returns no patch
+    /// and is then abandoned. An empty listing under the program's own account says the
+    /// program holds no patch where Windows has just met one, and does not answer for it.
+    /// </summary>
+    [Theory]
+    [InlineData(new[] { OtherPatch }, 0)]
+    [InlineData(new string[0], 1)]
+    [InlineData(null, 1)]
+    public async Task A_patch_list_that_came_back_short_before_naming_any_patch_holds_every_superseded_patch_unless_its_own_listing_names_one(
+        string[]? listing, int unsettled)
+    {
+        var msi = Machine();
+        msi.PatchRowsFailFrom[Short] = 0;
+
+        var result = await Scan(msi, Fallback(listings: listing is null
+            ? new()
+            : new() { [new AccountCode(MachineAccount, Short)] = listing }));
 
         AssertCounted(result, unsettled);
     }
@@ -385,22 +410,31 @@ public class InstallerQueryServiceShortProgramTests
         Assert.All(result.PairingsOfHoldersWithNoClaims, p => Assert.Equal(Recovered, p.ProductCode));
     }
 
+    /// <summary>
+    /// Access refused at the first row or after <see cref="Superseded"/>, or a list that
+    /// never ends, which in the product walk would refuse the scan. Here the scan stands,
+    /// and the program's pairings for the check under the lease are the rows Windows
+    /// returned before it stopped, each once. The program's own key lists every row Windows
+    /// returns, so the superseded patch stays offered and the program is asked about it.
+    /// </summary>
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task A_patch_list_that_refuses_for_that_program_leaves_the_scan_standing(bool neverEnds)
+    [InlineData(0u, new string[0])]
+    [InlineData(1u, new[] { Superseded })]
+    [InlineData(uint.MaxValue, new[] { EndlessPatch })]
+    public async Task A_patch_list_that_refuses_for_that_program_leaves_the_scan_standing_and_carries_the_rows_it_returned(
+        uint refusedAt, string[] carried)
     {
-        // Access refused, or a list that never ends, which in the product walk would refuse
-        // the scan. Here it carries none of the program's other patches.
         var msi = RecoveredHolder();
-        if (neverEnds) msi.NeverEndPatchesFor = Recovered;
-        else msi.PatchEnumResult[Recovered] = AccessDenied;
+        if (refusedAt == uint.MaxValue) msi.NeverEndPatchesFor = Recovered;
+        else msi.PatchRowResult[(Recovered, refusedAt)] = AccessDenied;
 
-        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded, OtherPatch, EndlessPatch]));
 
+        AssertOffered(Row(result));
         Assert.Contains(Recovered, msi.PatchEnumerationsStarted);
         Assert.Single(result.PairingsHeldByName, p => p.ProductCode == Recovered);
-        Assert.Empty(result.PairingsOfHoldersWithNoClaims);
+        Assert.Equal(carried, result.PairingsOfHoldersWithNoClaims.Select(p => p.PatchCode));
+        Assert.All(result.PairingsOfHoldersWithNoClaims, p => Assert.Equal(Recovered, p.ProductCode));
     }
 
     // ---- A recovered program's patches, as Windows Installer lists them ----
@@ -420,31 +454,170 @@ public class InstallerQueryServiceShortProgramTests
         AssertKeptOnAClaim(Row(result));
     }
 
+    // Every scan below reads the recovered program's product key under its own account:
+    // a key under any other account is an entry no listed installation accounts for, which
+    // holds the superseded patch back on its own (WithholdOnUnlistedEntries) and would pass
+    // a row whatever the rule under test did. The account half is tested on the helpers.
+
+    /// <summary>
+    /// Windows refuses the patch list before returning a row. The registry's reading of
+    /// the program, which here holds nothing that could be uninstalled, stands on the
+    /// program's own product key, whether that key lists the program's patches or has no
+    /// <c>Patches</c> key.
+    /// </summary>
     [Theory]
-    [InlineData(false)]
     [InlineData(true)]
-    public async Task A_recovered_programs_patch_list_Windows_will_not_give_adds_nothing(bool neverEnds)
+    [InlineData(false)]
+    public async Task A_recovered_programs_patch_list_Windows_refuses_before_any_row_leaves_the_registrys_reading_of_its_own_product_key_standing(
+        bool keyListsPatches)
     {
-        // No answer is no reason to hold: the registry's reading of the program stands.
         var msi = RecoveredHolder(otherPatchUninstallable: "1");
-        if (neverEnds) msi.NeverEndPatchesFor = Recovered;
-        else msi.PatchEnumResult[Recovered] = AccessDenied;
+        msi.PatchEnumResult[Recovered] = AccessDenied;
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount,
+            keyListsPatches ? [Superseded, OtherPatch] : null));
+
+        AssertOffered(Row(result));
+        Assert.Equal(0, result.Census.RecoveredPatchSetUnestablishedCount);
+    }
+
+    /// <summary>
+    /// The same refusal where the registry read no product key for the program: nothing
+    /// answers for it, and the superseded patch is held back.
+    /// </summary>
+    [Fact]
+    public async Task A_recovered_programs_patch_list_Windows_refuses_holds_the_superseded_one_where_the_registry_read_no_key_of_its_own()
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        msi.PatchEnumResult[Recovered] = AccessDenied;
 
         var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
 
-        AssertOffered(Row(result));
+        AssertOfferedOrWithheld(Row(result), withheld: true);
+        Assert.Equal(1, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
-    [Fact]
-    public async Task A_recovered_programs_patch_whose_uninstallable_Windows_will_not_give_adds_nothing()
+    /// <summary>
+    /// Windows returns <see cref="Superseded"/> and then refuses the rest of the list. The
+    /// registry's reading stands only where the program's own listing names the row
+    /// returned.
+    /// </summary>
+    [Theory]
+    [InlineData(new[] { Superseded, OtherPatch }, false)]
+    [InlineData(new[] { OtherPatch }, true)]
+    public async Task A_recovered_programs_patch_list_Windows_refuses_after_a_row_holds_the_superseded_one_unless_its_own_listing_names_that_row(
+        string[] listing, bool withheld)
     {
         var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        msi.PatchRowResult[(Recovered, 1)] = AccessDenied;
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
+
+        AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
+    }
+
+    /// <summary>
+    /// A patch list that never ends, returning <see cref="EndlessPatch"/> at every index,
+    /// and one abandoned after a run of rows that will not read, from its second row or
+    /// from its first. The registry's reading stands only where the program's own listing
+    /// names every patch Windows returned, and a list that met a row it could not read
+    /// needs a listing that names at least one patch however few rows it named.
+    /// </summary>
+    [Theory]
+    [InlineData(-1, new[] { Superseded, OtherPatch, EndlessPatch }, false)]
+    [InlineData(-1, new[] { Superseded, OtherPatch }, true)]
+    [InlineData(1, new[] { Superseded, OtherPatch }, false)]
+    [InlineData(1, new[] { OtherPatch, ThirdPatch }, true)]
+    [InlineData(0, new[] { Superseded, OtherPatch }, false)]
+    [InlineData(0, new string[0], true)]
+    [InlineData(0, null, true)]
+    public async Task A_recovered_programs_patch_list_that_is_not_whole_holds_the_superseded_one_unless_its_own_listing_names_every_patch_returned(
+        int rowsFailFrom, string[]? listing, bool withheld)
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        if (rowsFailFrom < 0) msi.NeverEndPatchesFor = Recovered;
+        else msi.PatchRowsFailFrom[Recovered] = (uint)rowsFailFrom;
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
+
+        AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
+    }
+
+    /// <summary>
+    /// Windows Installer lists <see cref="OtherPatch"/> and gives no Uninstallable for it,
+    /// failing or answering empty. The registry's reading covers the patch where the
+    /// program's own listing names it, and the program holds the superseded patch back
+    /// where that listing leaves the patch out or the program's key has no
+    /// <c>Patches</c> key.
+    /// </summary>
+    [Theory]
+    [InlineData(true, new[] { Superseded, OtherPatch }, false)]
+    [InlineData(false, new[] { Superseded, OtherPatch }, false)]
+    [InlineData(true, new[] { Superseded }, true)]
+    [InlineData(false, new[] { Superseded }, true)]
+    [InlineData(true, null, true)]
+    [InlineData(false, null, true)]
+    public async Task A_recovered_programs_patch_whose_uninstallable_Windows_will_not_give_holds_the_superseded_one_unless_its_own_listing_names_that_patch(
+        bool readFails, string[]? listing, bool withheld)
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: readFails ? "1" : "");
+        if (readFails) msi.PatchPropertyResult[(OtherPatch, Recovered, "Uninstallable")] = BadConfiguration;
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
+
+        AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
+    }
+
+    /// <summary>
+    /// The same, with <see cref="Recovered"/> installed per user and unmanaged under
+    /// <see cref="OwnerAccount"/>, whose product key sits under that account.
+    /// </summary>
+    [Theory]
+    [InlineData(new[] { Superseded, OtherPatch }, false)]
+    [InlineData(new[] { Superseded }, true)]
+    public async Task A_per_user_recovered_programs_patch_whose_uninstallable_Windows_will_not_give_is_answered_by_the_listing_under_its_own_account(
+        string[] listing, bool withheld)
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        msi.KeyedInstances[Recovered] = [(OwnerAccount, MsiInstallContext.UserUnmanaged)];
         msi.PatchPropertyResult[(OtherPatch, Recovered, "Uninstallable")] = BadConfiguration;
 
-        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
+        var result = await Scan(msi, RecoveredProgramsKey(OwnerAccount, listing));
 
-        AssertOffered(Row(result));
+        AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
+
+    [Theory]
+    [InlineData(MachineAccount, true)]
+    [InlineData("s-1-5-18", true)]
+    [InlineData(OtherAccount, false)]
+    [InlineData(null, false)]
+    public void Only_the_listing_and_the_product_key_under_the_installations_own_account_answer_for_it(
+        string? account, bool answers)
+    {
+        var listings = new Dictionary<AccountCode, IReadOnlyCollection<string>>
+        {
+            [new AccountCode(MachineAccount, Recovered)] = [OtherPatch],
+        };
+        RegistryProductEntry[] entries = [new(MachineAccount, Recovered, [OtherPatch])];
+
+        Assert.Equal(answers, InstallerQueryService.OwnListing(listings, account, Recovered) is not null);
+        Assert.Equal(answers, InstallerQueryService.ReadOwnProductKey(entries, account, Recovered));
+    }
+
+    [Theory]
+    [InlineData(new[] { OtherPatch, ThirdPatch }, new[] { OtherPatch }, true)]
+    [InlineData(new[] { OtherPatch }, new[] { "{dddddddd-0000-0000-0000-00000000000d}" }, true)]
+    [InlineData(new[] { OtherPatch }, new[] { OtherPatch, ThirdPatch }, false)]
+    [InlineData(new string[0], new string[0], true)]
+    [InlineData(null, new string[0], false)]
+    public void A_listing_names_every_patch_only_where_it_is_established_and_holds_each_one(
+        string[]? listed, string[] patchCodes, bool namesEvery) =>
+        Assert.Equal(namesEvery, InstallerQueryService.NamesEvery(listed, patchCodes));
 
     // ---- The machine and the fallback ----
 
@@ -518,14 +691,18 @@ public class InstallerQueryServiceShortProgramTests
     /// <paramref name="removablePatchOn"/>, so only what a test adds can hold the patch back.
     /// <paramref name="listings"/> are the own-account patch listings the reader established,
     /// and <paramref name="unclaimedProductFiles"/> the codes whose entry names a cached file on
-    /// the disk that the enumeration never claimed.
+    /// the disk that the enumeration never claimed. <paramref name="productEntries"/> are the
+    /// product keys the reader read, and <paramref name="heldCodes"/> replaces the patch codes
+    /// the reach holds for each code it names.
     /// </summary>
     private static InstallerQueryService.FallbackRead Fallback(
         string[]? registryCodes = null,
         Dictionary<AccountCode, IReadOnlyCollection<string>>? listings = null,
         RegistryPackageRecord[]? records = null,
         string? removablePatchOn = null,
-        string?[]? unclaimedProductFiles = null)
+        string?[]? unclaimedProductFiles = null,
+        RegistryProductEntry[]? productEntries = null,
+        Dictionary<string, IReadOnlyCollection<string>>? heldCodes = null)
     {
         registryCodes ??= [Listed, Short];
         var patchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
@@ -537,6 +714,8 @@ public class InstallerQueryServiceShortProgramTests
                 : ProductPatchSet.AllNonRemovable;
             held[code] = code == Listed ? [Superseded] : null;
         }
+        foreach (var (code, codes) in heldCodes ?? [])
+            held[code] = codes;
 
         return new InstallerQueryService.FallbackRead(
             0, registryCodes.Length,
@@ -549,8 +728,27 @@ public class InstallerQueryServiceShortProgramTests
                     [Superseded] = [Path.GetFullPath(SupersededFile)],
                 }),
             PackageRecords: records,
-            PatchListings: listings);
+            PatchListings: listings,
+            ProductEntries: productEntries);
     }
+
+    /// <summary>
+    /// A fallback reading <see cref="Recovered"/> as holding nothing that could be
+    /// uninstalled, from its product key under <paramref name="keyUnder"/>, whose
+    /// <c>Patches</c> key lists <paramref name="listing"/>, or is not there where
+    /// <paramref name="listing"/> is null. The patch codes the reach holds for
+    /// <see cref="Recovered"/> are that same listing, as the reader builds both from one
+    /// read.
+    /// </summary>
+    private static InstallerQueryService.FallbackRead RecoveredProgramsKey(
+        string keyUnder, string[]? listing) =>
+        Fallback(
+            registryCodes: [Listed, Short, Recovered],
+            listings: listing is null
+                ? new()
+                : new() { [new AccountCode(keyUnder, Recovered)] = listing },
+            productEntries: [new(keyUnder, Recovered, listing ?? [])],
+            heldCodes: new() { [Recovered] = listing ?? [] });
 
     private static async Task<InstallerQueryResult> Scan(FakeMsiApi msi, InstallerQueryService.FallbackRead fallback) =>
         await new InstallerQueryService(msi, (_, _) => fallback).GetRegisteredPackagesAsync();
@@ -580,6 +778,23 @@ public class InstallerQueryServiceShortProgramTests
     {
         Assert.True(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
+    }
+
+    /// <summary>
+    /// The row is offered, or withheld for its program alone: a withheld row is not a
+    /// claim and is not held back on the whole machine.
+    /// </summary>
+    private static void AssertOfferedOrWithheld(RegisteredPackage row, bool withheld)
+    {
+        if (!withheld)
+        {
+            AssertOffered(row);
+            return;
+        }
+
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.False(row.WithheldScanWide);
     }
 
     private static void AssertKeptOnAClaim(RegisteredPackage row)

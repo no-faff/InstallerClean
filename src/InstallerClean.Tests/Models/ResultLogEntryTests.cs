@@ -201,7 +201,8 @@ public class ResultLogEntryTests
         CandidateIdentityOpenRefusedCount: 0,
         CandidateIdentityUnavailableCount: 0,
         CandidateIdentityFaultedCount: 0,
-        RegistryKeyReadFailureCount: 0);
+        RegistryKeyReadFailureCount: 0,
+        RecoveredPatchSetUnestablishedCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -300,6 +301,9 @@ public class ResultLogEntryTests
                 // The registry side's failed reads, a figure of which
                 // nonStringLocalPackageCount near the top of this list is a part.
                 "registryKeyReadFailureCount",
+                // The installations found by name whose patch set the scan left
+                // unestablished, appended in schema 13.
+                "recoveredPatchSetUnestablishedCount",
                 // THE DERIVED TOTALS COME LAST AS A BLOCK, not beside their parts:
                 // each is a property rather than a constructor parameter, so a total
                 // contradicting its own breakdown inside one object is impossible
@@ -1586,7 +1590,8 @@ public class ResultLogEntryTests
                 PathNormalisationRefusedAtFullPathCount: 126,
                 PathNormalisationRefusedAtEmbeddedNullCount: 127,
                 PathFlaggedSpellingCount: 128,
-                RegistryKeyReadFailures: 141),
+                RegistryKeyReadFailures: 141,
+                RecoveredPatchSetUnestablishedCount: 142),
             ShortNameCreation: ShortNameCreationLabels.PerVolume,
             SupersededRegistrationCount: 112,
             ObsoletedRegistrationCount: 113,
@@ -1636,5 +1641,6 @@ public class ResultLogEntryTests
         Assert.Equal(139, machine.CandidateIdentityUnavailableCount);
         Assert.Equal(140, machine.CandidateIdentityFaultedCount);
         Assert.Equal(141, machine.RegistryKeyReadFailureCount);
+        Assert.Equal(142, machine.RecoveredPatchSetUnestablishedCount);
     }
 }

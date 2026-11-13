@@ -358,6 +358,15 @@ public record InstallerQueryResult(
 /// reports from many machines can say how it runs. It is not a count of anything held
 /// back: that is decided per cached path, over the products holding it.
 /// </param>
+/// <param name="RecoveredPatchSetUnestablishedCount">
+/// Installations the recovery found by name whose patch set the scan left unestablished
+/// on Windows Installer's own answers: a patch Windows lists whose Uninstallable it will
+/// not give and that the installation's own registry listing does not name, or a patch
+/// list that did not come back whole and that listing does not answer for. Each holds its
+/// product's superseded patches back. It counts installations, not patches, and is
+/// apart from <see cref="ProductsWithPatchSetUnestablishedCount"/>, which counts the
+/// registry's own reading.
+/// </param>
 /// <param name="ProductsWithPatchSetUnestablishedCount">
 /// Products whose patch set could not be established: the key would not open, or a
 /// patch carried no <c>Uninstallable</c> or one that was not a number.
@@ -525,7 +534,8 @@ public readonly record struct EnumerationCensus(
     // yields no code, or whose code no registry listing of a product this scan asks by
     // name records it as holding. One per entry. It withholds every superseded patch, and
     // it is not a count of products, so it is never added to the one above.
-    int UnattributedPatchFileCount = 0)
+    int UnattributedPatchFileCount = 0,
+    int RecoveredPatchSetUnestablishedCount = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused

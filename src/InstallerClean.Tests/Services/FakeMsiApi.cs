@@ -31,6 +31,10 @@ internal sealed class FakeMsiApi : IMsiApi
     public List<(string Code, uint Result)> Products { get; } = new();
     public bool NeverEndProducts { get; set; }
     public string? NeverEndPatchesFor { get; set; }
+
+    /// <summary>The row a patch list <see cref="NeverEndPatchesFor"/> names returns at every index.</summary>
+    public const string EndlessPatch = "{FFFFFFFF-0000-0000-0000-000000000001}";
+
     public Dictionary<string, List<string>> PatchCodes { get; } = new();
     public Dictionary<string, uint> PatchEnumResult { get; } = new();
 
@@ -300,7 +304,7 @@ internal sealed class FakeMsiApi : IMsiApi
         if (PassingErrorAt(MsiWalk.Patches, productCode, index, out var passingPatch)) return passingPatch;
         if (productCode is not null && productCode == NeverEndPatchesFor)
         {
-            WriteCode(patchCode, "{FFFFFFFF-0000-0000-0000-000000000001}");
+            WriteCode(patchCode, EndlessPatch);
             return Success;
         }
         if (productCode is not null && PatchEnumResult.TryGetValue(productCode, out var err))

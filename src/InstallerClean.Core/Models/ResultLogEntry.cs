@@ -177,9 +177,11 @@ public sealed record ResultLogEntry(
     /// <c>InstallProperties</c> key one of whose source lists did not read
     /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
     ///
-    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND TAKES NONE AWAY: <c>reportId</c>, last
-    /// (<see cref="ReportId"/>). A new top-level key, so the receiver deploys before a release
-    /// sends it.
+    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND ONE UNDER <c>machine</c>, AND TAKES NONE
+    /// AWAY: <c>reportId</c>, last (<see cref="ReportId"/>), and the installations found by
+    /// name whose patch set the scan left unestablished, last under <c>machine</c>
+    /// (<see cref="MachineInfo.RecoveredPatchSetUnestablishedCount"/>). A new top-level key,
+    /// so the receiver deploys before a release sends it.
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -672,6 +674,13 @@ public sealed record AppInfo(
 ///
 /// Appended after the identity groups for the reason given above.
 /// </param>
+/// <param name="RecoveredPatchSetUnestablishedCount">
+/// Installations the recovery found by name whose patch set the scan left unestablished on
+/// Windows Installer's own answers, each holding its product's superseded patches back
+/// (<see cref="EnumerationCensus.RecoveredPatchSetUnestablishedCount"/>). Apart from
+/// <see cref="ProductsWithPatchSetUnestablishedCount"/>, which counts the registry's own
+/// reading. Appended last, after the registry's read failures.
+/// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
     int LongFileNameCount,
@@ -713,7 +722,8 @@ public sealed record MachineInfo(
     int CandidateIdentityOpenRefusedCount,
     int CandidateIdentityUnavailableCount,
     int CandidateIdentityFaultedCount,
-    int RegistryKeyReadFailureCount)
+    int RegistryKeyReadFailureCount,
+    int RecoveredPatchSetUnestablishedCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -761,7 +771,8 @@ public sealed record MachineInfo(
             scan.CandidateIdentityReads.OpenRefusedCount,
             scan.CandidateIdentityReads.IdentityUnavailableCount,
             scan.CandidateIdentityReads.FaultedCount,
-            scan.Census.RegistryKeyReadFailures);
+            scan.Census.RegistryKeyReadFailures,
+            scan.Census.RecoveredPatchSetUnestablishedCount);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
