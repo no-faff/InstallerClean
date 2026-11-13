@@ -647,6 +647,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean 옆에 {0} 파일이 있는데 InstallerClean에는 그런 파일이 포함되어 있지 않아서 시작할 수 없습니다. 그 파일을 삭제한 다음 InstallerClean을 다시 실행하세요.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean에는 .NET Framework 4.8이 필요합니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 InstallerClean을 다시 여세요.`,
   'Cli.NeedsNetFramework48': `InstallerClean에는 .NET Framework 4.8이 필요합니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 InstallerClean을 다시 실행하세요.`,
+  'Window.Notices.Title': `타사 고지 사항`,
+  'About.Link.Notices': `타사 고지 사항`,
+  'Automation.About.Notices.HelpText': `InstallerClean에 포함된 글꼴, 아이콘, 코드의 라이선스를 표시합니다.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  타사 고지 사항 출력`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

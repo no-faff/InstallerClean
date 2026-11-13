@@ -1,8 +1,11 @@
 namespace InstallerClean.Cli;
 
 /// <summary>
-/// The run's cancellation source, cancelled by Ctrl+C on the console's control-handler thread
-/// and disposed by Main as the run returns. Cancel and Dispose take one lock, so they never
+/// The run's cancellation source, cancelled on the thread that brings the cancel (a thread-pool
+/// thread for Ctrl+C, Windows' own handler thread for a console being closed, the thread
+/// CancelKey.Watch starts for the event the version that started this one sets, or the run's
+/// own thread where the cancel came before the run answered it) and disposed by Main as the
+/// run returns. Cancel and Dispose take one lock, so they never
 /// overlap.
 /// </summary>
 /// <remarks>

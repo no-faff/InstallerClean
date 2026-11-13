@@ -626,6 +626,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean start niet omdat er naast het programma een bestand met de naam {0} staat, en InstallerClean wordt niet met zo'n bestand geleverd. Verwijder dat bestand en open InstallerClean daarna opnieuw.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean heeft .NET Framework 4.8 nodig. Installeer het van Microsoft, herstart de pc en open InstallerClean daarna opnieuw.`,
   'Cli.NeedsNetFramework48': `InstallerClean heeft .NET Framework 4.8 nodig. Installeer het van Microsoft, herstart de pc en voer InstallerClean daarna opnieuw uit.`,
+  'Window.Notices.Title': `Kennisgevingen van derden`,
+  'About.Link.Notices': `Kennisgevingen van derden`,
+  'Automation.About.Notices.HelpText': `Toont de licenties van de lettertypen, pictogrammen en code die InstallerClean bevat.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  De kennisgevingen van derden weergeven`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

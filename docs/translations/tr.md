@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | Silinmesi güvenli, gereksiz dosyalar |
 | The anonymous report | Anonim rapor |
 | InstallerClean couldn't read the report. | InstallerClean raporu okuyamadı. |
+| Third-party notices | Üçüncü taraf bildirimleri |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Kılavuz ve SSS |
 | Report a problem | Sorun bildir |
+| Third-party notices | Üçüncü taraf bildirimleri |
 | Check for updates automatically | Güncelleştirmeleri otomatik olarak denetle |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | github üzerindeki sürümler sayfasında daha yeni bir sürüm olup olmadığını denetler. |
 | Opens the readme on github in your browser. | github üzerindeki readme'yi tarayıcınızda açar. |
 | Opens the issue tracker on github.com in your browser. | github.com üzerindeki sorun izleyiciyi (Issues) tarayıcınızda açar. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean'in içerdiği yazı tiplerinin, simgelerin ve kodun lisanslarını gösterir. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | İşaretliyse InstallerClean, çalıştırdığınızda github üzerinde daha yeni bir sürüm olup olmadığını denetler. |
 | Download it from github | github'dan indirin |
 | Download .NET Framework 4.8 from Microsoft | .NET Framework 4.8'i Microsoft'tan indirin |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Kullanım: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Sürümü yazdır (-v de kabul edilir) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  Üçüncü taraf bildirimlerini yazdır |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Yalnızca tara - gereksizleri listele |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Gereksiz dosyaları kalıcı olarak sil |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Kayıtlı yedek klasörüne taşı |

@@ -88,4 +88,12 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- THIRD-PARTY-NOTICES, embedded as it is in the repository, so that every copy carries
+       the notices of the third-party work inside it. Resources/ThirdPartyNotices.cs reads it
+       by this LogicalName, and scripts/check-notices.ps1 reads each merged exe's copy by the
+       same name against the file. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\THIRD-PARTY-NOTICES" LogicalName="InstallerClean.THIRD-PARTY-NOTICES" />
+  </ItemGroup>
+
 </Project>

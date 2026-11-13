@@ -11,12 +11,12 @@ on:
   # exception. Also usable as a manual re-run from the Actions tab.
   workflow_dispatch:
 
-# Read-only, declared rather than inherited from the repository default. Every
-# step below only reads: two pinned actions, the node guards, dotnet, a
-# Chocolatey install and ISCC. Nothing here pushes, comments or uploads an
-# artefact, and a job that restores from nuget.org and installs a package from
-# the Chocolatey community feed is the one place a build-time dependency could
-# reach for whatever token the run is holding.
+# Read-only, declared rather than inherited from the repository default. Nothing
+# here pushes or comments: the steps run pinned actions, the node guards, dotnet,
+# a Chocolatey install, ISCC and WiX from nuget.org, and upload artefacts. A job
+# that restores from nuget.org or installs a package from the Chocolatey community
+# feed is where a build-time dependency could reach for whatever token the run is
+# holding.
 permissions:
   contents: read
 
@@ -413,10 +413,13 @@ jobs:
           "UI culture: $(if ($ui.Name) { $ui.Name } else { 'invariant' })"
 
       # The normal console verbosity prints each test with its outcome, and each
-      # skipped test with the reason it gives, which the default leaves out.
+      # skipped test with the reason it gives, which the default leaves out. A test
+      # still running after five minutes, where the slowest takes seconds, ends the
+      # run and is named as the test that was running, so a hang fails the step
+      # rather than holding it; no dump is taken, the name being what is wanted.
       - name: Test
         if: success() || failure()
-        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal"
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal" --blame-hang-timeout 5m --blame-hang-dump-type none
 
       # A build reports a broken reference in a documentation comment only when
       # it writes the documentation file, which no project here asks for. This
@@ -768,6 +771,15 @@ jobs:
         if: success() || failure()
         shell: pwsh
         run: ./scripts/check-one-file.ps1
+
+      # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
+      # command line prints. This reads that resource out of each merged exe against the file,
+      # and each merge's input list against the file's table of merged packages, so a package
+      # added to either exe is named there before it ships.
+      - name: Check each merged exe carries the notices of what it merges
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-notices.ps1
 
       # Reads each merged exe's own metadata against Microsoft's reference assemblies for .NET
       # Framework 4.0 to 4.8, downloaded from nuget.org and checked against their pinned
@@ -2260,3 +2272,90 @@ jobs:
             exit 1
           }
           'Every check passed.'
+
+  # 3.7.0's command line, from its release, and this build's merged command line scan the
+  # same runner, and the job fails where they do not offer and hold the same files
+  # (scripts/scan-comparison/compare-scans.ps1 says what else fails it and how it checks
+  # itself). It compares twice: on the runner's Installer folder as the image leaves it, and
+  # again once set-up-scenarios.ps1 has installed test programs and patches and put files of
+  # known kinds into the folder. Both command lines run /s, which changes nothing in the
+  # folder. The first-run mark is set first, so neither scan carries a report.
+  scan-comparison:
+    name: Scan comparison with 3.7.0 (Windows)
+    runs-on: windows-2025
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Merge the command line into one file
+        run: |
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The command line did not build." }
+
+      # The digest is the one GitHub records for the release asset.
+      - name: Download 3.7.0's command line
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'cli-3.7.0'
+          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern installerclean-cli.exe --dir $dir --clobber
+          if ($LASTEXITCODE -ne 0) { throw "3.7.0's command line did not download." }
+          $recorded = gh release view v3.7.0 --repo $env:GITHUB_REPOSITORY --json assets -q '.assets[] | select(.name == "installerclean-cli.exe") | .digest'
+          if ($LASTEXITCODE -ne 0 -or -not $recorded) { throw "GitHub gave no digest for 3.7.0's command line." }
+          $actual = 'sha256:' + (Get-FileHash -Algorithm SHA256 (Join-Path $dir 'installerclean-cli.exe')).Hash.ToLowerInvariant()
+          "recorded $recorded, downloaded $actual"
+          if ($actual -ne $recorded) { throw "The downloaded command line is not the release's." }
+          & (Join-Path $dir 'installerclean-cli.exe') --version
+          & 'publish/cli/installerclean-cli.exe' --version
+
+      - name: Set the first-run mark
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
+          New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
+          if ((Get-ItemProperty 'HKLM:\SOFTWARE\NoFaff\InstallerClean').FirstRunRecorded -ne 1) { throw "The first-run mark was not set." }
+
+      - name: Compare the scans of the runner as it is
+        run: pwsh scripts/scan-comparison/compare-scans.ps1 -Reference (Join-Path $env:RUNNER_TEMP 'cli-3.7.0/installerclean-cli.exe') -UnderTest publish/cli/installerclean-cli.exe -Label 'the runner as it is' -OutDir (Join-Path $env:RUNNER_TEMP 'scan-comparison')
+
+      # WiX 5 runs on any later .NET with roll-forward to a major version.
+      - name: Install the test programs and patches
+        if: success() || failure()
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw "WiX did not install." }
+          pwsh scripts/scan-comparison/set-up-scenarios.ps1 -OutDir (Join-Path $env:RUNNER_TEMP 'scan-scenarios')
+
+      - name: Compare the scans with the test programs and patches in place
+        if: success() || failure()
+        run: pwsh scripts/scan-comparison/compare-scans.ps1 -Reference (Join-Path $env:RUNNER_TEMP 'cli-3.7.0/installerclean-cli.exe') -UnderTest publish/cli/installerclean-cli.exe -Label 'with the test programs' -OutDir (Join-Path $env:RUNNER_TEMP 'scan-comparison') -Scenarios (Join-Path $env:RUNNER_TEMP 'scan-scenarios/scenarios.tsv')
+
+      - name: Upload what each scan printed
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: scan-comparison-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/scan-comparison
+            ${{ runner.temp }}/scan-scenarios/scenarios.tsv
+            ${{ runner.temp }}/scan-scenarios/logs
+          if-no-files-found: warn
+          retention-days: 7
+
+      # The merged command line this job compared, kept so a scan on another PC can run the
+      # same file.
+      - name: Upload the merged command line
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: merged-command-line-${{ github.run_attempt }}
+          path: publish/cli
+          if-no-files-found: error
+          retention-days: 30

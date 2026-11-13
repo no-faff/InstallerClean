@@ -55,7 +55,8 @@
 //
 // Usage (from the repo root):
 //   node scripts/check-translation-freshness.mjs            check, exit 1 on a stale,
-//                                                           GONE or ORPHANED entry
+//                                                           GONE, ORPHANED or
+//                                                           UNRECORDED slot
 //   node scripts/check-translation-freshness.mjs --record <Key> [<Key> ...]
 //                                                           stamp keys as translated now
 //   node scripts/check-translation-freshness.mjs --record-unverified <Key> [<Key> ...]
@@ -189,6 +190,7 @@ if (recordIdx !== -1 || unverifiedIdx !== -1 || recordAll) {
 }
 
 const stale = [];
+const unrecorded = [];
 const deleted = [];
 const visited = new Set();
 let checked = 0, fresh = 0, unverified = 0, absent = 0, notInLedger = 0, overridesWalked = 0;
@@ -212,7 +214,7 @@ for (const f of satFiles) {
       absent++;
       continue;
     }
-    if (recorded === undefined) { notInLedger++; continue; }
+    if (recorded === undefined) { notInLedger++; unrecorded.push({ lang, key }); continue; }
     checked++;
     const state = recordedFreshness(ledger, key, lang, neutral);
     if (state === UNVERIFIED) { unverified++; continue; }
@@ -261,7 +263,7 @@ console.log(
   `TOTALS: ${satFiles.length} satellite(s), ${neutral.size} neutral key(s); ` +
   `${checked} key-slot(s) checked, ${fresh} fresh, ${stale.length} STALE, ${deleted.length} GONE, ${orphaned.length} ORPHANED, ` +
   `${unverified} unverified (recorded as never established), ` +
-  `${notInLedger} not in the ledger (no claim made), ${absent} absent from the satellite.`
+  `${notInLedger} UNRECORDED (not in the ledger), ${absent} absent from the satellite.`
 );
 // PRINTED BESIDE THE WALK'S OWN TOTAL AND NEVER INSTEAD OF IT. The overrides are the
 // population a walk over the neutral alone misses, so a walk that reached fewer of them
@@ -279,9 +281,21 @@ for (const f of satFiles)
   for (const k of readResx(`${RES}/${f}`).keys())
     if (!neutral.has(k) && standsInFor(k, neutral) !== null) declared.add(`${langOf(f)}\u0000${k}`);
 console.log(`OVERRIDES: ${overridesWalked} key-slot(s) walked, ${declared.size} declared across the satellites.`);
-if (notInLedger > 0) {
-  console.log(`NOTE: ${notInLedger} key-slot(s) carry no ledger entry, so this run says NOTHING about them. It reports drift from the seed forward and makes no claim about any translation predating it.`);
+// A SLOT THE SATELLITE HOLDS AND THE LEDGER DOES NOT IS UNRECORDED, and fails the run.
+// The check can say nothing about it, and nothing about it later either, since a
+// translation that goes stale without ever having been stamped is stale against a
+// ledger with no entry to compare. So a key added to the satellites is stamped when
+// it is: --record once its translations are made, or --record-unverified where nobody
+// has established which English they were made from.
+const unrecordedByLang = new Map();
+for (const u of unrecorded) unrecordedByLang.set(u.lang, [...(unrecordedByLang.get(u.lang) || []), u.key]);
+for (const [lang, keys] of [...unrecordedByLang].sort()) {
+  console.log(`${lang}: ${keys.length} UNRECORDED (held by the satellite, no ledger entry): ${keys.sort().join(', ')}`);
 }
-// A STALE, GONE or ORPHANED entry fails the run, so on a pass every entry in the ledger
-// is either fresh against the English or stamped unverified.
-process.exit(stale.length || deleted.length || orphaned.length ? 1 : 0);
+if (unrecorded.length) {
+  console.error(`\n${unrecorded.length} key-slot(s) carry no ledger entry, so this check cannot tell when their English moves. Stamp them with --record <Key> once translated, or --record-unverified <Key>.`);
+}
+// A STALE, GONE, ORPHANED or UNRECORDED slot fails the run, so on a pass every slot a
+// satellite holds is in the ledger, and every entry there is either fresh against the
+// English or stamped unverified.
+process.exit(stale.length || deleted.length || orphaned.length || unrecorded.length ? 1 : 0);

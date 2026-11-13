@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. This page is generated from [`Strings.pt-BR.resx`](../../src/InstallerClean.Core/Resources/Strings.pt-BR.resx), so do not edit it by hand. The Brazilian Portuguese translation itself lives in [`gen-strings-pt-BR.mjs`](../../scripts/translations/gen-strings-pt-BR.mjs).
 
+Where Brazilian Portuguese needs a different form of a line for some counts, the form is in a row of its own directly under the line, marked _(one form)_, _(few form)_ or _(many form)_. The app shows it in place of that line at the counts it is written for.
+
 `{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
 
 ## Window titles
@@ -16,6 +18,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | Arquivos desnecessários que podem ser excluídos com segurança |
 | The anonymous report | O relatório anônimo |
 | InstallerClean couldn't read the report. | O InstallerClean não conseguiu ler o relatório. |
+| Third-party notices | Avisos de terceiros |
 
 ## Section headings
 
@@ -59,6 +62,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Guia e perguntas frequentes |
 | Report a problem | Relatar um problema |
+| Third-party notices | Avisos de terceiros |
 | Check for updates automatically | Verificar atualizações automaticamente |
 
 ## Field labels
@@ -407,6 +411,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Consulta a página de versões do github em busca de uma versão mais recente. |
 | Opens the readme on github in your browser. | Abre o readme no github no seu navegador. |
 | Opens the issue tracker on github.com in your browser. | Abre o rastreador de problemas (Issues) em github.com no seu navegador. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Mostra as licenças das fontes, dos ícones e do código que o InstallerClean inclui. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se marcada, o InstallerClean consulta o github em busca de uma versão mais recente quando você o executa. |
 | Download it from github | Baixe no github |
 | Download .NET Framework 4.8 from Microsoft | Baixe o .NET Framework 4.8 no site da Microsoft |
@@ -500,6 +505,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected failure ({0}). The crash log could not be written. | Erro: falha inesperada ({0}). Não foi possível gravar o log de falhas. |
 | Scanning {InstallerFolder}... | Analisando {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Foram encontrados {0} {1} desnecessários para limpar ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Foi encontrado {0} {1} desnecessário para limpar ({2}). |
 | No unneeded files identified. | Nenhum arquivo desnecessário identificado. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | O Windows tem um registro de {0} arquivo que não está em {InstallerFolder}: {1}. No dia a dia não causa problema, mas uma atualização ou desinstalação desse programa pode falhar. Para recolocar o arquivo, você precisa do instalador da versão que já tem. Consiga-o com o fabricante do programa e execute-o por cima da sua cópia atual. Uma versão mais nova não serve: ela teria que remover primeiro a que você tem, e é justamente essa etapa que precisa deste arquivo. Desinstalar primeiro também não funciona, pelo mesmo motivo. Isso deve restaurar o arquivo e deixar suas configurações intactas, mas a Microsoft não garante. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | O Windows tem registros de {0} arquivos que não estão em {InstallerFolder}: {1}. No dia a dia não causam problema, mas uma atualização ou desinstalação desses programas pode falhar. Para recolocar um arquivo, você precisa do instalador da versão desse programa que já tem. Consiga-o com o fabricante do programa e execute-o por cima da sua cópia atual. Uma versão mais nova não serve: ela teria que remover primeiro a que você tem, e é justamente essa etapa que precisa do arquivo. Desinstalar primeiro também não funciona, pelo mesmo motivo. Isso deve restaurar o arquivo e deixar suas configurações intactas, mas a Microsoft não garante. |
@@ -507,7 +513,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | O InstallerClean parou de esperar por {0} e deixou de lado qualquer arquivo que ainda precisava ser conferido com o que há lá. Quando o acesso voltar ao normal, execute o comando de novo. |
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | O InstallerClean parou de esperar por mais de uma unidade ou compartilhamento ({0}) e deixou de lado qualquer arquivo que ainda precisava ser conferido com algum deles. Quando voltarem a responder normalmente, execute o comando de novo. |
 | Deleting {0} unneeded {1}... | Excluindo {0} {1} desnecessários... |
+| Deleting {0} unneeded {1}...<br>_(one form)_ | Excluindo {0} {1} desnecessário... |
 | Permanently deleted {0} unneeded {1}. | Foram excluídos permanentemente {0} {1} desnecessários. |
+| Permanently deleted {0} unneeded {1}.<br>_(one form)_ | Foi excluído permanentemente {0} {1} desnecessário. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Erro: nenhum destino de movimentação especificado. Use /m CAMINHO. (Um padrão definido na GUI é por usuário e não se aplica a execuções agendadas ou em contas de serviço.) |
 | Error: destination cannot be inside the Windows Installer folder. | Erro: o destino não pode estar dentro da pasta do Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Erro: o destino deve ser um caminho totalmente qualificado. Recebido: {0} |
@@ -536,7 +544,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi excluído. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi movido. |
 | Moving {0} unneeded {1} to {2}... | Movendo {0} {1} desnecessários para {2}... |
+| Moving {0} unneeded {1} to {2}...<br>_(one form)_ | Movendo {0} {1} desnecessário para {2}... |
 | Moved {0} unneeded {1}. | Foram movidos {0} {1} desnecessários. |
+| Moved {0} unneeded {1}.<br>_(one form)_ | Foi movido {0} {1} desnecessário. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Confirme que seus programas ainda atualizam e desinstalam normalmente e depois exclua {0}. |
 | InstallerClean is free. If it helped, a tip is much appreciated: {0} | O InstallerClean é gratuito. Se ele ajudou, uma gorjeta é muito bem-vinda: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Atualizar agora? É altamente recomendável usar a versão mais recente. [{0}/{1}] |
@@ -575,6 +585,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Mostra esta ajuda (aceita também /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Mostra a versão (aceita também -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices   Mostra os avisos de terceiros |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s          Somente analisar - lista os supérfluos |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d          Exclui permanentemente os supérfluos |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m          Move para a pasta de backup salva |

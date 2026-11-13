@@ -94,6 +94,10 @@
     <value>InstallerClean 无法读取该报告。</value>
     <comment>Shown in the window headed Window.Report.Title, in place of the report, where the file holding it cannot be read when the window opens.</comment>
   </data>
+  <data name="Window.Notices.Title" xml:space="preserve">
+    <value>第三方声明</value>
+    <comment>The heading of the window About.Link.Notices opens, which shows the notices and licences of the other people's work inside InstallerClean: fonts, icons and code libraries. Also the window's spoken title and the screen-reader name of the box holding the text. The text itself is not translated: licences are kept in the words they were written in.</comment>
+  </data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>补丁</value></data>
@@ -233,6 +237,10 @@
     <value>报告问题</value>
     <comment>About-window link to the GitHub issue tracker.</comment>
   </data>
+  <data name="About.Link.Notices" xml:space="preserve">
+    <value>第三方声明</value>
+    <comment>About-window link that opens a window showing the notices and licences of the other people's work inside InstallerClean (Window.Notices.Title).</comment>
+  </data>
   <data name="About.AutoUpdateCheck" xml:space="preserve">
     <value>自动检查更新</value>
     <comment>Checkbox label in the About window.</comment>
@@ -321,6 +329,10 @@
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>在浏览器中打开 github.com 上的问题追踪页面（Issues）。</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.About.Notices.HelpText" xml:space="preserve">
+    <value>显示 InstallerClean 所含字体、图标和代码的许可证。</value>
+    <comment>Screen-reader help on the About window's "Third-party notices" link, which opens a window inside the app rather than a page in the browser.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
     <value>勾选后，InstallerClean 运行时会在 github 上检查是否有较新版本。</value>
@@ -2398,6 +2410,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Cli.Help.Usage" xml:space="preserve"><value>用法：</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     显示此帮助（也接受 /?、-h）</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  显示版本号（也接受 -v）</value></data>
+  <data name="Cli.Help.Notices" xml:space="preserve"><value>  installerclean-cli --notices  显示第三方声明</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         仅扫描 - 列出不需要的文件</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         永久删除不需要的文件</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         移动到已保存的备份文件夹</value></data>

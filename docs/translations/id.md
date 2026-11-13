@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | File tidak diperlukan yang aman dihapus |
 | The anonymous report | Laporan anonim |
 | InstallerClean couldn't read the report. | InstallerClean tidak bisa membaca laporan. |
+| Third-party notices | Pemberitahuan pihak ketiga |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Panduan dan FAQ |
 | Report a problem | Laporkan masalah |
+| Third-party notices | Pemberitahuan pihak ketiga |
 | Check for updates automatically | Periksa pembaruan secara otomatis |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Memeriksa halaman rilis github untuk mencari versi yang lebih baru. |
 | Opens the readme on github in your browser. | Membuka readme di github melalui browser Anda. |
 | Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui browser Anda. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Menampilkan lisensi font, ikon, dan kode yang disertakan dalam InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya. |
 | Download it from github | Unduh dari github |
 | Download .NET Framework 4.8 from Microsoft | Unduh .NET Framework 4.8 dari Microsoft |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Penggunaan: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Tampilkan bantuan ini (juga /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Cetak versi (juga -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  Cetak pemberitahuan pihak ketiga |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Pindai saja - daftar yang tak dipakai |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Hapus permanen yang tidak diperlukan |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Pindahkan ke folder cadangan tersimpan |

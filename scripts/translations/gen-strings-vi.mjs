@@ -646,6 +646,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean không khởi động được vì có một tệp tên {0} nằm cạnh nó, mà InstallerClean không đi kèm tệp nào như vậy. Hãy xóa tệp đó, rồi chạy lại InstallerClean.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean cần .NET Framework 4.8. Hãy cài đặt nó từ Microsoft, khởi động lại PC, rồi mở lại InstallerClean.`,
   'Cli.NeedsNetFramework48': `InstallerClean cần .NET Framework 4.8. Hãy cài đặt nó từ Microsoft, khởi động lại PC, rồi chạy lại InstallerClean.`,
+  'Window.Notices.Title': `Thông báo của bên thứ ba`,
+  'About.Link.Notices': `Thông báo của bên thứ ba`,
+  'Automation.About.Notices.HelpText': `Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices     In ra thông báo của bên thứ ba`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

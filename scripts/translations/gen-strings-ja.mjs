@@ -572,6 +572,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean の隣に {0} というファイルがあり、InstallerClean にはそのようなファイルが付属していないため、起動できません。そのファイルを削除してから、InstallerClean をもう一度起動してください。\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean には .NET Framework 4.8 が必要です。Microsoft からインストールして PC を再起動し、InstallerClean をもう一度開いてください。`,
   'Cli.NeedsNetFramework48': `InstallerClean には .NET Framework 4.8 が必要です。Microsoft からインストールして PC を再起動し、InstallerClean をもう一度実行してください。`,
+  'Window.Notices.Title': `サードパーティ通知`,
+  'About.Link.Notices': `サードパーティ通知`,
+  'Automation.About.Notices.HelpText': `InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  サードパーティ通知を表示`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

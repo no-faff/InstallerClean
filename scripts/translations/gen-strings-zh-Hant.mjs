@@ -559,6 +559,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean 無法啟動，因為它旁邊有一個名為 {0} 的檔案，而 InstallerClean 本身並不附帶這樣的檔案。請刪除該檔案，然後再次執行 InstallerClean。\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean 需要 .NET Framework 4.8。請從 Microsoft 安裝，重新啟動電腦，然後再次開啟 InstallerClean。`,
   'Cli.NeedsNetFramework48': `InstallerClean 需要 .NET Framework 4.8。請從 Microsoft 安裝，重新啟動電腦，然後再次執行 InstallerClean。`,
+  'Window.Notices.Title': `第三方聲明`,
+  'About.Link.Notices': `第三方聲明`,
+  'Automation.About.Notices.HelpText': `顯示 InstallerClean 所含字型、圖示和程式碼的授權條款。`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  顯示第三方聲明`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,
