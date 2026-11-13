@@ -167,18 +167,26 @@ public class FrameworkStreamsTests
     [Fact]
     public async Task A_response_body_read_the_server_stops_answering_ends_when_its_token_is_cancelled()
     {
-        await WithinServerBound(async () =>
+        await WithinServerBound(async step =>
         {
             using var server = StallingServer.Start(bodyLength: 1_000_000, sent: 4);
             using var client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            step.To("the request");
             using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+            step.To("the response stream");
             using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
             var buffer = new byte[4096];
             var got = 0;
+            step.To("the first four bytes");
             while (got < 4)
-                got += await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
+            {
+                var read4 = await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
+                Assert.True(read4 > 0, "The body ended before its first four bytes.");
+                got += read4;
+            }
             using var stall = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
 
+            step.To("the cancelled read");
             var read = body.ReadAsync(buffer, stall.Token).AsTask();
             var finished = await Task.WhenAny(read, Task.Delay(TimeSpan.FromSeconds(10)));
 
@@ -186,6 +194,7 @@ public class FrameworkStreamsTests
             var thrown = await Assert.ThrowsAsync<TaskCanceledException>(() => read);
             Assert.Equal(stall.Token, thrown.CancellationToken);
             Assert.Equal("The operation was canceled.", thrown.Message);
+            step.To("the disposes of the body, the response, the client and the server");
         });
     }
 
@@ -471,12 +480,30 @@ public class FrameworkStreamsTests
     /// </summary>
     private static readonly TimeSpan ServerBound = TimeSpan.FromSeconds(30);
 
-    private static async Task WithinServerBound(Func<Task> test)
+    private static Task WithinServerBound(Func<Task> test) => WithinServerBound(_ => test());
+
+    /// <summary>
+    /// <see cref="WithinServerBound(Func{Task})"/> for a test that names each wait as it
+    /// reaches it, so a test held past the bound says which wait held it.
+    /// </summary>
+    private static async Task WithinServerBound(Func<Step, Task> test)
     {
-        var run = Task.Run(test);
+        var step = new Step();
+        var run = Task.Run(() => test(step));
         var finished = await Task.WhenAny(run, Task.Delay(ServerBound));
-        Assert.True(finished == run, $"The test had not finished after {ServerBound.TotalSeconds} s.");
+        Assert.True(finished == run,
+            $"The test had not finished after {ServerBound.TotalSeconds} s, waiting on {step.Reached}.");
         await run;
+    }
+
+    /// <summary>The wait a test under <see cref="ServerBound"/> last reached.</summary>
+    private sealed class Step
+    {
+        private string _reached = "the start";
+
+        public string Reached => Volatile.Read(ref _reached);
+
+        public void To(string wait) => Volatile.Write(ref _reached, wait);
     }
 
     /// <summary>
