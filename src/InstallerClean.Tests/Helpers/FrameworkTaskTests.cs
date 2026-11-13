@@ -221,7 +221,8 @@ public class FrameworkTaskTests
 
             // From the minimum up, one at a time, to the first cap leaving a thread free.
             var free = 0;
-            for (var cap = minWorkers; cap <= _oldWorkers; cap++)
+            var cap = minWorkers;
+            for (; cap <= _oldWorkers; cap++)
             {
                 if (!ThreadPool.SetMaxThreads(cap, _oldPorts)) continue;
                 ThreadPool.GetAvailableThreads(out free, out _);
@@ -233,19 +234,27 @@ public class FrameworkTaskTests
                 Assert.Fail("the pool has no free thread to fill");
             }
 
-            var started = new CountdownEvent(free);
+            // The pool is full once no thread is free, whichever work items fill it: an item
+            // an earlier test queued can take a thread ahead of these, and holds it as these do.
             for (var i = 0; i < free; i++)
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
-                    started.Signal();
+                    Interlocked.Increment(ref _started);
                     _gate.Wait();
                 });
-            if (!started.Wait(10_000))
+            var filling = Stopwatch.StartNew();
+            while (!StillFull && filling.ElapsedMilliseconds < 10_000)
+                Thread.Sleep(20);
+            if (!StillFull)
             {
+                ThreadPool.GetAvailableThreads(out var freeAtEnd, out _);
                 Dispose();
-                Assert.Fail("the pool's threads did not all start");
+                Assert.Fail($"the pool did not fill: minimum {minWorkers}, cap {cap}, {free} free after the cap, "
+                    + $"{Volatile.Read(ref _started)} of {free} work items started, {freeAtEnd} free after 10 s");
             }
         }
+
+        private int _started;
 
         /// <summary>
         /// True where no pool thread is free: a work item the test does not hold that ends
