@@ -172,7 +172,7 @@ public static class AppCopy
     /// setup's record tells those two apart. Scoop's two files are asked before a
     /// record that cannot tell, because the setup never writes them.
     /// </summary>
-    /// <param name="isOneFile">Whether the running exe is the whole app (<see cref="IsOneFileBuild"/>).</param>
+    /// <param name="isOneFile">Whether the running exe is the whole app (<see cref="IsOneFileBuild()"/>).</param>
     /// <param name="exeFolder">The folder the running exe is in.</param>
     /// <param name="setup">The setup's record (<see cref="ReadSetupRecord"/>).</param>
     /// <param name="fileExists">Answers whether a file exists at a path.</param>
@@ -196,7 +196,7 @@ public static class AppCopy
     /// line's own download. Scoop installs only the window, so no copy of the command
     /// line is Scoop's.
     /// </summary>
-    /// <param name="isOneFile">Whether the running exe is the whole app (<see cref="IsOneFileBuild"/>).</param>
+    /// <param name="isOneFile">Whether the running exe is the whole app (<see cref="IsOneFileBuild()"/>).</param>
     /// <param name="exeFolder">The folder the running exe is in.</param>
     /// <param name="setup">The setup's record (<see cref="ReadSetupRecord"/>).</param>
     public static AppCopyKind DecideCommandLine(bool isOneFile, string exeFolder, SetupRecord setup)

@@ -536,6 +536,12 @@ function Get-KnownLook($run, [string]$relative) {
   if ($relative -match '^[a-z]{2,3}(-[a-z0-9]+)*\\installerclean\.resources(\\installerclean\.resources)?\.(dll|exe)$') {
     return 'a satellite assembly in a culture folder beside the exe, which a download cannot create'
   }
+  # The window asks whether Scoop's record of an install is beside it, which is how it tells
+  # Scoop's copy (AppCopy.IsScoopFolder). It asks only whether each file is there, and stops
+  # at the first answer that settles it, so a plant changes which of the four it asks for.
+  if ($relative -in 'scoop-manifest.json', 'manifest.json', 'scoop-install.json', 'install.json') {
+    return 'one of the files Scoop writes beside a copy it installs, which the window asks only whether it is there'
+  }
 }
 
 # The genuine files a first-pass run's looks and loads call for in its second-pass run. A
