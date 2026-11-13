@@ -105,6 +105,43 @@ else if (accessors.length !== declared)
         'shape has changed and everything below is a report on a partial read.',
     );
 
+// Strings.FrameworkCheck, the third door, which serves the strings of the .NET Framework
+// 4.8 check without the installer-folder token. Its members are internal so the count
+// above stays one of the Get accessors. Each names a key the resx defines, carries the
+// key's name, and falls back to the key as Get does:
+//     internal static string Window_Main_Title => Manager.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
+// Every 'internal static string' in the file is one of these or one of the doors Get and
+// Find, so a door added beside them is reported here.
+const checkAccessors = [...designer.matchAll(
+    /internal\s+static\s+string\s+(\w+)\s*=>\s*Manager\.GetString\("([^"]+)",\s*Localisation\.UiCulture\)\s*\?\?\s*"([^"]+)"\s*;/g,
+)].map((m) => ({ property: m[1], key: m[2], fallback: m[3] }));
+
+for (const { property, key, fallback } of checkAccessors) {
+    if (!resxKeys.has(key)) {
+        problems.push(`FrameworkCheck.${property}: reads "${key}", which Strings.resx does not define`);
+        continue;
+    }
+    const expected = key.replaceAll('.', '_');
+    if (property !== expected)
+        problems.push(`FrameworkCheck: ${key} is read by ${property}, expected ${expected}`);
+    if (fallback !== key)
+        problems.push(`FrameworkCheck.${property}: falls back to "${fallback}" rather than its key`);
+}
+
+const doors = [...designer.matchAll(/internal\s+static\s+string\??\s+(Get|Find)\s*\(/g)].length;
+const declaredInternal = (designer.match(/internal\s+static\s+string\b/g) || []).length;
+if (checkAccessors.length === 0)
+    problems.push(
+        'No Strings.FrameworkCheck members matched in Strings.Designer.cs. The generated ' +
+        'shape changed, or the door went, and the .NET Framework 4.8 check reads through it.',
+    );
+else if (doors !== 2 || checkAccessors.length + doors !== declaredInternal)
+    problems.push(
+        `PARSE CONTROL: Strings.Designer.cs declares ${declaredInternal} 'internal static string' ` +
+        `member(s); this guard matched the doors Get and Find (${doors} of 2) and ` +
+        `${checkAccessors.length} FrameworkCheck member(s). A door has been added, or the shape changed.`,
+    );
+
 if (problems.length > 0) {
     console.error(
         `Strings.Designer.cs is out of step with Strings.resx (${problems.length} problem(s)):\n`,
@@ -119,5 +156,6 @@ if (problems.length > 0) {
 }
 
 console.log(
-    `Strings.Designer.cs matches Strings.resx (${resxKeys.size} keys, ${accessors.length} accessors).`,
+    `Strings.Designer.cs matches Strings.resx (${resxKeys.size} keys, ${accessors.length} accessors, ` +
+    `${checkAccessors.length} through FrameworkCheck).`,
 );

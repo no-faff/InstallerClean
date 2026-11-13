@@ -53,13 +53,15 @@ internal static class NetFrameworkCheck
         if (!below48) return null;
         var url = UpdateManifest.NetFramework48DownloadUrl;
         if (commandLine)
-            return Strings.Cli_NeedsNetFramework48 + Environment.NewLine
-                + string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, url);
+            return Strings.FrameworkCheck.Cli_NeedsNetFramework48 + Environment.NewLine
+                + string.Format(Strings.FrameworkCheck.Cli_UpdateDownloadLink,
+                    Strings.FrameworkCheck.UpdateNotice_DownloadNetFramework48, url);
 
         // The link line in the language's own punctuation with no address in it, which then
         // stands on its own line. Every language's link line ends with the address.
-        var name = string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, "").TrimEnd(null);
-        return Strings.Startup_NeedsNetFramework48 + Environment.NewLine + Environment.NewLine
-            + name + Environment.NewLine + url;
+        var name = string.Format(Strings.FrameworkCheck.Cli_UpdateDownloadLink,
+            Strings.FrameworkCheck.UpdateNotice_DownloadNetFramework48, "").TrimEnd(null);
+        return Strings.FrameworkCheck.Startup_NeedsNetFramework48 + Environment.NewLine
+            + Environment.NewLine + name + Environment.NewLine + url;
     }
 }

@@ -37,15 +37,8 @@ internal static class InstallerFolderToken
     /// folder, or unchanged when it carries none, which is nearly every string
     /// and the reason for the test rather than an unconditional Replace.
     /// </summary>
-    /// <remarks>
-    /// string's own Contains and Replace, which compare ordinally on .NET Framework as on
-    /// .NET 10. Every string of a copy's .NET Framework 4.8 message comes through here, so
-    /// what this names keeps to the .NET Framework NetFrameworkCheck's remarks name. The
-    /// overloads taking a StringComparison are FrameworkStringExtensions' and search through
-    /// System.Memory's spans, whose own code needs more.
-    /// </remarks>
     internal static string Resolve(string value) =>
-        value.Contains(Token)
-            ? value.Replace(Token, InstallerCacheHelpers.InstallerFolder)
+        value.Contains(Token, StringComparison.Ordinal)
+            ? value.Replace(Token, InstallerCacheHelpers.InstallerFolder, StringComparison.Ordinal)
             : value;
 }

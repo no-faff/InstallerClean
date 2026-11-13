@@ -67,7 +67,7 @@ public partial class App : Application
         {
             message = NetFrameworkCheck.RefusalMessage(commandLine: false);
             if (message is null) return;
-            MessageBox.Show(message, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(message, Strings.FrameworkCheck.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (Exception)
         {
