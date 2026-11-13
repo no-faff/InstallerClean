@@ -253,10 +253,9 @@ begin
   Result := HasSwitch('/UPDATEFROMCLI');
 end;
 
-// Whether this PC has .NET Framework 4.8, as the app's own start reads it
-// (NetFrameworkCheck): no where the Release value it writes is missing or a number below
-// {#NetFramework48Release}, yes where it is at least that, and yes where a value is there
-// but is not a REG_DWORD, which says nothing about the PC. RegQueryDWordValue answers False
+// Whether this PC has .NET Framework 4.8: no where the Release value it writes is
+// missing or a number below {#NetFramework48Release}, yes where it is at least that, and
+// yes where a value is there but is not a REG_DWORD, which says nothing about the PC. RegQueryDWordValue answers False
 // both where the value is missing and where it is not a REG_DWORD, and RegValueExists tells
 // the two apart.
 function HasNetFramework48: Boolean;

@@ -44,15 +44,25 @@ internal static class KnownFolders
     internal static string GetPath(
         Environment.SpecialFolder folder, Query query, Action<IntPtr> free, Func<string, string?> variable)
     {
-        var (folderId, fallbackVariable) = folder switch
+        // Two variables rather than a tuple: crash.log's folder is read through here on the path
+        // a copy runs before its .NET Framework 4.8 check (NetFrameworkCheck).
+        Guid folderId;
+        string fallbackVariable;
+        switch (folder)
         {
-            Environment.SpecialFolder.Windows => (FOLDERID_Windows, "windir"),
-            Environment.SpecialFolder.LocalApplicationData => (FOLDERID_LocalAppData, "LOCALAPPDATA"),
-            Environment.SpecialFolder.CommonApplicationData => (FOLDERID_ProgramData, "ProgramData"),
-            Environment.SpecialFolder.ProgramFiles => (FOLDERID_ProgramFiles, "ProgramFiles"),
-            Environment.SpecialFolder.ProgramFilesX86 => (FOLDERID_ProgramFilesX86, "ProgramFiles(x86)"),
-            _ => throw new ArgumentOutOfRangeException(nameof(folder), folder, "Not a folder the app asks Windows for."),
-        };
+            case Environment.SpecialFolder.Windows:
+                folderId = FOLDERID_Windows; fallbackVariable = "windir"; break;
+            case Environment.SpecialFolder.LocalApplicationData:
+                folderId = FOLDERID_LocalAppData; fallbackVariable = "LOCALAPPDATA"; break;
+            case Environment.SpecialFolder.CommonApplicationData:
+                folderId = FOLDERID_ProgramData; fallbackVariable = "ProgramData"; break;
+            case Environment.SpecialFolder.ProgramFiles:
+                folderId = FOLDERID_ProgramFiles; fallbackVariable = "ProgramFiles"; break;
+            case Environment.SpecialFolder.ProgramFilesX86:
+                folderId = FOLDERID_ProgramFilesX86; fallbackVariable = "ProgramFiles(x86)"; break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(folder), folder, "Not a folder the app asks Windows for.");
+        }
 
         var path = IntPtr.Zero;
         try

@@ -291,6 +291,30 @@ namespace NativeImports
             return sizes;
         }
 
+        // Every instruction whose operand is a metadata token, with its opcode and the token: a
+        // type, a method, a field, a signature or a string. An opcode the table does not know
+        // throws, rather than walking on misaligned.
+        public static IEnumerable<(ILOpCode Op, int Token)> Tokens(byte[] il)
+        {
+            int i = 0;
+            while (i < il.Length)
+            {
+                ushort code = il[i++];
+                if (code == 0xFE) code = (ushort)(0xFE00 | il[i++]);
+                if (!OperandSize.TryGetValue(code, out var size)) throw new InvalidDataException($"opcode {code:X} at IL offset {i}");
+                if (size == -1)
+                {
+                    int targets = BitConverter.ToInt32(il, i);
+                    i += 4 + 4 * targets;
+                    continue;
+                }
+                var op = (ILOpCode)code;
+                if (size == 4 && !op.IsBranch() && op is not (ILOpCode.Ldc_i4 or ILOpCode.Ldc_r4 or ILOpCode.Ldstr))
+                    yield return (op, BitConverter.ToInt32(il, i));
+                i += size;
+            }
+        }
+
         // Every instruction that names a method, with its token and the constant an ldc.i4
         // pushed just before it. An opcode the table does not know throws, rather than walking
         // on misaligned. A calli names no method and is not listed.

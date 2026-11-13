@@ -135,7 +135,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// message name the file only when there is a file, which is why this is not
     /// an <c>Action</c>.
     /// </summary>
-    private readonly Func<Exception, (string Path, bool Written)> _logDiagnostic;
+    private readonly Func<Exception, CrashLogEntry> _logDiagnostic;
 
     public UpdateCheckService() : this(SharedClient, ex => CrashLog.TryWrite(ex)) { }
 
@@ -149,11 +149,11 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// so the timeout and body cap under test are the shipping values.
     /// </summary>
     internal UpdateCheckService(
-        HttpMessageHandler handler, Func<Exception, (string Path, bool Written)> logDiagnostic)
+        HttpMessageHandler handler, Func<Exception, CrashLogEntry> logDiagnostic)
         : this(CreateClient(handler), logDiagnostic) { }
 
     private UpdateCheckService(
-        HttpClient http, Func<Exception, (string Path, bool Written)> logDiagnostic)
+        HttpClient http, Func<Exception, CrashLogEntry> logDiagnostic)
     {
         _http = http;
         _logDiagnostic = logDiagnostic;

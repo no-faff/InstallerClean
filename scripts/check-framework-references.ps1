@@ -1,0 +1,348 @@
+# Fails (exit 1) where a merged exe needs what .NET Framework does not have, read from the two
+# exes build-and-test merges (publish/window and publish/cli) against Microsoft's reference
+# assemblies for .NET Framework 4.6.2, 4.7, 4.7.1, 4.7.2 and 4.8.
+#
+# For each exe the step holds:
+#
+#  - Every .NET Framework type and member the exe references resolves in 4.8, through the
+#    assembly its reference names and that assembly's forwarders (FrameworkReferences.cs).
+#    What the exe references that 4.6.2 lacks is printed for the record.
+#  - The exe reaches its .NET Framework 4.8 check and its message on 4.6.2, 4.7, 4.7.1 and
+#    4.7.2: nothing the runtime compiles or loads before the check has answered is missing
+#    from any of them. The command line's check is Program.RefuseWithoutNetFramework48,
+#    which Main calls; the window's is App.EndWithoutNetFramework48, which App's static
+#    constructor calls. Each check is followed, and the start it guards (Program.Start,
+#    App.OnStartup) is not.
+#  - No assembly merged into the exe but the exe's own carries a module initializer: the
+#    merge keeps only the primary assembly's, so another's would never run. The exe's own
+#    carries exactly one, and the merged exe's module constructor calls it.
+#
+# Every run also checks itself: an exe built here whose check path reaches what 4.6.2, 4.7
+# and 4.7.1 lack, which must report each one and nothing else, and one whose check path
+# reaches nothing missing, which must report nothing on its path and the misses of its
+# start in the whole-exe list. A reference .NET Framework 4.6.2 defines in mscorlib but the
+# exe takes from netstandard must read as missing from 4.6.2, which has no netstandard, and
+# as present in 4.7.1. A library built with a module initializer must be reported, and one
+# without must not. A download whose hash differs, a set with no mscorlib, an exe with no
+# framework references or a walk that reads no method fails the step.
+#
+# Run from the repo root after the two merged builds: pwsh scripts/check-framework-references.ps1
+param([string]$PublishRoot = 'publish')
+
+$ErrorActionPreference = 'Stop'
+Add-Type -Path (Join-Path $PSScriptRoot 'NativeImports.cs'), (Join-Path $PSScriptRoot 'FrameworkReferences.cs') -ReferencedAssemblies System.Reflection.Metadata,
+  System.Collections, System.Linq, System.Runtime, System.Collections.Immutable, System.Security.Cryptography, System.Memory
+
+$failures = [System.Collections.Generic.List[string]]::new()
+function Fail([string]$message) { $failures.Add($message); Write-Host "::error::$message" }
+
+# Microsoft.NETFramework.ReferenceAssemblies.<version> 1.0.3 from nuget.org, each with the
+# SHA-512 of its package and the folder its reference assemblies sit in.
+$packages = [ordered]@{
+  'net462' = @{ Folder = 'v4.6.2'; Sha512 = '1cc9f441098f61c26c56e29eb7d580f0841b070799bdced44bcf0ddfd8ad491a9c9ffd57393fca6a8d508a2ca4c54fafc7c93bff38a6d7571598ab6e9e3bb830' }
+  'net47'  = @{ Folder = 'v4.7';   Sha512 = 'c7610db70f82c80395f443b5579a2478c90f911f0b1965bc17ac46fa7771c04ab718c94d983a34083059b48ebdd0f3ffd233074f094fc32413bd80615291a264' }
+  'net471' = @{ Folder = 'v4.7.1'; Sha512 = '57199cd45c492d4e210346f699c10b9f83b94ba3f701fc6d9451e38351b0ea831a04f2fc80c46df574fe20e0e4cc359e27d6d7ff260de043e224ccfd661ff685' }
+  'net472' = @{ Folder = 'v4.7.2'; Sha512 = '3ef64aa456edb31b49062ea1272cedfe268aef5a8676ef66355a494f8dfe8b55a9db7ca6e7b615b9023e0449ceffdf4ada9c4f304818b73eb69fbc99144822d8' }
+  'net48'  = @{ Folder = 'v4.8';   Sha512 = '5d62a0c9e35a74d71341a215bd007c06b74236b11aafa7e8fdd7b539d41167d1c5cb48dc05268cf08579abae196a6a6c4a70bc0254ec002686654ba8170e3544' }
+}
+
+# The versions below 4.8 a check path has to run on, and the one every reference resolves in.
+$belowLabels = 'net462', 'net47', 'net471', 'net472'
+$targetLabel = 'net48'
+
+$work = Join-Path ([IO.Path]::GetTempPath()) ('framework-references-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $work | Out-Null
+try {
+  $sets = [ordered]@{}
+  foreach ($label in $packages.Keys) {
+    $id = "microsoft.netframework.referenceassemblies.$label"
+    $nupkg = Join-Path $work "$label.nupkg"
+    Invoke-WebRequest -Uri "https://api.nuget.org/v3-flatcontainer/$id/1.0.3/$id.1.0.3.nupkg" -OutFile $nupkg -UseBasicParsing
+    $hash = (Get-FileHash -Algorithm SHA512 -LiteralPath $nupkg).Hash.ToLowerInvariant()
+    if ($hash -ne $packages[$label].Sha512) { throw "The $label reference package's SHA-512 is $hash, where the pinned one is $($packages[$label].Sha512)." }
+    $dir = Join-Path $work $label
+    Expand-Archive -LiteralPath $nupkg -DestinationPath $dir
+    $sets[$label] = [FrameworkReferences.ReferenceSet]::Open($label, (Join-Path $dir "build/.NETFramework/$($packages[$label].Folder)"))
+    Write-Host "$label`: $($sets[$label].Files) reference assemblies"
+  }
+  $below = [FrameworkReferences.ReferenceSet[]]@($belowLabels | ForEach-Object { $sets[$_] })
+
+  # The whole-exe and path findings for one exe, each as a line naming the set.
+  function Get-Whole($exe, $set) { @($exe.Missing($set) | ForEach-Object { "$($set.Label): $($_.ToString())" }) }
+  function Get-Walk($exe, $checkCall) { [FrameworkReferences.Walk]::Run($exe, $below, $checkCall) }
+  function Get-PathLines($walk) { @($walk.Misses | ForEach-Object { "$($_.Set): $($_.ToString()), named by $(($walk.ChainTo($_.From)) -join ' -> ')" }) }
+
+  # Whether the walk followed the method, by Type::Name.
+  function Test-Followed($exe, $walk, [string]$member) {
+    $type, $name = $member -split '::', 2
+    $h = $exe.FindMethod($type, $name)
+    if ($null -eq $h) { throw "$($exe.Name) has no method $member." }
+    $walk.IsFollowed($h)
+  }
+
+  # The exes and the library built here for the controls.
+  $fixtureMain = @'
+    public static int Main(string[] args)
+    {
+        Before();
+        int? refused = Check();
+        if (refused.HasValue) return refused.Value;
+        return Start(args) + Later(args);
+    }
+'@
+  $sources = @{
+    'clean' = @"
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace Fixture
+{
+    internal static class Program
+    {
+$fixtureMain
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void Before() => Console.Out.Flush();
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static int? Check() => Environment.Version.Major < 4 ? 1 : (int?)null;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static int Start(string[] args)
+        {
+            var pair = (args.Length, "start");
+            var set = args.ToHashSet(StringComparer.Ordinal);
+            return pair.Item1 + set.Count + (RuntimeInformation.OSArchitecture == Architecture.X64 ? 1 : 0);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static int Later(string[] args) => (args.Length, 0, 0).Item1;
+    }
+}
+"@
+    'faulty' = @"
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace Fixture
+{
+    internal static class Program
+    {
+$fixtureMain
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void Before()
+        {
+            var pair = (1, 2);
+            Console.Write(pair.Item1);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static int? Check()
+        {
+            IShape shape = new Square();
+            return shape.Sides() + Counted.Total > 0 ? (int?)null : 1;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static int Start(string[] args) => (args.Length, 0, 0, 0).Item1;
+
+        static int Later(string[] args) => (args.Length, 0, 0).Item1;
+    }
+
+    internal interface IShape { int Sides(); }
+
+    internal sealed class Square : IShape
+    {
+        public int Sides() => RuntimeInformation.ProcessArchitecture == Architecture.X64 ? 4 : 4;
+    }
+
+    internal static class Counted
+    {
+        internal static readonly int Total = new[] { "a" }.ToHashSet(StringComparer.Ordinal).Count;
+    }
+}
+"@
+    'initializer' = @'
+namespace System.Runtime.CompilerServices
+{
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    internal sealed class ModuleInitializerAttribute : Attribute { }
+}
+
+namespace Fixture
+{
+    internal static class Start
+    {
+        [System.Runtime.CompilerServices.ModuleInitializer]
+        internal static void Before() => System.Console.Out.Flush();
+    }
+}
+'@
+    'library' = @'
+namespace Fixture
+{
+    public static class Library
+    {
+        public static int Answer() => 42;
+    }
+}
+'@
+  }
+  $fixtures = @{}
+  foreach ($name in $sources.Keys) {
+    $dir = Join-Path $work "fixture-$name"
+    New-Item -ItemType Directory -Path $dir | Out-Null
+    Set-Content -Path (Join-Path $dir "$name.cs") -Value $sources[$name]
+    $outputType = if ($name -in 'clean', 'faulty') { 'Exe' } else { 'Library' }
+    Set-Content -Path (Join-Path $dir "$name.csproj") -Value @"
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>$outputType</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+</Project>
+"@
+    $build = dotnet build (Join-Path $dir "$name.csproj") -c Release --nologo -o (Join-Path $dir 'out') 2>&1
+    if ($LASTEXITCODE -ne 0) { $build | Write-Host; throw "The $name fixture did not build." }
+    $ext = if ($outputType -eq 'Exe') { 'exe' } else { 'dll' }
+    $path = Join-Path $dir "out/$name.$ext"
+    if (-not (Test-Path -LiteralPath $path)) { throw "The $name fixture's build wrote no $path." }
+    $fixtures[$name] = $path
+  }
+
+  $fixtureCheck = 'Fixture.Program::Check'
+
+  Write-Host '== Control: an exe whose check path reaches nothing missing'
+  $clean = [FrameworkReferences.Exe]::Open($fixtures['clean'])
+  $walk = Get-Walk $clean $fixtureCheck
+  $lines = @(Get-PathLines $walk)
+  if ($lines) { foreach ($line in $lines) { Fail "The clean exe's check path was reported: $line" } }
+  else { Write-Host "  its check path reported nothing, as it should, over $($walk.Compiled.Count) methods" }
+  if (-not (Test-Followed $clean $walk $fixtureCheck)) { Fail "The walk did not follow the clean exe's check." }
+  if (Test-Followed $clean $walk 'Fixture.Program::Start') { Fail "The walk followed the clean exe's Start, which runs after the check." }
+  $whole = @(Get-Whole $clean $sets['net462'])
+  foreach ($want in 'System.ValueTuple`2', 'System.ValueTuple`3', 'System.Runtime.InteropServices.RuntimeInformation', 'System.Linq.Enumerable::ToHashSet') {
+    if (@($whole | Where-Object { $_.Contains($want) }).Count) { Write-Host "  whole exe on net462 reports, as it should: $want" }
+    else { Fail "The clean exe's whole-exe list on net462 does not report $want." }
+  }
+  $target = @(Get-Whole $clean $sets[$targetLabel])
+  foreach ($line in $target) { Fail "The clean exe reads as needing what $targetLabel lacks: $line" }
+
+  Write-Host '== Control: an exe whose check path reaches what 4.6.2, 4.7 and 4.7.1 lack'
+  $faulty = [FrameworkReferences.Exe]::Open($fixtures['faulty'])
+  $walk = Get-Walk $faulty $fixtureCheck
+  $lines = @(Get-PathLines $walk)
+  # Before runs ahead of the check; Later is compiled into Main; the check reaches Square
+  # through an interface call and Counted through its static field.
+  $expected = @(
+    'net462: System.ValueTuple`2  [mscorlib]', 'net462: System.ValueTuple`2::.ctor', 'net462: System.ValueTuple`2::Item1'
+    'net462: System.ValueTuple`3  [mscorlib]', 'net462: System.ValueTuple`3::.ctor', 'net462: System.ValueTuple`3::Item1'
+    'net462: System.Runtime.InteropServices.RuntimeInformation  [mscorlib]', 'net462: System.Runtime.InteropServices.Architecture  [mscorlib]'
+    'net462: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture'
+    'net47: System.Runtime.InteropServices.RuntimeInformation  [mscorlib]', 'net47: System.Runtime.InteropServices.Architecture  [mscorlib]'
+    'net47: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture'
+    'net462: System.Linq.Enumerable::ToHashSet', 'net47: System.Linq.Enumerable::ToHashSet', 'net471: System.Linq.Enumerable::ToHashSet'
+  )
+  foreach ($want in $expected) {
+    $hits = @($lines | Where-Object { $_.StartsWith($want) })
+    if ($hits.Count) { Write-Host "  reported, as it should be: $($hits[0])" }
+    else { Fail "The faulty exe did not report: $want" }
+  }
+  foreach ($line in $lines) {
+    if (-not @($expected | Where-Object { $line.StartsWith($_) })) { Fail "The faulty exe reported something no fault accounts for: $line" }
+  }
+  if (@($lines | Where-Object { $_.Contains('ValueTuple`4') })) { Fail "The faulty exe's Start, which runs after the check, was read as on its path." }
+
+  Write-Host '== Control: a reference taken from netstandard'
+  # The command line's merged packages take System.Object from netstandard. 4.6.2's mscorlib
+  # defines it, and 4.6.2 has no netstandard, so it is missing there and present in 4.7.1.
+  $cliPath = Join-Path $PublishRoot 'cli/installerclean-cli.exe'
+  if (-not (Test-Path -LiteralPath $cliPath)) { throw "$cliPath is not there; the two merged builds come first." }
+  $cli = [FrameworkReferences.Exe]::Open((Resolve-Path -LiteralPath $cliPath).Path)
+  $object = 'System.Object  [netstandard]'
+  if (@(Get-Whole $cli $sets['net462'] | Where-Object { $_.StartsWith("net462: $object ") }).Count) { Write-Host "  missing from net462, as it should be: $object" }
+  else { Fail "The command line's $object does not read as missing from net462, which has no netstandard." }
+  if (@(Get-Whole $cli $sets['net471'] | Where-Object { $_.StartsWith("net471: $object ") }).Count) { Fail "The command line's $object reads as missing from net471, which has netstandard." }
+  else { Write-Host "  present in net471, as it should be: $object" }
+
+  Write-Host '== Control: a library with a module initializer and one without'
+  $found = @([FrameworkReferences.Meta]::ModuleInitializers($fixtures['initializer']))
+  if (@($found | Where-Object { $_ -eq '[ModuleInitializer] Fixture.Start::Before' }).Count) { Write-Host "  reported, as it should be: $($found -join '; ')" }
+  else { Fail "The library built with a module initializer was not reported: $($found -join '; ')" }
+  $found = @([FrameworkReferences.Meta]::ModuleInitializers($fixtures['library']))
+  if ($found) { Fail "The library built without a module initializer was reported: $($found -join '; ')" }
+  else { Write-Host '  the one without reported nothing, as it should' }
+
+  $exes = @(
+    [pscustomobject]@{ Label = 'window'; Path = 'window/InstallerClean.exe'; Project = 'src/InstallerClean'; CheckCall = $null
+      Check = 'InstallerClean.App::EndWithoutNetFramework48'; Start = 'InstallerClean.App::OnStartup'; Initializer = 'InstallerClean.ProcessDefaults::SetBeforeMain' }
+    [pscustomobject]@{ Label = 'command line'; Path = 'cli/installerclean-cli.exe'; Project = 'src/InstallerClean.Cli'; CheckCall = 'InstallerClean.Cli.Program::RefuseWithoutNetFramework48'
+      Check = 'InstallerClean.Cli.Program::RefuseWithoutNetFramework48'; Start = 'InstallerClean.Cli.Program::Start'; Initializer = 'InstallerClean.Cli.LibrarySearch::SetBeforeMain' }
+  )
+  foreach ($entry in $exes) {
+    Write-Host ''
+    $path = Join-Path $PublishRoot $entry.Path
+    if (-not (Test-Path -LiteralPath $path)) { throw "$path is not there; the two merged builds come first." }
+    Write-Host "== $($entry.Label): $path"
+    $exe = [FrameworkReferences.Exe]::Open((Resolve-Path -LiteralPath $path).Path)
+    Write-Host "  $($exe.FrameworkTypeReferences) framework type references, $($exe.FrameworkMemberReferences) framework member references"
+    if (-not $exe.FrameworkTypeReferences -or -not $exe.FrameworkMemberReferences) { Fail "$path reads as referencing no .NET Framework type or member, so nothing was judged." }
+
+    $target = @(Get-Whole $exe $sets[$targetLabel])
+    foreach ($line in $target) { Fail "$($entry.Label) needs what .NET Framework 4.8 lacks: $line" }
+    if (-not $target) { Write-Host "  every reference resolves in $targetLabel" }
+
+    $old = @(Get-Whole $exe $sets['net462'])
+    Write-Host "  the exe as a whole needs $($old.Count) types and members net462 lacks:"
+    foreach ($line in $old) { Write-Host "    $line" }
+    if (-not $old) { Fail "$($entry.Label) reads as needing nothing net462 lacks, which a set with no netstandard and no ValueTuple cannot answer." }
+
+    $walk = Get-Walk $exe $entry.CheckCall
+    Write-Host "  the check path: $($walk.Compiled.Count) methods compiled, $($walk.TypesNamed) type and $($walk.MembersNamed) member names resolved against $($belowLabels -join ', ')"
+    if ($walk.Compiled.Count -lt 2) { Fail "$($entry.Label)'s walk read $($walk.Compiled.Count) methods, so its check path was not judged." }
+    if (-not (Test-Followed $exe $walk $entry.Check)) { Fail "$($entry.Label)'s walk did not follow $($entry.Check), so its check was not judged." }
+    if (Test-Followed $exe $walk $entry.Start) { Fail "$($entry.Label)'s walk followed $($entry.Start), which runs after the check." }
+    $lines = @(Get-PathLines $walk)
+    foreach ($line in $lines) { Fail "$($entry.Label)'s check path needs what a PC below 4.8 lacks: $line" }
+    if (-not $lines) { Write-Host "  nothing on the check path is missing from $($belowLabels -join ', ')" }
+    foreach ($a in $walk.Attributes) { Write-Host "  attribute on the path, not loaded by the runtime: $($a.Set): $($a.ToString()), on $($a.From)" }
+
+    # The merge's inputs, from the response file Directory.Build.targets writes: every line not
+    # an ILRepack option (a slash, a word, and a colon or nothing), the first being the exe's
+    # own assembly.
+    $rsp = Join-Path $entry.Project 'obj/Release/net48/onefile.rsp'
+    if (-not (Test-Path -LiteralPath $rsp)) { throw "$rsp is not there, so the merge's inputs cannot be read." }
+    $inputs = @(Get-Content -LiteralPath $rsp | Where-Object { $_ -and $_ -notmatch '^/[A-Za-z]+(:|$)' })
+    if ($inputs.Count -lt 2) { Fail "$rsp names $($inputs.Count) inputs, so the merged assemblies were not judged." }
+    Write-Host "  the merge's $($inputs.Count) inputs:"
+    for ($i = 0; $i -lt $inputs.Count; $i++) {
+      $found = @([FrameworkReferences.Meta]::ModuleInitializers($inputs[$i]))
+      Write-Host "    $([IO.Path]::GetFileName($inputs[$i])): $(if ($found) { $found -join '; ' } else { 'no module initializer' })"
+      if ($i -eq 0) {
+        $own = @($found | Where-Object { $_.StartsWith('[ModuleInitializer] ') })
+        if ($own.Count -ne 1 -or $own[0] -ne "[ModuleInitializer] $($entry.Initializer)") { Fail "$($entry.Label)'s own assembly carries $($own.Count) module initializers ($($own -join '; ')), where it should carry $($entry.Initializer) alone." }
+      }
+      elseif ($found) { Fail "$([IO.Path]::GetFileName($inputs[$i])), merged into the $($entry.Label), carries a module initializer the merge drops: $($found -join '; ')" }
+    }
+    $merged = @([FrameworkReferences.Meta]::ModuleInitializers($exe.Path))
+    Write-Host "  the merged exe: $($merged -join '; ')"
+    if (-not @($merged | Where-Object { $_ -eq '<Module>::.cctor' }).Count) { Fail "The merged $($entry.Label) has no module constructor, so $($entry.Initializer) never runs." }
+    elseif (-not (Test-Followed $exe $walk $entry.Initializer)) { Fail "The merged $($entry.Label)'s module constructor does not reach $($entry.Initializer)." }
+  }
+}
+finally { Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue }
+
+Write-Host ''
+if ($failures.Count) {
+  Write-Host "$($failures.Count) checks failed:"
+  $failures | ForEach-Object { Write-Host "  $_" }
+  exit 1
+}
+Write-Host 'Every check passed.'

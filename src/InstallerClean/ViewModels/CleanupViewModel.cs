@@ -2417,7 +2417,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </para>
     /// </summary>
     internal static string DescribeWriteFailure(
-        string dest, Exception ex, Func<(string Path, bool Written)> writeCrashLog) => ex switch
+        string dest, Exception ex, Func<CrashLogEntry> writeCrashLog) => ex switch
     {
         UnauthorizedAccessException =>
             string.Format(Strings.Error_AccessDeniedDestination, dest),
@@ -2432,7 +2432,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     };
 
     private static string NamingCrashLog(
-        string dest, Func<(string Path, bool Written)> writeCrashLog, string withLog, string withoutLog)
+        string dest, Func<CrashLogEntry> writeCrashLog, string withLog, string withoutLog)
     {
         var (path, written) = writeCrashLog();
         return written ? string.Format(withLog, dest, path) : string.Format(withoutLog, dest);
