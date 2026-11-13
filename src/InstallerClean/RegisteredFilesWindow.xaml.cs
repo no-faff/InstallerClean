@@ -77,16 +77,16 @@ public partial class RegisteredFilesWindow : Window
 
         if (ProductsList.Items.Count > 0)
         {
-            // The row to open on is the view-model's when it flagged one missing
-            // from disk: the main window's banner ends "Open Details for what to
-            // do", and what to do is the note only that row's details pane
-            // carries, so overriding the selection would send the user who
+            // The row to open on is the view-model's when it flagged one with a file
+            // missing from disk: the main window's banner ends "Open Details for
+            // what to do", and that row's details pane is the one about the missing
+            // file, so overriding the selection would send the user who
             // followed the banner somewhere else. Otherwise the view model's
             // intent was simply the top row, and which row that is belongs to the
             // view's order rather than to the pre-sort's, so it is read as index 0
             // rather than trusted to be where the pre-sort left it. The Max guards
             // a selection the list has not resolved.
-            var index = ProductsList.SelectedItem is ProductRow { IsMissing: true }
+            var index = ProductsList.SelectedItem is ProductRow { HasMissingFile: true }
                 ? Math.Max(ProductsList.SelectedIndex, 0)
                 : 0;
             ProductsList.SelectedIndex = index;
