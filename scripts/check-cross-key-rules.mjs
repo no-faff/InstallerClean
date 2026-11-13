@@ -16,15 +16,15 @@ import { readLedger, englishFor, recordedFreshness } from './translation-ledger.
 import { readCSharp, argumentSpan } from './csharp-source.mjs';
 import { sourceFiles, lineIndex } from './source-files.mjs';
 import { blankXmlComments } from './xml-source.mjs';
+import { supportedLanguages } from './supported-languages.mjs';
 
 const RESX_DIR = 'src/InstallerClean.Core/Resources';
 const GUI = 'src/InstallerClean';
 
-// Priority order, matching SupportedLanguages.CultureNames. The neutral is
-// checked too: en-GB's own pairs were only ever settled by hand, and it is the
-// language every satellite was generated from.
-const LANGS = ['en-GB', 'zh-Hans', 'ru', 'es', 'ja', 'pt-BR', 'pl', 'tr',
-  'ko', 'fr', 'it', 'de', 'id', 'vi', 'uk', 'nl', 'zh-Hant'];
+// Every language the app ships, from SupportedLanguages.CultureNames in its order. The
+// neutral is checked too: en-GB's own pairs were only ever settled by hand, and it is
+// the language every satellite was generated from.
+const LANGS = supportedLanguages().cultures;
 
 // ---------------------------------------------------------------------------
 // Rule 1. A control's spoken name says the same thing as its visible label.

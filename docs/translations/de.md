@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. This page is generated from [`Strings.de.resx`](../../src/InstallerClean.Core/Resources/Strings.de.resx), so do not edit it by hand. The German translation itself lives in [`gen-strings-de.mjs`](../../scripts/translations/gen-strings-de.mjs).
 
+Where German needs a different form of a line for some counts, the form is in a row of its own directly under the line, marked _(one form)_, _(few form)_ or _(many form)_. The app shows it in place of that line at the counts it is written for.
+
 `{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
 
 ## Window titles
@@ -507,6 +509,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean hat aufgehört, auf {0} zu warten, und jede Datei unangetastet gelassen, die noch damit abgeglichen werden musste. Sobald der Zugriff darauf wieder normal funktioniert, führe den Befehl erneut aus. |
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean hat aufgehört, auf mehrere Laufwerke oder Freigaben ({0}) zu warten, und jede Datei unangetastet gelassen, die noch mit einem davon abgeglichen werden musste. Sobald sie wieder normal reagieren, führe den Befehl erneut aus. |
 | Deleting {0} unneeded {1}... | {0} nicht benötigte {1} werden gelöscht... |
+| Deleting {0} unneeded {1}...<br>_(one form)_ | {0} nicht benötigte {1} wird gelöscht... |
 | Permanently deleted {0} unneeded {1}. | {0} nicht benötigte {1} endgültig gelöscht. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.) |
 | Error: destination cannot be inside the Windows Installer folder. | Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen. |
@@ -536,6 +539,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Fehler: Windows hat InstallerClean die Berechtigung verweigert zu prüfen, ob Windows Installer beschäftigt ist, und damit ließ sich nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts gelöscht. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Fehler: Windows hat InstallerClean die Berechtigung verweigert zu prüfen, ob Windows Installer beschäftigt ist, und damit ließ sich nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. |
 | Moving {0} unneeded {1} to {2}... | {0} nicht benötigte {1} werden nach {2} verschoben... |
+| Moving {0} unneeded {1} to {2}...<br>_(one form)_ | {0} nicht benötigte {1} wird nach {2} verschoben... |
 | Moved {0} unneeded {1}. | {0} nicht benötigte {1} verschoben. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Prüfe, ob deine Programme sich weiterhin wie gewohnt aktualisieren und deinstallieren lassen, und lösche dann {0}. |
 | InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean ist kostenlos. Wenn es dir geholfen hat, freue ich mich sehr über ein Trinkgeld: {0} |

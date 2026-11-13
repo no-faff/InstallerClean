@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. This page is generated from [`Strings.pl.resx`](../../src/InstallerClean.Core/Resources/Strings.pl.resx), so do not edit it by hand. The Polish translation itself lives in [`gen-strings-pl.mjs`](../../scripts/translations/gen-strings-pl.mjs).
 
+Where Polish needs a different form of a line for some counts, the form is in a row of its own directly under the line, marked _(one form)_, _(few form)_ or _(many form)_. The app shows it in place of that line at the counts it is written for.
+
 `{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
 
 ## Window titles
@@ -178,6 +180,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | Zatrzymano {0} plik. Skanowanie uznało go za niepotrzebny. Końcowa kontrola nie mogła tego potwierdzić. |
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | Zatrzymano {0} plików. Skanowanie uznało je za niepotrzebne. Końcowa kontrola nie mogła tego potwierdzić. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that.<br>_(few form)_ | Zatrzymano {0} pliki. Skanowanie uznało je za niepotrzebne. Końcowa kontrola nie mogła tego potwierdzić. |
 | Moved {0} of {1} {2} to {3} before you cancelled. | Przed anulowaniem przeniesiono {0}/{1} {2} do {3}. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Przed anulowaniem usunięto trwale {0}/{1} {2}. |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Łatwo to cofnąć. Przenieś je z powrotem do {InstallerFolder}, a wszystko wróci do stanu sprzed. |
@@ -206,14 +209,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | {0} file left alone | {0} plik pozostawiony bez zmian |
 | {0} files left alone | {0} plików pozostawionych bez zmian |
+| {0} files left alone<br>_(few form)_ | {0} pliki pozostawione bez zmian |
 | {0} unneeded file to clean up | {0} niepotrzebny plik do wyczyszczenia |
 | {0} unneeded files to clean up | {0} niepotrzebnych plików do wyczyszczenia |
+| {0} unneeded files to clean up<br>_(few form)_ | {0} niepotrzebne pliki do wyczyszczenia |
 | Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do. | Windows ma rekord dla {0} pliku, którego nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawia to kłopotu, ale aktualizacja lub odinstalowanie tego programu może się nie udać. Otwórz Szczegóły, aby dowiedzieć się, co zrobić. |
 | Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do. | Windows ma rekordy dla {0} plików, których nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawia to kłopotu, ale aktualizacja lub odinstalowanie tych programów może się nie udać. Otwórz Szczegóły, aby dowiedzieć się, co zrobić. |
 | {0} other program | jeszcze {0} program |
 | {0} other programs | jeszcze {0} programów |
+| {0} other programs<br>_(few form)_ | jeszcze {0} programy |
 | {0} file with no program named in the records | {0} plik, dla którego rekordy nie wskazują programu |
 | {0} files with no program named in the records | {0} plików, dla których rekordy nie wskazują programu |
+| {0} files with no program named in the records<br>_(few form)_ | {0} pliki, dla których rekordy nie wskazują programu |
 | InstallerClean carried on without drive {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan. | InstallerClean kontynuował bez dysku {0} i pozostawił bez zmian każdy plik, który trzeba było jeszcze z nim porównać. Gdy dysk znów zacznie normalnie odpowiadać, naciśnij przycisk Skanuj ponownie. |
 | InstallerClean carried on without {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan. | InstallerClean kontynuował bez {0} i pozostawił bez zmian każdy plik, którego sprawdzenie jeszcze od tego zależało. Gdy dostęp znów zacznie działać normalnie, naciśnij przycisk Skanuj ponownie. |
 | InstallerClean carried on without more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, Re-scan. | InstallerClean kontynuował bez kilku dysków lub udziałów ({0}) i pozostawił bez zmian każdy plik, który trzeba było jeszcze porównać z jednym z nich. Gdy znów zaczną normalnie odpowiadać, naciśnij przycisk Skanuj ponownie. |
@@ -231,8 +238,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded {1} ({2}) | {0} {1} do wyczyszczenia ({2}) |
 | {0} file left alone ({1}) | {0} plik pozostawiony bez zmian ({1}) |
 | {0} files left alone ({1}) | {0} plików pozostawionych bez zmian ({1}) |
+| {0} files left alone ({1})<br>_(few form)_ | {0} pliki pozostawione bez zmian ({1}) |
 | {0} missing | {0} brakujący |
 | {0} missing | {0} brakujących |
+| {0} missing<br>_(few form)_ | {0} brakujące |
 
 ## Confirmation dialogs
 
@@ -460,14 +469,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | file | plik |
 | files | plików |
+| files<br>_(few form)_ | pliki |
 | error | błąd |
 | errors | błędów |
+| errors<br>_(few form)_ | błędy |
 | package | pakiet |
 | packages | pakietów |
+| packages<br>_(few form)_ | pakiety |
 | product | produkt |
 | products | produktów |
+| products<br>_(few form)_ | produkty |
 | patch | poprawka |
 | patches | poprawek |
+| patches<br>_(few form)_ | poprawki |
 
 ## Sizes and times
 
@@ -500,6 +514,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected failure ({0}). The crash log could not be written. | Błąd: nieoczekiwana awaria ({0}). Nie udało się zapisać dziennika awarii. |
 | Scanning {InstallerFolder}... | Skanowanie {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Znaleziono {0} niepotrzebnych {1} do wyczyszczenia ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Znaleziono {0} niepotrzebny {1} do wyczyszczenia ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(few form)_ | Znaleziono {0} niepotrzebne {1} do wyczyszczenia ({2}). |
 | No unneeded files identified. | Nie zidentyfikowano niepotrzebnych plików. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows ma rekord dla {0} pliku, którego nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawia to kłopotu, ale aktualizacja lub odinstalowanie tego programu może się nie udać. Aby przywrócić plik, potrzebujesz instalatora tej wersji, którą już masz. Zdobądź go od producenta programu i uruchom na istniejącej kopii. Nowsza wersja nie wystarczy: musiałaby najpierw usunąć tę, którą masz, a to właśnie ten krok potrzebuje tego pliku. Odinstalowanie najpierw też nie zadziała, z tego samego powodu. To powinno przywrócić plik i zostawić twoje ustawienia nietknięte, ale Microsoft tego nie gwarantuje. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows ma rekordy dla {0} plików, których nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawia to kłopotu, ale aktualizacja lub odinstalowanie tych programów może się nie udać. Aby przywrócić plik, potrzebujesz instalatora tej wersji tego programu, którą już masz. Zdobądź go od producenta programu i uruchom na istniejącej kopii. Nowsza wersja nie wystarczy: musiałaby najpierw usunąć tę, którą masz, a to właśnie ten krok potrzebuje tego pliku. Odinstalowanie najpierw też nie zadziała, z tego samego powodu. To powinno przywrócić plik i zostawić twoje ustawienia nietknięte, ale Microsoft tego nie gwarantuje. |
@@ -507,7 +523,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean przestał czekać na {0} i pozostawił bez zmian każdy plik, którego sprawdzenie jeszcze od tego zależało. Gdy dostęp znów zacznie działać normalnie, uruchom polecenie ponownie. |
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean przestał czekać na kilka dysków lub udziałów ({0}) i pozostawił bez zmian każdy plik, który trzeba było jeszcze porównać z jednym z nich. Gdy znów zaczną normalnie odpowiadać, uruchom polecenie ponownie. |
 | Deleting {0} unneeded {1}... | Trwa usuwanie: {0} niepotrzebnych {1}... |
+| Deleting {0} unneeded {1}...<br>_(one form)_ | Trwa usuwanie: {0} niepotrzebny {1}... |
+| Deleting {0} unneeded {1}...<br>_(few form)_ | Trwa usuwanie: {0} niepotrzebne {1}... |
 | Permanently deleted {0} unneeded {1}. | Trwale usunięto {0} niepotrzebnych {1}. |
+| Permanently deleted {0} unneeded {1}.<br>_(one form)_ | Trwale usunięto {0} niepotrzebny {1}. |
+| Permanently deleted {0} unneeded {1}.<br>_(few form)_ | Trwale usunięto {0} niepotrzebne {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA. (Lokalizacja domyślna ustawiona w GUI jest przypisana do użytkownika i nie dotyczy uruchomień zaplanowanych ani na koncie usługi.) |
 | Error: destination cannot be inside the Windows Installer folder. | Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0} |
@@ -536,7 +556,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Błąd: Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc nie mógł wykluczyć, że plik stanie się potrzebny w trakcie. Nic nie zostało usunięte. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Błąd: Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc nie mógł wykluczyć, że plik stanie się potrzebny w trakcie. Nic nie zostało przeniesione. |
 | Moving {0} unneeded {1} to {2}... | Trwa przenoszenie: {0} niepotrzebnych {1} do {2}... |
+| Moving {0} unneeded {1} to {2}...<br>_(one form)_ | Trwa przenoszenie: {0} niepotrzebny {1} do {2}... |
+| Moving {0} unneeded {1} to {2}...<br>_(few form)_ | Trwa przenoszenie: {0} niepotrzebne {1} do {2}... |
 | Moved {0} unneeded {1}. | Przeniesiono {0} niepotrzebnych {1}. |
+| Moved {0} unneeded {1}.<br>_(one form)_ | Przeniesiono {0} niepotrzebny {1}. |
+| Moved {0} unneeded {1}.<br>_(few form)_ | Przeniesiono {0} niepotrzebne {1}. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Sprawdź, czy twoje programy nadal normalnie się aktualizują i odinstalowują, a potem skasuj {0}. |
 | InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean jest darmowy. Jeśli ci pomógł, napiwek będzie bardzo mile widziany: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Zaktualizować teraz? Zdecydowanie zaleca się korzystanie z najnowszej wersji. [{0}/{1}] |

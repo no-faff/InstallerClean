@@ -5,7 +5,13 @@
 //
 // ONE, a plain ASCII space (U+0020) before a high punctuation mark (! ? : ;) where
 // French typography requires a narrow no-break space (U+202F). An ASCII space there
-// both reads wrong and lets the mark wrap onto the next line on its own.
+// both reads wrong and lets the mark wrap onto the next line on its own. And the
+// same mark with no space before it at all, which is what tooling that strips the
+// space altogether leaves: a mark straight after a word, a placeholder or a closing
+// bracket or quote, with a space, a placeholder or the end of the value after it. A
+// mark with anything else after it, as in a drive's D:\ or the /? switch, is not
+// French punctuation and is left alone, and so is the text inside a placeholder, an
+// XML entity and an address.
 //
 // TWO, the space INSIDE a pair of guillemets, which French requires and which has
 // to be a no-break space for the same reason: the mark belongs to the words it
@@ -49,6 +55,18 @@ const dataRe = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g
 // A plain ASCII space ( ) immediately before ! ? : ;. The correct U+202F
 // and U+00A0 are not in the class, so a properly spaced value is clean.
 const badSpaceRe = / [!?:;]/g;
+
+// The value as the missing-space rule reads it: each placeholder made one private-use
+// character, each entity and each address a space, so a ':' inside {0:F1}, the ';'
+// of &amp; and the ':' of https:// are not marks. Positions do not survive, so a hit
+// is reported with its surroundings in this text.
+const PLACEHOLDER = '\ue000';
+const forMissingSpace = (value) =>
+  value
+    .replace(/&(?:#\d+|#x[0-9a-fA-F]+|\w+);/g, ' ')
+    .replace(/\{[^{}]*\}/g, PLACEHOLDER)
+    .replace(/\b[a-z][a-z0-9+.-]*:\/\/\S+/gi, ' ');
+const missingSpaceRe = new RegExp(`(?<=[\\p{L}\\p{N}${PLACEHOLDER})\\]»"'\u2019])[!?:;](?=[\\s${PLACEHOLDER}]|$)`, 'gu');
 
 // The two characters that are a correct space inside guillemets: the narrow
 // no-break space French typography asks for, and the ordinary no-break space,
@@ -103,6 +121,7 @@ const parseControl = (file, xml, parsed) => {
 };
 
 const problems = [];
+const missing = [];
 const guillemetProblems = [];
 // Counted so the success line can say how many marks the rule actually looked at.
 // A resx with no guillemets in it at all is a legitimate state and reads exactly
@@ -118,6 +137,11 @@ while ((m = dataRe.exec(xml)) !== null) {
   while ((h = badSpaceRe.exec(value)) !== null) {
     const around = value.slice(Math.max(0, h.index - 20), h.index + 2).replace(/\n/g, ' ');
     problems.push({ key, mark: value[h.index + 1], around });
+  }
+  const read = forMissingSpace(value);
+  for (const miss of read.matchAll(missingSpaceRe)) {
+    const around = read.slice(Math.max(0, miss.index - 20), miss.index + 2).replace(/\n/g, ' ').replaceAll(PLACEHOLDER, '{}');
+    missing.push({ key, mark: miss[0], around });
   }
 
   for (let i = 0; i < value.length; i++) {
@@ -144,6 +168,13 @@ if (problems.length) {
   console.error('with python3/printf, since many editors normalise it to a plain space.');
 }
 
+if (missing.length) {
+  console.error(`French spacing FAILED (${missing.length}): no space before a mark that wants U+202F:`);
+  for (const p of missing)
+    console.error(`  ${p.key}: "...${p.around}" (before '${p.mark}')`);
+  console.error('\nPut a narrow no-break space (U+202F) before the mark, written with python3/printf.');
+}
+
 if (guillemetProblems.length) {
   console.error(`French guillemets FAILED (${guillemetProblems.length}): no no-break space inside the mark:`);
   for (const g of guillemetProblems)
@@ -153,6 +184,6 @@ if (guillemetProblems.length) {
   console.error('space and some strip it altogether.');
 }
 
-if (problems.length || guillemetProblems.length) process.exit(1);
+if (problems.length || missing.length || guillemetProblems.length) process.exit(1);
 
-console.log(`French spacing OK: ${parsed.size} value(s) read from ${FILE.split('/').pop()}, no plain ASCII space before ! ? : ;, and a no-break space inside each of the ${guillemets} guillemet mark(s) found.`);
+console.log(`French spacing OK: ${parsed.size} value(s) read from ${FILE.split('/').pop()}, no plain ASCII space and no missing space before ! ? : ;, and a no-break space inside each of the ${guillemets} guillemet mark(s) found.`);

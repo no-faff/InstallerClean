@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. This page is generated from [`Strings.uk.resx`](../../src/InstallerClean.Core/Resources/Strings.uk.resx), so do not edit it by hand. The Ukrainian translation itself lives in [`gen-strings-uk.mjs`](../../scripts/translations/gen-strings-uk.mjs).
 
+Where Ukrainian needs a different form of a line for some counts, the form is in a row of its own directly under the line, marked _(one form)_, _(few form)_ or _(many form)_. The app shows it in place of that line at the counts it is written for.
+
 `{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
 
 ## Window titles
@@ -172,12 +174,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing was deleted | Нічого не видалено |
 | {0} file could not be moved. | Не вдалося перемістити {0} файл. |
 | {0} files could not be moved. | Не вдалося перемістити {0} файлів. |
+| {0} files could not be moved.<br>_(few form)_ | Не вдалося перемістити {0} файли. |
 | {0} file could not be deleted. | Не вдалося видалити {0} файл. |
 | {0} files could not be deleted. | Не вдалося видалити {0} файлів. |
+| {0} files could not be deleted.<br>_(few form)_ | Не вдалося видалити {0} файли. |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | Затримано {0} файл. Сканування вважало його непотрібним. Підсумкова перевірка не змогла це підтвердити. |
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | Затримано {0} файлів. Сканування вважало їх непотрібними. Підсумкова перевірка не змогла це підтвердити. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that.<br>_(few form)_ | Затримано {0} файли. Сканування вважало їх непотрібними. Підсумкова перевірка не змогла це підтвердити. |
 | Moved {0} of {1} {2} to {3} before you cancelled. | Переміщено {0} з {1} {2} до {3}, перш ніж ви скасували. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Це легко скасувати. Перемістіть їх назад до {InstallerFolder}, і все повернеться як було. |
@@ -206,14 +211,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | {0} file left alone | {0} файл залишено без змін |
 | {0} files left alone | {0} файлів залишено без змін |
+| {0} files left alone<br>_(few form)_ | {0} файли залишено без змін |
 | {0} unneeded file to clean up | {0} непотрібний файл для очищення |
 | {0} unneeded files to clean up | {0} непотрібних файлів для очищення |
+| {0} unneeded files to clean up<br>_(few form)_ | {0} непотрібні файли для очищення |
 | Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do. | Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цієї програми може не виконатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
 | Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do. | Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
+| Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.<br>_(few form)_ | Windows має записи про {0} файли, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
 | {0} other program | ще {0} програма |
 | {0} other programs | ще {0} програм |
+| {0} other programs<br>_(few form)_ | ще {0} програми |
 | {0} file with no program named in the records | {0} файл, для якого в записах не названо програми |
 | {0} files with no program named in the records | {0} файлів, для яких у записах не названо програми |
+| {0} files with no program named in the records<br>_(few form)_ | {0} файли, для яких у записах не названо програми |
 | InstallerClean carried on without drive {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan. | InstallerClean продовжив роботу без диска {0} і залишив без змін усі файли, які ще треба було звірити з ним. Коли він знову відповідатиме нормально, натисніть «Повторити сканування». |
 | InstallerClean carried on without {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan. | InstallerClean продовжив роботу без {0} і залишив без змін усі файли, які ще треба було звірити з тим, що там є. Коли доступ знову стане нормальним, натисніть «Повторити сканування». |
 | InstallerClean carried on without more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, Re-scan. | InstallerClean продовжив роботу без кількох дисків або мережевих ресурсів ({0}) і залишив без змін усі файли, які ще треба було звірити з одним із них. Коли вони знову відповідатимуть нормально, натисніть «Повторити сканування». |
@@ -231,8 +241,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded {1} ({2}) | {0} {1} для очищення ({2}) |
 | {0} file left alone ({1}) | {0} файл залишено без змін ({1}) |
 | {0} files left alone ({1}) | {0} файлів залишено без змін ({1}) |
+| {0} files left alone ({1})<br>_(few form)_ | {0} файли залишено без змін ({1}) |
 | {0} missing | {0} відсутній |
 | {0} missing | {0} відсутніх |
+| {0} missing<br>_(few form)_ | {0} відсутні |
 
 ## Confirmation dialogs
 
@@ -460,14 +472,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | file | файл |
 | files | файлів |
+| files<br>_(few form)_ | файли |
 | error | помилка |
 | errors | помилок |
+| errors<br>_(few form)_ | помилки |
 | package | пакет |
 | packages | пакетів |
+| packages<br>_(few form)_ | пакети |
 | product | продукт |
 | products | продуктів |
+| products<br>_(few form)_ | продукти |
 | patch | виправлення |
 | patches | виправлень |
+| patches<br>_(few form)_ | виправлення |
 
 ## Sizes and times
 
@@ -500,14 +517,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected failure ({0}). The crash log could not be written. | Помилка: неочікуваний збій ({0}). Журнал збою записати не вдалося. |
 | Scanning {InstallerFolder}... | Сканування {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Знайдено {0} непотрібних {1} для очищення ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Знайдено {0} непотрібний {1} для очищення ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(few form)_ | Знайдено {0} непотрібні {1} для очищення ({2}). |
 | No unneeded files identified. | Непотрібних файлів не виявлено. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цієї програми може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії цієї програми, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
+| Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.<br>_(few form)_ | Windows має записи про {0} файли, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії цієї програми, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
 | InstallerClean stopped waiting for drive {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean перестав чекати на диск {0} і залишив без змін усі файли, які ще треба було звірити з ним. Коли він почне відповідати нормально, запустіть команду ще раз. |
 | InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean перестав чекати на {0} і залишив без змін усі файли, які ще треба було звірити з тим, що там є. Коли доступ стане нормальним, запустіть команду ще раз. |
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean перестав чекати на кілька дисків або мережевих ресурсів ({0}) і залишив без змін усі файли, які ще треба було звірити з одним із них. Коли вони почнуть відповідати нормально, запустіть команду ще раз. |
 | Deleting {0} unneeded {1}... | Триває видалення: {0} непотрібних {1}... |
+| Deleting {0} unneeded {1}...<br>_(one form)_ | Триває видалення: {0} непотрібний {1}... |
+| Deleting {0} unneeded {1}...<br>_(few form)_ | Триває видалення: {0} непотрібні {1}... |
 | Permanently deleted {0} unneeded {1}. | Остаточно видалено {0} непотрібних {1}. |
+| Permanently deleted {0} unneeded {1}.<br>_(one form)_ | Остаточно видалено {0} непотрібний {1}. |
+| Permanently deleted {0} unneeded {1}.<br>_(few form)_ | Остаточно видалено {0} непотрібні {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.) |
 | Error: destination cannot be inside the Windows Installer folder. | Помилка: призначення не може бути всередині папки Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Помилка: призначення має бути повним шляхом. Отримано: {0} |
@@ -536,7 +560,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було видалено. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було переміщено. |
 | Moving {0} unneeded {1} to {2}... | Триває переміщення до {2}: {0} непотрібних {1}... |
+| Moving {0} unneeded {1} to {2}...<br>_(one form)_ | Триває переміщення до {2}: {0} непотрібний {1}... |
+| Moving {0} unneeded {1} to {2}...<br>_(few form)_ | Триває переміщення до {2}: {0} непотрібні {1}... |
 | Moved {0} unneeded {1}. | Переміщено {0} непотрібних {1}. |
+| Moved {0} unneeded {1}.<br>_(one form)_ | Переміщено {0} непотрібний {1}. |
+| Moved {0} unneeded {1}.<br>_(few form)_ | Переміщено {0} непотрібні {1}. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Переконайтеся, що ваші програми досі оновлюються та видаляються як звичайно, а потім видаліть {0}. |
 | InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean безкоштовний. Якщо він допоміг, чайові будуть дуже доречні: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Оновити зараз? Настійно рекомендуємо використовувати найновішу версію. [{0}/{1}] |
