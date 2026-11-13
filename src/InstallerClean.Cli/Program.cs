@@ -2037,7 +2037,7 @@ internal static class Program
     /// Ends a scan-only run once every line it has is printed, and returns its exit code.
     /// What a scan-only run is asked for is its output, so a write to it that failed, such
     /// as one to a redirect on a full disk, fails the run: the run reports the guard's first
-    /// failed write through <see cref="ReportUnexpectedError(string, Exception, ValueTuple{string, bool})"/>,
+    /// failed write through <see cref="ReportUnexpectedError(string, Exception, CrashLogEntry)"/>,
     /// whose HardError entry is its summary and whose line follows its output, and exits 1.
     /// Otherwise it writes the Ok entry <paramref name="summary"/> builds and exits 0. One
     /// summary either way, which is what an RMM counts runs by.

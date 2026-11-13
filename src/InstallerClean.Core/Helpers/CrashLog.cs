@@ -199,7 +199,7 @@ public static class CrashLog
 /// not be worked out, and whether the entry reached it.
 /// </summary>
 /// <remarks>
-/// A type of its own rather than a tuple: <see cref="TryWrite"/> is on the path a copy runs
+/// A type of its own rather than a tuple: <see cref="CrashLog.TryWrite"/> is on the path a copy runs
 /// before its .NET Framework 4.8 check (<see cref="Services.NetFrameworkCheck"/>).
 /// </remarks>
 public readonly record struct CrashLogEntry(string Path, bool Written);
