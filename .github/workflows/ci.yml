@@ -772,6 +772,14 @@ jobs:
         shell: pwsh
         run: ./scripts/check-one-file.ps1
 
+      # Reads each merged exe's PE and CLI headers: AMD64, PE32+, IL only, and no request or
+      # preference for a 32-bit process. An AnyCPU exe preferring 32-bit, built by the script,
+      # is its control.
+      - name: Check each merged exe is a 64-bit x64 image
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-architecture.ps1
+
       # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
       # command line prints. This reads that resource out of each merged exe against the file,
       # and each merge's input list against the file's table of merged packages, so a package

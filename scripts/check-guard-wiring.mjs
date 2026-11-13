@@ -51,6 +51,10 @@ const GUARDS = [
     command: './scripts/check-framework-references.ps1',
     workflows: ['.github/workflows/ci.yml'],
   },
+  {
+    command: './scripts/check-architecture.ps1',
+    workflows: ['.github/workflows/ci.yml', '.github/workflows/release.yml'],
+  },
 ];
 
 // The if: values a guard's step or job may carry: each runs the step on every run the
