@@ -34,10 +34,43 @@ public partial class App : Application
     /// this point the domain knows it targets .NET Framework 4.8, so the runtime's own defaults
     /// are those of 4.8.
     /// </summary>
+    /// <remarks>
+    /// On a PC without .NET Framework 4.8 the window says what to install, in a plain
+    /// message box, and ends, before Application's constructor and before anything scans.
+    /// The portable carries no config naming the runtime, so .NET Framework starts it on any
+    /// 4.x. The runtime compiles a method whole the first time it runs, and a member the PC's
+    /// .NET Framework lacks fails that compile, so the check runs here, in a method of its
+    /// own, ahead of Application's constructor and every method the window's start compiles. The message is in the
+    /// language Windows displays: the language picked in the app is read later.
+    /// </remarks>
     static App()
     {
         SystemLibraries.WriteWhatTheInitializerKept();
         FrameworkSwitches.Pin();
+        EndWithoutNetFramework48();
+    }
+
+    /// <summary>
+    /// Where the PC does not have .NET Framework 4.8, shows the message saying what to
+    /// install and ends the process with exit code 1.
+    /// </summary>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void EndWithoutNetFramework48()
+    {
+        // A throw out of a type initializer reaches no handler the app has set, so a check or
+        // a box that fails lets the start go on, where the app's own handlers catch what follows.
+        string? message;
+        try
+        {
+            message = NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: false);
+            if (message is null) return;
+            MessageBox.Show(message, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Exception)
+        {
+            return;
+        }
+        Environment.Exit(1);
     }
 
     private static InstanceLock? _instanceLock;
@@ -209,16 +242,6 @@ public partial class App : Application
         // this entry.
         LanguageFonts.Initialise((System.Windows.Media.FontFamily)Resources["Type.FontFamily"]);
         Resources["Type.FontFamily"] = LanguageFonts.For(SupportedLanguages.Active(Localisation.UiCulture));
-
-        // On a PC without .NET Framework 4.8 the window says what to install, in a plain
-        // message box, and closes, before anything scans. The portable carries no config
-        // naming the runtime, so .NET Framework starts it on any 4.x.
-        if (NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: false) is { } needsNetFramework48)
-        {
-            MessageBox.Show(needsNetFramework48, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Warning);
-            EndFailedStart(splash: null);
-            return;
-        }
 
         // A .exe.config beside the copy that says more than the build's own is a file
         // somebody else wrote, which on .NET Framework the runtime reads. A config beside

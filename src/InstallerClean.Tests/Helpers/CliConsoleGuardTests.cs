@@ -380,6 +380,27 @@ public class CliConsoleGuardTests
         Assert.Equal(CliEventClass.TransientSkip, summary.Class);
     }
 
+    // ---- A refusal at the start ----
+
+    [Fact]
+    public void A_refusal_prints_its_message_on_a_line_and_gives_the_error_code()
+    {
+        var error = new StringWriter();
+
+        Assert.Equal(CliExitCode.Error, Program.Refuse("refused here", error));
+        Assert.Equal("refused here" + NewLine, error.ToString());
+    }
+
+    [Fact]
+    public void A_refusal_whose_error_stream_refuses_every_write_still_gives_the_error_code()
+    {
+        using var _ = TestCrashLog.OwnFolder();
+        var error = new ConsoleFailingAt("");
+
+        Assert.Equal(CliExitCode.Error, Program.Refuse("refused here", error));
+        Assert.True(error.Refused > 0, "The error stream was never written to.");
+    }
+
     // ---- Main ----
 
     [Theory]
