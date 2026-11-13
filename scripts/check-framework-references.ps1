@@ -1,26 +1,29 @@
 # Fails (exit 1) where a merged exe needs what .NET Framework does not have, read from the two
 # exes build-and-test merges (publish/window and publish/cli) against Microsoft's reference
-# assemblies for .NET Framework 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1, 4.7.2 and 4.8.
+# assemblies for .NET Framework 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1, 4.7.2
+# and 4.8.
 #
 # For each exe the step holds:
 #
 #  - Every .NET Framework type and member the exe references resolves in 4.8, through the
 #    assembly its reference names and that assembly's forwarders (FrameworkReferences.cs).
 #    What the exe references that 4.6.2 lacks is printed for the record.
-#  - The exe reaches its .NET Framework 4.8 check and its message on 4.6, 4.6.1, 4.6.2, 4.7,
-#    4.7.1 and 4.7.2: nothing the runtime compiles or loads before the check has answered is
-#    missing from any of them. The command line's check is Program.RefuseWithoutNetFramework48,
-#    which Main calls; the window's is App.EndWithoutNetFramework48, which App's static
-#    constructor calls first. Each check is followed, and what runs after it (Program.Start,
-#    App.OnStartup and the rest of App's static constructor) is not.
+#  - The exe reaches its .NET Framework 4.8 check and its message on 4.0, 4.5, 4.5.1, 4.5.2,
+#    4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 and 4.7.2: nothing the runtime compiles or loads before the
+#    check has answered is missing from any of them. The command line's check is
+#    Program.RefuseWithoutNetFramework48, which Main calls; the window's is
+#    App.EndWithoutNetFramework48, which App's static constructor calls first. Each check is
+#    followed, and what runs after it (Program.Start, App.OnStartup and the rest of App's
+#    static constructor) is not. Each missing member is printed once, with the chain it was
+#    first met on and every method of the app's own through which the walk reaches it.
 #  - No assembly merged into the exe but the exe's own carries a module initializer: the
 #    merge keeps only the primary assembly's, so another's would never run. The exe's own
 #    carries exactly one, and the merged exe's module constructor calls it.
 #
-# Every run also checks itself: an exe built here whose check path reaches what 4.6 to 4.7.1
-# lack, which must report each one and nothing else, and one whose check path reaches
-# nothing missing, which must report nothing on its path and the misses of its
-# start in the whole-exe list. One whose check is called from its entry type's static
+# Every run also checks itself: an exe built here whose check path reaches what 4.0 to 4.7.1
+# lack, which must report each one and nothing else, and name both routes to the one it
+# reaches two ways, and one whose check path reaches nothing missing, which must report
+# nothing on its path and the misses of its start in the whole-exe list. One whose check is called from its entry type's static
 # constructor must report what that constructor runs before the check and nothing after
 # it. A reference .NET Framework 4.6.2 defines in mscorlib but the
 # exe takes from netstandard must read as missing from 4.6.2, which has no netstandard, and
@@ -41,6 +44,10 @@ function Fail([string]$message) { $failures.Add($message); Write-Host "::error::
 # Microsoft.NETFramework.ReferenceAssemblies.<version> 1.0.3 from nuget.org, each with the
 # SHA-512 of its package and the folder its reference assemblies sit in.
 $packages = [ordered]@{
+  'net40'  = @{ Folder = 'v4.0';   Sha512 = 'bd45e6c0fc62ee56350c49b19eb9ef7bf6b826037f6755c4e916a8cdc9a5aab7f6399c6cf6c99705bdd0f72d9d6769423ed54cc990513388d03c15f3d38227a5' }
+  'net45'  = @{ Folder = 'v4.5';   Sha512 = 'ccf2793ea73af9c060e22af7dc05abc80f025312498faf02b3509fa3ca6566dd471f743407f12a5689fa2d15f0f5bf1d7d0c8b60ca9324993699a5e02e118923' }
+  'net451' = @{ Folder = 'v4.5.1'; Sha512 = '7d2d90c31c7725ba09d9a50292730674cd7749a60bb20bab5de86ff8ba799676e5fe52b0b47e794bfb88dcaeca4411f90aa1b12ea05f59626f033fde952f4008' }
+  'net452' = @{ Folder = 'v4.5.2'; Sha512 = '125b35cb0b1b2c3fd7a44810595d3232900e1e4d0b79ccf88d698e78bc33192149dca15707ee7bc0a8d7e2b109c6a25ff7b08816752670efa9bc8cfc2df4d7bf' }
   'net46'  = @{ Folder = 'v4.6';   Sha512 = 'd8351799a723a8d4d79f9144f79a9613a6cbdb669ed26ff4acbfd280adda5ac5baa82943cd7566a3490e2f270287a255ea2ddd414fca32e4f6c2dad3f047d988' }
   'net461' = @{ Folder = 'v4.6.1'; Sha512 = 'b717dcc15dab52be03c6bd2bda353adfb0ecc785bd5a8d4fc47239a1324f46c4ac187595d902d2ef90c69bbbc9d9eeec97d04c6599f5ef8feba374833bfa01c6' }
   'net462' = @{ Folder = 'v4.6.2'; Sha512 = '1cc9f441098f61c26c56e29eb7d580f0841b070799bdced44bcf0ddfd8ad491a9c9ffd57393fca6a8d508a2ca4c54fafc7c93bff38a6d7571598ab6e9e3bb830' }
@@ -51,7 +58,7 @@ $packages = [ordered]@{
 }
 
 # The versions below 4.8 a check path has to run on, and the one every reference resolves in.
-$belowLabels = 'net46', 'net461', 'net462', 'net47', 'net471', 'net472'
+$belowLabels = 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462', 'net47', 'net471', 'net472'
 $targetLabel = 'net48'
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ('framework-references-' + [guid]::NewGuid().ToString('N'))
@@ -74,7 +81,10 @@ try {
   # The whole-exe and path findings for one exe, each as a line naming the set.
   function Get-Whole($exe, $set) { @($exe.Missing($set) | ForEach-Object { "$($set.Label): $($_.ToString())" }) }
   function Get-Walk($exe, $checkCall) { [FrameworkReferences.Walk]::Run($exe, $below, $checkCall) }
-  function Get-PathLines($walk) { @($walk.Misses | ForEach-Object { "$($_.Set): $($_.ToString()), named by $(($walk.ChainTo($_.From)) -join ' -> ')" }) }
+  # A miss prints the chain it was first met on, and then every way the app's own code reaches
+  # it, so a second route is in view before the first is cut.
+  # The app's own methods are those in InstallerClean; a fixture's are its Program's.
+  function Get-PathLines($walk, [string]$app = 'InstallerClean.') { @($walk.Misses | ForEach-Object { "$($_.Set): $($_.ToString()), named by $(($walk.ChainTo($_.From)) -join ' -> '); reached from $(($walk.AppRoutesTo($_.From, $app)) -join ' | ')" }) }
 
   # Whether the walk followed the method, by Type::Name.
   function Test-Followed($exe, $walk, [string]$member) {
@@ -142,14 +152,14 @@ $fixtureMain
         static void Before()
         {
             var pair = (1, 2);
-            Console.Write(pair.Item1);
+            Console.Write(pair.Item1 + Shared.Tally());
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         static int? Check()
         {
             IShape shape = new Square();
-            return shape.Sides() + Counted.Total > 0 ? (int?)null : 1;
+            return shape.Sides() + Counted.Total + Shared.Tally() > 0 ? (int?)null : 1;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -168,6 +178,12 @@ $fixtureMain
     internal static class Counted
     {
         internal static readonly int Total = new[] { "a" }.ToHashSet(StringComparer.Ordinal).Count;
+    }
+
+    internal static class Shared
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static int Tally() => (0, 0, 0, 0, 0).Item1;
     }
 }
 "@
@@ -277,23 +293,30 @@ namespace Fixture
   $target = @(Get-Whole $clean $sets[$targetLabel])
   foreach ($line in $target) { Fail "The clean exe reads as needing what $targetLabel lacks: $line" }
 
-  Write-Host '== Control: an exe whose check path reaches what 4.6 to 4.7.1 lack'
+  Write-Host '== Control: an exe whose check path reaches what 4.0 to 4.7.1 lack'
   $faulty = [FrameworkReferences.Exe]::Open($fixtures['faulty'])
   $walk = Get-Walk $faulty $fixtureCheck
-  $lines = @(Get-PathLines $walk)
+  $lines = @(Get-PathLines $walk 'Fixture.Program::')
   # Before runs ahead of the check; Later is compiled into Main; the check reaches Square
-  # through an interface call and Counted through its static field.
+  # through an interface call and Counted through its static field; Before and the check
+  # both call Shared.Tally.
   $expected = @(
-    foreach ($label in 'net46', 'net461', 'net462') {
+    foreach ($label in 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462') {
       "$label`: System.ValueTuple``2  [mscorlib]", "$label`: System.ValueTuple``2::.ctor", "$label`: System.ValueTuple``2::Item1"
       "$label`: System.ValueTuple``3  [mscorlib]", "$label`: System.ValueTuple``3::.ctor", "$label`: System.ValueTuple``3::Item1"
+      "$label`: System.ValueTuple``5  [mscorlib]", "$label`: System.ValueTuple``5::.ctor", "$label`: System.ValueTuple``5::Item1"
     }
-    foreach ($label in 'net46', 'net461', 'net462', 'net47') {
+    foreach ($label in 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462', 'net47') {
       "$label`: System.Runtime.InteropServices.RuntimeInformation  [mscorlib]", "$label`: System.Runtime.InteropServices.Architecture  [mscorlib]"
       "$label`: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture"
     }
-    foreach ($label in 'net46', 'net461', 'net462', 'net47', 'net471') { "$label`: System.Linq.Enumerable::ToHashSet" }
+    foreach ($label in 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462', 'net47', 'net471') { "$label`: System.Linq.Enumerable::ToHashSet" }
   )
+  # A member reached by two routes prints one chain and names both.
+  foreach ($line in @($lines | Where-Object { $_.Contains('ValueTuple`5') })) {
+    if (-not ($line.Contains('reached from Fixture.Program::Before() | Fixture.Program::Check()'))) { Fail "The faulty exe's Shared.Tally is reached from Before and the check, and the line does not name both: $line" }
+  }
+  if (-not @($lines | Where-Object { $_.Contains('ValueTuple`5') })) { Fail 'The faulty exe did not report what Shared.Tally names.' }
   foreach ($want in $expected) {
     $hits = @($lines | Where-Object { $_.StartsWith($want) })
     if ($hits.Count) { Write-Host "  reported, as it should be: $($hits[0])" }
@@ -309,8 +332,8 @@ namespace Fixture
   # what Main calls, runs only once the check has answered.
   $static = [FrameworkReferences.Exe]::Open($fixtures['staticcheck'])
   $walk = Get-Walk $static $fixtureCheck
-  $lines = @(Get-PathLines $walk)
-  $expected = @(foreach ($label in 'net46', 'net461', 'net462') {
+  $lines = @(Get-PathLines $walk 'Fixture.Program::')
+  $expected = @(foreach ($label in 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462') {
     "$label`: System.ValueTuple``2  [mscorlib]", "$label`: System.ValueTuple``2::.ctor", "$label`: System.ValueTuple``2::Item1"
   })
   foreach ($want in $expected) {

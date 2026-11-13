@@ -770,10 +770,10 @@ jobs:
         run: ./scripts/check-one-file.ps1
 
       # Reads each merged exe's own metadata against Microsoft's reference assemblies for .NET
-      # Framework 4.6 to 4.8, downloaded from nuget.org and checked against their pinned
+      # Framework 4.0 to 4.8, downloaded from nuget.org and checked against their pinned
       # hashes. Fails where a type or member the exe references is not in 4.8, where anything
       # the runtime compiles or loads on the way to the copy's .NET Framework 4.8 check is not
-      # in 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 or 4.7.2, so that a PC below 4.8 would
+      # in 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 or 4.7.2, so that a PC below 4.8 would
       # not reach the message saying what to install, or where an assembly merged into the exe
       # carries a module initializer the merge drops. What the exe needs that 4.6.2 lacks is
       # printed for the record. The script builds an exe whose check path reaches what those
