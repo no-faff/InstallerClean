@@ -15,10 +15,11 @@ namespace InstallerClean.Services;
 /// config, which names 4.8, and the setup refuses to install where 4.8 is missing.
 ///
 /// EVERYTHING A COPY RUNS BEFORE THIS CHECK ANSWERS, this check and its message included, uses
-/// only what .NET Framework 4.6.2 has: no ValueTuple, no netstandard type, nothing added after
-/// 4.6.2. A method naming anything else fails to compile there, and the copy ends without
-/// the message. build-and-test's check-framework-references.ps1 walks that path in each
-/// merged exe and fails on anything 4.6.2, 4.7, 4.7.1 or 4.7.2 lacks.
+/// only what .NET Framework 4.6 has: no ValueTuple, no netstandard type, nothing added after
+/// 4.6. Windows 10 1507 ships 4.6, and the portable and the command line check no Windows
+/// version of their own. A method naming anything else fails to compile there, and the copy
+/// ends without the message. build-and-test's check-framework-references.ps1 walks that path
+/// in each merged exe and fails on anything 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 or 4.7.2 lacks.
 /// </remarks>
 internal static class NetFrameworkCheck
 {

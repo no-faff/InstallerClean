@@ -1,15 +1,15 @@
 # Fails (exit 1) where a merged exe needs what .NET Framework does not have, read from the two
 # exes build-and-test merges (publish/window and publish/cli) against Microsoft's reference
-# assemblies for .NET Framework 4.6.2, 4.7, 4.7.1, 4.7.2 and 4.8.
+# assemblies for .NET Framework 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1, 4.7.2 and 4.8.
 #
 # For each exe the step holds:
 #
 #  - Every .NET Framework type and member the exe references resolves in 4.8, through the
 #    assembly its reference names and that assembly's forwarders (FrameworkReferences.cs).
 #    What the exe references that 4.6.2 lacks is printed for the record.
-#  - The exe reaches its .NET Framework 4.8 check and its message on 4.6.2, 4.7, 4.7.1 and
-#    4.7.2: nothing the runtime compiles or loads before the check has answered is missing
-#    from any of them. The command line's check is Program.RefuseWithoutNetFramework48,
+#  - The exe reaches its .NET Framework 4.8 check and its message on 4.6, 4.6.1, 4.6.2, 4.7,
+#    4.7.1 and 4.7.2: nothing the runtime compiles or loads before the check has answered is
+#    missing from any of them. The command line's check is Program.RefuseWithoutNetFramework48,
 #    which Main calls; the window's is App.EndWithoutNetFramework48, which App's static
 #    constructor calls. Each check is followed, and the start it guards (Program.Start,
 #    App.OnStartup) is not.
@@ -17,9 +17,9 @@
 #    merge keeps only the primary assembly's, so another's would never run. The exe's own
 #    carries exactly one, and the merged exe's module constructor calls it.
 #
-# Every run also checks itself: an exe built here whose check path reaches what 4.6.2, 4.7
-# and 4.7.1 lack, which must report each one and nothing else, and one whose check path
-# reaches nothing missing, which must report nothing on its path and the misses of its
+# Every run also checks itself: an exe built here whose check path reaches what 4.6 to 4.7.1
+# lack, which must report each one and nothing else, and one whose check path reaches
+# nothing missing, which must report nothing on its path and the misses of its
 # start in the whole-exe list. A reference .NET Framework 4.6.2 defines in mscorlib but the
 # exe takes from netstandard must read as missing from 4.6.2, which has no netstandard, and
 # as present in 4.7.1. A library built with a module initializer must be reported, and one
@@ -39,6 +39,8 @@ function Fail([string]$message) { $failures.Add($message); Write-Host "::error::
 # Microsoft.NETFramework.ReferenceAssemblies.<version> 1.0.3 from nuget.org, each with the
 # SHA-512 of its package and the folder its reference assemblies sit in.
 $packages = [ordered]@{
+  'net46'  = @{ Folder = 'v4.6';   Sha512 = 'd8351799a723a8d4d79f9144f79a9613a6cbdb669ed26ff4acbfd280adda5ac5baa82943cd7566a3490e2f270287a255ea2ddd414fca32e4f6c2dad3f047d988' }
+  'net461' = @{ Folder = 'v4.6.1'; Sha512 = 'b717dcc15dab52be03c6bd2bda353adfb0ecc785bd5a8d4fc47239a1324f46c4ac187595d902d2ef90c69bbbc9d9eeec97d04c6599f5ef8feba374833bfa01c6' }
   'net462' = @{ Folder = 'v4.6.2'; Sha512 = '1cc9f441098f61c26c56e29eb7d580f0841b070799bdced44bcf0ddfd8ad491a9c9ffd57393fca6a8d508a2ca4c54fafc7c93bff38a6d7571598ab6e9e3bb830' }
   'net47'  = @{ Folder = 'v4.7';   Sha512 = 'c7610db70f82c80395f443b5579a2478c90f911f0b1965bc17ac46fa7771c04ab718c94d983a34083059b48ebdd0f3ffd233074f094fc32413bd80615291a264' }
   'net471' = @{ Folder = 'v4.7.1'; Sha512 = '57199cd45c492d4e210346f699c10b9f83b94ba3f701fc6d9451e38351b0ea831a04f2fc80c46df574fe20e0e4cc359e27d6d7ff260de043e224ccfd661ff685' }
@@ -47,7 +49,7 @@ $packages = [ordered]@{
 }
 
 # The versions below 4.8 a check path has to run on, and the one every reference resolves in.
-$belowLabels = 'net462', 'net47', 'net471', 'net472'
+$belowLabels = 'net46', 'net461', 'net462', 'net47', 'net471', 'net472'
 $targetLabel = 'net48'
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ('framework-references-' + [guid]::NewGuid().ToString('N'))
@@ -235,20 +237,22 @@ namespace Fixture
   $target = @(Get-Whole $clean $sets[$targetLabel])
   foreach ($line in $target) { Fail "The clean exe reads as needing what $targetLabel lacks: $line" }
 
-  Write-Host '== Control: an exe whose check path reaches what 4.6.2, 4.7 and 4.7.1 lack'
+  Write-Host '== Control: an exe whose check path reaches what 4.6 to 4.7.1 lack'
   $faulty = [FrameworkReferences.Exe]::Open($fixtures['faulty'])
   $walk = Get-Walk $faulty $fixtureCheck
   $lines = @(Get-PathLines $walk)
   # Before runs ahead of the check; Later is compiled into Main; the check reaches Square
   # through an interface call and Counted through its static field.
   $expected = @(
-    'net462: System.ValueTuple`2  [mscorlib]', 'net462: System.ValueTuple`2::.ctor', 'net462: System.ValueTuple`2::Item1'
-    'net462: System.ValueTuple`3  [mscorlib]', 'net462: System.ValueTuple`3::.ctor', 'net462: System.ValueTuple`3::Item1'
-    'net462: System.Runtime.InteropServices.RuntimeInformation  [mscorlib]', 'net462: System.Runtime.InteropServices.Architecture  [mscorlib]'
-    'net462: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture'
-    'net47: System.Runtime.InteropServices.RuntimeInformation  [mscorlib]', 'net47: System.Runtime.InteropServices.Architecture  [mscorlib]'
-    'net47: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture'
-    'net462: System.Linq.Enumerable::ToHashSet', 'net47: System.Linq.Enumerable::ToHashSet', 'net471: System.Linq.Enumerable::ToHashSet'
+    foreach ($label in 'net46', 'net461', 'net462') {
+      "$label`: System.ValueTuple``2  [mscorlib]", "$label`: System.ValueTuple``2::.ctor", "$label`: System.ValueTuple``2::Item1"
+      "$label`: System.ValueTuple``3  [mscorlib]", "$label`: System.ValueTuple``3::.ctor", "$label`: System.ValueTuple``3::Item1"
+    }
+    foreach ($label in 'net46', 'net461', 'net462', 'net47') {
+      "$label`: System.Runtime.InteropServices.RuntimeInformation  [mscorlib]", "$label`: System.Runtime.InteropServices.Architecture  [mscorlib]"
+      "$label`: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture"
+    }
+    foreach ($label in 'net46', 'net461', 'net462', 'net47', 'net471') { "$label`: System.Linq.Enumerable::ToHashSet" }
   )
   foreach ($want in $expected) {
     $hits = @($lines | Where-Object { $_.StartsWith($want) })
