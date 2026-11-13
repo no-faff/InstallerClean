@@ -211,6 +211,8 @@ Three builds, choose one:
 - **Setup** (`InstallerClean-3.7.0-setup.exe`): a regular Windows installer. Adds a Start Menu entry and uninstalls cleanly. Tucked into Programs so it's easy to find six months from now, or to run more often than that if you install and uninstall a lot of software.
 - **CLI** (`installerclean-cli.exe`): the command-line version on its own, one file. No install, no uninstaller. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
 
+The release also carries **Slim** (`InstallerClean-slim.exe`). From 3.8.0 it is the same file as the portable, under the name a slim copy from an earlier release updates to.
+
 From 2.2.0 the setup and portable filenames carry their version number, so a downloaded copy always says what it is; the CLI keeps its plain `installerclean-cli.exe` name so scheduled tasks and scripts that point at it keep working across updates.
 
 Download from the [releases page](../../releases/latest), then run. It's unsigned, so Windows shows an "unknown publisher" warning; the [FAQ](#unknown-publisher) explains what you'll see and why it's safe.
