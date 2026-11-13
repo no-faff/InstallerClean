@@ -11,7 +11,9 @@
 #  - The exe reaches its start checks, for Windows 10 version 1607 and .NET Framework 4.8,
 #    and their messages on 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 and 4.7.2:
 #    nothing the runtime compiles or loads before the checks have answered is missing from
-#    any of them. The command line's checks are Program.RefuseOnAPcThatCannotRunIt, which
+#    any of them, and nothing that runs there calls a member that reads every attribute the
+#    exe carries (a ResourceManager constructor among them) where one of those attributes is a
+#    type that version lacks. The command line's checks are Program.RefuseOnAPcThatCannotRunIt, which
 #    Main calls; the window's are App.EndOnAPcThatCannotRunIt, which App's static constructor
 #    calls first. Each check is
 #    followed, and what runs after it (Program.Start, App.OnStartup and the rest of App's
@@ -22,7 +24,8 @@
 #    carries exactly one, and the merged exe's module constructor calls it.
 #
 # Every run also checks itself: an exe built here whose check path reaches what 4.0 to 4.7.1
-# lack, which must report each one and nothing else, and name both routes to the one it
+# lack, a ResourceManager in an assembly carrying an attribute 4.0 lacks among them, which
+# must report each one and nothing else, and name both routes to the one it
 # reaches two ways, and one whose check path reaches nothing missing, which must report
 # nothing on its path and the misses of its start in the whole-exe list. One whose check is called from its entry type's static
 # constructor must report what that constructor runs before the check and nothing after
@@ -143,6 +146,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+[assembly: DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+
 namespace Fixture
 {
     internal static class Program
@@ -160,7 +165,8 @@ $fixtureMain
         static int? Check()
         {
             IShape shape = new Square();
-            return shape.Sides() + Counted.Total + Shared.Tally() > 0 ? (int?)null : 1;
+            var strings = new System.Resources.ResourceManager("Fixture.Strings", typeof(Program).Assembly);
+            return shape.Sides() + Counted.Total + Shared.Tally() + strings.BaseName.Length > 0 ? (int?)null : 1;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -300,7 +306,8 @@ namespace Fixture
   $lines = @(Get-PathLines $walk 'Fixture.Program::')
   # Before runs ahead of the check; Later is compiled into Main; the check reaches Square
   # through an interface call and Counted through its static field; Before and the check
-  # both call Shared.Tally.
+  # both call Shared.Tally; the check makes a ResourceManager in an assembly carrying an
+  # attribute 4.0 lacks.
   $expected = @(
     foreach ($label in 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462') {
       "$label`: System.ValueTuple``2  [mscorlib]", "$label`: System.ValueTuple``2::.ctor", "$label`: System.ValueTuple``2::Item1"
@@ -312,6 +319,9 @@ namespace Fixture
       "$label`: System.Runtime.InteropServices.RuntimeInformation::get_ProcessArchitecture"
     }
     foreach ($label in 'net40', 'net45', 'net451', 'net452', 'net46', 'net461', 'net462', 'net47', 'net471') { "$label`: System.Linq.Enumerable::ToHashSet" }
+    # The ResourceManager reads the assembly's attributes, and 4.0 alone lacks
+    # DefaultDllImportSearchPathsAttribute.
+    'net40: System.Resources.ResourceManager::.ctor'
   )
   # A member reached by two routes prints one chain and names both.
   foreach ($line in @($lines | Where-Object { $_.Contains('ValueTuple`5') })) {
