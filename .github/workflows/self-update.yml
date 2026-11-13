@@ -22,8 +22,17 @@
 # newer version does: running the command and putting itself, or its setup, at the running
 # copy's path once both have ended. The checks read what the update left.
 #
-# No exe the job runs makes a request of the network: the old copy's check is answered by
-# the Debug switch, and the newer version is started with /noupdate.
+# Two more legs update the window the same way, from a folder of its own, as the portable
+# and as the slim: the tag's window, published as a Debug single file and told by
+# INSTALLERCLEAN_DEBUG_PRETEND_COPY which of the two it is, offers the commit's merged
+# window as its update, and its update button is pressed through UI Automation, as a user
+# would press it. The checks read the file at the path, which keeps its name, and the
+# newer window it starts.
+#
+# No command line the job runs makes a request of the network: the old copy's check is
+# answered by the Debug switch, and the newer version is started with /noupdate. The newer
+# window, which the replace starts as a user would start it, checks GitHub for a newer
+# release as any copy does.
 
 name: Self-update
 
@@ -44,7 +53,7 @@ env:
 
 jobs:
   update:
-    name: Update ${{ matrix.route == 'setup' && 'the setup''s copy' || 'the command line''s own download' }}
+    name: Update ${{ matrix.route == 'setup' && 'the setup''s copy' || matrix.route == 'download' && 'the command line''s own download' || matrix.route == 'window' && 'the portable by its update button' || 'the slim by its update button' }}
     # The same image as ci.yml and release.yml.
     runs-on: windows-2025
     timeout-minutes: 45
@@ -52,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        route: [download, setup]
+        route: [download, setup, window, slim]
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -84,10 +93,11 @@ jobs:
           "OLD_TREE=$tree" | Add-Content $env:GITHUB_ENV
 
       - name: Publish the old version's command line
+        if: matrix.route == 'download' || matrix.route == 'setup'
         run: dotnet publish "$env:OLD_TREE/src/InstallerClean.Cli/InstallerClean.Cli.csproj" -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o "$env:OLD_TREE/publish/cli"
 
       - name: Publish the old version's window
-        if: matrix.route == 'setup'
+        if: matrix.route != 'download'
         run: dotnet publish "$env:OLD_TREE/src/InstallerClean/InstallerClean.csproj" -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o "$env:OLD_TREE/publish/self-contained"
 
       - name: Build the newer version's two exes
@@ -135,6 +145,7 @@ jobs:
       # stops for, so the step fails on one rather than letting the update fail
       # for a reason that is not the code.
       - name: Put the older version in place
+        if: matrix.route == 'download' || matrix.route == 'setup'
         shell: pwsh
         run: |
           if ('${{ matrix.route }}' -eq 'setup') {
@@ -176,6 +187,7 @@ jobs:
       # and inherits the output, so it is read to the end of both. The function
       # is kept in a file for the second run the checks make.
       - name: Run the update
+        if: matrix.route == 'download' || matrix.route == 'setup'
         shell: pwsh
         run: |
           $helper = Join-Path $env:RUNNER_TEMP 'run.ps1'
@@ -237,6 +249,166 @@ jobs:
           if ($watch) { Stop-TempWatch $watch $stop }
           if ($left) { "Still running 300 s after the update run ended: $($left -join ', ')" | Set-Content (Join-Path $env:RUNNER_TEMP 'update-stuck.txt') }
           else { '  nothing the update started is running' }
+
+      # The window's legs. The old window goes in a folder of its own under the name the
+      # portable or the slim is downloaded as.
+      - name: Put the older window in place
+        if: matrix.route == 'window' || matrix.route == 'slim'
+        shell: pwsh
+        run: |
+          $folder = Join-Path $env:RUNNER_TEMP 'portable'
+          New-Item -ItemType Directory -Force -Path $folder | Out-Null
+          $name = if ('${{ matrix.route }}' -eq 'slim') { 'InstallerClean-slim.exe' } else { 'InstallerClean-portable.exe' }
+          $exe = Join-Path $folder $name
+          Copy-Item "$env:OLD_TREE/publish/self-contained/InstallerClean.exe" $exe
+          $v = (Get-Item $exe).VersionInfo.FileVersion
+          "  $exe carries $v"
+          if (-not $v.StartsWith("$env:OLD_VERSION.")) { throw "$exe carries $v, not $env:OLD_VERSION." }
+          if (Get-Process InstallerClean -ErrorAction SilentlyContinue) { throw "InstallerClean is already running." }
+          "WINDOW_EXE=$exe" | Add-Content $env:GITHUB_ENV
+
+      # Windows PowerShell, where UI Automation's assemblies are part of the framework. The
+      # step is elevated, as the window is, which UI Automation needs to reach it. The
+      # update notice's button and the offer card's both press the update; the first of the
+      # two that shows, enabled, is pressed. Where neither shows in time, every element of
+      # the window is printed.
+      - name: Press the old window's update button
+        if: matrix.route == 'window' || matrix.route == 'slim'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+          $A = [System.Windows.Automation.AutomationElement]
+          function Put([string]$line) { [IO.File]::AppendAllText($env:GITHUB_ENV, "$line`n") }
+
+          $started = Get-Date
+          Put "RUN_STARTED=$($started.ToUniversalTime().ToString('o'))"
+          $info = New-Object System.Diagnostics.ProcessStartInfo $env:WINDOW_EXE
+          $info.UseShellExecute = $false
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_LATEST'] = "v$env:NEWER_VERSION"
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST'] = $env:UPDATE_MANIFEST
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD'] = (Resolve-Path 'publish/window/InstallerClean.exe').Path
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_COPY'] = $(if ('${{ matrix.route }}' -eq 'slim') { 'slim' } else { 'portable' })
+          $old = [System.Diagnostics.Process]::Start($info)
+          Put "OLD_PID=$($old.Id)"
+          "  started the old window, process $($old.Id)"
+
+          $button = $null
+          $deadline = $started.AddSeconds(300)
+          while (-not $button -and (Get-Date) -lt $deadline -and -not $old.HasExited) {
+            $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $old.Id)
+            foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
+              foreach ($id in 'UpdateNowButton', 'UpdateOfferUpdateNowButton') {
+                $named = New-Object System.Windows.Automation.PropertyCondition($A::AutomationIdProperty, $id)
+                $found = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $named)
+                if ($found -and $found.Current.IsEnabled -and -not $found.Current.IsOffscreen) { $button = $found; break }
+              }
+              if ($button) { break }
+            }
+            if (-not $button) { Start-Sleep -Seconds 1 }
+          }
+          if (-not $button) {
+            if ($old.HasExited) { "::error::The old window ended with exit code $($old.ExitCode) before its update button showed." }
+            else { "::error::No enabled update button showed in the old window within 300 s." }
+            $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $old.Id)
+            foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
+              foreach ($e in $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [System.Windows.Automation.Condition]::TrueCondition)) {
+                $c = $e.Current
+                "  $($c.ControlType.ProgrammaticName)  id '$($c.AutomationId)'  name '$($c.Name)'$(if ($c.IsOffscreen) { '  (off screen)' })"
+              }
+            }
+            if (-not $old.HasExited) { $old.Kill() }
+            exit 1
+          }
+          "  pressing $($button.Current.AutomationId), '$($button.Current.Name)', $([int]((Get-Date) - $started).TotalSeconds) s after the start"
+          $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+          Put "PRESSED=1"
+          if (-not $old.WaitForExit(120000)) { "::error::The old window was still running 120 s after its update button was pressed."; exit 1 }
+          "  the old window ended with exit code $($old.ExitCode)"
+
+      # The newer exe the old window staged replaces it at its path once it has ended and
+      # starts the copy there, which stays open. Each is waited for, then the checks read the
+      # file at the path, what is left beside it, the newer window's report of its first scan,
+      # which names the kind of copy it takes itself for, and the crash log, and the newer
+      # window is closed.
+      - name: Check the window's update
+        if: ${{ !cancelled() && env.PRESSED == '1' }}
+        shell: pwsh
+        run: |
+          . scripts/native-libraries.ps1
+          $failures = [System.Collections.Generic.List[string]]::new()
+          function Fail([string]$message) { $failures.Add($message); Write-Host "::error::$message" }
+          function Same($a, $b) {
+            $a = $a -as [version]; $b = $b -as [version]
+            $null -ne $a -and $null -ne $b -and
+              $a.Major -eq $b.Major -and $a.Minor -eq $b.Minor -and [Math]::Max($a.Build, 0) -eq [Math]::Max($b.Build, 0)
+          }
+          $exe = $env:WINDOW_EXE
+          $folder = Split-Path $exe
+          $since = [datetime]::Parse($env:RUN_STARTED)
+
+          $left = Wait-StagingProcesses 300 $since
+          if ($left) { Fail "Still running 300 s after the old window ended: $($left -join ', ')" } else { '  nothing run from a staging folder is running' }
+
+          "The newer window:"
+          $newer = $null
+          $clock = [System.Diagnostics.Stopwatch]::StartNew()
+          while (-not $newer -and $clock.Elapsed.TotalSeconds -lt 120) {
+            $newer = Get-Process InstallerClean -ErrorAction SilentlyContinue | Where-Object { $_.Path -and [string]::Equals($_.Path, $exe, 'OrdinalIgnoreCase') } | Select-Object -First 1
+            if (-not $newer) { Start-Sleep -Seconds 1 }
+          }
+          if ($newer) { "  process $($newer.Id) runs from $exe" } else { Fail "No InstallerClean runs from $exe 120 s after the staged exe ended." }
+
+          "The file at the path:"
+          $v = (Get-Item $exe).VersionInfo.FileVersion
+          if (Same $v $env:NEWER_VERSION) { "  $exe carries $v" } else { Fail "$exe carries $v, not $env:NEWER_VERSION." }
+          foreach ($file in Get-ChildItem -LiteralPath $folder -File) {
+            if ($file.FullName -eq $exe) { continue }
+            Fail "$($file.FullName) is beside the updated window."
+          }
+          foreach ($suffix in @(Get-ReplaceSuffixes) + '.old', '.new') {
+            if (Test-Path -LiteralPath "$exe$suffix") { Fail "$exe$suffix is still there." }
+          }
+
+          # The report of the newer window's first scan names the kind of copy it takes itself
+          # for. Printed for the record: which card a scan with nothing to offer shows on the
+          # runner, and whether it writes the report, is what this run shows.
+          "The newer window's report of its first scan:"
+          $report = Join-Path $env:LOCALAPPDATA 'InstallerClean\last-run.json'
+          $clock.Restart()
+          while (-not (Test-Path -LiteralPath $report) -and $newer -and -not $newer.HasExited -and $clock.Elapsed.TotalSeconds -lt 300) { Start-Sleep -Seconds 2 }
+          if (Test-Path -LiteralPath $report) {
+            $kind = (Get-Content -Raw -LiteralPath $report | ConvertFrom-Json).app.copyKind
+            "  $report names the copy kind '$kind'"
+          } else { "  no $report within 300 s" }
+
+          if ($newer -and -not $newer.HasExited) {
+            "  the newer window's title: '$($newer.MainWindowTitle)'"
+            $null = $newer.CloseMainWindow()
+            if (-not $newer.WaitForExit(30000)) { $newer.Kill(); '  the newer window did not close in 30 s and was ended' }
+            else { "  the newer window closed with exit code $($newer.ExitCode)" }
+          }
+
+          "The download folders:"
+          $staging = @(Get-ChildItem $env:ProgramData -Directory -Filter "$(Split-Path (Get-StagingPrefix) -Leaf)*" -ErrorAction SilentlyContinue)
+          if ($staging) { Fail "Download folders are left under ${env:ProgramData} after the newer window started: $($staging.Name -join ', ')" } else { "  no download folder under $env:ProgramData" }
+
+          "The crash log:"
+          foreach ($log in (Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'), (Join-Path $env:LOCALAPPDATA 'NoFaff\InstallerClean\crash.log')) {
+            if (-not (Test-Path $log)) { "  no $log"; continue }
+            "  $log holds:"
+            Get-Content $log | ForEach-Object { "    $_" }
+            foreach ($pattern in 'Could not load file or assembly', 'UpdateFailedException') {
+              foreach ($h in @(Select-String -Path $log -SimpleMatch $pattern)) { Fail "$log line $($h.LineNumber): $($h.Line.Trim())" }
+            }
+          }
+
+          if ($failures.Count -gt 0) {
+            "$($failures.Count) checks failed:"
+            $failures | ForEach-Object { "  $_" }
+            exit 1
+          }
+          'Every check passed.'
 
       # What the update left, read before the checks make their second run,
       # which changes it. This explains a result and decides none, so it runs
@@ -311,6 +483,7 @@ jobs:
       # update's own work, written into the folder; on the setup's copy the setup
       # writes it, so there the check reads what the setup leaves.
       - name: Check the result
+        if: matrix.route == 'download' || matrix.route == 'setup'
         shell: pwsh
         run: |
           # For Get-ReplaceSuffixes and Get-StagingPrefix. Its Fail and its failures are
