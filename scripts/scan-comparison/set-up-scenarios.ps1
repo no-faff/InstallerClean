@@ -245,7 +245,7 @@ RecordWhatItAdds 'V, a per-user package advertised by SYSTEM and not installed' 
 # per-user source list goes on naming the copy.
 $xMsi = Join-Path $build 'X-1.0.0.msi'
 $beforeX = CacheNames
-$xCopy = Place $xMsi 'a copy of X''s package in the Installer folder, the source of SYSTEM''s per-user installation of X, which is also installed per machine from elsewhere' 'holds' 'it is the package SYSTEM''s per-user installation of X opens from its source list'
+$xCopy = Place $xMsi 'a copy of X''s package in the Installer folder, the source of SYSTEM''s per-user installation of X, which is also installed per machine from elsewhere' 'holds' 'SYSTEM''s per-user installation of X names it on its source list'
 Invoke-MsiexecAsSystem 'install X per user for SYSTEM from its copy in the Installer folder' "/i `"$xCopy`" ALLUSERS=`"`""
 $xPacked = Packed $products.X.Code
 $xUnmanaged = "Registry::HKEY_USERS\S-1-5-18\Software\Microsoft\Installer\Products\$xPacked"

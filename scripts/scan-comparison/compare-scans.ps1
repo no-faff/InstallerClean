@@ -208,4 +208,8 @@ if ($failures.Count) {
     $failures | ForEach-Object { "  $_" }
     exit 1
 }
-"$Label passed: $($before.Count) files, $($verdicts[1].Offered.Count) offered and $($before.Count - $verdicts[1].Offered.Count) held by both builds."
+if ($accepted.Count) {
+    "$Label passed: $($before.Count) files, $($verdicts[1].Offered.Count) offered and $($before.Count - $verdicts[1].Offered.Count) held by $ReferenceName, and $UnderTestName the same but for the $($accepted.Count) expected above."
+} else {
+    "$Label passed: $($before.Count) files, $($verdicts[1].Offered.Count) offered and $($before.Count - $verdicts[1].Offered.Count) held by both builds."
+}
