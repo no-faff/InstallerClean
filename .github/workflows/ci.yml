@@ -2479,20 +2479,32 @@ jobs:
           needs1607=$(value Startup.NeedsWindows10Version1607)
           [ -n "$needs48" ] && [ -n "$needs1607" ] || { echo "::error::Strings.resx gave no text to expect."; exit 1; }
 
+          # A process that fails under Wine opens Wine's crash dialog, which nobody closes here.
+          # With the dialog off the debugger prints what failed to the error stream and the run
+          # ends, and the time limit turns anything else that waits into an exit code.
+          wine reg add 'HKCU\Software\Wine\WineDbg' /v ShowCrashDialog /t REG_DWORD /d 0 /f > /dev/null
+          wineserver -w
+
           failed=0
           for pair in "win10|$needs48" "win7|$needs1607"; do
             version=${pair%%|*}
             expected=${pair#*|}
             winetricks -q "$version" > /dev/null
             wineserver -w
+            # Ubuntu's xvfb-run sends its command's error stream to its output stream, so both are
+            # redirected inside it, where each still has its own.
             set +e
-            xvfb-run -a wine publish/cli/installerclean-cli.exe /s /noupdate > out.txt 2> err.txt
+            timeout -k 10 180 xvfb-run -a sh -c 'exec wine "$0" /s /noupdate > out.txt 2> err.txt' publish/cli/installerclean-cli.exe
             code=$?
             set -e
+            [ "$code" -eq 124 ] && wineserver -k
             echo "== Wine as $version with ${{ matrix.framework }}: exit code $code"
             echo "-- stdout"; cat out.txt
             echo "-- stderr"; cat err.txt
-            if [ "$code" -ne 1 ]; then
+            if [ "$code" -eq 124 ]; then
+              echo "::warning::Wine run, $version with ${{ matrix.framework }}: still running after three minutes, so it was ended."
+              failed=1
+            elif [ "$code" -ne 1 ]; then
               echo "::warning::Wine run, $version with ${{ matrix.framework }}: exit code $code, where 1 was expected."
               failed=1
             fi
