@@ -197,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | How many programs and patches Windows has a record of | Windows에 기록이 있는 프로그램과 패치의 수 |
 | Whether Windows still makes old-style short file names | Windows가 아직도 예전 방식의 짧은 파일 이름을 만드는지 여부 |
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows가 10인지 11인지, x64인지 Arm인지, 그리고 어떤 언어와 국가 또는 지역으로 설정되어 있는지 |
-| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | InstallerClean의 버전, 받은 방법(setup, portable, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 보고서를 InstallerClean과 명령줄 도구 중 어느 쪽에서 보냈는지, 그리고 표시하던 언어 |
+| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean의 버전, 받은 방법(setup, portable, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 실행이 InstallerClean과 명령줄 도구 중 어느 쪽에서 이루어졌는지, 그리고 표시하던 언어 |
 | Counts of anything that went wrong | 문제가 생긴 일의 횟수 |
 | Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 이 항목은 모두 수치 또는 라벨입니다. 보고서에는 사용자나 사용자의 PC, 파일, 프로그램을 가리키는 정보가 없으며, 저에게는 사용자의 IP 주소가 전혀 보이지 않습니다. |
 | See exactly what's sent | 보내는 내용 그대로 보기 |
@@ -336,8 +336,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 업데이트를 내려받지 못했습니다. |
 | The update couldn't be installed. | 업데이트를 설치하지 못했습니다. |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요. |
-| GitHub returned an error response. Try again in a few minutes. | GitHub가 오류 응답을 반환했습니다. 몇 분 후에 다시 시도하세요. |
-| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub의 응답에 인식할 수 있는 릴리스가 없습니다. 나중에 다시 시도하거나, 릴리스 페이지를 직접 여세요. |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | 업데이트 확인에서 GitHub의 릴리스 페이지 대신 오류가 돌아왔습니다. GitHub에서 왔을 수도 있고, 프록시 같은 네트워크상의 다른 무언가에서 왔을 수도 있습니다. 나중에 다시 시도하거나 브라우저에서 릴리스 페이지를 여세요. |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | 업데이트 확인에서 릴리스를 가리키지 않는 응답이 돌아왔습니다. GitHub에서 왔을 수도 있고, 프록시나 로그인 페이지 같은 네트워크상의 다른 무언가에서 왔을 수도 있습니다. 나중에 다시 시도하거나 브라우저에서 릴리스 페이지를 여세요. |
 | The check timed out. Your connection to GitHub may be slow; try again. | 확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요. |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 {0}에 있습니다. |
 | The check failed for an unknown reason. The crash log could not be written. | 알 수 없는 이유로 확인에 실패했습니다. 크래시 로그를 기록할 수 없었습니다. |
@@ -585,7 +585,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 경로    지정한 경로로 이동 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli는 끝날 때까지 프롬프트를 붙잡고 있으므로<br>스크립트나 예약 작업이 이를 기다릴 수 있습니다. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 폴더는 사용자별 저장. 예약 또는 SYSTEM 실행에는 /m 경로 필요. |
-| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | 검사하기 전에 InstallerClean의 새 버전이 있는지 확인합니다. 직접 실행하면<br>업데이트하기 전에 묻고, 1분 안에 아무도 응답하지 않으면 업데이트합니다.<br>예약 작업이나 스크립트에서 자동으로 실행되면 묻지 않고 업데이트합니다.<br>확인을 건너뛰려면 /noupdate를 추가하세요. |
+| Before it scans, it checks for a newer version of InstallerClean, unless<br>"Check for updates automatically" is turned off for the account it runs<br>as. Where its window is on screen and nothing is piped into or out of it,<br>it asks before updating, and updates if nobody answers within a minute.<br>Anywhere else, such as a scheduled task set to run whether or not anyone<br>is logged on, it updates without asking.<br>Add /noupdate to skip the check. | 검사하기 전에 InstallerClean의 새 버전이 있는지 확인합니다. 단, 실행하는<br>계정에서 “자동으로 업데이트 확인”이 꺼져 있으면 확인하지 않습니다. 명령줄<br>도구의 창이 화면에 있고 입력과 출력이 모두 리디렉션되지 않았다면,<br>업데이트하기 전에 묻고 1분 안에 아무도 응답하지 않으면 업데이트합니다. 그<br>밖의 경우, 예를 들어 로그온 여부와 관계없이 실행되도록 설정한 예약<br>작업에서는 묻지 않고 업데이트합니다. 업데이트 확인을 건너뛰려면<br>/noupdate를 추가하세요. |
 | Exit codes: | 종료 코드: |
 |   0   success: the run did what it was asked |   0   성공: 요청한 일을 했음 |
 |   1   nothing processed: the run failed or was refused |   1   아무것도 처리되지 않음: 실행이 실패했거나 거부됨 |

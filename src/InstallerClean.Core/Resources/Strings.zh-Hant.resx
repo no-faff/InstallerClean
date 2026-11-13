@@ -974,7 +974,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean 的版本、取得方式（setup、portable、Scoop、單獨的命令列工具、從原始碼建置，或未知）、報告是由 InstallerClean 還是命令列工具傳送的，以及其顯示的語言</value>
+    <value>InstallerClean 的版本、取得方式（setup、portable、Scoop、單獨的命令列工具、從原始碼建置，或未知）、本次執行是在 InstallerClean 還是命令列工具中進行的，以及其顯示的語言</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1549,8 +1549,8 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>無法連線到 GitHub。請檢查您的網際網路連線，然後再試一次。</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub 傳回了錯誤回應。請過幾分鐘再試一次。</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub 的回應中沒有可辨識的發行版本。請稍後再試，或直接開啟發行頁面。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>更新檢查收到的是一個錯誤，而不是 GitHub 的發行頁面。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器。請稍後再試，或在瀏覽器中開啟發行頁面。</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>更新檢查收到的回應中沒有指明任何發行版本。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器或登入頁面。請稍後再試，或在瀏覽器中開啟發行頁面。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>檢查逾時。您與 GitHub 的連線可能較慢；請再試一次。</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2196,7 +2196,7 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>無法傳送報告。報告保存在 {0}。</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>正在傳送較早一次執行留下的待傳送報告。</value></data>
@@ -2273,10 +2273,12 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2421,11 +2423,11 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 會佔住命令提示字元直到結束，&#10;因此指令碼或排定的工作可以等候它完成。</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>該資料夾依使用者儲存；排定的工作或 SYSTEM 執行需要 /m 路徑。</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>掃描前，它會檢查是否有較新版本的 InstallerClean。由您親自執行時，&#10;它會在更新前詢問，一分鐘內無人回答則直接更新。在排定的工作或指令碼中&#10;自動執行時，它會直接更新而不詢問。&#10;加上 /noupdate 可略過檢查。</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>掃描前，它會檢查是否有較新版本的 InstallerClean，除非執行它的&#10;帳戶已關閉「自動檢查更新」。如果它的視窗顯示在螢幕上，且輸入和&#10;輸出都沒有被重新導向，它會在更新前詢問，一分鐘內無人回答則直接&#10;更新。在其他情況下，例如設定為無論是否有人登入都執行的排定&#10;工作，它會直接更新而不詢問。&#10;加上 /noupdate 可略過檢查。</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>結束代碼：</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

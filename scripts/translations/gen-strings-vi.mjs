@@ -360,8 +360,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại.`,
-  'UpdateCheck.Failed.ServerError': `GitHub trả về phản hồi lỗi. Hãy thử lại sau vài phút.`,
-  'UpdateCheck.Failed.ResponseParseError': `Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành.`,
+  'UpdateCheck.Failed.ServerError': `Lần kiểm tra cập nhật nhận về một lỗi thay vì trang phát hành của GitHub. Lỗi có thể đến từ GitHub hoặc từ thứ gì đó trên mạng của bạn, chẳng hạn proxy. Hãy thử lại sau, hoặc mở trang phát hành trong trình duyệt của bạn.`,
+  'UpdateCheck.Failed.ResponseParseError': `Lần kiểm tra cập nhật nhận về một phản hồi không nêu tên bản phát hành nào. Phản hồi có thể đến từ GitHub hoặc từ thứ gì đó trên mạng của bạn, chẳng hạn proxy hoặc trang đăng nhập. Hãy thử lại sau, hoặc mở trang phát hành trong trình duyệt của bạn.`,
   'UpdateCheck.Failed.Timeout': `Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại.`,
   'UpdateCheck.Failed.Unknown': `Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong {0} nếu bạn cần báo cáo.`,
 
@@ -584,7 +584,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Windows có bản ghi về bao nhiêu chương trình và bản vá`,
   'Completion.ReportPanel.ShortNames': `Windows có còn tạo tên tệp ngắn kiểu cũ hay không`,
   'Completion.ReportPanel.Windows': `Windows là bản 10 hay 11, x64 hay Arm, và đang đặt ngôn ngữ cùng quốc gia hoặc khu vực nào`,
-  'Completion.ReportPanel.AppVersion': `Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), báo cáo được gửi từ InstallerClean hay từ công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị`,
+  'Completion.ReportPanel.AppVersion': `Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), lần chạy là trong InstallerClean hay trong công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị`,
   'Completion.ReportPanel.Errors': `Số lần xảy ra bất kỳ sự cố nào`,
   'Completion.ReportPanel.Closing': `Mỗi mục này là một con số hoặc một nhãn. Không có gì trong báo cáo nêu tên bạn, máy tính, tệp hay chương trình của bạn, và tôi không bao giờ thấy địa chỉ IP của bạn.`,
   'Automation.ReportInfo': `Báo cáo chứa những gì`,
@@ -611,7 +611,7 @@ const MAP = {
   'Cli.UpdateListsOnlyAfterMove': `Phiên bản mới sẽ quét và liệt kê những gì tìm thấy, không di chuyển gì cả. Để di chuyển, hãy chạy lại /m sau đó.`,
   'Cli.UpdateRunningInstead': `Thay vào đó, chạy {0} bằng InstallerClean {1}.`,
   'Cli.UpdateDownloadLink': `{0}: {1}`,
-  'Cli.Help.UpdateNote': `Trước khi quét, công cụ kiểm tra xem có phiên bản InstallerClean mới hơn&#10;không. Khi bạn tự chạy, nó hỏi trước khi cập nhật, và cập nhật nếu không&#10;ai trả lời trong một phút. Khi chạy tự động, trong một tác vụ theo lịch&#10;hoặc một tập lệnh, nó cập nhật mà không hỏi. Thêm /noupdate để bỏ qua&#10;bước kiểm tra.`,
+  'Cli.Help.UpdateNote': `Trước khi quét, công cụ kiểm tra xem có phiên bản InstallerClean mới hơn&#10;không, trừ khi “Tự động kiểm tra cập nhật” bị tắt cho tài khoản đang chạy&#10;nó. Khi cửa sổ của nó đang hiện trên màn hình và không có gì được chuyển&#10;hướng vào hoặc ra khỏi nó, nó hỏi trước khi cập nhật, và cập nhật nếu&#10;không ai trả lời trong một phút. Ở mọi trường hợp khác, chẳng hạn một tác&#10;vụ theo lịch được đặt chạy dù có ai đăng nhập hay không, nó cập nhật mà&#10;không hỏi. Thêm /noupdate để bỏ qua bước kiểm tra.`,
   'UpdateNotice.Scoop': `Bản này được cài bằng Scoop. Để cập nhật, hãy đóng InstallerClean rồi chạy:`,
   'UpdateNotice.ScoopGlobal': `Bản này được cài bằng Scoop cho tất cả người dùng. Để cập nhật, hãy đóng InstallerClean, mở terminal với quyền quản trị viên rồi chạy:`,
   'UpdateNotice.CommandCopied': `Đã sao chép`,

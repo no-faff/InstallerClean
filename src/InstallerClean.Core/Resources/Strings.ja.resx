@@ -974,7 +974,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語</value>
+    <value>InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、実行が InstallerClean とコマンドラインツールのどちらで行われたか、そして表示していた言語</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1549,8 +1549,8 @@ InstallerClean はすでに管理者として実行されていたため、同�
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub に到達できませんでした。インターネット接続を確認して再試行してください。</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>更新の確認で、GitHub のリリースページではなくエラーが返ってきました。GitHub、またはプロキシなどお使いのネットワーク上の何かから返された可能性があります。後でもう一度試すか、ブラウザーでリリースページを開いてください。</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>更新の確認で、リリースを示していない応答が返ってきました。GitHub、またはプロキシやサインインページなどお使いのネットワーク上の何かから返された可能性があります。後でもう一度試すか、ブラウザーでリリースページを開いてください。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2204,7 +2204,7 @@ InstallerClean を管理者としてもう一度実行してください。</val
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>レポートを送信できませんでした。{0} に保存されています。</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>以前の実行から送信待ちになっているレポートを送信しています。</value></data>
@@ -2282,10 +2282,12 @@ InstallerClean を管理者としてもう一度実行してください。</val
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2439,11 +2441,11 @@ InstallerClean を管理者としてもう一度実行してください。</val
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli は終了までプロンプトを占有するため、&#10;スクリプトやスケジュールされたタスクが完了を待てます。</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>フォルダーはユーザーごと。予約実行や SYSTEM には /m PATH が必要。</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>スキャンの前に、InstallerClean の新しいバージョンがあるか確認します。&#10;自分で実行した場合は、更新する前に確認を求め、1 分以内に応答が&#10;なければ更新します。スケジュールされたタスクやスクリプトで&#10;自動実行される場合は、確認なしで更新します。&#10;確認を省くには /noupdate を付けてください。</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>スキャンの前に、InstallerClean の新しいバージョンがあるか確認します。&#10;ただし、実行しているアカウントで「更新を自動的に確認する」が&#10;オフの場合は確認しません。コンソールのウィンドウが画面上にあり、&#10;入力も出力もリダイレクトされていない場合は、更新する前に確認を&#10;求め、1 分以内に応答がなければ更新します。それ以外の場合は、&#10;たとえばログオンの有無にかかわらず実行するよう設定した&#10;スケジュールされたタスクでは、確認なしで更新します。&#10;更新の確認を省くには /noupdate を付けてください。</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>終了コード：</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

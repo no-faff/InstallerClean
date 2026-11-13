@@ -974,7 +974,7 @@ Para reponerlo, necesitas el instalador de la versión que ya tienes. Consíguel
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>La versión de InstallerClean, cómo lo obtuviste (setup, portable, Scoop, la herramienta de línea de comandos por sí sola, compilado desde el código fuente o desconocido), si el informe se envió desde InstallerClean o desde la herramienta de línea de comandos, y el idioma en que se mostraba</value>
+    <value>La versión de InstallerClean, cómo lo obtuviste (setup, portable, Scoop, la herramienta de línea de comandos por sí sola, compilado desde el código fuente o desconocido), si la ejecución fue en InstallerClean o en la herramienta de línea de comandos, y el idioma en que se mostraba</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1549,8 +1549,8 @@ Detalles en {1}.</value></data>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>No se pudo conectar con GitHub. Comprueba tu conexión a internet y vuelve a intentarlo.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub devolvió una respuesta de error. Vuelve a intentarlo en unos minutos.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La respuesta de GitHub no contenía una versión reconocible. Vuelve a intentarlo más tarde, o abre directamente la página de versiones.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>La comprobación de actualizaciones recibió un error en lugar de la página de versiones de GitHub. Puede haber venido de GitHub o de algo de tu red, como un proxy. Vuelve a intentarlo más tarde o abre la página de versiones en tu navegador.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La comprobación de actualizaciones recibió una respuesta que no nombraba ninguna versión. Puede haber venido de GitHub o de algo de tu red, como un proxy o una página de inicio de sesión. Vuelve a intentarlo más tarde o abre la página de versiones en tu navegador.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Se agotó el tiempo de espera de la comprobación. Tu conexión con GitHub puede ser lenta; vuelve a intentarlo.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2196,7 +2196,7 @@ Vuelve a ejecutar InstallerClean como administrador.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>No se pudo enviar el informe. Se conserva en {0}.</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>Se envía un informe que esperaba desde una ejecución anterior.</value></data>
@@ -2273,10 +2273,12 @@ Vuelve a ejecutar InstallerClean como administrador.</value></data>
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2425,11 +2427,11 @@ Vuelve a ejecutar InstallerClean como administrador.</value></data>
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli bloquea el símbolo del sistema hasta terminar,&#10;para que un script o una tarea programada pueda esperarlo.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Carpeta por usuario; ejecuciones programadas o SYSTEM: /m RUTA.</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Antes de analizar, comprueba si hay una versión más reciente de&#10;InstallerClean. Cuando lo ejecutas tú, pregunta antes de actualizar, y se&#10;actualiza si nadie responde en un minuto. Cuando se ejecuta solo, en una&#10;tarea programada o un script, se actualiza sin preguntar. Añade /noupdate&#10;para omitir la comprobación.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Antes de analizar, comprueba si hay una versión más reciente de&#10;InstallerClean, a menos que la opción “Buscar actualizaciones&#10;automáticamente” esté desactivada para la cuenta con la que se ejecuta. Si&#10;su ventana está en pantalla y su entrada y su salida no están redirigidas,&#10;pregunta antes de actualizar, y se actualiza si nadie responde en un&#10;minuto. En cualquier otro caso, por ejemplo una tarea programada&#10;configurada para ejecutarse con o sin sesión iniciada, se actualiza sin&#10;preguntar. Añade /noupdate para omitir la comprobación.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Códigos de salida:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

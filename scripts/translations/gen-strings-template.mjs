@@ -444,8 +444,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Couldn't reach GitHub. Check your internet connection and try again.`,
-  'UpdateCheck.Failed.ServerError': `GitHub returned an error response. Try again in a few minutes.`,
-  'UpdateCheck.Failed.ResponseParseError': `GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser.`,
   'UpdateCheck.Failed.Timeout': `The check timed out. Your connection to GitHub may be slow; try again.`,
   'UpdateCheck.Failed.Unknown': `The check failed for an unknown reason. Details are in {0} if you need to report it.`,
   'UpdateCheck.Failed.Unknown.NoLog': `The check failed for an unknown reason. The crash log could not be written.`,
@@ -649,7 +649,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `How many programs and patches Windows has a record of`,
   'Completion.ReportPanel.ShortNames': `Whether Windows still makes old-style short file names`,
   'Completion.ReportPanel.Windows': `Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing`,
   'Completion.ReportPanel.Errors': `Counts of anything that went wrong`,
   'Completion.ReportPanel.Closing': `Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address.`,
   'Automation.ReportInfo': `What the report holds`,
@@ -676,7 +676,7 @@ const MAP = {
   'Cli.UpdateListsOnlyAfterMove': `The new version will scan and list what it finds, without moving anything. To move, run /m again afterwards.`,
   'Cli.UpdateRunningInstead': `Running {0} with InstallerClean {1} instead.`,
   'Cli.UpdateDownloadLink': `{0}: {1}`,
-  'Cli.Help.UpdateNote': `Before it scans, it checks for a newer version of InstallerClean.&#10;When you run it yourself, it asks before updating, and updates if nobody&#10;answers within a minute. When it runs on its own, in a scheduled task or&#10;a script, it updates without asking.&#10;Add /noupdate to skip the check.`,
+  'Cli.Help.UpdateNote': `Before it scans, it checks for a newer version of InstallerClean, unless&#10;"Check for updates automatically" is turned off for the account it runs&#10;as. Where its window is on screen and nothing is piped into or out of it,&#10;it asks before updating, and updates if nobody answers within a minute.&#10;Anywhere else, such as a scheduled task set to run whether or not anyone&#10;is logged on, it updates without asking.&#10;Add /noupdate to skip the check.`,
   'UpdateNotice.Scoop': `This copy was installed by Scoop. To update it, close InstallerClean and run:`,
   'UpdateNotice.ScoopGlobal': `This copy was installed by Scoop for all users. To update it, close InstallerClean, open a terminal as administrator and run:`,
   'UpdateNotice.CommandCopied': `Copied`,

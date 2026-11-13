@@ -197,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | How many programs and patches Windows has a record of | Windows 記錄了多少個程式和修補程式 |
 | Whether Windows still makes old-style short file names | Windows 是否仍會產生舊式的短檔名 |
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows 是 10 還是 11、是 x64 還是 Arm，以及設定的是哪種語言和哪個國家或地區 |
-| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | InstallerClean 的版本、取得方式（setup、portable、Scoop、單獨的命令列工具、從原始碼建置，或未知）、報告是由 InstallerClean 還是命令列工具傳送的，以及其顯示的語言 |
+| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean 的版本、取得方式（setup、portable、Scoop、單獨的命令列工具、從原始碼建置，或未知）、本次執行是在 InstallerClean 還是命令列工具中進行的，以及其顯示的語言 |
 | Counts of anything that went wrong | 所有出錯情況的次數 |
 | Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 這些內容都是數字或標籤。報告中沒有任何內容能指出您、您的電腦、您的檔案或程式，我也從來看不到您的 IP 位址。 |
 | See exactly what's sent | 查看傳送的確切內容 |
@@ -336,8 +336,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 無法下載更新。 |
 | The update couldn't be installed. | 無法安裝更新。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 無法連線到 GitHub。請檢查您的網際網路連線，然後再試一次。 |
-| GitHub returned an error response. Try again in a few minutes. | GitHub 傳回了錯誤回應。請過幾分鐘再試一次。 |
-| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub 的回應中沒有可辨識的發行版本。請稍後再試，或直接開啟發行頁面。 |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | 更新檢查收到的是一個錯誤，而不是 GitHub 的發行頁面。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器。請稍後再試，或在瀏覽器中開啟發行頁面。 |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | 更新檢查收到的回應中沒有指明任何發行版本。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器或登入頁面。請稍後再試，或在瀏覽器中開啟發行頁面。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 檢查逾時。您與 GitHub 的連線可能較慢；請再試一次。 |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 檢查因不明原因失敗。如果您需要回報這個問題，詳細資料在 {0}。 |
 | The check failed for an unknown reason. The crash log could not be written. | 檢查因不明原因失敗。無法寫入當機記錄檔。 |
@@ -585,7 +585,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 路徑    移到指定的路徑 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli 會佔住命令提示字元直到結束，<br>因此指令碼或排定的工作可以等候它完成。 |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 該資料夾依使用者儲存；排定的工作或 SYSTEM 執行需要 /m 路徑。 |
-| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | 掃描前，它會檢查是否有較新版本的 InstallerClean。由您親自執行時，<br>它會在更新前詢問，一分鐘內無人回答則直接更新。在排定的工作或指令碼中<br>自動執行時，它會直接更新而不詢問。<br>加上 /noupdate 可略過檢查。 |
+| Before it scans, it checks for a newer version of InstallerClean, unless<br>"Check for updates automatically" is turned off for the account it runs<br>as. Where its window is on screen and nothing is piped into or out of it,<br>it asks before updating, and updates if nobody answers within a minute.<br>Anywhere else, such as a scheduled task set to run whether or not anyone<br>is logged on, it updates without asking.<br>Add /noupdate to skip the check. | 掃描前，它會檢查是否有較新版本的 InstallerClean，除非執行它的<br>帳戶已關閉「自動檢查更新」。如果它的視窗顯示在螢幕上，且輸入和<br>輸出都沒有被重新導向，它會在更新前詢問，一分鐘內無人回答則直接<br>更新。在其他情況下，例如設定為無論是否有人登入都執行的排定<br>工作，它會直接更新而不詢問。<br>加上 /noupdate 可略過檢查。 |
 | Exit codes: | 結束代碼： |
 |   0   success: the run did what it was asked |   0   成功：這次執行完成了要求的事 |
 |   1   nothing processed: the run failed or was refused |   1   沒有處理任何內容：這次執行失敗或被拒絕 |

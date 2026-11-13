@@ -377,8 +377,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `GitHub war nicht erreichbar. Prüfe deine Internetverbindung und versuch es erneut.`,
-  'UpdateCheck.Failed.ServerError': `GitHub hat eine Fehlerantwort zurückgegeben. Versuch es in ein paar Minuten erneut.`,
-  'UpdateCheck.Failed.ResponseParseError': `Die Antwort von GitHub enthielt keine erkennbare Version. Versuch es später erneut oder öffne die Releases-Seite direkt.`,
+  'UpdateCheck.Failed.ServerError': `Die Update-Prüfung hat statt der Releases-Seite von GitHub einen Fehler zurückbekommen. Er kann von GitHub oder von etwas in deinem Netzwerk stammen, etwa einem Proxy. Versuch es später erneut oder öffne die Releases-Seite in deinem Browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `Die Update-Prüfung hat eine Antwort bekommen, in der keine Version genannt war. Sie kann von GitHub oder von etwas in deinem Netzwerk stammen, etwa einem Proxy oder einer Anmeldeseite. Versuch es später erneut oder öffne die Releases-Seite in deinem Browser.`,
   'UpdateCheck.Failed.Timeout': `Bei der Prüfung wurde das Zeitlimit überschritten. Deine Verbindung zu GitHub ist vielleicht langsam; versuch es erneut.`,
   'UpdateCheck.Failed.Unknown': `Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in {0}, falls du es melden möchtest.`,
 
@@ -602,7 +602,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Zu wie vielen Programmen und Patches Windows einen Eintrag hat`,
   'Completion.ReportPanel.ShortNames': `Ob Windows noch kurze Dateinamen im alten Stil anlegt`,
   'Completion.ReportPanel.Windows': `Ob Windows 10 oder 11 und x64 oder Arm ist und auf welche Sprache und welches Land oder welche Region es eingestellt ist`,
-  'Completion.ReportPanel.AppVersion': `Die Version von InstallerClean, wie du es bekommen hast (Setup, Portable, Scoop, das Befehlszeilenprogramm allein, selbst aus dem Quellcode gebaut oder unbekannt), ob der Bericht von InstallerClean oder vom Befehlszeilenprogramm gesendet wurde, und die Sprache, in der es angezeigt wurde`,
+  'Completion.ReportPanel.AppVersion': `Die Version von InstallerClean, wie du es bekommen hast (Setup, Portable, Scoop, das Befehlszeilenprogramm allein, selbst aus dem Quellcode gebaut oder unbekannt), ob der Lauf in InstallerClean oder im Befehlszeilenprogramm stattfand, und die Sprache, in der es angezeigt wurde`,
   'Completion.ReportPanel.Errors': `Wie oft etwas schiefgegangen ist`,
   'Completion.ReportPanel.Closing': `Jede dieser Angaben ist eine Zahl oder eine Bezeichnung. Nichts im Bericht nennt dich, deinen PC, deine Dateien oder deine Programme, und ich sehe deine IP-Adresse nie.`,
   'Automation.ReportInfo': `Was der Bericht enthält`,
@@ -629,7 +629,7 @@ const MAP = {
   'Cli.UpdateListsOnlyAfterMove': `Die neue Version scannt und listet auf, was sie findet, ohne etwas zu verschieben. Zum Verschieben führe danach /m erneut aus.`,
   'Cli.UpdateRunningInstead': `Stattdessen wird {0} mit InstallerClean {1} ausgeführt.`,
   'Cli.UpdateDownloadLink': `{0}: {1}`,
-  'Cli.Help.UpdateNote': `Vor dem Scannen prüft es, ob es eine neuere Version von InstallerClean&#10;gibt. Wenn du es selbst startest, fragt es vor dem Aktualisieren und&#10;aktualisiert, wenn innerhalb einer Minute niemand antwortet. Läuft es von&#10;selbst, in einer geplanten Aufgabe oder einem Skript, aktualisiert es ohne&#10;zu fragen. Mit /noupdate wird die Prüfung übersprungen.`,
+  'Cli.Help.UpdateNote': `Vor dem Scannen prüft es, ob es eine neuere Version von InstallerClean&#10;gibt, es sei denn, „Automatisch nach Updates suchen“ ist für das Konto&#10;ausgeschaltet, unter dem es läuft. Wenn sein Fenster auf dem Bildschirm zu&#10;sehen ist und weder Eingabe noch Ausgabe umgeleitet wird, fragt es vor dem&#10;Aktualisieren und aktualisiert, wenn innerhalb einer Minute niemand&#10;antwortet. Überall sonst, etwa in einer geplanten Aufgabe, die ausgeführt&#10;wird, ob jemand angemeldet ist oder nicht, aktualisiert es ohne zu fragen.&#10;Mit /noupdate wird die Prüfung übersprungen.`,
   'UpdateNotice.Scoop': `Diese Kopie wurde mit Scoop installiert. Um sie zu aktualisieren, schließe InstallerClean und führe Folgendes aus:`,
   'UpdateNotice.ScoopGlobal': `Diese Kopie wurde mit Scoop für alle Benutzer installiert. Um sie zu aktualisieren, schließe InstallerClean, öffne ein Terminal als Administrator und führe Folgendes aus:`,
   'UpdateNotice.CommandCopied': `Kopiert`,

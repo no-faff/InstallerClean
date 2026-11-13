@@ -368,8 +368,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Impossible de joindre GitHub. Vérifiez votre connexion internet et réessayez.`,
-  'UpdateCheck.Failed.ServerError': `GitHub a renvoyé une réponse d'erreur. Réessayez dans quelques minutes.`,
-  'UpdateCheck.Failed.ResponseParseError': `La réponse de GitHub ne contenait pas de version reconnaissable. Réessayez plus tard, ou ouvrez directement la page des versions.`,
+  'UpdateCheck.Failed.ServerError': `La vérification des mises à jour a reçu une erreur au lieu de la page des versions de GitHub. Elle peut venir de GitHub ou d'un élément de votre réseau, comme un proxy. Réessayez plus tard, ou ouvrez la page des versions dans votre navigateur.`,
+  'UpdateCheck.Failed.ResponseParseError': `La vérification des mises à jour a reçu une réponse qui ne nommait aucune version. Elle peut venir de GitHub ou d'un élément de votre réseau, comme un proxy ou une page de connexion. Réessayez plus tard, ou ouvrez la page des versions dans votre navigateur.`,
   'UpdateCheck.Failed.Timeout': `La vérification a expiré. Votre connexion à GitHub est peut-être lente ; réessayez.`,
   'UpdateCheck.Failed.Unknown': `La vérification a échoué pour une raison inconnue. Les détails sont dans {0} si vous devez le signaler.`,
 
@@ -592,7 +592,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Le nombre de programmes et de correctifs dont Windows garde un enregistrement`,
   'Completion.ReportPanel.ShortNames': `Si Windows crée encore des noms de fichiers courts à l'ancienne`,
   'Completion.ReportPanel.Windows': `Si Windows est en version 10 ou 11, x64 ou Arm, et la langue et le pays ou la région qui y sont définis`,
-  'Completion.ReportPanel.AppVersion': `La version d'InstallerClean, la façon dont vous l'avez obtenu (setup, portable, Scoop, l'outil en ligne de commande seul, compilé depuis les sources, ou inconnu), si le rapport a été envoyé depuis InstallerClean ou depuis l'outil en ligne de commande, et la langue dans laquelle il s'affichait`,
+  'Completion.ReportPanel.AppVersion': `La version d'InstallerClean, la façon dont vous l'avez obtenu (setup, portable, Scoop, l'outil en ligne de commande seul, compilé depuis les sources, ou inconnu), si l'exécution s'est faite dans InstallerClean ou dans l'outil en ligne de commande, et la langue dans laquelle il s'affichait`,
   'Completion.ReportPanel.Errors': `Le décompte de tout ce qui a échoué`,
   'Completion.ReportPanel.Closing': `Chacun de ces éléments est un nombre ou un libellé. Rien dans le rapport ne désigne ni vous, ni votre PC, ni vos fichiers, ni vos programmes, et je ne vois jamais votre adresse IP.`,
   'Automation.ReportInfo': `Ce que contient le rapport`,
@@ -619,7 +619,7 @@ const MAP = {
   'Cli.UpdateListsOnlyAfterMove': `La nouvelle version va analyser et lister ce qu'elle trouve, sans rien déplacer. Pour déplacer, relancez /m ensuite.`,
   'Cli.UpdateRunningInstead': `Exécution de {0} avec InstallerClean {1} à la place.`,
   'Cli.UpdateDownloadLink': `{0} : {1}`,
-  'Cli.Help.UpdateNote': `Avant l'analyse, il vérifie s'il existe une version plus récente&#10;d'InstallerClean. Lancé par vous, il demande avant de mettre à jour, et&#10;se met à jour si personne ne répond dans la minute. Lancé seul, dans une&#10;tâche planifiée ou un script, il se met à jour sans demander. Ajoutez&#10;/noupdate pour ignorer la vérification.`,
+  'Cli.Help.UpdateNote': `Avant l'analyse, il vérifie s'il existe une version plus récente&#10;d'InstallerClean, sauf si l'option « Rechercher des mises à jour&#10;automatiquement » est désactivée pour le compte sous lequel il s'exécute.&#10;Lorsque sa fenêtre est affichée à l'écran et que rien n'est redirigé vers&#10;lui ni depuis lui, il demande avant de mettre à jour, et se met à jour si&#10;personne ne répond dans la minute. Partout ailleurs, par exemple dans une&#10;tâche planifiée configurée pour s'exécuter que quelqu'un soit connecté ou&#10;non, il se met à jour sans demander. Ajoutez /noupdate pour ignorer la&#10;vérification.`,
   'UpdateNotice.Scoop': `Cette copie a été installée par Scoop. Pour la mettre à jour, fermez InstallerClean et exécutez :`,
   'UpdateNotice.ScoopGlobal': `Cette copie a été installée par Scoop pour tous les utilisateurs. Pour la mettre à jour, fermez InstallerClean, ouvrez un terminal en tant qu'administrateur et exécutez :`,
   'UpdateNotice.CommandCopied': `Copié`,

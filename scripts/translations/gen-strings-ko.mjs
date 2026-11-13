@@ -358,8 +358,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.`,
-  'UpdateCheck.Failed.ServerError': `GitHub가 오류 응답을 반환했습니다. 몇 분 후에 다시 시도하세요.`,
-  'UpdateCheck.Failed.ResponseParseError': `GitHub의 응답에 인식할 수 있는 릴리스가 없습니다. 나중에 다시 시도하거나, 릴리스 페이지를 직접 여세요.`,
+  'UpdateCheck.Failed.ServerError': `업데이트 확인에서 GitHub의 릴리스 페이지 대신 오류가 돌아왔습니다. GitHub에서 왔을 수도 있고, 프록시 같은 네트워크상의 다른 무언가에서 왔을 수도 있습니다. 나중에 다시 시도하거나 브라우저에서 릴리스 페이지를 여세요.`,
+  'UpdateCheck.Failed.ResponseParseError': `업데이트 확인에서 릴리스를 가리키지 않는 응답이 돌아왔습니다. GitHub에서 왔을 수도 있고, 프록시나 로그인 페이지 같은 네트워크상의 다른 무언가에서 왔을 수도 있습니다. 나중에 다시 시도하거나 브라우저에서 릴리스 페이지를 여세요.`,
   'UpdateCheck.Failed.Timeout': `확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요.`,
   'UpdateCheck.Failed.Unknown': `알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 {0}에 있습니다.`,
 
@@ -585,7 +585,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Windows에 기록이 있는 프로그램과 패치의 수`,
   'Completion.ReportPanel.ShortNames': `Windows가 아직도 예전 방식의 짧은 파일 이름을 만드는지 여부`,
   'Completion.ReportPanel.Windows': `Windows가 10인지 11인지, x64인지 Arm인지, 그리고 어떤 언어와 국가 또는 지역으로 설정되어 있는지`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean의 버전, 받은 방법(setup, portable, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 보고서를 InstallerClean과 명령줄 도구 중 어느 쪽에서 보냈는지, 그리고 표시하던 언어`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean의 버전, 받은 방법(setup, portable, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 실행이 InstallerClean과 명령줄 도구 중 어느 쪽에서 이루어졌는지, 그리고 표시하던 언어`,
   'Completion.ReportPanel.Errors': `문제가 생긴 일의 횟수`,
   'Completion.ReportPanel.Closing': `이 항목은 모두 수치 또는 라벨입니다. 보고서에는 사용자나 사용자의 PC, 파일, 프로그램을 가리키는 정보가 없으며, 저에게는 사용자의 IP 주소가 전혀 보이지 않습니다.`,
   'Automation.ReportInfo': `보고서에 담긴 내용`,
@@ -612,7 +612,7 @@ const MAP = {
   'Cli.UpdateListsOnlyAfterMove': `새 버전은 검사하여 찾은 항목을 나열하기만 하고 아무것도 이동하지 않습니다. 이동하려면 그 후에 /m을 다시 실행하세요.`,
   'Cli.UpdateRunningInstead': `대신 InstallerClean {1} 버전으로 {0} 명령을 실행합니다.`,
   'Cli.UpdateDownloadLink': `{0}: {1}`,
-  'Cli.Help.UpdateNote': `검사하기 전에 InstallerClean의 새 버전이 있는지 확인합니다. 직접 실행하면&#10;업데이트하기 전에 묻고, 1분 안에 아무도 응답하지 않으면 업데이트합니다.&#10;예약 작업이나 스크립트에서 자동으로 실행되면 묻지 않고 업데이트합니다.&#10;확인을 건너뛰려면 /noupdate를 추가하세요.`,
+  'Cli.Help.UpdateNote': `검사하기 전에 InstallerClean의 새 버전이 있는지 확인합니다. 단, 실행하는&#10;계정에서 “자동으로 업데이트 확인”이 꺼져 있으면 확인하지 않습니다. 명령줄&#10;도구의 창이 화면에 있고 입력과 출력이 모두 리디렉션되지 않았다면,&#10;업데이트하기 전에 묻고 1분 안에 아무도 응답하지 않으면 업데이트합니다. 그&#10;밖의 경우, 예를 들어 로그온 여부와 관계없이 실행되도록 설정한 예약&#10;작업에서는 묻지 않고 업데이트합니다. 업데이트 확인을 건너뛰려면&#10;/noupdate를 추가하세요.`,
   'UpdateNotice.Scoop': `이 사본은 Scoop으로 설치되었습니다. 업데이트하려면 InstallerClean을 닫고 다음을 실행하세요:`,
   'UpdateNotice.ScoopGlobal': `이 사본은 Scoop으로 모든 사용자용으로 설치되었습니다. 업데이트하려면 InstallerClean을 닫고, 관리자 권한으로 터미널을 열어 다음을 실행하세요:`,
   'UpdateNotice.CommandCopied': `복사됨`,

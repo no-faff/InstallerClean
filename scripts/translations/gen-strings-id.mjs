@@ -382,8 +382,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi.`,
-  'UpdateCheck.Failed.ServerError': `GitHub mengembalikan respons kesalahan. Coba lagi dalam beberapa menit.`,
-  'UpdateCheck.Failed.ResponseParseError': `Respons GitHub tidak memuat rilis yang dikenali. Coba lagi nanti, atau buka halaman rilis langsung.`,
+  'UpdateCheck.Failed.ServerError': `Pemeriksaan pembaruan menerima kesalahan alih-alih halaman rilis GitHub. Kesalahan itu bisa berasal dari GitHub atau dari sesuatu di jaringan Anda, seperti proxy. Coba lagi nanti, atau buka halaman rilis di browser Anda.`,
+  'UpdateCheck.Failed.ResponseParseError': `Pemeriksaan pembaruan menerima jawaban yang tidak menyebutkan rilis mana pun. Jawaban itu bisa berasal dari GitHub atau dari sesuatu di jaringan Anda, seperti proxy atau halaman masuk. Coba lagi nanti, atau buka halaman rilis di browser Anda.`,
   'UpdateCheck.Failed.Timeout': `Pemeriksaan kehabisan waktu. Koneksi Anda ke GitHub mungkin lambat; coba lagi.`,
   'UpdateCheck.Failed.Unknown': `Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di {0} jika Anda perlu melaporkannya.`,
 
@@ -609,7 +609,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Berapa banyak program dan patch yang dicatat Windows`,
   'Completion.ReportPanel.ShortNames': `Apakah Windows masih membuat nama file pendek gaya lama`,
   'Completion.ReportPanel.Windows': `Apakah Windows versi 10 atau 11 dan x64 atau Arm, serta bahasa dan negara atau kawasan yang disetel di dalamnya`,
-  'Completion.ReportPanel.AppVersion': `Versi InstallerClean, cara Anda mendapatkannya (setup, portable, Scoop, alat baris perintah yang berdiri sendiri, dibuat dari kode sumber, atau tidak diketahui), apakah laporan dikirim dari InstallerClean atau alat baris perintah, dan bahasa yang ditampilkannya`,
+  'Completion.ReportPanel.AppVersion': `Versi InstallerClean, cara Anda mendapatkannya (setup, portable, Scoop, alat baris perintah yang berdiri sendiri, dibuat dari kode sumber, atau tidak diketahui), apakah proses dijalankan di InstallerClean atau di alat baris perintah, dan bahasa yang ditampilkannya`,
   'Completion.ReportPanel.Errors': `Jumlah dari apa pun yang gagal`,
   'Completion.ReportPanel.Closing': `Masing-masing berupa angka atau label. Tidak ada di dalam laporan yang menyebut Anda, PC Anda, file Anda, atau program Anda, dan saya tidak pernah melihat alamat IP Anda.`,
   'Automation.ReportInfo': `Isi laporan`,
@@ -636,7 +636,7 @@ const MAP = {
   'Cli.UpdateListsOnlyAfterMove': `Versi baru akan memindai dan menampilkan daftar temuannya, tanpa memindahkan apa pun. Untuk memindahkan, jalankan /m lagi setelahnya.`,
   'Cli.UpdateRunningInstead': `Menjalankan {0} dengan InstallerClean {1} sebagai gantinya.`,
   'Cli.UpdateDownloadLink': `{0}: {1}`,
-  'Cli.Help.UpdateNote': `Sebelum memindai, alat ini memeriksa versi InstallerClean yang lebih baru.&#10;Jika Anda menjalankannya sendiri, alat ini bertanya sebelum memperbarui,&#10;dan memperbarui jika tidak ada yang menjawab dalam satu menit. Jika&#10;berjalan otomatis lewat tugas terjadwal atau skrip, ia memperbarui tanpa&#10;bertanya. Tambahkan /noupdate untuk melewati pemeriksaan.`,
+  'Cli.Help.UpdateNote': `Sebelum memindai, alat ini memeriksa versi InstallerClean yang lebih baru,&#10;kecuali “Periksa pembaruan secara otomatis” dimatikan untuk akun yang&#10;menjalankannya. Jika jendelanya tampil di layar dan input maupun outputnya&#10;tidak dialihkan, alat ini bertanya sebelum memperbarui, dan memperbarui&#10;jika tidak ada yang menjawab dalam satu menit. Di tempat lain, misalnya&#10;tugas terjadwal yang diatur berjalan baik ada maupun tidak ada yang masuk,&#10;alat ini memperbarui tanpa bertanya. Tambahkan /noupdate untuk melewati&#10;pemeriksaan.`,
   'UpdateNotice.Scoop': `Salinan ini dipasang oleh Scoop. Untuk memperbaruinya, tutup InstallerClean lalu jalankan:`,
   'UpdateNotice.ScoopGlobal': `Salinan ini dipasang oleh Scoop untuk semua pengguna. Untuk memperbaruinya, tutup InstallerClean, buka terminal sebagai administrator, lalu jalankan:`,
   'UpdateNotice.CommandCopied': `Tersalin`,

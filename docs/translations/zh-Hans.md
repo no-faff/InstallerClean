@@ -197,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | How many programs and patches Windows has a record of | Windows 记录了多少个程序和补丁 |
 | Whether Windows still makes old-style short file names | Windows 是否仍在生成旧式短文件名 |
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows 是 10 还是 11，是 x64 还是 Arm，以及设置的是哪种语言和哪个国家或地区 |
-| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | InstallerClean 的版本、获取方式（setup、portable、Scoop、单独的命令行工具、从源代码构建，或未知）、报告是由 InstallerClean 还是命令行工具发送的，以及其显示的语言 |
+| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean 的版本、获取方式（setup、portable、Scoop、单独的命令行工具、从源代码构建，或未知）、本次运行是在 InstallerClean 还是命令行工具中进行的，以及其显示的语言 |
 | Counts of anything that went wrong | 所有出错情况的计数 |
 | Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 这些内容都是数字或标签。报告中没有任何内容会指明您、您的电脑、文件或程序，我也永远看不到您的 IP 地址。 |
 | See exactly what's sent | 查看发送的确切内容 |
@@ -336,8 +336,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 无法下载更新。 |
 | The update couldn't be installed. | 无法安装更新。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 无法连接到 GitHub。请检查您的网络连接后重试。 |
-| GitHub returned an error response. Try again in a few minutes. | GitHub 返回了错误响应。请过几分钟后重试。 |
-| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。 |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | 更新检查收到的是一个错误，而不是 GitHub 的发布页面。它可能来自 GitHub，也可能来自您网络中的其他环节，例如代理服务器。请稍后重试，或在浏览器中打开发布页面。 |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | 更新检查收到的响应中没有指明任何发布版本。它可能来自 GitHub，也可能来自您网络中的其他环节，例如代理服务器或登录页面。请稍后重试，或在浏览器中打开发布页面。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 检查超时。您与 GitHub 的连接可能较慢；请重试。 |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 检查因未知原因失败。如果您需要报告此问题，详情在 {0} 中。 |
 | The check failed for an unknown reason. The crash log could not be written. | 检查因未知原因失败。无法写入崩溃日志。 |
@@ -585,7 +585,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 路径    移动到指定路径 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli 会占住命令提示符直到结束，<br>因此脚本或计划任务可以等待它完成。 |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 该文件夹按用户保存；计划任务或 SYSTEM 运行需要 /m 路径。 |
-| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | 扫描前，它会检查是否有较新版本的 InstallerClean。由您亲自运行时，<br>它会在更新前询问，一分钟内无人回答则直接更新。在计划任务或脚本中<br>自动运行时，它会直接更新而不询问。<br>添加 /noupdate 可跳过检查。 |
+| Before it scans, it checks for a newer version of InstallerClean, unless<br>"Check for updates automatically" is turned off for the account it runs<br>as. Where its window is on screen and nothing is piped into or out of it,<br>it asks before updating, and updates if nobody answers within a minute.<br>Anywhere else, such as a scheduled task set to run whether or not anyone<br>is logged on, it updates without asking.<br>Add /noupdate to skip the check. | 扫描前，它会检查是否有较新版本的 InstallerClean，除非运行它的<br>账户已关闭“自动检查更新”。如果它的窗口显示在屏幕上，且输入和<br>输出都没有被重定向，它会在更新前询问，一分钟内无人回答则直接<br>更新。在其他情况下，例如设置为无论是否有人登录都运行的计划<br>任务，它会直接更新而不询问。<br>添加 /noupdate 可跳过检查。 |
 | Exit codes: | 退出代码： |
 |   0   success: the run did what it was asked |   0   成功：本次运行做了要求的事 |
 |   1   nothing processed: the run failed or was refused |   1   没有处理任何内容：本次运行失败或被拒绝 |

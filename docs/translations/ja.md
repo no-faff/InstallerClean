@@ -197,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | How many programs and patches Windows has a record of | Windows に登録情報がある、プログラムとパッチの数 |
 | Whether Windows still makes old-style short file names | Windows が今も旧式の短いファイル名を作成しているかどうか |
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows が 10 か 11 か、x64 か Arm か、そしてどの言語と国または地域に設定されているか |
-| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語 |
+| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、実行が InstallerClean とコマンドラインツールのどちらで行われたか、そして表示していた言語 |
 | Counts of anything that went wrong | うまくいかなかったことの件数 |
 | Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。 |
 | See exactly what's sent | 送信される内容をそのまま見る |
@@ -336,8 +336,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 更新をダウンロードできませんでした。 |
 | The update couldn't be installed. | 更新をインストールできませんでした。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub に到達できませんでした。インターネット接続を確認して再試行してください。 |
-| GitHub returned an error response. Try again in a few minutes. | GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。 |
-| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。 |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | 更新の確認で、GitHub のリリースページではなくエラーが返ってきました。GitHub、またはプロキシなどお使いのネットワーク上の何かから返された可能性があります。後でもう一度試すか、ブラウザーでリリースページを開いてください。 |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | 更新の確認で、リリースを示していない応答が返ってきました。GitHub、またはプロキシやサインインページなどお使いのネットワーク上の何かから返された可能性があります。後でもう一度試すか、ブラウザーでリリースページを開いてください。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。 |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 不明な理由で確認に失敗しました。報告が必要な場合は詳細が {0} にあります。 |
 | The check failed for an unknown reason. The crash log could not be written. | 確認が不明な理由で失敗しました。クラッシュログを書き込めませんでした。 |
@@ -585,7 +585,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PATH    指定されたパスに移動 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli は終了までプロンプトを占有するため、<br>スクリプトやスケジュールされたタスクが完了を待てます。 |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | フォルダーはユーザーごと。予約実行や SYSTEM には /m PATH が必要。 |
-| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | スキャンの前に、InstallerClean の新しいバージョンがあるか確認します。<br>自分で実行した場合は、更新する前に確認を求め、1 分以内に応答が<br>なければ更新します。スケジュールされたタスクやスクリプトで<br>自動実行される場合は、確認なしで更新します。<br>確認を省くには /noupdate を付けてください。 |
+| Before it scans, it checks for a newer version of InstallerClean, unless<br>"Check for updates automatically" is turned off for the account it runs<br>as. Where its window is on screen and nothing is piped into or out of it,<br>it asks before updating, and updates if nobody answers within a minute.<br>Anywhere else, such as a scheduled task set to run whether or not anyone<br>is logged on, it updates without asking.<br>Add /noupdate to skip the check. | スキャンの前に、InstallerClean の新しいバージョンがあるか確認します。<br>ただし、実行しているアカウントで「更新を自動的に確認する」が<br>オフの場合は確認しません。コンソールのウィンドウが画面上にあり、<br>入力も出力もリダイレクトされていない場合は、更新する前に確認を<br>求め、1 分以内に応答がなければ更新します。それ以外の場合は、<br>たとえばログオンの有無にかかわらず実行するよう設定した<br>スケジュールされたタスクでは、確認なしで更新します。<br>更新の確認を省くには /noupdate を付けてください。 |
 | Exit codes: | 終了コード： |
 |   0   success: the run did what it was asked |   0   成功：求められた処理を行った |
 |   1   nothing processed: the run failed or was refused |   1   何も処理されなかった：実行が失敗したか拒否された |

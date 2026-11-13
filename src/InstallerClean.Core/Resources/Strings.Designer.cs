@@ -178,6 +178,7 @@ public static class Strings
     public static string Cli_DonateAsk => Get("Cli.DonateAsk");
     public static string Cli_EventLogAdminRightsNeeded => Get("Cli.EventLogAdminRightsNeeded");
     public static string Cli_EventLogBadArguments => Get("Cli.EventLogBadArguments");
+    public static string Cli_EventLogCancelledNoFileRemoved => Get("Cli.EventLogCancelledNoFileRemoved");
     public static string Cli_EventLogCancelledNoWork => Get("Cli.EventLogCancelledNoWork");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogCoverLostNoWork => Get("Cli.EventLogCoverLostNoWork");
