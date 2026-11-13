@@ -181,7 +181,9 @@ public class FrameworkStreamsTests
             step.Server = server;
             while (got < 4)
             {
-                var read4 = await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
+                var pending = body.ReadAsync(buffer, got, buffer.Length - got, CancellationToken.None);
+                step.Watch(pending);
+                var read4 = await pending;
                 Assert.True(read4 > 0, "The body ended before its first four bytes.");
                 got += read4;
             }
@@ -494,7 +496,7 @@ public class FrameworkStreamsTests
         var finished = await Task.WhenAny(run, Task.Delay(ServerBound));
         Assert.True(finished == run,
             $"The test had not finished after {ServerBound.TotalSeconds} s, waiting on {step.Reached}"
-            + (step.Server is { } server ? $", the server having {server.Reached}." : "."));
+            + (step.Server is { } server ? $", the server having {server.Reached}." : ".") + step.Sample);
         await run;
     }
 
@@ -509,6 +511,26 @@ public class FrameworkStreamsTests
 
         /// <summary>The server the test talks to, once it has one to report on.</summary>
         public StallingServer? Server { get; set; }
+
+        private string _sample = "";
+
+        /// <summary>What a watch found when its read had not finished.</summary>
+        public string Sample => Volatile.Read(ref _sample);
+
+        /// <summary>
+        /// Ten seconds on, on a thread of its own so a starved pool cannot hold it, records
+        /// the read's status and the pool's free threads if the read has not finished.
+        /// </summary>
+        public void Watch(Task read) =>
+            new Thread(() =>
+            {
+                if (read.Wait(10_000)) return;
+                ThreadPool.GetAvailableThreads(out var workers, out var ports);
+                ThreadPool.GetMaxThreads(out var maxWorkers, out var maxPorts);
+                Volatile.Write(ref _sample,
+                    $" After 10 s the read was {read.Status}, with {workers} of {maxWorkers} worker threads"
+                    + $" and {ports} of {maxPorts} completion threads free.");
+            }) { IsBackground = true }.Start();
     }
 
     /// <summary>
