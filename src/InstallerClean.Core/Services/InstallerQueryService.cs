@@ -1117,7 +1117,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             listed.Add(new ListedInstallation(recoveredCode, recoveredSid, (int)recoveredContext,
                 SecondCopyNotRuledOut: instanceReading != InstanceReading.Ordinary));
 
-            FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets, ct, abandonedLog);
+            FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets,
+                fallback, ct, abandonedLog);
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
@@ -1629,17 +1630,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
             && !HoldsPackageRecord(fallback.PackageRecords, account, isPatch: false, installation.ProductCode))
             return false;
 
-        if (installation.PatchListShort)
-        {
-            if (fallback.PatchListings is null
-                || !fallback.PatchListings.TryGetValue(new AccountCode(account, installation.ProductCode),
-                    out var listed))
-                return false;
-
-            foreach (var patchCode in installation.PatchCodesListed)
-                if (!listed.Contains(patchCode, StringComparer.OrdinalIgnoreCase))
-                    return false;
-        }
+        if (installation.PatchListShort
+            && !NamesEvery(
+                OwnListing(fallback.PatchListings, account, installation.ProductCode),
+                installation.PatchCodesListed))
+            return false;
 
         foreach (var (patchCode, patchSid, patchContext) in installation.LostPatchRecords)
         {
@@ -4056,12 +4051,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Uninstallable answer is anything but "0" marks the product as holding a patch that
     /// could be uninstalled, which holds its superseded patches.
     ///
-    /// ONLY AN ANSWER COUNTS HERE. A walk Windows refuses, a list it ends short and an
-    /// Uninstallable it will not give add nothing, and the registry's reading of the
-    /// product stands as the verdict. That reading is the same record: msi.dll answers
-    /// Uninstallable from the Uninstallable value under the product's Patches subkey,
-    /// which <see cref="ReadProductPatchSet"/> reads. Do not turn a
-    /// refusal into Unestablished here: that would hold files on a question nobody answered.
+    /// THE REGISTRY ANSWERS FOR A PATCH ONLY WHERE THE INSTALLATION'S OWN PRODUCT KEY
+    /// LISTS IT. Its listing is the one under the account the installation is installed
+    /// in (<see cref="OwnListing"/>), and a listing under another account is another
+    /// installation's. <see cref="ReadProductPatchSet"/> reads the Uninstallable of each
+    /// patch that listing names until one can be uninstalled, so the registry's verdict
+    /// answers for every patch it names. A patch whose Uninstallable will not read, or
+    /// reads empty, adds nothing where the listing names it, and marks the product
+    /// Unestablished where it does not: Windows lists a patch the registry holds no
+    /// registration of, a product key with no <c>Patches</c> key included.
+    ///
+    /// A WALK THAT IS NOT WHOLE LEAVES THE REGISTRY'S VERDICT STANDING ONLY WHERE THE
+    /// INSTALLATION'S OWN LISTING NAMES EVERY ROW WINDOWS RETURNED. A walk Windows refused,
+    /// one that never ended and one abandoned after a run of unreadable rows each keep the
+    /// rows they returned, and those rows are read as a whole walk's are. A row that did not
+    /// read is a patch Windows holds and did not name, so a walk that met one needs an
+    /// established listing that names at least one patch however few rows the walk named:
+    /// an empty listing says the program holds no patch where Windows has just met one. A
+    /// walk refused before it returned or met any row is answered by the
+    /// installation's own product key alone (<see cref="ReadOwnProductKey"/>): the
+    /// registry's verdict for that key stands, a product key with no <c>Patches</c> key
+    /// reading as one that holds no patch. Anything else marks the product Unestablished.
     ///
     /// ITS WALKS HAVE A RESTART BUDGET OF THEIR OWN. The scan's keyed walks share one pause
     /// budget (<see cref="WalkRestarts.KeyedPauseLimit"/>), and a walk here that spent it
@@ -4073,34 +4083,94 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string? userSid,
         MsiInstallContext context,
         Dictionary<string, ProductPatchSet> apiPatchSets,
+        FallbackRead fallback,
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
-        var restarts = WalkRestarts.For(ct, WalkPause);
-        List<(string PatchCode, string? UserSid, MsiInstallContext Context)> patches;
-        try
+        void Fold(ProductPatchSet verdict) =>
+            apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seen)
+                ? Worse(seen, verdict)
+                : verdict;
+
+        var walk = WalkPatchList(productCode, userSid, context, WalkRestarts.For(ct, WalkPause), ct, failureLog);
+        // Each row once: a list that never ended can return the same row up to the index cap.
+        var rows = walk.Patches.Distinct().ToList();
+        var account = UserDataAccount(userSid, context);
+        var listed = OwnListing(fallback.PatchListings, account, productCode);
+
+        if (walk.Refusal is not null || walk.Incomplete)
         {
-            (patches, _) = EnumeratePatches(productCode, userSid, context, restarts, ct, failureLog);
-        }
-        catch (Exception ex) when (ex is LocalisedAccessException or LocalisedInvalidOperationException)
-        {
-            return;
+            var answered = rows.Count == 0 && !walk.Incomplete
+                ? ReadOwnProductKey(fallback.ProductEntries, account, productCode)
+                : NamesEvery(listed, rows.Select(p => p.PatchCode))
+                    && (!walk.Incomplete || listed!.Count > 0);
+            if (!answered) Fold(ProductPatchSet.Unestablished);
+
+            // A refusal leaves no breadcrumb of its own where the scan carries on past it.
+            if (walk.Refusal is not null)
+                failureLog.Record(new InvalidOperationException(
+                    $"Patch list refused for recovered product {productCode} (context {context}, " +
+                    $"SID {userSid ?? "none"}) after {rows.Count} distinct rows; " +
+                    (answered ? "the registry's reading stands." : "its patch set is unestablished."),
+                    walk.Refusal), "recovered-refusal");
         }
 
-        foreach (var (patchCode, patchSid, patchContext) in patches)
+        foreach (var (patchCode, patchSid, patchContext) in rows)
         {
             ct.ThrowIfCancellationRequested();
             var uninstallable = GetPatchProperty(
                 _msi, patchCode, productCode, patchSid, patchContext, MsiInstallProperty.Uninstallable);
-            if (uninstallable.Unreadable || uninstallable.Value.Length == 0) continue;
+            if (uninstallable.Unreadable || uninstallable.Value.Length == 0)
+            {
+                if (listed?.Contains(patchCode, StringComparer.OrdinalIgnoreCase) != true)
+                    Fold(ProductPatchSet.Unestablished);
+                continue;
+            }
 
-            var verdict = uninstallable.Value == "0"
+            Fold(uninstallable.Value == "0"
                 ? ProductPatchSet.AllNonRemovable
-                : ProductPatchSet.RemovablePatchPresent;
-            apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seen)
-                ? Worse(seen, verdict)
-                : verdict;
+                : ProductPatchSet.RemovablePatchPresent);
         }
+    }
+
+    /// <summary>
+    /// Whether <paramref name="listed"/> is an established listing naming every one of
+    /// <paramref name="patchCodes"/>.
+    /// </summary>
+    internal static bool NamesEvery(IReadOnlyCollection<string>? listed, IEnumerable<string> patchCodes) =>
+        listed is not null
+        && patchCodes.All(code => listed.Contains(code, StringComparer.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// The patch codes the product key under <paramref name="account"/>, a
+    /// <see cref="UserDataAccount"/> answer, lists under its own <c>Patches</c> key, or null
+    /// where that listing was not established or the account is null. A listing under
+    /// another account does not answer for this one.
+    /// </summary>
+    internal static IReadOnlyCollection<string>? OwnListing(
+        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? patchListings,
+        string? account,
+        string productCode) =>
+        account is not null
+        && patchListings is not null
+        && patchListings.TryGetValue(new AccountCode(account, productCode), out var listed)
+            ? listed
+            : null;
+
+    /// <summary>
+    /// Whether the registry read a product key for <paramref name="productCode"/> under
+    /// <paramref name="account"/>, a <see cref="UserDataAccount"/> answer. False where the
+    /// account is null.
+    /// </summary>
+    internal static bool ReadOwnProductKey(
+        IReadOnlyList<RegistryProductEntry>? productEntries,
+        string? account,
+        string productCode)
+    {
+        if (account is null || productEntries is null) return false;
+
+        var own = new AccountCode(account, productCode);
+        return productEntries.Any(entry => new AccountCode(entry.Account, entry.Code).Equals(own));
     }
 
     /// <summary>
@@ -5113,9 +5183,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// declines to assert a patch list Windows will not hand over, rather than
     /// losing the whole scan over it. The AccessDenied and never-ended-cap refusals
     /// below are a machine-level breakdown, and the product loop lets them refuse
-    /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> and
-    /// <see cref="FoldRecoveredPatchSet"/> catch them, the offer resting on what the
-    /// judging pass has already read.
+    /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> catches them, the offer
+    /// resting on what the judging pass has already read.
+    /// <see cref="FoldRecoveredPatchSet"/> walks through <see cref="WalkPatchList"/>, so a
+    /// refusal reaches it with the rows returned before it.
     ///
     /// A WALK THAT MEETS A ROW IT CANNOT READ IS MADE AGAIN FROM THE FIRST INDEX
     /// (<see cref="WalkRestarts.KeyedWalk"/>), whether it skipped the row, was abandoned
@@ -5137,6 +5208,26 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
+        var walk = WalkPatchList(productCode, userSid, context, restarts, ct, failureLog);
+        if (walk.Refusal is not null) throw walk.Refusal;
+
+        return (walk.Patches, walk.Incomplete);
+    }
+
+    /// <summary>
+    /// <see cref="EnumeratePatches"/>' walk, handing back a refusal with the rows returned
+    /// before it rather than throwing it, for <see cref="FoldRecoveredPatchSet"/>.
+    /// </summary>
+    private (List<(string PatchCode, string? UserSid, MsiInstallContext Context)> Patches, bool Incomplete,
+        Exception? Refusal)
+        WalkPatchList(
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        WalkRestarts restarts,
+        CancellationToken ct,
+        PerItemFailureLog failureLog)
+    {
         var walk = restarts.KeyedWalk(
             () => WalkPatches(productCode, userSid, context, ct),
             walked => !walked.MetAnUnreadRow);
@@ -5144,15 +5235,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (walk.Abandoned is { } abandoned)
             LogPatchEnumerationAbandoned(productCode, context, userSid, abandoned.Error, abandoned.Index,
                 failureLog, abandoned.Cause);
-        if (walk.Refusal is not null) throw walk.Refusal;
 
-        return (walk.Patches, walk.Incomplete);
+        return (walk.Patches, walk.Incomplete, walk.Refusal);
     }
 
     /// <summary>
-    /// One walk of a product's patch list from index 0, for <see cref="EnumeratePatches"/>.
+    /// One walk of a product's patch list from index 0, for <see cref="WalkPatchList"/>.
     /// <c>Abandoned</c> carries what the breadcrumb records where a run of unreadable rows
-    /// ended the walk, and <c>Refusal</c> the exception the walk ends the scan with.
+    /// ended the walk, and <c>Refusal</c> the exception for a walk Windows refused, which
+    /// <see cref="EnumeratePatches"/> throws.
     /// <c>MetAnUnreadRow</c> is true where a row did not read, and false where every row
     /// read to the end or the walk spent the index budget.
     /// </summary>
