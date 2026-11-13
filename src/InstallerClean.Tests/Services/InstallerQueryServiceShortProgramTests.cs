@@ -388,22 +388,29 @@ public class InstallerQueryServiceShortProgramTests
         Assert.All(result.PairingsOfHoldersWithNoClaims, p => Assert.Equal(Recovered, p.ProductCode));
     }
 
+    /// <summary>
+    /// Access refused at the first row or after <see cref="Superseded"/>, or a list that
+    /// never ends, which in the product walk would refuse the scan. Here the scan stands,
+    /// and the program's pairings for the check under the lease are the rows Windows
+    /// returned before it stopped, each once.
+    /// </summary>
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task A_patch_list_that_refuses_for_that_program_leaves_the_scan_standing(bool neverEnds)
+    [InlineData(0u, new string[0])]
+    [InlineData(1u, new[] { Superseded })]
+    [InlineData(uint.MaxValue, new[] { EndlessPatch })]
+    public async Task A_patch_list_that_refuses_for_that_program_leaves_the_scan_standing_and_carries_the_rows_it_returned(
+        uint refusedAt, string[] carried)
     {
-        // Access refused, or a list that never ends, which in the product walk would refuse
-        // the scan. Here it carries none of the program's other patches.
         var msi = RecoveredHolder();
-        if (neverEnds) msi.NeverEndPatchesFor = Recovered;
-        else msi.PatchEnumResult[Recovered] = AccessDenied;
+        if (refusedAt == uint.MaxValue) msi.NeverEndPatchesFor = Recovered;
+        else msi.PatchRowResult[(Recovered, refusedAt)] = AccessDenied;
 
         var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
 
         Assert.Contains(Recovered, msi.PatchEnumerationsStarted);
         Assert.Single(result.PairingsHeldByName, p => p.ProductCode == Recovered);
-        Assert.Empty(result.PairingsOfHoldersWithNoClaims);
+        Assert.Equal(carried, result.PairingsOfHoldersWithNoClaims.Select(p => p.PatchCode));
+        Assert.All(result.PairingsOfHoldersWithNoClaims, p => Assert.Equal(Recovered, p.ProductCode));
     }
 
     // ---- A recovered program's patches, as Windows Installer lists them ----

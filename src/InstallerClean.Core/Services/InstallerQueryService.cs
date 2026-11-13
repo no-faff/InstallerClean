@@ -1527,8 +1527,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// THEY CARRY NO PATH. The check reads only whether each can be uninstalled, and
     /// nothing reads a path off one.
     ///
-    /// A LIST THAT DID NOT RUN TO ITS END CARRIES WHAT IT LISTED, and one Windows refused
-    /// outright, or that never ended, carries nothing and does not refuse the scan. The
+    /// A LIST THAT DID NOT RUN TO ITS END CARRIES WHAT IT LISTED, one Windows refused or
+    /// that never ended included, each row once, and none of them refuses the scan. The
     /// offer rests on the judging pass, which reads each such installation's patch set as
     /// the registry lists it in full, and for a recovered installation as Windows
     /// Installer lists it too (<see cref="FoldRecoveredPatchSet"/>); these pairings are
@@ -1550,18 +1550,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             var installation = PairingOf(held) with { PatchCode = string.Empty };
             if (withClaims.Contains(installation) || !asked.Add(installation)) continue;
 
-            List<(string PatchCode, string? UserSid, MsiInstallContext Context)> patches;
-            try
-            {
-                (patches, _) = EnumeratePatches(held.ProductCode, held.UserSid,
-                    (MsiInstallContext)held.Context, restarts, ct, failureLog);
-            }
-            catch (Exception ex) when (ex is LocalisedAccessException or LocalisedInvalidOperationException)
-            {
-                continue;
-            }
+            var walk = WalkPatchList(held.ProductCode, held.UserSid,
+                (MsiInstallContext)held.Context, restarts, ct, failureLog);
 
-            foreach (var (patchCode, patchSid, patchContext) in patches)
+            foreach (var (patchCode, patchSid, patchContext) in walk.Patches.Distinct())
                 pairings.Add(new PatchClaim(string.Empty, patchCode, held.ProductCode, patchSid, (int)patchContext));
         }
 
@@ -5183,10 +5175,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// declines to assert a patch list Windows will not hand over, rather than
     /// losing the whole scan over it. The AccessDenied and never-ended-cap refusals
     /// below are a machine-level breakdown, and the product loop lets them refuse
-    /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> catches them, the offer
-    /// resting on what the judging pass has already read.
-    /// <see cref="FoldRecoveredPatchSet"/> walks through <see cref="WalkPatchList"/>, so a
-    /// refusal reaches it with the rows returned before it.
+    /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> and
+    /// <see cref="FoldRecoveredPatchSet"/> walk through <see cref="WalkPatchList"/>, so a
+    /// refusal reaches them with the rows returned before it.
     ///
     /// A WALK THAT MEETS A ROW IT CANNOT READ IS MADE AGAIN FROM THE FIRST INDEX
     /// (<see cref="WalkRestarts.KeyedWalk"/>), whether it skipped the row, was abandoned
@@ -5216,7 +5207,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     /// <summary>
     /// <see cref="EnumeratePatches"/>' walk, handing back a refusal with the rows returned
-    /// before it rather than throwing it, for <see cref="FoldRecoveredPatchSet"/>.
+    /// before it rather than throwing it, for <see cref="FoldRecoveredPatchSet"/> and
+    /// <see cref="PairingsOfHoldersWithNoClaims"/>.
     /// </summary>
     private (List<(string PatchCode, string? UserSid, MsiInstallContext Context)> Patches, bool Incomplete,
         Exception? Refusal)
