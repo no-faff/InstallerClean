@@ -178,6 +178,7 @@ public class FrameworkStreamsTests
             var buffer = new byte[4096];
             var got = 0;
             step.To("the first four bytes");
+            step.Server = server;
             while (got < 4)
             {
                 var read4 = await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
@@ -492,7 +493,8 @@ public class FrameworkStreamsTests
         var run = Task.Run(() => test(step));
         var finished = await Task.WhenAny(run, Task.Delay(ServerBound));
         Assert.True(finished == run,
-            $"The test had not finished after {ServerBound.TotalSeconds} s, waiting on {step.Reached}.");
+            $"The test had not finished after {ServerBound.TotalSeconds} s, waiting on {step.Reached}"
+            + (step.Server is { } server ? $", the server having {server.Reached}." : "."));
         await run;
     }
 
@@ -504,6 +506,9 @@ public class FrameworkStreamsTests
         public string Reached => Volatile.Read(ref _reached);
 
         public void To(string wait) => Volatile.Write(ref _reached, wait);
+
+        /// <summary>The server the test talks to, once it has one to report on.</summary>
+        public StallingServer? Server { get; set; }
     }
 
     /// <summary>
@@ -511,50 +516,61 @@ public class FrameworkStreamsTests
     /// <c>bodyLength</c> bytes by its Content-Length, of which it sends the first
     /// <c>sent</c> ("MZab" and on) and then stops, holding the connection open.
     /// </summary>
+    /// <remarks>
+    /// It runs on a thread of its own and writes the head and the bytes it sends in one
+    /// write, so what it sends never waits on a thread-pool thread: a test under
+    /// <see cref="ServerBound"/> held by a starved pool is held in the client, and
+    /// <see cref="Reached"/> says how far the server got.
+    /// </remarks>
     private sealed class StallingServer : IDisposable
     {
         private readonly TcpListener _listener;
-        private readonly CancellationTokenSource _stop = new();
+        private readonly ManualResetEventSlim _stop = new();
+        private string _reached = "not accepted";
 
         private StallingServer(TcpListener listener) => _listener = listener;
 
         public Uri Address => new($"http://127.0.0.1:{((IPEndPoint)_listener.LocalEndpoint).Port}/");
+
+        /// <summary>How far the server has got with its one request.</summary>
+        public string Reached => Volatile.Read(ref _reached);
 
         public static StallingServer Start(int bodyLength, int sent)
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
             listener.Start();
             var server = new StallingServer(listener);
-            _ = Task.Run(() => server.Serve(bodyLength, sent));
+            new Thread(() => server.Serve(bodyLength, sent)) { IsBackground = true, Name = "StallingServer" }.Start();
             return server;
         }
 
-        private async Task Serve(int bodyLength, int sent)
+        private void Serve(int bodyLength, int sent)
         {
             try
             {
-                using var client = await _listener.AcceptTcpClientAsync();
+                using var client = _listener.AcceptTcpClient();
+                client.NoDelay = true;
                 using var connection = client.GetStream();
+                Volatile.Write(ref _reached, "accepted");
                 var request = new byte[4096];
-                _ = await connection.ReadAsync(request, 0, request.Length);
-                var head = Encoding.ASCII.GetBytes(
-                    $"HTTP/1.1 200 OK\r\nContent-Length: {bodyLength}\r\nContent-Type: application/octet-stream\r\n\r\n");
-                await connection.WriteAsync(head, 0, head.Length);
-                var body = Encoding.ASCII.GetBytes("MZab".PadRight(sent, 'c').Substring(0, sent));
-                await connection.WriteAsync(body, 0, body.Length);
-                await connection.FlushAsync();
-                await FrameworkTask.Delay(Timeout.Infinite, _stop.Token);
+                _ = connection.Read(request, 0, request.Length);
+                var answer = Encoding.ASCII.GetBytes(
+                    $"HTTP/1.1 200 OK\r\nContent-Length: {bodyLength}\r\nContent-Type: application/octet-stream\r\n\r\n"
+                    + "MZab".PadRight(sent, 'c').Substring(0, sent));
+                connection.Write(answer, 0, answer.Length);
+                connection.Flush();
+                Volatile.Write(ref _reached, $"sent the head and {sent} bytes");
+                _stop.Wait();
             }
-            catch (Exception ex) when (ex is OperationCanceledException or IOException or ObjectDisposedException or SocketException)
+            catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException or InvalidOperationException)
             {
             }
         }
 
         public void Dispose()
         {
-            _stop.Cancel();
+            _stop.Set();
             _listener.Stop();
-            _stop.Dispose();
         }
     }
 }
