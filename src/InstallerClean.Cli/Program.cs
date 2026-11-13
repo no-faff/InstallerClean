@@ -65,7 +65,7 @@ internal static class Program
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int? RefuseWithoutNetFramework48() =>
         NetFrameworkCheck.RefusalMessage(commandLine: true) is { } message
-            ? Refuse(message)
+            ? RefuseWithoutRecording(message)
             : null;
 
     /// <summary>The run, on a PC that has .NET Framework 4.8.</summary>
@@ -201,6 +201,36 @@ internal static class Program
         try
         {
             new ConsoleGuard(error ?? Console.Error).WriteLine(message);
+        }
+        finally
+        {
+            RestoreOutputEncoding(previousOutputEncoding);
+        }
+        return ExitError;
+    }
+
+    /// <summary>
+    /// <see cref="Refuse"/> for the refusal on a PC without .NET Framework 4.8, where a write
+    /// that fails loses its text and is not recorded in crash.log. Recording it asks the crash
+    /// log for its folder, which can move an earlier version's folder into place and runs
+    /// code needing more than the .NET Framework NetFrameworkCheck's remarks name, on a PC
+    /// that cannot run the app. The window records nothing where its message cannot be shown
+    /// either.
+    /// </summary>
+    /// <param name="message">What the refusal says.</param>
+    /// <param name="error">
+    /// The error stream, or null for the console's, which is read once the code page is set.
+    /// </param>
+    internal static int RefuseWithoutRecording(string message, TextWriter? error = null)
+    {
+        var previousOutputEncoding = TrySetUtf8Output();
+        try
+        {
+            (error ?? Console.Error).WriteLine(message);
+        }
+        catch (Exception)
+        {
+            // The text is lost, and the copy ends with the error code as it would have.
         }
         finally
         {
