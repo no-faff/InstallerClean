@@ -408,13 +408,17 @@ internal static class Program
         var invocation = CliContract.ParseArguments(args);
         switch (invocation.Command)
         {
-            // What help and version are asked for is their output, so a write to it that
-            // failed fails the run. Neither writes an Application-log entry either way.
+            // What help, version and the notices are asked for is their output, so a write to
+            // it that failed fails the run. None of them writes an Application-log entry either
+            // way.
             case CliCommand.Help:
                 PrintUsage();
                 return output.Failed ? ExitError : ExitOk;
             case CliCommand.Version:
                 PrintVersion();
+                return output.Failed ? ExitError : ExitOk;
+            case CliCommand.Notices:
+                PrintNotices();
                 return output.Failed ? ExitError : ExitOk;
             case CliCommand.NoArguments:
                 // An argless run is a misconfiguration, most often a scheduled
@@ -454,8 +458,8 @@ internal static class Program
         // other InstallerClean process. The manifest asks Windows for the rights,
         // and Windows can still start the tool without them, a compatibility setting
         // being one way, so the tool asks its own token; AdministratorRights says
-        // what the scan needs them for. Help and --version return above and need no
-        // rights.
+        // what the scan needs them for. Help, --version and --notices return above and
+        // need no rights.
         if (!AdministratorRights.Held())
             return RefuseWithoutAdministratorRights(arg);
 
@@ -3043,6 +3047,17 @@ internal static class Program
         Console.WriteLine($"{name.Name} {version}");
     }
 
+    /// <summary>
+    /// Prints THIRD-PARTY-NOTICES as the build embedded it, a console line per line of the
+    /// file, so every break is the host's newline as it is for the help. The text is in the
+    /// words its licences are written in and is never translated.
+    /// </summary>
+    private static void PrintNotices()
+    {
+        foreach (var line in ThirdPartyNotices.Read().TrimEnd('\n').Split('\n'))
+            Console.WriteLine(line);
+    }
+
     private static void PrintUsage()
     {
         WriteHelp(Strings.Cli_Help_Header);
@@ -3052,6 +3067,7 @@ internal static class Program
         WriteHelp(Strings.Cli_Help_Usage);
         WriteHelp(Strings.Cli_Help_Help);
         WriteHelp(Strings.Cli_Help_Version);
+        WriteHelp(Strings.Cli_Help_Notices);
         WriteHelp(Strings.Cli_Help_ScanOnly);
         WriteHelp(Strings.Cli_Help_Delete);
         WriteHelp(Strings.Cli_Help_MoveDefault);

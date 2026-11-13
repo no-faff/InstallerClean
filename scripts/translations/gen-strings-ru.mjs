@@ -539,6 +539,9 @@ const MAP = {
   'UpdateNotice.CheckingDownload': `Проверка скачанного файла...`,
   'Startup.PlantedConfigRefusal': `InstallerClean не запустится, потому что рядом с ним находится файл с именем {0}, а InstallerClean не поставляется с таким файлом. Удалите этот файл, а затем снова запустите InstallerClean.\n\n{1}`,
   'Startup.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова откройте InstallerClean.`,
+  'Window.Notices.Title': `Уведомления третьих сторон`,
+  'About.Link.Notices': `Уведомления третьих сторон`,
+  'Automation.About.Notices.HelpText': `Показывает лицензии шрифтов, значков и кода, входящих в InstallerClean.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -717,6 +720,7 @@ const CLI = {
   'Cli.UpdateNoAnswer': `Ответа нет уже минуту, поэтому InstallerClean обновляется без вопросов, как при запуске, когда отвечать некому.`,
   'Cli.ReportNoAnswer': `Ответа нет уже минуту.`,
   'Cli.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices    Показать уведомления третьих сторон`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

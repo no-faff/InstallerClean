@@ -769,6 +769,15 @@ jobs:
         shell: pwsh
         run: ./scripts/check-one-file.ps1
 
+      # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
+      # command line prints. This reads that resource out of each merged exe against the file,
+      # and each merge's input list against the file's table of merged packages, so a package
+      # added to either exe is named there before it ships.
+      - name: Check each merged exe carries the notices of what it merges
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-notices.ps1
+
       # Reads each merged exe's own metadata against Microsoft's reference assemblies for .NET
       # Framework 4.6.2, 4.7, 4.7.1, 4.7.2 and 4.8, downloaded from nuget.org and checked
       # against their pinned hashes. Fails where a type or member the exe references is not in

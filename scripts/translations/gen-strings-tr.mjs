@@ -572,6 +572,10 @@ Ayrıntılar şuraya yazıldı:
   'Startup.PlantedConfigRefusal': `InstallerClean başlamıyor çünkü yanında {0} adlı bir dosya var ve InstallerClean böyle bir dosyayla gelmez. Bu dosyayı silin, ardından InstallerClean'i yeniden çalıştırın.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean için .NET Framework 4.8 gerekiyor. Microsoft'tan yükleyin, bilgisayarı yeniden başlatın, ardından InstallerClean'i yeniden açın.`,
   'Cli.NeedsNetFramework48': `InstallerClean için .NET Framework 4.8 gerekiyor. Microsoft'tan yükleyin, bilgisayarı yeniden başlatın, ardından InstallerClean'i yeniden çalıştırın.`,
+  'Window.Notices.Title': `Üçüncü taraf bildirimleri`,
+  'About.Link.Notices': `Üçüncü taraf bildirimleri`,
+  'Automation.About.Notices.HelpText': `InstallerClean'in içerdiği yazı tiplerinin, simgelerin ve kodun lisanslarını gösterir.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  Üçüncü taraf bildirimlerini yazdır`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

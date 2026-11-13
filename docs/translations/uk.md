@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | Непотрібні файли, які можна безпечно видалити |
 | The anonymous report | Анонімний звіт |
 | InstallerClean couldn't read the report. | InstallerClean не зміг прочитати звіт. |
+| Third-party notices | Повідомлення третіх сторін |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Посібник і поширені запитання |
 | Report a problem | Повідомити про проблему |
+| Third-party notices | Повідомлення третіх сторін |
 | Check for updates automatically | Автоматично перевіряти оновлення |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Перевіряє на сторінці випусків github, чи є новіша версія. |
 | Opens the readme on github in your browser. | Відкриває readme на github у вашому браузері. |
 | Opens the issue tracker on github.com in your browser. | Відкриває список проблем (Issues) на github.com у вашому браузері. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Показує ліцензії шрифтів, значків і коду, що входять до InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії. |
 | Download it from github | Завантажити з github |
 | Download .NET Framework 4.8 from Microsoft | Завантажити .NET Framework 4.8 з сайту Microsoft |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Використання: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Показати цю довідку (також приймає /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Вивести версію (також приймає -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  Вивести повідомлення третіх сторін |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Лише сканувати - список непотрібних |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Видалити непотрібні файли назавжди |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Перемістити до збереженої папки |

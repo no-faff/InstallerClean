@@ -267,6 +267,7 @@ InstallerClean is unsigned. Here's what you can check before you run it:
 | `/m PATH` | Scan, then move them to `PATH`. Quote it if it has a space in it. | |
 | `--help` | Print the usage and exit `0`. | `/?`, `-h` |
 | `--version` | Print the version and exit `0`. | `-v` |
+| `--notices` | Print the notices and licences of the third-party work inside InstallerClean, and exit `0`. | |
 
 Flags are case-insensitive, so `/S` and `/D` work as well as `/s` and `/d`. Only one flag per run: they can't be combined, and `/s` and `/d` take nothing after them.
 
@@ -496,6 +497,8 @@ If InstallerClean frees some space and you're feeling generous, I'd really appre
 ## Licence
 
 [Apache 2.0](LICENSE)
+
+InstallerClean includes fonts, icons and code from other projects, each under its own licence, all listed in [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Every download carries that file's text: the app shows it from its About window, and `installerclean-cli --notices` prints it.
 
 ---
 

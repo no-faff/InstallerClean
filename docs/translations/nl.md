@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | Overbodige bestanden die veilig kunnen worden verwijderd |
 | The anonymous report | Het anonieme rapport |
 | InstallerClean couldn't read the report. | InstallerClean kon het rapport niet lezen. |
+| Third-party notices | Kennisgevingen van derden |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Handleiding en FAQ |
 | Report a problem | Een probleem melden |
+| Third-party notices | Kennisgevingen van derden |
 | Check for updates automatically | Automatisch controleren op updates |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Kijkt op de releasepagina van github of er een nieuwere versie is. |
 | Opens the readme on github in your browser. | Opent het readme-bestand op github in je browser. |
 | Opens the issue tracker on github.com in your browser. | Opent de issue-tracker op github.com in je browser. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Toont de licenties van de lettertypen, pictogrammen en code die InstallerClean bevat. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Als dit is aangevinkt, kijkt InstallerClean bij het starten op github of er een nieuwere versie is. |
 | Download it from github | Download het van github |
 | Download .NET Framework 4.8 from Microsoft | Download .NET Framework 4.8 van Microsoft |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Gebruik: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Deze helptekst weergeven (ook /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  De versie weergeven (ook -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  De kennisgevingen van derden weergeven |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Alleen scannen: overbodige bestanden tonen |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Definitief verwijderen wat overbodig is |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Verplaatsen naar de opgeslagen back-upmap |

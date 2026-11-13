@@ -671,6 +671,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean tidak akan dimulai karena ada file bernama {0} di sebelahnya, dan InstallerClean tidak menyertakan file seperti itu. Hapus file itu, lalu buka InstallerClean lagi.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean memerlukan .NET Framework 4.8. Pasang dari Microsoft, mulai ulang PC, lalu buka InstallerClean lagi.`,
   'Cli.NeedsNetFramework48': `InstallerClean memerlukan .NET Framework 4.8. Pasang dari Microsoft, mulai ulang PC, lalu jalankan InstallerClean lagi.`,
+  'Window.Notices.Title': `Pemberitahuan pihak ketiga`,
+  'About.Link.Notices': `Pemberitahuan pihak ketiga`,
+  'Automation.About.Notices.HelpText': `Menampilkan lisensi font, ikon, dan kode yang disertakan dalam InstallerClean.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  Cetak pemberitahuan pihak ketiga`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

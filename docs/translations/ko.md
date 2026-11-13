@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | 안전하게 삭제할 수 있는 불필요한 파일 |
 | The anonymous report | 익명 보고서 |
 | InstallerClean couldn't read the report. | InstallerClean이 보고서를 읽을 수 없었습니다. |
+| Third-party notices | 타사 고지 사항 |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | 안내서 및 자주 묻는 질문 |
 | Report a problem | 문제 신고 |
+| Third-party notices | 타사 고지 사항 |
 | Check for updates automatically | 자동으로 업데이트 확인 |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | github의 릴리스 페이지에서 새 버전이 있는지 확인합니다. |
 | Opens the readme on github in your browser. | 브라우저에서 github의 readme를 엽니다. |
 | Opens the issue tracker on github.com in your browser. | 브라우저에서 github.com의 이슈 트래커를 엽니다. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean에 포함된 글꼴, 아이콘, 코드의 라이선스를 표시합니다. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다. |
 | Download it from github | github에서 내려받기 |
 | Download .NET Framework 4.8 from Microsoft | Microsoft에서 .NET Framework 4.8 내려받기 |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | 사용법: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     이 도움말 표시 (/?, -h도 사용 가능) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  버전 출력 (-v도 사용 가능) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  타사 고지 사항 출력 |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         검사만 - 불필요한 파일 나열 |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         불필요한 파일 영구 삭제 |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         저장된 백업 폴더로 이동 |
