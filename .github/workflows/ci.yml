@@ -2442,6 +2442,13 @@ jobs:
           test -f publish/cli/installerclean-cli.exe
           rm publish/cli/installerclean-cli.exe.config
 
+      # The window as the portable is downloaded, with no config beside it, for the same reason.
+      - name: Merge the window into one file
+        run: |
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:EnableWindowsTargeting=true --nologo
+          test -f publish/window/InstallerClean.exe
+          rm -f publish/window/InstallerClean.exe.config
+
       - name: Install Wine and winetricks
         run: |
           sudo dpkg --add-architecture i386
@@ -2607,3 +2614,136 @@ jobs:
             echo "== The refusal path under Wine as $version with ${{ matrix.framework }}"
             timeout -k 10 180 xvfb-run -a wine "$probe/out/RefusalProbe.exe" "$(winepath -w publish/cli/installerclean-cli.exe)" || echo "exit code $?"
           done
+
+      # The window shows its refusal in a message box and waits for it to be closed. A net40
+      # helper run beside it finds the box by its title, prints the text it holds and presses
+      # OK; the window then has to end with exit code 1 having shown the expected sentence.
+      - name: Run the window under Windows 10 and under Windows 7
+        if: ${{ !cancelled() }}
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEDEBUG: -all
+          LANG: en_US.UTF-8
+        run: |
+          set -u
+          value() {
+            python3 - "$1" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          root = ET.parse('src/InstallerClean.Core/Resources/Strings.resx').getroot()
+          hits = [d.find('value').text for d in root.iter('data') if d.get('name') == sys.argv[1]]
+          if len(hits) != 1: sys.exit(f'Strings.resx holds {len(hits)} values named {sys.argv[1]}')
+          print(hits[0])
+          PY
+          }
+          needs48=$(value Startup.NeedsNetFramework48)
+          needs1607=$(value Startup.NeedsWindows10Version1607)
+          title=$(value Window.Main.Title)
+          [ -n "$needs48" ] && [ -n "$needs1607" ] && [ -n "$title" ] || { echo "::error::Strings.resx gave no text to expect."; exit 1; }
+
+          reader="$RUNNER_TEMP/box-reader"
+          mkdir -p "$reader"
+          cat > "$reader/BoxReader.csproj" <<'XML'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net40</TargetFramework>
+              <LangVersion>latest</LangVersion>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+            </ItemGroup>
+          </Project>
+          XML
+          cat > "$reader/Program.cs" <<'CS'
+          using System;
+          using System.Runtime.InteropServices;
+          using System.Text;
+          using System.Threading;
+
+          // args[0]: the box's title. args[1]: how many seconds to wait for it. Prints the box's
+          // text and presses its OK button, exit 0; exit 2 where no box shows in time, having
+          // printed every top-level window.
+          static class Program
+          {
+              delegate bool EnumProc(IntPtr window, IntPtr data);
+              [DllImport("user32.dll")] static extern bool EnumWindows(EnumProc proc, IntPtr data);
+              [DllImport("user32.dll")] static extern bool EnumChildWindows(IntPtr parent, EnumProc proc, IntPtr data);
+              [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetWindowText(IntPtr window, StringBuilder text, int length);
+              [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetClassName(IntPtr window, StringBuilder name, int length);
+              [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr window);
+              [DllImport("user32.dll")] static extern bool PostMessage(IntPtr window, uint message, IntPtr w, IntPtr l);
+
+              static string Text(IntPtr window) { var s = new StringBuilder(4096); GetWindowText(window, s, s.Capacity); return s.ToString(); }
+              static string Class(IntPtr window) { var s = new StringBuilder(256); GetClassName(window, s, s.Capacity); return s.ToString(); }
+
+              static int Main(string[] args)
+              {
+                  var deadline = DateTime.UtcNow.AddSeconds(int.Parse(args[1]));
+                  while (DateTime.UtcNow < deadline)
+                  {
+                      var box = IntPtr.Zero;
+                      EnumWindows((w, d) =>
+                      {
+                          if (IsWindowVisible(w) && Class(w) == "#32770" && Text(w) == args[0]) { box = w; return false; }
+                          return true;
+                      }, IntPtr.Zero);
+                      if (box != IntPtr.Zero)
+                      {
+                          Console.WriteLine("title: " + Text(box));
+                          EnumChildWindows(box, (w, d) =>
+                          {
+                              if (Class(w) == "Static" && Text(w).Length > 0) Console.WriteLine("text: " + Text(w));
+                              return true;
+                          }, IntPtr.Zero);
+                          PostMessage(box, 0x0111 /* WM_COMMAND */, (IntPtr)1 /* IDOK */, IntPtr.Zero);
+                          return 0;
+                      }
+                      Thread.Sleep(500);
+                  }
+                  Console.WriteLine("No message box titled " + args[0] + " showed. The top-level windows:");
+                  EnumWindows((w, d) => { Console.WriteLine("  [" + Class(w) + "] " + Text(w) + (IsWindowVisible(w) ? "" : " (hidden)")); return true; }, IntPtr.Zero);
+                  return 2;
+              }
+          }
+          CS
+          dotnet build "$reader/BoxReader.csproj" -c Release --nologo -o "$reader/out"
+
+          # Both under one display: the window in the background, the reader beside it.
+          cat > "$RUNNER_TEMP/window-run.sh" <<'SH'
+          wine "$1" > window-out.txt 2> window-err.txt &
+          app=$!
+          wine "$2" "$3" 120 > box.txt 2>&1
+          echo $? > box-code.txt
+          wait $app
+          echo $? > window-code.txt
+          SH
+
+          failed=0
+          for pair in "win10|$needs48" "win7|$needs1607"; do
+            version=${pair%%|*}
+            expected=${pair#*|}
+            winetricks -q "$version" > /dev/null
+            wineserver -w
+            rm -f window-out.txt window-err.txt box.txt box-code.txt window-code.txt
+            set +e
+            timeout -k 10 240 xvfb-run -a sh "$RUNNER_TEMP/window-run.sh" publish/window/InstallerClean.exe "$reader/out/BoxReader.exe" "$title"
+            outer=$?
+            set -e
+            [ "$outer" -eq 124 ] && wineserver -k
+            code=$(cat window-code.txt 2>/dev/null || echo none)
+            echo "== The window under Wine as $version with ${{ matrix.framework }}: exit code $code"
+            echo "-- the message box"; cat box.txt 2>/dev/null
+            echo "-- the window's error stream"; cat window-err.txt 2>/dev/null
+            if [ "$outer" -eq 124 ]; then
+              echo "::warning::Wine window run, $version with ${{ matrix.framework }}: still running after four minutes, so it was ended."
+              failed=1
+            elif [ "$code" != 1 ]; then
+              echo "::warning::Wine window run, $version with ${{ matrix.framework }}: exit code $code, where 1 was expected."
+              failed=1
+            fi
+            if ! grep -qF -- "$expected" box.txt 2>/dev/null; then
+              echo "::warning::Wine window run, $version with ${{ matrix.framework }}: the message box does not carry \"$expected\"."
+              failed=1
+            fi
+          done
+          exit $failed
