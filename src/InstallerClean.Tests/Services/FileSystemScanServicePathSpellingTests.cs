@@ -281,6 +281,30 @@ public class FileSystemScanServicePathSpellingTests
     }
 
     [Fact]
+    public async Task A_file_is_still_offered_where_no_registration_identifies_because_each_names_nothing()
+    {
+        // The only registration is the anchor, and its identity read finds nothing at
+        // the path, the answer for a cached file that has gone. With no registration
+        // identified there is nothing to compare a candidate against, so the candidate
+        // side is not asked, and an answer that names nothing gives nothing up.
+        var ids = Identities(
+            reads: Array.Empty<(string, ulong)>(),
+            (Anchor, FileIdentityRead.NamesNothing));
+
+        var result = await Scan(
+            walkedFiles: new[] { Orphan },
+            registeredPaths: Array.Empty<string>(),
+            fileIds: ids);
+
+        Assert.Equal(1, result.RegistrationIdentityReads.AttemptCount);
+        Assert.Equal(0, result.RegistrationIdentityReads.RefusedTotal);
+        Assert.Equal(0, result.CandidateIdentityReads.AttemptCount);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
+        Assert.Empty(result.WithheldFiles!);
+        Assert.Equal(Orphan, Assert.Single(result.RemovableFiles).FullPath);
+    }
+
+    [Fact]
     public async Task No_reader_at_all_leaves_the_string_comparison_to_decide()
     {
         // This pins what a scan built without one does: the string comparison
