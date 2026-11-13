@@ -14,7 +14,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | --- | --- |
 | InstallerClean | InstallerClean |
 | About | Informazioni |
-| Files left alone | File lasciati stare |
+| Files left alone | File non toccati |
 | Unneeded files that are safe to delete | File non necessari, sicuri da eliminare |
 | The anonymous report | Il rapporto anonimo |
 | InstallerClean couldn't read the report. | InstallerClean non è riuscito a leggere il rapporto. |
@@ -43,24 +43,24 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Carry on _without it | Continua _senza attendere |
 | Check for _updates | Controlla _aggiornamenti |
 | _Close | _Chiudi |
-| _Close without tipping | _Chiudi senza lasciare la mancia |
+| _Close without tipping | _Chiudi senza fare una donazione |
 | _Delete permanently | _Elimina definitivamente |
-| _Done | _Fatto |
+| _Done | _OK |
 | Details | Dettagli |
-| _Leave a tip | _Lascia una mancia |
-| Leave a tip | Lascia una mancia |
-| _Leave a tip | _Lascia una mancia |
+| _Leave a tip | _Fai una donazione |
+| Leave a tip | Fai una donazione |
+| _Leave a tip | _Fai una donazione |
 | Leave a _star on GitHub | Lascia una _stella su GitHub |
 | Apache 2.0 licence | Licenza Apache 2.0 |
 | _Move | _Sposta |
-| Path to folder if you move rather than delete. | Percorso della cartella se sposti anziché eliminare. |
+| Path to folder if you move rather than delete. | Percorso cartella salvataggio file se usi 'Sposta' anziché 'Elimina'. |
 | _Re-scan | _Ripeti scansione |
 
 ## About window
 
 | English | Italiano |
 | --- | --- |
-| Guide and FAQ | Guida e FAQ |
+| Guide and FAQ | Guida e domande frequenti (FAQ) |
 | Report a problem | Segnala un problema |
 | Third-party notices | Avvisi di terze parti |
 | Check for updates automatically | Controlla automaticamente gli aggiornamenti |
@@ -125,9 +125,9 @@ Where Italian needs a different form of a line for some counts, the form is in a
 
 | English | Italiano |
 | --- | --- |
-| Any unneeded files below are safe to delete. | Tutti i file non necessari qui sotto sono sicuri da eliminare. |
-| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | Si trovano in {InstallerFolder}. InstallerClean interroga Windows su ogni programma installato: un file compare nell'elenco quando nessun programma lo rivendica ({0}), oppure quando una patch più recente lo ha sostituito e nessun programma potrebbe tornare a esso ({1}). |
-| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | Spostali in una cartella di backup che scegli tu, poi elimina quella cartella quando sei convinto che i tuoi programmi si aggiornino e si disinstallino ancora normalmente. Rimetterli in {InstallerFolder} ripristina tutto. Oppure eliminali definitivamente adesso. |
+| Any unneeded files below are safe to delete. | I file non necessari qui sotto possono essere eliminati in sicurezza. |
+| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | Si trovano in {InstallerFolder}. InstallerClean interroga Windows per ogni programma installato: un file compare nell'elenco quando nessun programma lo rivendica ({0}), oppure quando una patch più recente lo ha sostituito e nessun programma potrebbe tornare a esso ({1}). |
+| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | Spostali in una cartella di backup a tua scelta, poi elimina quella cartella quando sei convinto che i programmi si aggiornino e si disinstallino ancora normalmente. Se ricopi i file in {InstallerFolder} ripristini tutto. Oppure eliminali definitivamente adesso. |
 | Nothing scanned yet. | Ancora nessuna scansione. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Premi Ripeti scansione per cercare in {InstallerFolder} i file di installazione che nessun programma usa più. |
 | Nothing to show until the next scan. | Niente da mostrare fino alla prossima scansione. |
@@ -165,7 +165,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | All clean | Tutto pulito |
 | Nothing to clean up in {InstallerFolder} | Niente da eliminare in {InstallerFolder} |
 | Scanned {0} {1} in {2} | Analizzati {0} {1} in {2} |
-| Nothing offered on this PC | Nulla proposto su questo PC |
+| Nothing offered on this PC | Nessun file proposto su questo PC |
 | One file ({2}) was held back because Windows shows it was changed after InstallerClean started scanning. If a program was installing or updating, scan again once it has finished and InstallerClean will check it again. | Un file ({2}) è stato trattenuto perché Windows indica che è stato modificato dopo che InstallerClean ha iniziato la scansione. Se un programma si stava installando o aggiornando, ripeti la scansione quando ha finito e InstallerClean lo controllerà di nuovo. |
 | {0} {1} ({2}) were held back because Windows shows they were changed after InstallerClean started scanning. If a program was installing or updating, scan again once it has finished and InstallerClean will check them again. | {0} {1} ({2}) sono stati trattenuti perché Windows indica che sono stati modificati dopo che InstallerClean ha iniziato la scansione. Se un programma si stava installando o aggiornando, ripeti la scansione quando ha finito e InstallerClean li controllerà di nuovo. |
 | Delete that folder when you're satisfied all is well. | Elimina quella cartella quando sei convinto che vada tutto bene. |
@@ -187,14 +187,14 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Annullarlo è semplice. Rispostali in {InstallerFolder} e tornerà tutto com'era. |
 | {0} {1} permanently deleted | {0} {1} eliminato definitivamente |
 | {0} {1} permanently deleted | {0} {1} eliminati definitivamente |
-| Any tip is much appreciated | Ogni mancia è molto apprezzata |
+| Any tip is much appreciated | Ogni donazione è molto apprezzata |
 | Send _anonymous report | Invia rapporto _anonimo |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | Il rapporto aggiunge il tuo risultato a [questo grafico] su GitHub, che mostra quanto spazio le persone stanno recuperando con InstallerClean. Contiene anche questi dettagli tecnici, che mi aiutano a individuare eventuali bug: |
 | How much space was freed, and how many files were moved or deleted | Quanto spazio è stato liberato e quanti file sono stati spostati o eliminati |
 | Whether a Move went to the same drive, another drive, a removable drive or a network share | Se Sposta ha portato i file sulla stessa unità, su un'altra unità, su un'unità rimovibile o su una condivisione di rete |
 | How long the scan and the Move or Delete took | Quanto sono durati la scansione e Sposta o Elimina |
 | How many installer files there are of each kind, and how much space they take | Quanti file di installazione ci sono di ogni tipo e quanto spazio occupano |
-| How many files were left alone, and why | Quanti file sono stati lasciati stare e perché |
+| How many files were left alone, and why | Quanti file non sono stati toccati e perché |
 | How often InstallerClean waited for a slow drive or network share, and how many it stopped waiting for | Quante volte InstallerClean ha atteso un'unità o una condivisione di rete lenta e quante ha smesso di attendere |
 | How many programs and patches Windows has a record of | Di quanti programmi e patch Windows ha un record |
 | Whether Windows still makes old-style short file names | Se Windows crea ancora i nomi di file brevi vecchio stile |
@@ -208,10 +208,10 @@ Where Italian needs a different form of a line for some counts, the form is in a
 
 | English | Italiano |
 | --- | --- |
-| {0} file left alone | {0} file lasciato stare |
-| {0} files left alone | {0} file lasciati stare |
-| {0} unneeded file to clean up | {0} file non necessario da eliminare |
-| {0} unneeded files to clean up | {0} file non necessari da eliminare |
+| {0} file left alone | {0} file non toccato |
+| {0} files left alone | {0} file non toccati |
+| {0} unneeded file to clean up | {0} file non necessario che è possibile eliminare |
+| {0} unneeded files to clean up | {0} file non necessari che è possibile eliminare |
 | Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do. | Windows ha un record per {0} file che non è in {InstallerFolder}: {1}. Nell'uso quotidiano non crea problemi, ma un aggiornamento o una disinstallazione di quel programma può fallire. Apri Dettagli per sapere cosa fare. |
 | Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do. | Windows ha record per {0} file che non sono in {InstallerFolder}: {1}. Nell'uso quotidiano non creano problemi, ma un aggiornamento o una disinstallazione di quei programmi può fallire. Apri Dettagli per sapere cosa fare. |
 | {0} other program | {0} altro programma |
@@ -233,8 +233,8 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Re-scan. | L'orologio di questo PC è tornato indietro o ha perso tempo durante la scansione, perciò InstallerClean ha trattenuto i file in {InstallerFolder} non nominati nei record di alcun programma installato, invece di proporli. Premi Ripeti scansione. |
 | {0} of {1} {2} | {0} di {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} da eliminare ({2}) |
-| {0} file left alone ({1}) | {0} file lasciato stare ({1}) |
-| {0} files left alone ({1}) | {0} file lasciati stare ({1}) |
+| {0} file left alone ({1}) | {0} file non toccato ({1}) |
+| {0} files left alone ({1}) | {0} file non toccati ({1}) |
 | {0} missing | {0} mancante |
 | {0} missing | {0} mancanti |
 
@@ -375,7 +375,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 
 | English | Italiano |
 | --- | --- |
-| Any tip is much appreciated | Ogni mancia è molto apprezzata |
+| Any tip is much appreciated | Ogni donazione è molto apprezzata |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI. |
 | Close | Chiudi |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Dovrei proprio far pagare InstallerClean, perché mi è costato un'enorme quantità di lavoro, ma voglio mantenerlo gratuito perché aiuti quante più persone possibile. La tua donazione ripaga lo sforzo ed è molto apprezzata. |
@@ -392,9 +392,9 @@ Where Italian needs a different form of a line for some counts, the form is in a
 
 | English | Italiano |
 | --- | --- |
-| Leave a tip | Lascia una mancia |
-| Leave a tip | Lascia una mancia |
-| Leave a tip | Lascia una mancia |
+| Leave a tip | Fai una donazione |
+| Leave a tip | Fai una donazione |
+| Leave a tip | Fai una donazione |
 | Cancel operation | Annulla operazione |
 | Cancel scan | Annulla scansione |
 | Cancel startup scan | Annulla scansione all'avvio |
@@ -429,7 +429,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Startup scan progress | Avanzamento scansione all'avvio |
 | Details, unneeded files | Dettagli, file non necessari |
 | Available for cleanup. | Disponibili per la pulizia. |
-| Details, files left alone | Dettagli, file lasciati stare |
+| Details, files left alone | Dettagli, file non toccati |
 | Read-only inventory. | Elenco sola lettura. |
 | Sorted by {0}, ascending | Ordinati per {0}, crescente |
 | Sorted by {0}, descending | Ordinati per {0}, decrescente |
@@ -549,7 +549,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Moved {0} unneeded {1}. | Spostati {0} {1} non necessari. |
 | Moved {0} unneeded {1}.<br>_(one form)_ | Spostato {0} {1} non necessario. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Verifica che i tuoi programmi si aggiornino e si disinstallino ancora normalmente, poi elimina {0}. |
-| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean è gratuito. Se ti è stato utile, una mancia è molto apprezzata: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean è gratuito. Se ti è stato utile, una donazione sarà molto apprezzata: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Aggiornare ora? Si consiglia vivamente di usare la versione più recente. [{0}/{1}] |
 | Y | S |
 | N | N |
@@ -593,7 +593,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PERCORSO  Sposta nel percorso specificato |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blocca il prompt finché non termina, così uno script<br>o un'operazione pianificata può attenderlo. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Cartella per utente; esecuzioni pianificate o SYSTEM: /m PERCORSO. |
-| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | Prima della scansione controlla se esiste una versione più recente di<br>InstallerClean. Se lo avvii tu, chiede prima di aggiornare, e si aggiorna<br>se nessuno risponde entro un minuto. Se viene eseguito da solo, in<br>un'operazione pianificata o in uno script, si aggiorna senza chiedere.<br>Aggiungi /noupdate per saltare il controllo. |
+| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | Prima della scansione controlla se esiste una versione più recente di<br>InstallerClean. Se lo avvii tu, chiede prima di aggiornare, e si aggiorna<br>se nessuno risponde entro un minuto. Se viene eseguito da solo, in<br>un'operazione pianificata o in uno script, si aggiorna senza chiedere.<br>Per saltare il controllo aggiungi '/noupdate'. |
 | Exit codes: | Codici di uscita: |
 |   0   success: the run did what it was asked |   0   riuscito: ha fatto quanto richiesto |
 |   1   nothing processed: the run failed or was refused |   1   nulla elaborato: l'esecuzione è fallita o è stata rifiutata |
