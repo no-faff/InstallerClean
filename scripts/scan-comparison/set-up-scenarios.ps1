@@ -2,7 +2,9 @@
 # and puts files into the Installer folder, so the comparison has files of known kinds to judge
 # beside the runner's own. Nothing here needs a restart, and a step Windows answers with
 # "restart required" stops the script. Writes scenarios.tsv to -OutDir: one row per file in
-# the Installer folder the script made or placed, with what that file is.
+# the Installer folder the script made or placed, with what that file is, and, for a file the
+# build under test is meant to judge otherwise than 3.7.0, whether it holds or offers the file
+# and why (compare-scans.ps1).
 #
 # What it sets up:
 #  - A and B, per machine, at 1.0.0. Patch P1 updates both to 1.0.1, so one cached patch
@@ -13,6 +15,10 @@
 #    Patch P3 updates both and is applied by SYSTEM, so one cached patch serves SYSTEM's
 #    program and a machine program.
 #  - V, a per-user package SYSTEM advertises (msiexec /ju) and never installs.
+#  - X, installed per user by SYSTEM from a copy of its package placed in the Installer folder,
+#    then per machine from the build folder. Windows Installer keeps one record and one cached
+#    package for both, and SYSTEM's source list still names the copy, which this build holds
+#    and 3.7.0 offers.
 #  - C, per machine, installed and removed, its cached copy kept and put back under the name
 #    Windows gave it, so the folder holds a file whose program has gone.
 #  - Files no program or patch registered: D, a program never installed; a second copy of A
@@ -40,6 +46,7 @@ $products = [ordered]@{
     S = @{ Code = '{014CFBC6-35F1-4EFD-A83C-8C39D2506E1E}'; Upgrade = '{CDDF9CC9-ECF5-4AEE-8C20-C74F36A9E52D}'; Component = '{0F929006-FD3F-4460-B128-B1D35FE9BC16}'; Scope = 'perUser'; Versions = '1.0.0', '1.0.1' }
     M = @{ Code = '{B4790A2F-EF1F-4CB7-847D-CAEABD85F56A}'; Upgrade = '{0EF225CD-3A41-427C-83BE-E16A18ECE231}'; Component = '{D2C16BA7-8268-4CCE-8832-864AE9C2E31E}'; Scope = 'perMachine'; Versions = '1.0.0', '1.0.1' }
     V = @{ Code = '{99DC2DBB-7BFE-4B55-A347-4B354CE3BEFC}'; Upgrade = '{E95AFCC4-6E05-472D-ADA3-5117C5D37118}'; Component = '{7EC7F849-EDA1-4223-9424-821AE4B07130}'; Scope = 'perUser'; Versions = , '1.0.0' }
+    X = @{ Code = '{E6704E1A-DF47-478B-9FAD-3AA7FA64FDCD}'; Upgrade = '{C18FE168-72F6-40F6-B6DA-CE51E12B337F}'; Component = '{76F88265-1A25-4465-A78D-80CCEBA2A187}'; Scope = 'perUserOrMachine'; Versions = , '1.0.0' }
 }
 $patches = [ordered]@{
     P1 = @{ Code = '{BFAD921A-E6F1-4150-AD44-F4C695549ED4}'; Name = 'ICScanComparisonFamily'; Family = '1.0.1.0'; Supersede = 'no'; Targets = @{ A = '1.0.1'; B = '1.0.1' } }
@@ -48,7 +55,7 @@ $patches = [ordered]@{
     P3 = @{ Code = '{C3A29953-BE83-4409-A590-1C8886D20F7B}'; Name = 'ICScanComparisonSystemFamily'; Family = '1.0.1.0'; Supersede = 'no'; Targets = @{ M = '1.0.1'; S = '1.0.1' } }
 }
 $rows = [System.Collections.Generic.List[string]]::new()
-$rows.Add("file`twhat it is")
+$rows.Add("file`twhat it is`tthis build`twhy")
 
 function Invoke-Wix([string[]]$wixArgs) {
     $out = & wix @wixArgs 2>&1
@@ -95,12 +102,16 @@ function ProductPackage([string]$code, [string]$sid, [int]$context) { [ScenarioM
 function PatchPackage([string]$productCode, [string]$patchCode) { [ScenarioMsi]::Patch($patchCode, $productCode, '', $machine, 'LocalPackage') }
 function PatchState([string]$productCode, [string]$patchCode) { [ScenarioMsi]::Patch($patchCode, $productCode, '', $machine, 'State') }
 
-function Record([string]$path, [string]$what) {
+# A file's row. $expect, where it is given, is 'holds' or 'offers': what the build under test
+# does with the file where 3.7.0 does the other, with $why the reason.
+function Record([string]$path, [string]$what, [string]$expect = '', [string]$why = '') {
     if (-not $path) { throw "Windows Installer lists no cached file for $what." }
     if (-not (Test-Path -LiteralPath $path)) { throw "The cached file for $what, $path, is not on disk." }
+    if ($expect -notin '', 'holds', 'offers') { throw "An expected difference is 'holds' or 'offers', not '$expect'." }
+    if (($expect -eq '') -ne ($why -eq '')) { throw "An expected difference for $what needs both what this build does and why." }
     $name = Split-Path -Leaf $path
-    "  $name`: $what"
-    $rows.Add("$name`t$what")
+    "  $name`: $what$(if ($expect) { " (this build $expect it: $why)" })"
+    $rows.Add("$name`t$what`t$expect`t$why")
 }
 
 # A name the Installer folder does not hold yet, in the folder's own form: hexadecimal digits
@@ -111,11 +122,21 @@ function NewCacheName([string]$extension) {
     return $name
 }
 
-function Place([string]$source, [string]$what) {
+# Copies $source into the Installer folder under a new name, records it, and answers its path.
+function Place([string]$source, [string]$what, [string]$expect = '', [string]$why = '') {
     $extension = [System.IO.Path]::GetExtension($source)
     $target = Join-Path $installer (NewCacheName $extension)
     Copy-Item -LiteralPath $source -Destination $target
-    Record $target $what
+    Record $target $what $expect $why | Out-Host
+    return $target
+}
+
+# A product code in the packed form Windows Installer names its registry keys with.
+function Packed([string]$code) {
+    $h = $code.Trim('{', '}').Replace('-', '').ToUpperInvariant()
+    $r = (-join $h.Substring(0, 8).ToCharArray()[7..0]) + (-join $h.Substring(8, 4).ToCharArray()[3..0]) + (-join $h.Substring(12, 4).ToCharArray()[3..0])
+    for ($i = 16; $i -lt 32; $i += 2) { $r += $h[$i + 1]; $r += $h[$i] }
+    return $r
 }
 
 "Building the test programs and patches"
@@ -218,6 +239,34 @@ RecordWhatItAdds 'P3, a patch shared by M and SYSTEM''s S, applied by SYSTEM' {
 RecordWhatItAdds 'V, a per-user package advertised by SYSTEM and not installed' {
     Invoke-MsiexecAsSystem 'advertise V per user as SYSTEM' "/ju `"$(Join-Path $build 'V-1.0.0.msi')`""
 }
+
+# X per user by SYSTEM from a copy in the Installer folder, then per machine from the build
+# folder. The per-machine install replaces the one cached package the two share, and SYSTEM's own
+# per-user source list goes on naming the copy.
+$xMsi = Join-Path $build 'X-1.0.0.msi'
+$beforeX = CacheNames
+$xCopy = Place $xMsi 'a copy of X''s package in the Installer folder, the source of SYSTEM''s per-user installation of X, which is also installed per machine from elsewhere' 'holds' 'it is the package SYSTEM''s per-user installation of X opens from its source list'
+Invoke-MsiexecAsSystem 'install X per user for SYSTEM from its copy in the Installer folder' "/i `"$xCopy`" ALLUSERS=`"`""
+$xPacked = Packed $products.X.Code
+$xUnmanaged = "Registry::HKEY_USERS\S-1-5-18\Software\Microsoft\Installer\Products\$xPacked"
+$xManaged = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Managed\S-1-5-18\Installer\Products\$xPacked"
+"  SYSTEM's per-user product key for X: unmanaged $(Test-Path -LiteralPath $xUnmanaged), managed $(Test-Path -LiteralPath $xManaged)"
+foreach ($context in 1, $userUnmanaged, $machine) {
+    "  X's cached package as SYSTEM's install left it, in context ${context}: $([ScenarioMsi]::Product($products.X.Code, $(if ($context -eq $machine) { '' } else { 'S-1-5-18' }), $context, 'LocalPackage'))"
+}
+if (-not ((Test-Path -LiteralPath $xUnmanaged) -or (Test-Path -LiteralPath $xManaged))) {
+    throw "SYSTEM's install of X made no per-user product key, so the runner does not hold the shape X is for."
+}
+Invoke-Msiexec 'install X per machine' @('/i', "`"$xMsi`"", 'ALLUSERS=1')
+$xSourceList = Join-Path $xUnmanaged 'SourceList'
+if (Test-Path -LiteralPath $xSourceList) { "  SYSTEM's per-user source list for X names $((Get-ItemProperty -LiteralPath $xSourceList).PackageName)" }
+if (-not (Test-Path -LiteralPath $xCopy)) { throw "X's copy $xCopy is no longer in the Installer folder after X's two installs." }
+"  X's cached package per machine: $(ProductPackage $products.X.Code '' $machine)"
+# Every file X's two installs left in the folder, the copy apart, which has its row.
+$xLeft = @(CacheNames | Where-Object { $_ -notin $beforeX -and $_ -ne (Split-Path -Leaf $xCopy) })
+if (-not $xLeft.Count) { throw "X's two installs left no cached package in the Installer folder." }
+foreach ($name in $xLeft) { Record (Join-Path $installer $name) 'a file X''s installs, per user by SYSTEM and then per machine, left in the Installer folder' }
+
 $p1 = PatchPackage $products.A.Code $patches.P1.Code
 if ($p1 -ne (PatchPackage $products.B.Code $patches.P1.Code)) { throw "P1 is not one cached file for A and B." }
 "  P1's state on A is $(PatchState $products.A.Code $patches.P1.Code) and on B is $(PatchState $products.B.Code $patches.P1.Code) (1 applied, 2 superseded)"
@@ -233,10 +282,10 @@ if (Test-Path -LiteralPath $cPackage) { throw "The removal of C left its cached 
 Copy-Item -LiteralPath $cKept -Destination $cPackage
 Record $cPackage 'C, installed and removed, its cached copy put back under the name Windows gave it'
 
-Place (Join-Path $build 'D-1.0.0.msi') 'D, never installed'
-Place (Join-Path $build 'A-1.0.1.msi') 'a second copy of A at 1.0.1, the installed program''s own product code'
-Place (Join-Path $build 'Q.msp') 'Q, a patch for A that was never applied'
-Place $p1 'a second copy of P1''s cached patch under a new name'
+$null = Place (Join-Path $build 'D-1.0.0.msi') 'D, never installed'
+$null = Place (Join-Path $build 'A-1.0.1.msi') 'a second copy of A at 1.0.1, the installed program''s own product code'
+$null = Place (Join-Path $build 'Q.msp') 'Q, a patch for A that was never applied'
+$null = Place $p1 'a second copy of P1''s cached patch under a new name'
 
 $tsv = Join-Path $OutDir 'scenarios.tsv'
 Set-Content -LiteralPath $tsv -Value $rows -Encoding utf8

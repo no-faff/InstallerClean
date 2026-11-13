@@ -1,9 +1,12 @@
 <!-- A test program for the scan comparison: one small text file and nothing else.
-     The job builds it several times, passing Tag, Version, Scope (perMachine or perUser),
-     PayloadDir, ProductCode, UpgradeCode and ComponentGuid. A per-machine copy installs its
-     file under Program Files; a per-user copy installs it under the installing account's
-     local application data, with a registry value under that account's hive as the
-     component's key path, which is what Windows Installer asks of a per-user component. -->
+     The job builds it several times, passing Tag, Version, Scope (perMachine, perUser or
+     perUserOrMachine), PayloadDir, ProductCode, UpgradeCode and ComponentGuid. A per-machine
+     copy installs its file under Program Files; a per-user copy installs it under the
+     installing account's local application data, with a registry value under that account's
+     hive as the component's key path, which is what Windows Installer asks of a per-user
+     component. A copy that installs either way, by ALLUSERS on the command line, installs one
+     registry value and no file, under the account's hive per user and under HKLM per
+     machine. -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="InstallerClean scan comparison $(Tag)" Manufacturer="No Faff test" Version="$(Version)"
            ProductCode="$(ProductCode)" UpgradeCode="$(UpgradeCode)"
@@ -14,6 +17,15 @@
       <Directory Id="INSTALLFOLDER" Name="ICScanComparison$(Tag)">
         <Component Id="C_Payload" Guid="$(ComponentGuid)">
           <File Id="F_Payload" Name="payload.txt" Source="$(PayloadDir)\payload.txt" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+<?elseif $(Scope) = perUserOrMachine ?>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="ICScanComparison$(Tag)">
+        <Component Id="C_Payload" Guid="$(ComponentGuid)">
+          <RegistryValue Root="HKMU" Key="Software\NoFaffTest\ICScanComparison$(Tag)" Name="Installed"
+                         Type="integer" Value="1" KeyPath="yes" />
         </Component>
       </Directory>
     </StandardDirectory>
