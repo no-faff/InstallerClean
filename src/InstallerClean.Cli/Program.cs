@@ -471,10 +471,12 @@ internal static class Program
         // runs. The registration is released as the run returns.
         using var onCtrlC = CancelKey.Process.Answer(CancelRun);
 
-        // Runs once, on the console's own control-handler thread or, where Ctrl+C came
-        // before the registration, on this one. Nothing in here may throw: on the
-        // control-handler thread Main's try/catch does not cover it, so an escape is
-        // unhandled, a runtime abort and a stack trace on stderr in place of the
+        // Runs once, on the thread that brings the cancel: a thread-pool thread for Ctrl+C,
+        // which the runtime queues there while the console's control-handler thread waits,
+        // Windows' own handler thread for a console being closed, the thread
+        // CancelKey.Watch starts for the event a newer version sets, or, where the cancel
+        // came before the registration, this one. Nothing in here may throw: on any of the first
+        // three Main's try/catch does not cover it, so an escape is unhandled, a runtime abort and a stack trace on stderr in place of the
         // documented exit code and the single Application-log entry, on a surface that
         // deliberately keeps ex.Message out.
         void CancelRun()
@@ -799,7 +801,8 @@ internal static class Program
 
     /// <summary>
     /// Prints a blank line and <paramref name="line"/>, the line saying the run is
-    /// cancelling. Never throws: it runs on the console's control-handler thread too.
+    /// cancelling. Never throws: it runs on the thread that brings the cancel too, which
+    /// Main's try/catch does not cover.
     /// </summary>
     internal static void SayCancelling(string line)
     {

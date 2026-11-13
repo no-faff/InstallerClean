@@ -175,9 +175,10 @@ internal sealed class CommandLineUpdate
     /// How long the run waits for Ctrl+C's cancellation once something Ctrl+C can end has
     /// ended without it: the question's read, which Ctrl+C can end as the end of input, or
     /// the newer version, which Windows ends with <see cref="ControlCExit"/> where it has
-    /// no handler for Ctrl+C yet. The host's handler cancels the token on the console's
-    /// control-handler thread, which can run after either has ended, so the run waits up
-    /// to this long for it and reads that Ctrl+C as its own.
+    /// no handler for Ctrl+C yet. The host's handler cancels the token on a thread-pool
+    /// thread, where the runtime queues it while the console's control-handler thread
+    /// waits, and it can run after either has ended, so the run waits up to this long for
+    /// it and reads that Ctrl+C as its own.
     /// </summary>
     internal static readonly TimeSpan ControlCBound = Durations.FromMilliseconds(500);
 
