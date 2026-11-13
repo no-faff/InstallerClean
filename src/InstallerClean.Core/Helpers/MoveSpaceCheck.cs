@@ -98,13 +98,14 @@ internal static class MoveSpaceCheck
     /// A SHARE, OR A DRIVE LETTER MAPPED ONTO ONE, IS ASKED WHETHER IT IS THIS PC'S OWN
     /// SHARE ONTO THAT VOLUME. The nearest folder of the destination that is there is opened,
     /// through the share, and the serial number in its file id (<c>FILE_ID_INFO</c>) is
-    /// compared with the cache root's. A match is confirmed the way the destination gates
-    /// confirm one (<see cref="InstallerCacheHelpers.LocalPathThroughThisPCsVolumes"/>): the
-    /// same file id opens on the cache's volume as a folder ending in the share path's own
-    /// folder names. So a share on another computer imaged from the same disk, whose volume
-    /// carries the same serial number, answers false. A share whose server does not answer
-    /// the file-id question answers false, the answer a share has always had here. Any
-    /// other failure to read either side, and anything thrown, answers null.
+    /// compared with the cache root's. A match counts only where the share's server is this
+    /// PC by name and the same file id opens on the cache's volume as a folder ending in the
+    /// share path's own folder names, as the destination gates confirm one
+    /// (<see cref="InstallerCacheHelpers.LocalPathOf"/>). A match on any other server, such
+    /// as another computer imaged from the same disk, answers null (<see cref="ConfirmedOnCacheVolume"/>).
+    /// A share whose server does not answer the file-id question answers false, the answer a
+    /// share has always had here. Any other failure to read either side, and anything
+    /// thrown, answers null.
     ///
     /// The share is asked over the network, so a caller belongs off the dispatcher, as
     /// every caller is: the window's tooltip on its background hop and the pre-flight's
@@ -121,26 +122,26 @@ internal static class MoveSpaceCheck
     /// <param name="identities">
     /// Reads a folder's file id. Null in production (<see cref="FileIdentityReader"/>).
     /// </param>
-    /// <param name="localPathOf">
-    /// Confirms a serial number match by the folder's local path. Null in production
-    /// (<see cref="InstallerCacheHelpers.LocalPathThroughThisPCsVolumes"/>).
+    /// <param name="share">
+    /// Stands in for what confirms a serial number match. Null in production
+    /// (<see cref="ShareReads.Production"/>).
     /// </param>
     internal static bool? ResolveIsOnInstallerCacheDrive(
         string destination, string? installerCacheRoot = null, IFileIdentityReader? identities = null,
-        LocalPathReader? localPathOf = null)
+        ShareReads? share = null)
     {
         if (string.IsNullOrWhiteSpace(destination)) return null;
 
         try
         {
             if (StorageHelpers.IsRemotePath(destination))
-                return ShareOnCacheVolume(destination, installerCacheRoot, identities, localPathOf);
+                return ShareOnCacheVolume(destination, installerCacheRoot, identities, share ?? ShareReads.Production);
 
             var local = LocalVolumeMatch(destination, installerCacheRoot, out var destinationVolume);
             if (local != false || destinationVolume is null) return local;
 
             return StorageHelpers.GetDriveKind(destinationVolume) == DriveType.Network
-                ? ShareOnCacheVolume(destination, installerCacheRoot, identities, localPathOf)
+                ? ShareOnCacheVolume(destination, installerCacheRoot, identities, share ?? ShareReads.Production)
                 : false;
         }
         catch
@@ -186,16 +187,15 @@ internal static class MoveSpaceCheck
 
     /// <summary>
     /// Whether the nearest folder of <paramref name="destination"/> that is there is on the
-    /// cache root's volume, by the serial number in its file id, confirmed by its local path:
-    /// true or false where both were read, false where the destination's folder gives no file
-    /// id or its id does not open there as the same folder, and null where either side would
-    /// not read, nothing is there up to the share's root, or the destination does not resolve.
-    /// A folder that is not there yet is passed over for its parent, and the walk ends at the
-    /// root.
+    /// cache root's volume, by the serial number in its file id, confirmed as
+    /// <see cref="ConfirmedOnCacheVolume"/> confirms it: false where the serial numbers differ
+    /// or the destination's folder gives no file id, and null where either side would not
+    /// read or nothing is there up to the share's root. A folder that is not there yet is
+    /// passed over for its parent, and the walk ends at the root.
     /// </summary>
     private static bool? ShareOnCacheVolume(
         string destination, string? installerCacheRoot, IFileIdentityReader? identities,
-        LocalPathReader? localPathOf)
+        ShareReads share)
     {
         identities ??= Identities;
         var cacheRoot = installerCacheRoot ?? InstallerCacheHelpers.InstallerFolder;
@@ -209,14 +209,18 @@ internal static class MoveSpaceCheck
             {
                 case FileIdentityRead.Read:
                     if (reached.VolumeSerialNumber != root.VolumeSerialNumber) return false;
-                    return ConfirmedOnCacheVolume(destination, cacheRoot, localPathOf);
+                    return ConfirmedOnCacheVolume(destination, cacheRoot, share);
                 case FileIdentityRead.IdentityUnavailable:
                     return false;
                 case FileIdentityRead.NamesNothing:
                     if (IsRootAlone(folder)) return null;
                     var parent = PathText.GetDirectoryName(folder);
                     if (parent is null) return null;
-                    folder = SpelledToOpen(parent);
+                    parent = SpelledToOpen(parent);
+
+                    // Each step is shorter than the one before, so the walk always ends.
+                    if (parent.Length >= folder.Length) return null;
+                    folder = parent;
                     break;
                 default:
                     return null;
@@ -226,35 +230,45 @@ internal static class MoveSpaceCheck
 
     /// <summary>
     /// Whether <paramref name="destination"/>, its volume serial number matching the cache
-    /// root's, reaches a folder on the cache's volume, asked as the destination gates ask it:
-    /// of the kernel's resolution of the destination, so a drive mapped onto a share is
-    /// compared by the folder names below the share's own root. Null where the destination
-    /// does not resolve.
+    /// root's, is this PC's own share onto a folder of the cache's volume: true where the
+    /// share's server is this PC by name (<see cref="ThisPCName.Names"/>) and the folder's
+    /// local path is established as the destination gates establish it
+    /// (<see cref="InstallerCacheHelpers.LocalPathOf"/>), false where the server is this PC
+    /// and the local path is not established, and null where the destination does not
+    /// resolve to a share path or its server is not this PC by name.
+    ///
+    /// A SERIAL NUMBER AND A FILE ID DO NOT TELL THIS PC FROM ANOTHER IMAGED FROM THE SAME
+    /// DISK. Its volume carries the same serial number, its folders keep their ids and names,
+    /// and a volume's root has the same id on every NTFS volume. So a matching serial number
+    /// on a server that is not this PC by name is not settled either way, which covers an
+    /// alias of this PC in a hosts file or in DNS as well.
     /// </summary>
-    private static bool? ConfirmedOnCacheVolume(
-        string destination, string cacheRoot, LocalPathReader? localPathOf)
+    private static bool? ConfirmedOnCacheVolume(string destination, string cacheRoot, ShareReads share)
     {
-        if (localPathOf is not null) return localPathOf(destination, [cacheRoot]) is not null;
+        var resolved = share.Resolve(destination);
+        if (resolved is null || !share.NamesThisPC(ThisPCName.ServerOf(resolved))) return null;
 
-        if (!InstallerCacheHelpers.TryResolveFinalPath(destination, out var resolved)) return null;
-        return InstallerCacheHelpers.LocalPathThroughThisPCsVolumes(resolved, [cacheRoot]) is not null;
-    }
-
-    /// <summary>Whether <paramref name="path"/> is a volume or share root and nothing below it.</summary>
-    private static bool IsRootAlone(string path)
-    {
-        var root = PathText.GetPathRoot(path);
-        return !string.IsNullOrEmpty(root)
-            && path.TrimEnd('\\', '/').Equals(root.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase);
+        return InstallerCacheHelpers.LocalPathOf(resolved, proven: true, [cacheRoot], share.LocalPathOf) is not null;
     }
 
     /// <summary>
-    /// <paramref name="folder"/> as it is opened: a volume or share root with its trailing
-    /// separator, the spelling that opens a share's root as a folder, and any other folder as
-    /// it is.
+    /// Whether <paramref name="path"/> is a root and nothing below it, measured as
+    /// <see cref="PathText.GetRootLength"/> measures a root, so either separator counts.
+    /// </summary>
+    private static bool IsRootAlone(string path)
+    {
+        var rootLength = PathText.GetRootLength(path);
+        return rootLength > 0 && rootLength >= path.TrimEnd('\\', '/').Length;
+    }
+
+    /// <summary>
+    /// <paramref name="folder"/> as it is opened: a share root with its trailing separator,
+    /// the spelling that opens a share's root as a folder, and any other folder as it is
+    /// written. <c>Z:</c> stays as it is, being the current folder on Z and not its root.
     /// </summary>
     private static string SpelledToOpen(string folder) =>
-        IsRootAlone(folder)
+        IsRootAlone(folder) && folder.Length > 1
+            && PathText.IsDirectorySeparator(folder[0]) && PathText.IsDirectorySeparator(folder[1])
             ? PathText.GetPathRoot(folder)!.TrimEnd('\\', '/') + Path.DirectorySeparatorChar
             : folder;
 
@@ -328,4 +342,23 @@ internal static class MoveSpaceCheck
             return null;
         }
     }
+}
+
+/// <summary>
+/// What <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> asks to confirm that a
+/// share whose volume serial number matches the cache's is this PC's own: the kernel's
+/// resolution of the destination to a share path (null where it does not resolve to one),
+/// whether a server name is this PC, and the local path of a folder reached through a share.
+/// </summary>
+internal sealed record ShareReads(
+    Func<string, string?> Resolve, Func<string?, bool> NamesThisPC, LocalPathReader LocalPathOf)
+{
+    /// <summary>The kernel, this PC's own names and its own volumes.</summary>
+    internal static ShareReads Production { get; } = new(
+        destination => InstallerCacheHelpers.TryResolveFinalPath(destination, out var resolved)
+            && InstallerCacheHelpers.IsUncPath(resolved)
+                ? resolved
+                : null,
+        ThisPCName.Names,
+        InstallerCacheHelpers.LocalPathThroughThisPCsVolumes);
 }

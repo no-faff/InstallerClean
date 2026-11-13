@@ -175,7 +175,7 @@ internal static class InstallerCacheHelpers
     /// for a destination that does not resolve: refusing would leave a person with no
     /// destination they could use.
     /// </summary>
-    private static string? LocalPathOf(
+    internal static string? LocalPathOf(
         string resolvedInput, bool proven, IReadOnlyList<string> roots, LocalPathReader? localPathOf)
     {
         if (!proven || !IsUncPath(resolvedInput)) return null;
@@ -188,7 +188,7 @@ internal static class InstallerCacheHelpers
     /// resolved path through a share or a drive mapped onto one is spelled. A path that keeps a
     /// <c>\\?\</c> or <c>\\.\</c> in front, such as a volume with no drive letter, is local.
     /// </summary>
-    private static bool IsUncPath(string resolvedPath) =>
+    internal static bool IsUncPath(string resolvedPath) =>
         resolvedPath.StartsWith(@"\\", StringComparison.Ordinal)
         && !resolvedPath.StartsWith(@"\\?\", StringComparison.Ordinal)
         && !resolvedPath.StartsWith(@"\\.\", StringComparison.Ordinal);
