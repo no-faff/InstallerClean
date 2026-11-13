@@ -34,7 +34,7 @@ public sealed record ResultLogEntry(
     MachineInfo Machine,
     ScanInfo Scan,
     OperationInfo Operation,
-    string ReportId)
+    Guid ReportId)
 {
     /// <summary>
     /// Schema 2 separates <see cref="ScanInfo.ObsoletedCount"/>
@@ -173,11 +173,13 @@ public sealed record ResultLogEntry(
     /// files a key held back (<see cref="ScanInfo.UnlistedKeysWithInstallPropertiesCount"/> to
     /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
     ///
-    /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND ONE AT THE TOP LEVEL, AND TAKES NONE AWAY:
-    /// the product keys without an <c>InstallProperties</c> key one of whose source lists did
-    /// not read (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>), and
-    /// <c>reportId</c>, last (<see cref="ReportId"/>). A new top-level key, so the receiver
-    /// deploys before a release sends it.
+    /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys without an
+    /// <c>InstallProperties</c> key one of whose source lists did not read
+    /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
+    ///
+    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND TAKES NONE AWAY: <c>reportId</c>, last
+    /// (<see cref="ReportId"/>). A new top-level key, so the receiver deploys before a release
+    /// sends it.
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -187,7 +189,7 @@ public sealed record ResultLogEntry(
     /// <c>machine</c> arriving before the receiving end knows the name is a
     /// rejected report and a user told sending failed. The receiver ships first.
     /// </summary>
-    public const int CurrentSchemaVersion = 12;
+    public const int CurrentSchemaVersion = 13;
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it when the
     // report box was put on the card, so the report carries that reading. The host is the
@@ -247,10 +249,10 @@ public sealed record ResultLogEntry(
             NewReportId());
 
     /// <summary>
-    /// A new random GUID in its 36-character form, lower case, which is how both
-    /// runtimes write one.
+    /// A new random GUID. The serialiser writes a Guid in its 36-character form, lower
+    /// case, which is the form the receiver accepts.
     /// </summary>
-    internal static string NewReportId() => Guid.NewGuid().ToString("D");
+    internal static Guid NewReportId() => Guid.NewGuid();
 
     private static string ResolveOs()
     {

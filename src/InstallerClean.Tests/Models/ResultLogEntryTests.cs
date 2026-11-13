@@ -210,7 +210,7 @@ public class ResultLogEntryTests
         Machine: SampleMachine(),
         Scan: SampleScan(),
         Operation: SampleOperation(),
-        ReportId: "0b6e4d2a-91c3-4f58-a7e0-3d5c8b1f9a46");
+        ReportId: Guid.Parse("0b6e4d2a-91c3-4f58-a7e0-3d5c8b1f9a46"));
 
     [Fact]
     public void Serialises_bytesFreed_not_bytesCleared()
@@ -233,15 +233,15 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void Schema_version_is_twelve()
+    public void Schema_version_is_thirteen()
     {
         // The receiving Edge Function field-validates per version and holds each version a
         // release sends to its exact set of keys, every count in it required; a version it
         // does not know goes to its lenient v<n>-unknown/ path. So a key added to or taken
         // from what a version carries moves the version once a release sends it, and this
-        // pin makes that move a deliberate, reviewed act. Schema 12 is schema 11 with one key
-        // appended under scan and reportId appended at the top level.
-        Assert.Equal(12, ResultLogEntry.CurrentSchemaVersion);
+        // pin makes that move a deliberate, reviewed act. Schema 13 is schema 12 with reportId
+        // appended at the top level.
+        Assert.Equal(13, ResultLogEntry.CurrentSchemaVersion);
     }
 
     [Fact]
@@ -1137,7 +1137,11 @@ public class ResultLogEntryTests
             ResultLogEntry.ForDelete(
                 scan, 10, new DeleteResult(0, Array.Empty<FileOperationError>()), 0, 20,
                 new ReverifyResult([], []), "GB", ReportHost.CommandLine, AppCopyKind.Setup),
-        }.Select(entry => entry.ReportId).ToList();
+        }.Select(entry =>
+        {
+            using var doc = JsonDocument.Parse(ResultLogService.Serialize(entry));
+            return doc.RootElement.GetProperty("reportId").GetString()!;
+        }).ToList();
 
         Assert.Equal(ids.Count, ids.Distinct().Count());
         Assert.All(ids, id => Assert.Matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", id));
