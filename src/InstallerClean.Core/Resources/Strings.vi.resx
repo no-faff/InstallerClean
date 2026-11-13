@@ -974,7 +974,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), báo cáo được gửi từ InstallerClean hay từ công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị</value>
+    <value>Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), lần chạy là trong InstallerClean hay trong công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1223,8 +1223,18 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        heading names none and has to stay true of all of them. -->
   <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean đã dừng</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Quét thất bại</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Các bản ghi Windows Installer trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <!-- The closing sentence after the message of a stop at a scan or at the check made
+       before a Move or Delete, joined to it as two sentences. Error.NothingRemoved follows
+       Error.InstallerDbEmpty, Error.MsiAccessDenied, Error.MsiNonSuccess,
+       Error.MsiEnumerationNeverEnded, Error.MsiPatchEnumerationNeverEnded,
+       Error.ScanRecordsUnreadable and Error.ScanCacheRootUnresolved. crash.log leaves it out. -->
+  <data name="Error.NothingRemoved" xml:space="preserve"><value>Không có gì bị xóa.</value></data>
+  <!-- As Error.NothingRemoved, after Error.ScanCorrelationFailed,
+       Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
+       Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
+  <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>Không có gì được đề xuất và không có gì bị bỏ đi.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Các bản ghi Windows Installer trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng.</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1237,7 +1247,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: nó đã đọc {1} {2}, rồi một mục trả về không đọc được (mã lỗi {0}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: nó đã đọc {1} {2}, rồi một mục trả về không đọc được (mã lỗi {0}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng.</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1249,7 +1259,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1257,7 +1267,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1272,7 +1282,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Gần như không có thứ gì các bản ghi trỏ tới thực sự nằm ở đó, và gần như không có thứ gì ở đó được bản ghi nào nêu tên, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Gần như không có thứ gì các bản ghi trỏ tới thực sự nằm ở đó, và gần như không có thứ gì ở đó được bản ghi nào nêu tên, nên không tệp nào có thể được chứng tỏ là không cần thiết.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1284,7 +1294,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Thư mục có tệp bên trong, nhưng không một bản ghi nào trỏ tới bất cứ thứ gì trong đó, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Thư mục có tệp bên trong, nhưng không một bản ghi nào trỏ tới bất cứ thứ gì trong đó, nên không tệp nào có thể được chứng tỏ là không cần thiết.</value></data>
   <!-- Shown when the scan stops before its walk because Windows reports the
        Installer folder at a path other than its own, ignoring case: the folder,
        or a folder above it, is a junction or a directory symbolic link, and a
@@ -1292,13 +1302,13 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        reports and no cause for it, because more than one condition produces it.
        {0} is that path, a full folder path such as D:\Cache\Installer. Names the
        folder the app asked about through the {InstallerFolder} token. -->
-  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean không thể quét {InstallerFolder} trên máy này. Windows báo thư mục đó là {0}, và InstallerClean chỉ quét một thư mục Installer mà Windows báo đúng ở đường dẫn của chính nó. Không có gì được đề xuất và không có gì bị bỏ đi.</value></data>
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean không thể quét {InstallerFolder} trên máy này. Windows báo thư mục đó là {0}, và InstallerClean chỉ quét một thư mục Installer mà Windows báo đúng ở đường dẫn của chính nó.</value></data>
   <!-- Shown when the scan stops at its walk because Windows answered that the
        cache folder cannot be found when the app went to list it. Only that answer
        reaches this message; every other failure to list the folder gets
        Error.ScanInstallerFolderListFailed below. Names the folder through the
        {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows báo rằng {InstallerFolder} không tồn tại trên máy này, nên InstallerClean đã dừng lại. Không có gì được đề xuất và không có gì bị bỏ đi.</value></data>
+  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows báo rằng {InstallerFolder} không tồn tại trên máy này, nên InstallerClean đã dừng lại.</value></data>
   <!-- Shown when the scan stops at its walk because Windows returned an error while
        the app was listing the cache folder, whether when the folder was opened or
        part-way through it: a refusal or any other failed read. Windows answering
@@ -1306,7 +1316,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        instead. States no cause beyond that, because more than one condition
        produces it and naming one would be false of the others. Names the folder
        through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows đã báo lỗi khi InstallerClean cố liệt kê các tệp trong {InstallerFolder}, nên InstallerClean không lấy được danh sách đầy đủ và đã dừng lại. Không có gì được đề xuất và không có gì bị bỏ đi.</value></data>
+  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows đã báo lỗi khi InstallerClean cố liệt kê các tệp trong {InstallerFolder}, nên InstallerClean không lấy được danh sách đầy đủ và đã dừng lại.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1315,14 +1325,14 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean không khiến được Windows phân giải đường dẫn thật của {InstallerFolder}, nên không tệp nào có thể được chứng tỏ là nằm bên trong và không tệp nào được đề xuất để dọn. Lần quét này không tìm thấy gì vì phép kiểm tra ấy thất bại, chứ không phải vì thư mục đã sạch. Không có gì bị bỏ đi.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean không khiến được Windows phân giải đường dẫn thật của {InstallerFolder}, nên không tệp nào có thể được chứng tỏ là nằm bên trong và không tệp nào được đề xuất để dọn. Lần quét này không tìm thấy gì vì phép kiểm tra ấy thất bại, chứ không phải vì thư mục đã sạch.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1549,8 +1559,8 @@ Chi tiết trong {1}.</value></data>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub trả về phản hồi lỗi. Hãy thử lại sau vài phút.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>Lần kiểm tra cập nhật nhận về một lỗi thay vì trang phát hành của GitHub. Lỗi có thể đến từ GitHub hoặc từ thứ gì đó trên mạng của bạn, chẳng hạn proxy. Hãy thử lại sau, hoặc mở trang phát hành trong trình duyệt của bạn.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Lần kiểm tra cập nhật nhận về một phản hồi không nêu tên bản phát hành nào. Phản hồi có thể đến từ GitHub hoặc từ thứ gì đó trên mạng của bạn, chẳng hạn proxy hoặc trang đăng nhập. Hãy thử lại sau, hoặc mở trang phát hành trong trình duyệt của bạn.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2196,7 +2206,7 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>Không thể gửi báo cáo. Báo cáo được lưu giữ tại {0}.</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>Đang gửi một báo cáo còn chờ từ một lần chạy trước đó.</value></data>
@@ -2273,10 +2283,12 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2423,11 +2435,11 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli giữ dấu nhắc cho tới khi xong, để một tập lệnh hoặc&#10;một tác vụ theo lịch có thể chờ nó.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Thư mục theo người dùng; tác vụ theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN.</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Trước khi quét, công cụ kiểm tra xem có phiên bản InstallerClean mới hơn&#10;không. Khi bạn tự chạy, nó hỏi trước khi cập nhật, và cập nhật nếu không&#10;ai trả lời trong một phút. Khi chạy tự động, trong một tác vụ theo lịch&#10;hoặc một tập lệnh, nó cập nhật mà không hỏi. Thêm /noupdate để bỏ qua&#10;bước kiểm tra.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Trước khi quét, công cụ kiểm tra xem có phiên bản InstallerClean mới hơn&#10;không, trừ khi “Tự động kiểm tra cập nhật” bị tắt cho tài khoản đang chạy&#10;nó. Khi cửa sổ của nó đang hiện trên màn hình và không có gì được chuyển&#10;hướng vào hoặc ra khỏi nó, nó hỏi trước khi cập nhật, và cập nhật nếu&#10;không ai trả lời trong một phút. Ở mọi trường hợp khác, chẳng hạn một tác&#10;vụ theo lịch được đặt chạy dù có ai đăng nhập hay không, nó cập nhật mà&#10;không hỏi. Thêm /noupdate để bỏ qua bước kiểm tra.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Mã thoát:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

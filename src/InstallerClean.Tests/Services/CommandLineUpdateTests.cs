@@ -218,6 +218,18 @@ public sealed class CommandLineUpdateTests : IDisposable
         Assert.Equal([Available, Downloading, string.Format(Strings.Cli_UpdateRunningNewer, "/m", Latest)], _host.Output);
     }
 
+    [Fact]
+    public void An_unwatched_run_names_its_command_when_a_switch_comes_before_it()
+    {
+        var updater = new FakeUpdater();
+        _host.NewerVersionExitCode = 4;
+
+        Run(updater, canAsk: false, command: "/d", arguments: ["/noquestions", "/d"]);
+
+        Assert.Equal((Staged, "/noquestions /d", Exe, Current, Latest, true), Assert.Single(_host.NewerVersionRuns));
+        Assert.Equal([Available, Downloading, string.Format(Strings.Cli_UpdateRunningNewer, "/d", Latest)], _host.Output);
+    }
+
     [Theory]
     [InlineData("/d", true)]
     [InlineData("/m", true)]

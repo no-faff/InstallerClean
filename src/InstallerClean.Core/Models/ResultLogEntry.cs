@@ -297,7 +297,7 @@ public sealed record ResultLogEntry(
 /// a UN M.49 number, or one of two fixed labels.
 /// </param>
 /// <param name="Host">
-/// The program that sent the report, as <see cref="ReportHostLabel.For"/> labels it: the
+/// The program whose run the report describes, as <see cref="ReportHostLabel.For"/> labels it: the
 /// window or the command-line tool.
 ///
 /// A COMMAND-LINE TOOL IN THE SETUP'S FOLDER AND THE WINDOW IN THE SAME FOLDER BOTH HAVE

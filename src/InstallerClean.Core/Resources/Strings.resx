@@ -974,7 +974,7 @@ To put it back, you need the installer for the version you already have. Get it 
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing</value>
+    <value>InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1223,8 +1223,18 @@ InstallerClean was already running as administrator, so starting it again that w
        heading names none and has to stay true of all of them. -->
   <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean stopped</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan failed</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <!-- The closing sentence after the message of a stop at a scan or at the check made
+       before a Move or Delete, joined to it as two sentences. Error.NothingRemoved follows
+       Error.InstallerDbEmpty, Error.MsiAccessDenied, Error.MsiNonSuccess,
+       Error.MsiEnumerationNeverEnded, Error.MsiPatchEnumerationNeverEnded,
+       Error.ScanRecordsUnreadable and Error.ScanCacheRootUnresolved. crash.log leaves it out. -->
+  <data name="Error.NothingRemoved" xml:space="preserve"><value>Nothing has been removed.</value></data>
+  <!-- As Error.NothingRemoved, after Error.ScanCorrelationFailed,
+       Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
+       Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
+  <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped.</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1237,7 +1247,7 @@ InstallerClean was already running as administrator, so starting it again that w
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {1} {2}, then an entry came back unreadable (error code {0}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {1} {2}, then an entry came back unreadable (error code {0}). Rather than work from a part-read list, InstallerClean stopped.</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1249,7 +1259,7 @@ InstallerClean was already running as administrator, so starting it again that w
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1257,7 +1267,7 @@ InstallerClean was already running as administrator, so starting it again that w
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1272,7 +1282,7 @@ InstallerClean was already running as administrator, so starting it again that w
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1284,7 +1294,7 @@ InstallerClean was already running as administrator, so starting it again that w
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded.</value></data>
   <!-- Shown when the scan stops before its walk because Windows reports the
        Installer folder at a path other than its own, ignoring case: the folder,
        or a folder above it, is a junction or a directory symbolic link, and a
@@ -1292,13 +1302,13 @@ InstallerClean was already running as administrator, so starting it again that w
        reports and no cause for it, because more than one condition produces it.
        {0} is that path, a full folder path such as D:\Cache\Installer. Names the
        folder the app asked about through the {InstallerFolder} token. -->
-  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path.</value></data>
   <!-- Shown when the scan stops at its walk because Windows answered that the
        cache folder cannot be found when the app went to list it. Only that answer
        reaches this message; every other failure to list the folder gets
        Error.ScanInstallerFolderListFailed below. Names the folder through the
        {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows reports that {InstallerFolder} doesn't exist on this PC, so InstallerClean stopped. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows reports that {InstallerFolder} doesn't exist on this PC, so InstallerClean stopped.</value></data>
   <!-- Shown when the scan stops at its walk because Windows returned an error while
        the app was listing the cache folder, whether when the folder was opened or
        part-way through it: a refusal or any other failed read. Windows answering
@@ -1306,7 +1316,7 @@ InstallerClean was already running as administrator, so starting it again that w
        instead. States no cause beyond that, because more than one condition
        produces it and naming one would be false of the others. Names the folder
        through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows reported an error when InstallerClean tried to list the files in {InstallerFolder}, so it couldn't get a complete list and stopped. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows reported an error when InstallerClean tried to list the files in {InstallerFolder}, so it couldn't get a complete list and stopped.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1315,14 +1325,14 @@ InstallerClean was already running as administrator, so starting it again that w
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1549,8 +1559,8 @@ Details in {1}.</value></data>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Couldn't reach GitHub. Check your internet connection and try again.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub returned an error response. Try again in a few minutes.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>The check timed out. Your connection to GitHub may be slow; try again.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2236,7 +2246,7 @@ Run InstallerClean again as administrator.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>The report could not be sent. It is kept in {0}.</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>Sending a report left waiting by an earlier run.</value></data>
@@ -2316,11 +2326,14 @@ Run InstallerClean again as administrator.</value></data>
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
   <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode cancelled: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
   <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0} mode cancelled before any work was done. No action taken.</value></data>
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
+  <data name="Cli.EventLogCancelledNoFileRemoved" xml:space="preserve"><value>{0} mode cancelled before any file was deleted or moved. No action taken.</value></data>
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2347,22 +2360,22 @@ Run InstallerClean again as administrator.</value></data>
   <data name="Cli.EventLogUpdateNothingAtPath" xml:space="preserve"><value>An update to InstallerClean {0} was not installed: once the copy being updated had closed, nothing was left at its path. InstallerClean can be downloaded again from {1}.</value></data>
   <!-- 0 = the version that was not installed. Event ID 3007, written by that version where the
        command line's copy at the path was not replaced and is as it was. -->
-  <data name="Cli.EventLogUpdateNotInstalled" xml:space="preserve"><value>An update to InstallerClean {0} was not installed, and the copy it was to replace was left as it was. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean. crash.log says what stopped it.</value></data>
+  <data name="Cli.EventLogUpdateNotInstalled" xml:space="preserve"><value>An update to InstallerClean {0} was not installed, and the copy it was to replace was left as it was. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as. crash.log says what stopped it.</value></data>
   <!-- 0 = the version being installed. Event ID 3007, written by that version where its replace
        of the command line's copy stopped after the move over that copy had begun. -->
   <data name="Cli.EventLogUpdateStoppedPartWay" xml:space="preserve"><value>An update to InstallerClean {0} stopped after it had begun to replace the copy at its path. crash.log says what happened.</value></data>
   <!-- 0 = the version the setup was downloaded as. Event ID 3007, written by the command line of
        that version where the setup beside it carries another version, so it was not run. -->
-  <data name="Cli.EventLogUpdateSetupNotThisVersion" xml:space="preserve"><value>The setup downloaded to update InstallerClean to {0} is not version {0}, so it was not run. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateSetupNotThisVersion" xml:space="preserve"><value>The setup downloaded to update InstallerClean to {0} is not version {0}, so it was not run. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = the version that was not installed. Event ID 3007, written by that version where
        InstallerClean was still in use after the setup's wait for it, so the setup was not run. -->
-  <data name="Cli.EventLogUpdateInUseAfterWait" xml:space="preserve"><value>An update to InstallerClean {0} was not installed because InstallerClean was in use. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateInUseAfterWait" xml:space="preserve"><value>An update to InstallerClean {0} was not installed because InstallerClean was in use. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = the setup's version, 1 = its exit code. Event ID 3007, written by the command line of
        that version where the setup it ran ended with an exit code other than 0. -->
-  <data name="Cli.EventLogUpdateSetupExitCode" xml:space="preserve"><value>The InstallerClean {0} setup ended with exit code {1}. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateSetupExitCode" xml:space="preserve"><value>The InstallerClean {0} setup ended with exit code {1}. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = the setup's version. Event ID 3007, written by the command line of that version where
        the setup ended with exit code 0 and the command line at the path does not carry it. -->
-  <data name="Cli.EventLogUpdateSetupNotInPlace" xml:space="preserve"><value>The InstallerClean {0} setup finished without putting version {0} of the command line in place. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateSetupNotInPlace" xml:space="preserve"><value>The InstallerClean {0} setup finished without putting version {0} of the command line in place. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = mode arg, 1 = the version that ran, 2 = the newer version it did not run. Event ID
        3006, the run's only entry, where Ctrl+C came after the run said it goes on with the
        version it is, so nothing ran. One for each reason, in the order of
@@ -2499,11 +2512,11 @@ Run InstallerClean again as administrator.</value></data>
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Before it scans, it checks for a newer version of InstallerClean.&#10;When you run it yourself, it asks before updating, and updates if nobody&#10;answers within a minute. When it runs on its own, in a scheduled task or&#10;a script, it updates without asking.&#10;Add /noupdate to skip the check.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Before it scans, it checks for a newer version of InstallerClean, unless&#10;"Check for updates automatically" is turned off for the account it runs&#10;as. Where its window is on screen and nothing is piped into or out of it,&#10;it asks before updating, and updates if nobody answers within a minute.&#10;Anywhere else, such as a scheduled task set to run whether or not anyone&#10;is logged on, it updates without asking.&#10;Add /noupdate to skip the check.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Exit codes:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

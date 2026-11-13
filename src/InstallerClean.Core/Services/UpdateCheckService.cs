@@ -196,10 +196,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
             {
                 // Two different situations wearing one status range each,
                 // and the sentence on screen differs accordingly. A 4xx or
-                // 5xx is GitHub refusing. A 2xx is something answering in
-                // GitHub's place, a captive portal or a filtering proxy
-                // serving its own page, because the releases page itself
-                // does not answer this request with a body.
+                // 5xx is an error, from GitHub or from a proxy or filter on
+                // the way, and the status does not say which. A 2xx is
+                // something answering in GitHub's place, a captive portal or
+                // a filtering proxy serving its own page, because the
+                // releases page itself does not answer this request with a
+                // body.
                 //
                 // Either way the status alone is useless for diagnosis
                 // after the fact, and nothing in the breadcrumb names a
