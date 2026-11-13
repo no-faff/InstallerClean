@@ -327,11 +327,27 @@ public class MoveSpaceCheckIntegrationTests
     }
 
     [Fact]
-    public void RefusalFreeSpace_measures_for_itself_when_the_caller_has_not()
+    public void MeasuredRefusalFreeSpace_allows_a_move_that_fits()
     {
-        // The command line's overload. A byte fits anywhere, so this proves the
-        // measured path runs and allows, rather than that any particular volume
-        // is full.
-        Assert.Null(MoveSpaceCheck.RefusalFreeSpace(Path.GetTempPath(), 1));
+        // The command line's route. A byte fits anywhere, so this pins the allowing
+        // answer rather than that any particular volume is full.
+        Assert.Null(MoveSpaceCheck.MeasuredRefusalFreeSpace(Path.GetTempPath(), 1));
+    }
+
+    [Fact]
+    public void MeasuredRefusalFreeSpace_measures_for_itself_when_the_caller_has_not()
+    {
+        // A Move onto the cache's volume is allowed before any measurement is looked
+        // at. The cache root goes on an unmounted letter, so the temp folder is off
+        // the cache's volume wherever it is, and the answer rests on the measurement
+        // alone. Nothing has long.MaxValue bytes free, so a measurement that was
+        // taken refuses.
+        var unmounted = TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host
+
+        Assert.NotNull(MoveSpaceCheck.AvailableFreeSpaceForDestination(Path.GetTempPath()));
+        Assert.NotNull(MoveSpaceCheck.MeasuredRefusalFreeSpace(
+            Path.GetTempPath(), long.MaxValue, installerCacheRoot: $@"{unmounted}:\nope"));
     }
 }
