@@ -594,6 +594,81 @@ public class DeclaredProductCheckTests
         Assert.Contains(Candidate, f.Files.Reads);
     }
 
+    /// <summary>The key S-1-5-18's own per-user-unmanaged source list of product A is held in.</summary>
+    private static readonly string SystemsOwnListOfA = ScriptedSourceListRegistry.InHive(
+        DirectoryGuard.SystemSid, @"Software\Microsoft\Installer\Products\11111111111111111111111111111111\SourceList");
+
+    /// <summary>The key S-1-5-18's own per-user-managed source list of product A is held in.</summary>
+    private const string SystemsOwnManagedListOfA =
+        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Managed\S-1-5-18\Installer\Products\11111111111111111111111111111111\SourceList";
+
+    [Theory]
+    [InlineData(MsiInstallContext.UserUnmanaged)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void A_copy_the_systems_own_per_user_installation_of_a_product_installed_per_machine_has_as_its_source_is_kept(
+        MsiInstallContext context)
+    {
+        // S-1-5-18 installed product A per user from this copy in the Installer folder, and an
+        // administrator then installed it per machine from the setup folder. The per-machine
+        // installation's cached package and sources are other files, and the per-user installation
+        // opens this copy.
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.RecordsSources(ProductA, DirectoryGuard.SystemSid, context, "a.msi", InstallerFolder + @"\");
+
+        AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f);
+    }
+
+    [Fact]
+    public void A_copy_is_let_through_where_the_systems_own_per_user_installation_has_its_source_elsewhere()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.RecordsSources(ProductA, DirectoryGuard.SystemSid, MsiInstallContext.UserUnmanaged, "other.msi", SetupFolder);
+        f.Files.Answers(SetupFolder + "other.msi", FileIdentityRead.NamesNothing);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+        Assert.Contains(SystemsOwnListOfA, f.Msi.Registry.Reads);
+        Assert.Contains(SetupFolder + "other.msi", f.Files.Reads);
+    }
+
+    [Fact]
+    public void A_copy_is_let_through_where_the_system_has_no_per_user_installation_of_the_product()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+        Assert.Contains(SystemsOwnListOfA, f.Msi.Registry.Reads);
+    }
+
+    [Fact]
+    public void Every_copy_is_kept_where_the_systems_own_per_user_source_list_will_not_read()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.Registry.Answers(SystemsOwnListOfA, RegistryKeyPresence.Unreadable);
+
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
+    }
+
+    [Fact]
+    public void Every_copy_is_kept_where_the_systems_hive_is_not_loaded()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.Registry.HiveIs(DirectoryGuard.SystemSid, RegistryKeyPresence.Absent);
+
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
+    }
+
+    [Fact]
+    public void Every_copy_is_kept_where_the_systems_own_per_user_source_list_names_a_variable()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.Registry.Holds(SystemsOwnListOfA,
+            new RegistryValue(MsiInstallProperty.PackageName, RegistryValueKind.String, "a.msi"));
+        f.Msi.Registry.Holds(SystemsOwnListOfA + @"\Net",
+            new RegistryValue("1", RegistryValueKind.ExpandString, @"%SystemRoot%\Installer\"));
+
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormOther, f);
+    }
+
     [Fact]
     public void A_copy_is_let_through_when_every_installation_records_another_present_package()
     {
@@ -685,7 +760,9 @@ public class DeclaredProductCheckTests
         var machineOnly = new[] { (ProductA, (string?)null, MsiInstallContext.Machine) };
         Assert.Equal(machineOnly, f.Msi.PackageNameReads);
         Assert.Equal(machineOnly, f.Msi.SourceListWalks);
-        Assert.DoesNotContain(f.Msi.Registry.Reads, read => read.StartsWith("HKEY_USERS", StringComparison.Ordinal));
+        Assert.DoesNotContain(f.Msi.Registry.Reads,
+            read => read.StartsWith("HKEY_USERS", StringComparison.Ordinal)
+                && !read.StartsWith(ScriptedSourceListRegistry.InHive(DirectoryGuard.SystemSid, string.Empty), StringComparison.Ordinal));
     }
 
     [Theory]
@@ -2165,6 +2242,7 @@ public class DeclaredProductCheckTests
             new[]
             {
                 ProductAKey, ProductAKey + @"\Net", ProductAKey + @"\URL", ProductAKey + @"\Media", ProductAProperties,
+                SystemsOwnListOfA, SystemsOwnManagedListOfA,
             },
             f.Msi.Registry.Reads);
     }
@@ -5684,6 +5762,7 @@ public class DeclaredProductCheckTests
         PackageNameEmpty,
         PackageNameRead,
         LocalPackageUnreadable,
+        SystemsOwnListThere,
     }
 
     private static void Break(
@@ -5725,6 +5804,16 @@ public class DeclaredProductCheckTests
             case NoPackageFault.LocalPackageUnreadable:
                 f.Msi.PackageReadAnswers(OfficeFeatures, null, Machine, MsiError.AccessDenied);
                 break;
+            case NoPackageFault.SystemsOwnListThere:
+            {
+                // S-1-5-18's own per-user installation of the code keeps a source list.
+                var list = ScriptedSourceListRegistry.InHive(DirectoryGuard.SystemSid,
+                    @"Software\Microsoft\Installer\Products\99E80CA9B0328E74791254777B1F42AE\SourceList");
+                f.Msi.Registry.Holds(list, new RegistryValue(MsiInstallProperty.PackageName, RegistryValueKind.String, "a.msi"));
+                foreach (var below in new[] { @"\Net", @"\URL", @"\Media" })
+                    f.Msi.Registry.Answers(list + below, RegistryKeyPresence.Absent);
+                break;
+            }
         }
     }
 
@@ -5738,6 +5827,7 @@ public class DeclaredProductCheckTests
     [InlineData(NoPackageFault.PackageNameEmpty)]
     [InlineData(NoPackageFault.PackageNameRead)]
     [InlineData(NoPackageFault.LocalPackageUnreadable)]
+    [InlineData(NoPackageFault.SystemsOwnListThere)]
     public void A_registration_not_shown_to_have_no_package_to_open_keeps_every_installation_package(
         NoPackageFault fault)
     {
@@ -10359,8 +10449,18 @@ internal sealed class ScriptedMsiProducts : IMsiApi
         var code = UnpackedForTheFake(match.Groups["packed"].Value);
 
         if (!(isPatch ? _patchSources : _sources).TryGetValue((code, sid, context), out var list))
+        {
+            // S-1-5-18 has no per-user installation of a code installed per machine unless a test
+            // scripts one, so its own per-user list, which the check reads for every such code, is
+            // not there. For any other code an unscripted list still throws.
+            if (!isPatch && sid == DirectoryGuard.SystemSid && !match.Groups["key"].Success
+                && _localPackages.Keys.Any(key => key.Context == MsiInstallContext.Machine && key.Sid is null
+                    && string.Equals(key.ProductCode, code, StringComparison.OrdinalIgnoreCase)))
+                return new RegistryKeyValues(RegistryKeyPresence.Absent);
+
             throw new InvalidOperationException(
                 $"the fake registry was asked for {path}, whose list no test scripted");
+        }
 
         switch (match.Groups["key"].Value)
         {
@@ -10843,7 +10943,16 @@ internal sealed class ScriptedSourceListRegistry : IRegistryReader
     public void HoldsLinkSetting(string keyPath, string valueName, RegistryDwordRead read) =>
         _linkSettings[(keyPath, valueName)] = read;
 
-    internal ScriptedSourceListRegistry(ScriptedMsiProducts msi) => _msi = msi;
+    /// <summary>
+    /// A registry over <paramref name="msi"/>'s scripted records, in which the hive of
+    /// <c>S-1-5-18</c> is loaded, as it is on every running Windows; a test can script it otherwise
+    /// (<see cref="HiveIs"/>).
+    /// </summary>
+    internal ScriptedSourceListRegistry(ScriptedMsiProducts msi)
+    {
+        _msi = msi;
+        _hives[DirectoryGuard.SystemSid] = RegistryKeyPresence.Present;
+    }
 
     /// <summary>Every key path this reader was asked for, in order, spelled as asked.</summary>
     public List<string> Reads { get; } = new();

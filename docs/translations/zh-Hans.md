@@ -199,7 +199,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows 是 10 还是 11，是 x64 还是 Arm，以及设置的是哪种语言和哪个国家或地区 |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean 的版本、获取方式（setup、portable、Scoop、单独的命令行工具、从源代码构建，或未知）、本次运行是在 InstallerClean 还是命令行工具中进行的，以及其显示的语言 |
 | Counts of anything that went wrong | 所有出错情况的计数 |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 这些内容都是数字或标签。报告中没有任何内容会指明您、您的电脑、文件或程序，我也永远看不到您的 IP 地址。 |
+| A random code made for this report, so that it's only counted once if it's sent more than once | 为这份报告生成的随机代码，这样即使报告发送多次也只计一次 |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 除了这个代码，这些内容都是数字或标签。报告中没有任何内容会指明您、您的电脑、文件或程序，我也永远看不到您的 IP 地址。 |
 | See exactly what's sent | 查看发送的确切内容 |
 
 ## Summaries and counts

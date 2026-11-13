@@ -199,7 +199,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows が 10 か 11 か、x64 か Arm か、そしてどの言語と国または地域に設定されているか |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、実行が InstallerClean とコマンドラインツールのどちらで行われたか、そして表示していた言語 |
 | Counts of anything that went wrong | うまくいかなかったことの件数 |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。 |
+| A random code made for this report, so that it's only counted once if it's sent more than once | 複数回送信されても 1 回だけ数えられるよう、このレポート用に作られるランダムなコード |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | そのコードを除き、これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。 |
 | See exactly what's sent | 送信される内容をそのまま見る |
 
 ## Summaries and counts

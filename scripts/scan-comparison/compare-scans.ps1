@@ -24,8 +24,12 @@
 # out and one held file listed has those two files reported, each the right way round. A
 # check that reports anything else fails the step.
 #
-# -Scenarios names a file of `name<TAB>what it is` rows, as set-up-scenarios.ps1 writes; each
-# of its files is printed with both verdicts.
+# -Scenarios names a file of `name<TAB>what it is<TAB>this build<TAB>why` rows, as
+# set-up-scenarios.ps1 writes; each of its files is printed with both verdicts. A row whose third
+# column is 'holds' or 'offers' expects the build under test to do that with the file and the
+# reference build the other. That difference is printed with its reason and does not fail the
+# step; it not happening, either build judging the file the other way, fails it. A difference on
+# any other file fails the step as above, so a file of the runner's own never carries one.
 #
 #   pwsh scripts/scan-comparison/compare-scans.ps1 -Reference <exe> -UnderTest <exe> -Label <text> -OutDir <folder> [-Scenarios <tsv>]
 param(
@@ -139,10 +143,33 @@ $referenceMoved = @(Compare-Verdicts $before $verdicts[1] $verdicts[3])
 foreach ($d in $referenceMoved) { "  $ReferenceName, run 1 against run 3: $($d.Name): $($d.One) / $($d.Two)" }
 if ($referenceMoved.Count) { Fail "Files $ReferenceName gave two answers for, so the comparison cannot be read: $($referenceMoved.Count)." }
 
+# The scenario rows, with each file's expected difference where its row names one.
+$scenarioRows = @()
+$expectedDifferences = @{}
+if ($Scenarios) {
+    foreach ($row in @(Get-Content -LiteralPath $Scenarios | Select-Object -Skip 1)) {
+        $name, $what, $expect, $why = $row -split "`t", 4
+        $scenarioRows += [pscustomobject]@{ Name = $name; What = $what }
+        if (-not $expect -and -not $why) { continue }
+        if ($expect -notin 'holds', 'offers' -or -not $why) { Fail "The scenario row for $name names an expected difference '$expect' without 'holds' or 'offers' and a reason." }
+        else { $expectedDifferences[$name] = [pscustomobject]@{ Holds = $expect -eq 'holds'; Why = $why } }
+    }
+}
+
 $differences = @(Compare-Verdicts $before $verdicts[1] $verdicts[2])
-"Files whose verdict differs between $ReferenceName and ${UnderTestName}: $($differences.Count)"
-foreach ($d in $differences) { "  $($d.Name): $ReferenceName $($d.One); $UnderTestName $($d.Two)" }
-if ($differences.Count) { Fail "Files offered by one build and held by the other: $($differences.Count)." }
+$accepted = @($differences | Where-Object { $expectedDifferences.Contains($_.Name) -and ($_.Two -eq 'held') -eq $expectedDifferences[$_.Name].Holds })
+$unexpected = @($differences | Where-Object { $_ -notin $accepted })
+"Files whose verdict differs between $ReferenceName and ${UnderTestName}: $($differences.Count), $($accepted.Count) of them expected"
+foreach ($d in $unexpected) { "  $($d.Name): $ReferenceName $($d.One); $UnderTestName $($d.Two)" }
+foreach ($d in $accepted) { "  expected: $($d.Name): $ReferenceName $($d.One); $UnderTestName $($d.Two). $($expectedDifferences[$d.Name].Why)" }
+if ($unexpected.Count) { Fail "Files offered by one build and held by the other: $($unexpected.Count)." }
+foreach ($name in $expectedDifferences.Keys) {
+    if (@($accepted | Where-Object Name -eq $name).Count) { continue }
+    if (-not $before.Contains($name)) { continue }
+    $one = if ($verdicts[1].Offered.Contains($name)) { 'offered' } else { 'held' }
+    $two = if ($verdicts[2].Offered.Contains($name)) { 'offered' } else { 'held' }
+    Fail "The test file $name was expected to be $(if ($expectedDifferences[$name].Holds) { 'held' } else { 'offered' }) by $UnderTestName and the other way by $ReferenceName, and $ReferenceName $one it and $UnderTestName $two it."
+}
 
 $rowsDiffer = @($verdicts[1].Offered.Keys | Where-Object { $verdicts[2].Offered.Contains($_) -and $verdicts[2].Offered[$_] -ne $verdicts[1].Offered[$_] })
 "Files offered by both whose row text differs (printed, not failed): $($rowsDiffer.Count)"
@@ -150,8 +177,8 @@ foreach ($name in $rowsDiffer) { "  ${name}: $ReferenceName $($verdicts[1].Offer
 
 if ($Scenarios) {
     "The test files, with each build's verdict:"
-    foreach ($row in @(Get-Content -LiteralPath $Scenarios | Select-Object -Skip 1)) {
-        $name, $what = $row -split "`t", 2
+    foreach ($row in $scenarioRows) {
+        $name, $what = $row.Name, $row.What
         $one = if ($verdicts[1].Offered.Contains($name)) { 'offered' } elseif ($before.Contains($name)) { 'held' } else { 'NOT IN THE FOLDER' }
         $two = if ($verdicts[2].Offered.Contains($name)) { 'offered' } elseif ($before.Contains($name)) { 'held' } else { 'NOT IN THE FOLDER' }
         "  ${name}: $ReferenceName $one, $UnderTestName $two. $what"
@@ -181,4 +208,8 @@ if ($failures.Count) {
     $failures | ForEach-Object { "  $_" }
     exit 1
 }
-"$Label passed: $($before.Count) files, $($verdicts[1].Offered.Count) offered and $($before.Count - $verdicts[1].Offered.Count) held by both builds."
+if ($accepted.Count) {
+    "$Label passed: $($before.Count) files, $($verdicts[1].Offered.Count) offered and $($before.Count - $verdicts[1].Offered.Count) held by $ReferenceName, and $UnderTestName the same but for the $($accepted.Count) expected above."
+} else {
+    "$Label passed: $($before.Count) files, $($verdicts[1].Offered.Count) offered and $($before.Count - $verdicts[1].Offered.Count) held by both builds."
+}
