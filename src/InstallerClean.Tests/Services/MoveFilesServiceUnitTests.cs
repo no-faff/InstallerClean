@@ -484,9 +484,11 @@ public class MoveFilesServiceUnitTests
     public async Task The_claims_are_handed_to_the_re_read_untouched()
     {
         // The re-read can only re-ask about what it is given, and a service that
-        // dropped, merged or reordered the claims on the way in would still pass
-        // every held-back assertion above, because the fake decides what to
-        // reclaim without looking at them. Its Delete twin pins the same thing.
+        // dropped, merged, swapped or reordered the claims on the way in would still
+        // pass every held-back assertion above, because the fake decides what to
+        // reclaim without looking at them. The batch half and the siblings half are
+        // two different lists, so each is pinned to its own. Its Delete twin pins
+        // the same thing.
         var fs = new MockFileSystem();
         var source = $@"{SourceDir}\a.msp";
         fs.AddFile(source, new MockFileData("payload"));
@@ -496,13 +498,19 @@ public class MoveFilesServiceUnitTests
             new PatchClaim(source, "{AAAA0000-0000-0000-0000-000000000001}",
                 "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
         };
+        var siblings = new[]
+        {
+            new PatchClaim($@"{SourceDir}\b.msp", "{AAAA0000-0000-0000-0000-000000000002}",
+                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
+        };
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
         var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new MoveFilesService(fs, mutex, null, reverifier);
 
-        await svc.MoveFilesAsync(new[] { source }, DestDir, new UnderLeaseClaims(claims, claims));
+        await svc.MoveFilesAsync(new[] { source }, DestDir, new UnderLeaseClaims(claims, siblings));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
+        Assert.Equal(siblings, reverifier.SiblingsSeen);
     }
 
     [Fact]

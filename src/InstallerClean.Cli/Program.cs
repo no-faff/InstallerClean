@@ -1786,7 +1786,7 @@ internal static class Program
             // destination validation because only the surviving set's size says
             // how much room is needed, and asked before the folder is created so a
             // refusal leaves nothing behind.
-            if (MoveSpaceCheck.RefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
+            if (MoveSpaceCheck.MeasuredRefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveNotEnoughSpace,
                     moveDest, DisplayHelpers.FormatSize(totalBytes),

@@ -20,7 +20,7 @@ internal static class MoveSpaceCheck
     /// on that volume. A rename consumes nothing and frees nothing.
     /// </summary>
     /// <remarks>
-    /// THIS IS THE QUESTION <see cref="RefusalFreeSpace(string, long, long?)"/> ASKS, AND
+    /// THIS IS THE QUESTION <see cref="RefusalFreeSpace(string, long, long?, string?)"/> ASKS, AND
     /// ONLY IT. A Move through a share copies every file, even through this PC's own share
     /// onto the cache's own volume, so a share answers false here without being asked, and
     /// so does a drive letter mapped onto a share, its volume being the redirector's. Where
@@ -299,21 +299,29 @@ internal static class MoveSpaceCheck
     /// destination (a share whose caller lacks query rights) has established
     /// nothing, and the same rule covers it: no claim rather than a wrong one.
     /// </remarks>
-    internal static long? RefusalFreeSpace(string destination, long totalBytes, long? availableFreeSpace)
+    /// <param name="installerCacheRoot">
+    /// Test-only, null in production: as <see cref="RenamesOnInstallerCacheDrive"/>'s.
+    /// </param>
+    internal static long? RefusalFreeSpace(
+        string destination, long totalBytes, long? availableFreeSpace, string? installerCacheRoot = null)
     {
-        if (RenamesOnInstallerCacheDrive(destination)) return null;
+        if (RenamesOnInstallerCacheDrive(destination, installerCacheRoot)) return null;
         if (availableFreeSpace is not long free) return null;
         return free < totalBytes ? free : null;
     }
 
     /// <summary>
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/> for a caller that has
-    /// not measured the destination itself, which is the command line: its
+    /// <see cref="RefusalFreeSpace(string, long, long?, string?)"/> for a caller that
+    /// has not measured the destination itself, which is the command line: its
     /// destination is validated before the scan and created by
     /// <c>MoveFilesService</c>, so nothing on the way has had reason to ask.
     /// </summary>
-    internal static long? RefusalFreeSpace(string destination, long totalBytes) =>
-        RefusalFreeSpace(destination, totalBytes, AvailableFreeSpaceForDestination(destination));
+    /// <param name="installerCacheRoot">
+    /// Test-only, null in production: as <see cref="RenamesOnInstallerCacheDrive"/>'s.
+    /// </param>
+    internal static long? MeasuredRefusalFreeSpace(
+        string destination, long totalBytes, string? installerCacheRoot = null) =>
+        RefusalFreeSpace(destination, totalBytes, AvailableFreeSpaceForDestination(destination), installerCacheRoot);
 
     /// <summary>
     /// The free space at <paramref name="destination"/>, or at the nearest
