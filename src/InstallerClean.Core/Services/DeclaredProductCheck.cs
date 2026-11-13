@@ -664,7 +664,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         var context = (MsiInstallContext)installation.Context;
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, installation.ProductCode, installation.UserSid, context, MsiInstallProperty.LocalPackage);
+            _msi, installation.ProductCode, installation.UserSid, context, MsiInstallProperty.LocalPackage, restarts: null);
         reading = SecondCopyReading.PathUnreadable;
         if (read.Unreadable) return false;
 
@@ -927,11 +927,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (!ReadsItsOwnRecord(sid, context)) return RecordReading.AnotherAccount;
 
         var packageCode = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.PackageCode);
+            _msi, code, sid, context, MsiInstallProperty.PackageCode, restarts: null);
         if (packageCode.Unreadable || packageCode.Value.TrimEnd('\0').Length == 0)
             return RecordReading.PackageCodeUnanswered;
 
-        return InstallerQueryService.ReadInstanceType(_msi, code, sid, context)
+        return InstallerQueryService.ReadInstanceType(_msi, code, sid, context, restarts: null)
             == InstallerQueryService.InstanceReading.Ordinary
             ? RecordReading.Ordinary
             : RecordReading.InstanceTypeNotOrdinary;
@@ -1233,7 +1233,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage);
+            _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage, restarts: null);
         if (read.Unreadable)
         {
             reading = CachedPackageReading.PathUnreadable;
@@ -1706,7 +1706,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         foreach (var (registeredCode, sid, context) in installations)
         {
             var read = InstallerQueryService.ReadProductProperty(
-                _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage);
+                _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage, restarts: null);
             if (read.Unreadable)
             {
                 cause = DeclaredProductInstalledCause.PathUnreadable;
@@ -1905,7 +1905,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             || ProductKeyPath(code, sid, context) is not { } productKey)
             return null;
 
-        var read = InstallerQueryService.ReadProductProperty(_msi, code, sid, context, MsiInstallProperty.PackageCode);
+        var read = InstallerQueryService.ReadProductProperty(_msi, code, sid, context, MsiInstallProperty.PackageCode, restarts: null);
         if (read.Unreadable || PackageIdentityReader.Canonicalise(read.Value.TrimEnd('\0')) is not { } answered)
             return null;
 
@@ -2113,7 +2113,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     {
         givenUp = null;
         var name = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.PackageName);
+            _msi, code, sid, context, MsiInstallProperty.PackageName, restarts: null);
         if (name.Unreadable) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         var packageName = name.Value.TrimEnd('\0');
@@ -2959,7 +2959,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         string code, string? sid, MsiInstallContext context, RegistryKeyValues media, out SourceRefusal refusal)
     {
         var answered = InstallerQueryService.ReadSourceListProperty(
-            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.MediaPackagePath);
+            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.MediaPackagePath, restarts: null);
         if (answered.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var path = answered.Value.TrimEnd('\0');
@@ -3047,9 +3047,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         out SourceRefusal refusal)
     {
         var source = InstallerQueryService.ReadSourceListProperty(
-            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedSource);
+            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedSource, restarts: null);
         var type = InstallerQueryService.ReadSourceListProperty(
-            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedType);
+            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedType, restarts: null);
         if (source.Unreadable || type.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = source.Value.TrimEnd('\0');
@@ -3128,7 +3128,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         RegistryKeyValues properties, string code, string? sid, MsiInstallContext context, out SourceRefusal refusal)
     {
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.InstallSource);
+            _msi, code, sid, context, MsiInstallProperty.InstallSource, restarts: null);
         if (read.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = read.Value.TrimEnd('\0');
@@ -4356,7 +4356,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         foreach (var (productCode, sid, context) in registrations)
         {
             var read = InstallerQueryService.GetPatchProperty(
-                _msi, code, productCode, sid, context, MsiInstallProperty.LocalPackage);
+                _msi, code, productCode, sid, context, MsiInstallProperty.LocalPackage, restarts: null);
             if (read.Unreadable) return null;
 
             var path = read.Value.TrimEnd('\0');
@@ -4866,7 +4866,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             var key = (patchCode.ToUpperInvariant(), productCode.ToUpperInvariant(), sid?.ToUpperInvariant(), context);
             if (!_patchStates.TryGetValue(key, out var read))
                 _patchStates[key] = read = InstallerQueryService.GetPatchProperty(
-                    _msi, patchCode, productCode, sid, context, MsiInstallProperty.State);
+                    _msi, patchCode, productCode, sid, context, MsiInstallProperty.State, restarts: null);
 
             return read;
         }

@@ -625,10 +625,10 @@ public sealed class RemovableReverifier : IRemovableReverifier
             var context = (Interop.MsiInstallContext)claim.Context;
             var state = InstallerQueryService.GetPatchProperty(
                 _msi, claim.PatchCode, claim.ProductCode, claim.UserSid, context,
-                Interop.MsiInstallProperty.State);
+                Interop.MsiInstallProperty.State, restarts: null);
             var uninstallable = InstallerQueryService.GetPatchProperty(
                 _msi, claim.PatchCode, claim.ProductCode, claim.UserSid, context,
-                Interop.MsiInstallProperty.Uninstallable);
+                Interop.MsiInstallProperty.Uninstallable, restarts: null);
 
             var notRegistered = state.NotRegistered || uninstallable.NotRegistered;
             var unreadable = (state.Unreadable && !state.NotRegistered)
@@ -724,7 +724,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
                 var siblingUninstallable = InstallerQueryService.GetPatchProperty(
                     _msi, onThisProduct.PatchCode, onThisProduct.ProductCode,
                     onThisProduct.UserSid, siblingContext,
-                    Interop.MsiInstallProperty.Uninstallable);
+                    Interop.MsiInstallProperty.Uninstallable, restarts: null);
 
                 // A POSITIVE ZERO IS THE ONLY CLEAN ANSWER, and the scan reads a
                 // zero the same way. Anything else condemns: a read that failed, an

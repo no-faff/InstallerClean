@@ -168,6 +168,73 @@ internal sealed class FakeMsiApi : IMsiApi
         return true;
     }
 
+    // Keyed by (patch code or null, product code, property, whether the value call).
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property, bool ValueCall), (uint Error, int Calls)>
+        _passingReads = new();
+
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property), int> _reads = new();
+
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property), Queue<string>> _passingValues = new();
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property), string> _valueBeingRead = new();
+
+    /// <summary>
+    /// Values that pass: the next reads of <paramref name="property"/> that no passing error
+    /// answers give <paramref name="values"/>, one a read in order, and every read after them
+    /// answers as the fixture scripts the property. <paramref name="patchCode"/> is null for
+    /// a product's own property.
+    /// </summary>
+    public void PassingReadValues(string? patchCode, string productCode, string property, params string[] values) =>
+        _passingValues[(patchCode, productCode, property)] = new Queue<string>(values);
+
+    // The value a passing value gives this read: taken from the queue at the sizing call and
+    // kept for the value call after it.
+    private bool PassingValueAt(string? patchCode, string productCode, string property, char[]? value, out string passing)
+    {
+        var key = (patchCode, productCode, property);
+        if (value is null)
+        {
+            _valueBeingRead.Remove(key);
+            if (_passingValues.TryGetValue(key, out var queue) && queue.Count > 0)
+                _valueBeingRead[key] = queue.Dequeue();
+        }
+
+        return _valueBeingRead.TryGetValue(key, out passing!);
+    }
+
+    /// <summary>
+    /// An error that passes, on a property read: the next <paramref name="calls"/> reads of
+    /// <paramref name="property"/> answer <paramref name="error"/>, and every read after
+    /// them answers as the fixture scripts the property. <paramref name="patchCode"/> is
+    /// null for a product's own property. Where <paramref name="onValueCall"/> is true the
+    /// error answers the call that writes the value, after a sizing call that answered
+    /// with the value's length.
+    /// </summary>
+    public void PassingReadError(string? patchCode, string productCode, string property, uint error,
+        int calls = 1, bool onValueCall = false) =>
+        _passingReads[(patchCode, productCode, property, onValueCall)] = (error, calls);
+
+    /// <summary>
+    /// How many times <paramref name="property"/> was read: one for each sizing call, which
+    /// every read makes once, whether or not a value call follows it.
+    /// <paramref name="patchCode"/> is null for a product's own property.
+    /// </summary>
+    public int Reads(string? patchCode, string productCode, string property) =>
+        _reads.TryGetValue((patchCode, productCode, property), out var reads) ? reads : 0;
+
+    private bool PassingReadErrorAt(string? patchCode, string productCode, string property, char[]? value, out uint error)
+    {
+        var valueCall = value is not null;
+        if (!valueCall) _reads[(patchCode, productCode, property)] = Reads(patchCode, productCode, property) + 1;
+
+        error = Success;
+        var key = (patchCode, productCode, property, valueCall);
+        if (!_passingReads.TryGetValue(key, out var passing) || passing.Calls <= 0) return false;
+
+        _passingReads[key] = (passing.Error, passing.Calls - 1);
+        error = passing.Error;
+        return true;
+    }
+
     private static readonly List<(string? Sid, MsiInstallContext Context)> OneMachineInstance =
         new() { (null, MsiInstallContext.Machine) };
 
@@ -318,6 +385,15 @@ internal sealed class FakeMsiApi : IMsiApi
     public uint GetProductInfo(string productCode, string? userSid, MsiInstallContext context, string property,
         char[]? value, ref uint valueLength)
     {
+        if (PassingReadErrorAt(null, productCode, property, value, out var passingRead))
+        {
+            valueLength = 0;
+            return passingRead;
+        }
+
+        if (PassingValueAt(null, productCode, property, value, out var passingValue))
+            return DoubleCall(passingValue, value, ref valueLength);
+
         // A forced code answers the sizing call, so the real API's second
         // call never happens either: nothing survives a failed first call.
         if (ProductPropertyResult.TryGetValue((productCode, property), out var forced))
@@ -352,6 +428,15 @@ internal sealed class FakeMsiApi : IMsiApi
         string property, char[]? value, ref uint valueLength)
     {
         PatchInfoReads.Add((patchCode, productCode, userSid, context, property));
+
+        if (PassingReadErrorAt(patchCode, productCode, property, value, out var passingRead))
+        {
+            valueLength = 0;
+            return passingRead;
+        }
+
+        if (PassingValueAt(patchCode, productCode, property, value, out var passingValue))
+            return DoubleCall(passingValue, value, ref valueLength);
 
         if (PatchPropertyResult.TryGetValue((patchCode, productCode, property), out var forced))
         {
