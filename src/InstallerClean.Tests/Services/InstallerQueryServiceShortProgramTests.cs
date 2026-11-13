@@ -403,6 +403,50 @@ public class InstallerQueryServiceShortProgramTests
         Assert.Empty(result.PairingsOfHoldersWithNoClaims);
     }
 
+    // ---- A recovered program's patches, as Windows Installer lists them ----
+
+    [Fact]
+    public async Task A_recovered_program_Windows_says_holds_an_uninstallable_patch_holds_the_superseded_one()
+    {
+        // The registry reads the program as holding nothing that could be uninstalled.
+        // Windows Installer, asked for the program's own patches, answers that one can be,
+        // and that patch could roll back onto the superseded patch's file.
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+
+        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
+
+        var row = Row(result);
+        Assert.False(row.IsRemovable);
+        Assert.False(row.WithheldScanWide);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_recovered_programs_patch_list_Windows_will_not_give_adds_nothing(bool neverEnds)
+    {
+        // No answer is no reason to hold: the registry's reading of the program stands.
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        if (neverEnds) msi.NeverEndPatchesFor = Recovered;
+        else msi.PatchEnumResult[Recovered] = AccessDenied;
+
+        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
+
+        Assert.Contains(Recovered, msi.PatchEnumerationsStarted);
+        AssertOffered(Row(result));
+    }
+
+    [Fact]
+    public async Task A_recovered_programs_patch_whose_uninstallable_Windows_will_not_give_adds_nothing()
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        msi.PatchPropertyResult[(OtherPatch, Recovered, "Uninstallable")] = BadConfiguration;
+
+        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
+
+        AssertOffered(Row(result));
+    }
+
     // ---- The machine and the fallback ----
 
     /// <summary>
@@ -457,14 +501,15 @@ public class InstallerQueryServiceShortProgramTests
 
     /// <summary>
     /// <see cref="Recovered"/>, a program the walk never listed, holding
-    /// <see cref="Superseded"/> superseded and declaring zero, and <see cref="OtherPatch"/>.
+    /// <see cref="Superseded"/> superseded and declaring zero, and <see cref="OtherPatch"/>,
+    /// declaring <paramref name="otherPatchUninstallable"/>.
     /// It holds no claim, and asked by name it answers that it holds the patch.
     /// </summary>
-    private static FakeMsiApi RecoveredHolder()
+    private static FakeMsiApi RecoveredHolder(string otherPatchUninstallable = "0")
     {
         var msi = Machine();
         msi.AddPatch(Recovered, Superseded, SupersededFile, state: "2", uninstallable: "0");
-        msi.AddPatch(Recovered, OtherPatch, OtherPatchFile, state: "1", uninstallable: "0");
+        msi.AddPatch(Recovered, OtherPatch, OtherPatchFile, state: "1", uninstallable: otherPatchUninstallable);
         return msi;
     }
 

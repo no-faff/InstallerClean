@@ -1116,6 +1116,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             listed.Add(new ListedInstallation(recoveredCode, recoveredSid, (int)recoveredContext,
                 SecondCopyNotRuledOut: instanceReading != InstanceReading.Ordinary));
+
+            FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets, restarts, ct, abandonedLog);
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
@@ -1527,8 +1529,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// A LIST THAT DID NOT RUN TO ITS END CARRIES WHAT IT LISTED, and one Windows refused
     /// outright, or that never ended, carries nothing and does not refuse the scan. The
     /// offer rests on the judging pass, which reads each such installation's patch set as
-    /// the registry lists it in full; these pairings are what the check under the lease
-    /// re-reads in the window after it.
+    /// the registry lists it in full, and for a recovered installation as Windows
+    /// Installer lists it too (<see cref="FoldRecoveredPatchSet"/>); these pairings are
+    /// what the check under the lease re-reads in the window after it.
     /// </summary>
     private IReadOnlyList<PatchClaim> PairingsOfHoldersWithNoClaims(
         IReadOnlyList<PatchClaim> heldByName,
@@ -1995,6 +1998,56 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// an installation the enumeration listed, so which installations of them exist is
     /// not established.
     /// </param>
+    /// <summary>
+    /// Puts the patches Windows Installer lists for a recovered installation into
+    /// <paramref name="apiPatchSets"/>, as the product loop does for an enumerated one, so
+    /// a recovered product is judged on msi.dll's answers as well as the registry's
+    /// listing (<see cref="ProductVerdict"/> takes the worse of the two). A patch whose
+    /// Uninstallable answer is anything but "0" marks the product as holding a patch that
+    /// could be uninstalled, which holds its superseded patches.
+    ///
+    /// ONLY AN ANSWER COUNTS HERE. A walk Windows refuses, a list it ends short and an
+    /// Uninstallable it will not give add nothing, and the registry's reading of the
+    /// product stands as the verdict. That reading is Windows' own record of the same
+    /// value: msi.dll answers Uninstallable from the Uninstallable value under the
+    /// product's Patches subkey that <see cref="ReadProductPatchSet"/> reads. Do not turn a
+    /// refusal into Unestablished here: that would hold files on a question nobody answered.
+    /// </summary>
+    private void FoldRecoveredPatchSet(
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        Dictionary<string, ProductPatchSet> apiPatchSets,
+        WalkRestarts restarts,
+        CancellationToken ct,
+        PerItemFailureLog failureLog)
+    {
+        List<(string PatchCode, string? UserSid, MsiInstallContext Context)> patches;
+        try
+        {
+            (patches, _) = EnumeratePatches(productCode, userSid, context, restarts, ct, failureLog);
+        }
+        catch (Exception ex) when (ex is LocalisedAccessException or LocalisedInvalidOperationException)
+        {
+            return;
+        }
+
+        foreach (var (patchCode, patchSid, patchContext) in patches)
+        {
+            ct.ThrowIfCancellationRequested();
+            var uninstallable = GetPatchProperty(
+                _msi, patchCode, productCode, patchSid, patchContext, MsiInstallProperty.Uninstallable);
+            if (uninstallable.Unreadable || uninstallable.Value.Length == 0) continue;
+
+            var verdict = uninstallable.Value == "0"
+                ? ProductPatchSet.AllNonRemovable
+                : ProductPatchSet.RemovablePatchPresent;
+            apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seen)
+                ? Worse(seen, verdict)
+                : verdict;
+        }
+    }
+
     private readonly record struct MissedProducts(
         List<(string ProductCode, string? Sid, MsiInstallContext Context)> Recovered,
         int RecoveredOfEnumerated,
@@ -4054,8 +4107,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// ONE. The registry side is the product's own <c>Patches</c> key, listed by
     /// <see cref="RegistryNames.SubKeysOf"/> separately from Windows Installer's
     /// enumeration, so a fault in that enumeration does not reach it. The API side is
-    /// the same pairings the product loop already read, so it costs nothing and it catches a patch the registry's own key does
-    /// not list.
+    /// the same pairings the product loop already read, so it costs nothing and it
+    /// catches a patch the registry's own key does not list. A product the enumeration
+    /// missed and the recovery found has its API side from a walk of each recovered
+    /// installation's own patches (<see cref="FoldRecoveredPatchSet"/>).
     ///
     /// AN ABSENT REGISTRY ENTRY IS AN INABILITY AND AN ABSENT API ENTRY IS NOT, which
     /// looks inconsistent and is the point. The registry walk visits every product key
