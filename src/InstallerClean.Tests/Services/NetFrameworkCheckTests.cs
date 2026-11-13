@@ -33,8 +33,6 @@ public class NetFrameworkCheckTests
     [InlineData(RegistryDwordState.Read, 528039)]
     [InlineData(RegistryDwordState.Read, 461808)]
     [InlineData(RegistryDwordState.Absent, 0)]
-    [InlineData(RegistryDwordState.Unreadable, 0)]
-    [InlineData(RegistryDwordState.WrongType, 0)]
     public void A_pc_without_it_is_told_what_to_install_and_where(RegistryDwordState state, int release)
     {
         var window = NetFrameworkCheck.RefusalMessage(Release(state, release), commandLine: false);
@@ -46,6 +44,15 @@ public class NetFrameworkCheckTests
         Assert.Equal(Strings.Startup_NeedsNetFramework48 + Environment.NewLine + Environment.NewLine
             + Strings.UpdateNotice_DownloadNetFramework48 + ":" + Environment.NewLine
             + "https://go.microsoft.com/fwlink/?linkid=2088631", window);
+    }
+
+    [Theory]
+    [InlineData(RegistryDwordState.Unreadable)]
+    [InlineData(RegistryDwordState.WrongType)]
+    public void A_release_value_that_cannot_be_read_starts_the_copy(RegistryDwordState state)
+    {
+        Assert.Null(NetFrameworkCheck.RefusalMessage(Release(state), commandLine: false));
+        Assert.Null(NetFrameworkCheck.RefusalMessage(Release(state), commandLine: true));
     }
 
     // In each language the window's link line is that language's Cli.UpdateDownloadLink

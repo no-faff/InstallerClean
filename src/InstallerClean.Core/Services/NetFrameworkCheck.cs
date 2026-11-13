@@ -9,9 +9,9 @@ namespace InstallerClean.Services;
 /// <remarks>
 /// The portable and command-line downloads ship no config naming the runtime, so .NET
 /// Framework starts them on whatever 4.x the PC has. Each reads the Release value .NET
-/// Framework 4.8 writes (<see cref="UpdateManifest.HasNetFramework48"/>) at its start: the
-/// command line before it reads its arguments, the window once the language is applied and
-/// before anything scans. Below 4.8 each says what to install and ends. The setup's copy has its
+/// Framework 4.8 writes, the value <see cref="UpdateManifest.HasNetFramework48"/> reads, at
+/// its start: the command line before it reads its arguments, the window before
+/// Application's constructor. Below 4.8 each says what to install and ends. The setup's copy has its
 /// config, which names 4.8, and the setup refuses to install where 4.8 is missing.
 /// </remarks>
 internal static class NetFrameworkCheck
@@ -24,9 +24,21 @@ internal static class NetFrameworkCheck
     /// again, and after a blank line comes the link's name and, on a line of its own, the
     /// address.
     /// </summary>
+    /// <remarks>
+    /// Only a Release value read below 4.8's, or no value at all, refuses: a value that could
+    /// not be read or is not a number says nothing about the PC, and the copy starts.
+    /// </remarks>
     internal static string? RefusalMessage(IRegistryReader registry, bool commandLine)
     {
-        if (UpdateManifest.HasNetFramework48(registry)) return null;
+        var release = registry.LocalMachineDwordValue(
+            UpdateManifest.NetFrameworkKeyPath, UpdateManifest.NetFrameworkReleaseValueName);
+        var below48 = release.State switch
+        {
+            RegistryDwordState.Read => release.Value < UpdateManifest.NetFramework48Release,
+            RegistryDwordState.Absent => true,
+            _ => false,
+        };
+        if (!below48) return null;
         var url = UpdateManifest.NetFramework48DownloadUrl;
         if (commandLine)
             return Strings.Cli_NeedsNetFramework48 + Environment.NewLine

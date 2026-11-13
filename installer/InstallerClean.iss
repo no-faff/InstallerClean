@@ -28,8 +28,8 @@
 ; The published binaries and the setup output all sit under ..\publish;
 ; defined once here so the [Files] sources and OutputDir cannot drift apart.
 #define PublishDir "..\publish"
-; The registry key and the Release value .NET Framework 4.8 writes. [Code] reads them
-; as UpdateManifest.HasNetFramework48 does, and the two change together.
+; The registry key and the Release value .NET Framework 4.8 writes. They repeat
+; UpdateManifest's, which the app's own check reads, and the two change together.
 #define NetFrameworkKey "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
 #define NetFramework48Release "528040"
 ; The single-instance mutex, named by AppMutex and by the wait in [Code]. It matches
@@ -253,14 +253,20 @@ begin
   Result := HasSwitch('/UPDATEFROMCLI');
 end;
 
-// Whether this PC has .NET Framework 4.8: the Release value it writes, at least
-// {#NetFramework48Release}. The app reads the same value (UpdateManifest.HasNetFramework48).
+// Whether this PC has .NET Framework 4.8, as the app's own start reads it
+// (NetFrameworkCheck): no where the Release value it writes is missing or a number below
+// {#NetFramework48Release}, yes where it is at least that, and yes where a value is there
+// but is not a REG_DWORD, which says nothing about the PC. RegQueryDWordValue answers False
+// both where the value is missing and where it is not a REG_DWORD, and RegValueExists tells
+// the two apart.
 function HasNetFramework48: Boolean;
 var
   Release: Cardinal;
 begin
-  Result := RegQueryDWordValue(HKLM, '{#NetFrameworkKey}', 'Release', Release)
-    and (Release >= {#NetFramework48Release});
+  if RegQueryDWordValue(HKLM, '{#NetFrameworkKey}', 'Release', Release) then
+    Result := Release >= {#NetFramework48Release}
+  else
+    Result := RegValueExists(HKLM, '{#NetFrameworkKey}', 'Release');
 end;
 
 // Started by an update, Setup waits for every copy of the app to close before it
@@ -280,7 +286,7 @@ begin
   Result := HasNetFramework48;
   if not Result then
   begin
-    Log('.NET Framework 4.8 is not installed: no Release value of at least {#NetFramework48Release} under HKLM\{#NetFrameworkKey}.');
+    Log('.NET Framework 4.8 is not installed: the Release value under HKLM\{#NetFrameworkKey} is missing or below {#NetFramework48Release}.');
     SuppressibleMsgBox(CustomMessage('NeedsNetFramework48'), mbCriticalError, MB_OK, IDOK);
     Exit;
   end;
