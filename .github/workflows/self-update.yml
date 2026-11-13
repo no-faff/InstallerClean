@@ -328,9 +328,8 @@ jobs:
 
       # The newer exe the old window staged replaces it at its path once it has ended and
       # starts the copy there, which stays open. Each is waited for, then the checks read the
-      # file at the path, what is left beside it, the newer window's report of its first scan,
-      # which names the kind of copy it takes itself for, and the crash log, and the newer
-      # window is closed.
+      # file at the path, what is left beside it, the kind of copy it decides it is, the
+      # download folders and the crash log.
       - name: Check the window's update
         if: ${{ !cancelled() && env.PRESSED == '1' }}
         shell: pwsh
@@ -371,24 +370,69 @@ jobs:
             if (Test-Path -LiteralPath "$exe$suffix") { Fail "$exe$suffix is still there." }
           }
 
-          # The report of the newer window's first scan names the kind of copy it takes itself
-          # for. Printed for the record: which card a scan with nothing to offer shows on the
-          # runner, and whether it writes the report, is what this run shows.
-          "The newer window's report of its first scan:"
+          # The kind of copy the newer window takes itself for goes into every report it writes.
+          # It writes one only for the PC's first finished run, and a scan writes it only
+          # from the card for a scan that offers nothing, so on a runner whose scan offers
+          # files no report is written. Where there is one its kind is printed.
+          "The newer window's report:"
           $report = Join-Path $env:LOCALAPPDATA 'InstallerClean\last-run.json'
           $clock.Restart()
-          while (-not (Test-Path -LiteralPath $report) -and $newer -and -not $newer.HasExited -and $clock.Elapsed.TotalSeconds -lt 300) { Start-Sleep -Seconds 2 }
+          while (-not (Test-Path -LiteralPath $report) -and $newer -and -not $newer.HasExited -and $clock.Elapsed.TotalSeconds -lt 120) { Start-Sleep -Seconds 2 }
           if (Test-Path -LiteralPath $report) {
-            $kind = (Get-Content -Raw -LiteralPath $report | ConvertFrom-Json).app.copyKind
-            "  $report names the copy kind '$kind'"
-          } else { "  no $report within 300 s" }
+            "  $report names the copy kind '$((Get-Content -Raw -LiteralPath $report | ConvertFrom-Json).app.copyKind)'"
+          } else { "  no $report within 120 s of the newer window's start" }
 
-          if ($newer -and -not $newer.HasExited) {
-            "  the newer window's title: '$($newer.MainWindowTitle)'"
-            $null = $newer.CloseMainWindow()
-            if (-not $newer.WaitForExit(30000)) { $newer.Kill(); '  the newer window did not close in 30 s and was ended' }
-            else { "  the newer window closed with exit code $($newer.ExitCode)" }
+          # The kind the updated file's own code decides for its path, read through the same
+          # AppCopy.Decide the running window calls, with this runner's setup record and its
+          # Scoop check. The merged exe is its own entry assembly when it runs, which is what
+          # makes it a one-file build, so that answer is given as true. A copy in a folder
+          # of its own is the portable, whichever name it has.
+          "The kind of copy the updated file decides it is:"
+          $probe = Join-Path $env:RUNNER_TEMP 'copy-kind'
+          New-Item -ItemType Directory -Force -Path $probe | Out-Null
+          Set-Content -Path (Join-Path $probe 'CopyKind.csproj') -Value @'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net48</TargetFramework>
+              <PlatformTarget>x64</PlatformTarget>
+              <LangVersion>latest</LangVersion>
+            </PropertyGroup>
+          </Project>
+          '@
+          Set-Content -Path (Join-Path $probe 'Program.cs') -Value @'
+          using System;
+          using System.IO;
+          using System.Reflection;
+
+          // args[0]: the updated window. Prints the kind AppCopy.Decide answers for its folder.
+          static class Program
+          {
+              const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+
+              static int Main(string[] args)
+              {
+                  var exe = Assembly.LoadFrom(args[0]);
+                  var appCopy = exe.GetType("InstallerClean.Services.AppCopy", true);
+                  var registry = Activator.CreateInstance(exe.GetType("InstallerClean.Services.RegistryReader", true), nonPublic: true);
+                  var setup = appCopy.GetMethod("ReadSetupRecord", All).Invoke(null, new[] { registry });
+                  var exists = exe.GetType("System.IO.FrameworkFile", true).GetMethod("Exists", All);
+                  var fileExists = (Func<string, bool>)Delegate.CreateDelegate(typeof(Func<string, bool>), exists);
+                  var kind = appCopy.GetMethod("Decide", All).Invoke(null, new object[] { true, Path.GetDirectoryName(args[0]), setup, fileExists });
+                  Console.WriteLine("setup record " + setup + ", kind " + kind);
+                  return 0;
+              }
           }
+          '@
+          $build = dotnet build (Join-Path $probe 'CopyKind.csproj') -c Release --nologo -o (Join-Path $probe 'out') 2>&1
+          if ($LASTEXITCODE -ne 0) { $build | Write-Host; Fail 'The copy kind harness did not build.' }
+          else {
+            $answer = & (Join-Path $probe 'out/CopyKind.exe') $exe
+            "  $answer"
+            if ($LASTEXITCODE -ne 0 -or "$answer" -notmatch ', kind Portable$') { Fail "The updated file does not decide it is the portable: $answer" }
+          }
+
+          if ($newer -and -not $newer.HasExited) { "NEWER_PID=$($newer.Id)" | Add-Content $env:GITHUB_ENV }
 
           "The download folders:"
           $staging = @(Get-ChildItem $env:ProgramData -Directory -Filter "$(Split-Path (Get-StagingPrefix) -Leaf)*" -ErrorAction SilentlyContinue)
@@ -410,6 +454,29 @@ jobs:
             exit 1
           }
           'Every check passed.'
+
+      # What the newer window shows, read through UI Automation in Windows PowerShell, then
+      # the window is closed.
+      - name: Print the newer window and close it
+        if: ${{ !cancelled() && env.NEWER_PID != '' }}
+        shell: powershell
+        run: |
+          Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+          $A = [System.Windows.Automation.AutomationElement]
+          $newer = Get-Process -Id ([int]$env:NEWER_PID) -ErrorAction SilentlyContinue
+          if (-not $newer) { "  the newer window had already ended"; exit 0 }
+          $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $newer.Id)
+          foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
+            "  window '$($window.Current.Name)':"
+            foreach ($e in $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)) {
+              $c = $e.Current
+              if ($c.IsOffscreen -or -not $c.Name) { continue }
+              "    $($c.ControlType.ProgrammaticName)  id '$($c.AutomationId)'  name '$($c.Name)'"
+            }
+          }
+          $null = $newer.CloseMainWindow()
+          if (-not $newer.WaitForExit(30000)) { $newer.Kill(); '  the newer window did not close in 30 s and was ended' }
+          else { '  the newer window closed' }
 
       # What the update left, read before the checks make their second run,
       # which changes it. This explains a result and decides none, so it runs
