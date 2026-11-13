@@ -167,6 +167,7 @@ const ALLOWED = [
 const NAMES_NO_VARIABLE = new Map([
   ['Environment.CurrentDirectory', 'the current folder'],
   ['Environment.CurrentManagedThreadId', 'the managed thread'],
+  ['Environment.Exit', 'the end of the process'],
   ['Environment.NewLine', 'the line ending'],
   ['Environment.OSVersion', 'the version of Windows'],
   ['Environment.ProcessId', 'the process'],
