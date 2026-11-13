@@ -178,6 +178,7 @@ public static class Strings
     public static string Cli_DonateAsk => Get("Cli.DonateAsk");
     public static string Cli_EventLogAdminRightsNeeded => Get("Cli.EventLogAdminRightsNeeded");
     public static string Cli_EventLogBadArguments => Get("Cli.EventLogBadArguments");
+    public static string Cli_EventLogCancelledNoFileRemoved => Get("Cli.EventLogCancelledNoFileRemoved");
     public static string Cli_EventLogCancelledNoWork => Get("Cli.EventLogCancelledNoWork");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogCoverLostNoWork => Get("Cli.EventLogCoverLostNoWork");
@@ -439,6 +440,8 @@ public static class Strings
     public static string Error_MsiPatchEnumerationNeverEnded => Get("Error.MsiPatchEnumerationNeverEnded");
     public static string Error_NotEnoughSpaceBody => Get("Error.NotEnoughSpaceBody");
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
+    public static string Error_NothingOfferedNothingRemoved => Get("Error.NothingOfferedNothingRemoved");
+    public static string Error_NothingRemoved => Get("Error.NothingRemoved");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
     public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");

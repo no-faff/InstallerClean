@@ -400,11 +400,81 @@ public class RegisteredFilesViewModelTests
         // own size goes, and this row's own file is on the disk. That would be false of
         // it, so the flag lives on the patch row instead.
         Assert.False(product.IsMissing);
+        // The triangle is the row's mark for the patch instead.
+        Assert.True(product.HasMissingFile);
 
         var patch = Assert.Single(product.Patches);
         Assert.True(patch.IsMissing);
         Assert.Equal("gone.msp, missing", patch.AccessibleName);
         Assert.DoesNotContain("0 B", patch.AccessibleName);
+    }
+
+    [Fact]
+    public void A_program_with_a_missing_patch_is_opened_on_and_marked_and_shows_no_note()
+    {
+        // The main window names the program and sends the reader here, so the window
+        // opens on it and the triangle marks it, as for a missing .msi. Its own file is
+        // on the disk, so its size stands. The recovery note is about a missing .msi
+        // and stays off.
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\aaa.msi", "Product A", "{AAA}"),
+            Pkg(@"C:\Windows\Installer\present.msi", "Product B", "{BBB}"),
+            new(@"C:\Windows\Installer\gone.msp", "Product B", "{BBB}",
+                PatchState: 1, FileExists: false),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+
+        var row = vm.SelectedProduct;
+        Assert.NotNull(row);
+        Assert.Equal("Product B", row.ProductName);
+        Assert.True(row.HasMissingFile);
+        Assert.False(row.IsMissing);
+        Assert.False(vm.ShowMissing);
+        Assert.False(vm.Products.Single(p => p.ProductName == "Product A").HasMissingFile);
+    }
+
+    [Fact]
+    public void A_patches_only_row_with_one_patch_gone_keeps_its_size_and_reads_a_patch_that_is_there()
+    {
+        // The row's size is its patches' total, so it is missing only where all of them
+        // are. Its details come from a patch on the disk, the first listed being gone.
+        var packages = new List<RegisteredPackage>
+        {
+            new(@"C:\Windows\Installer\gone.msp", "Product A", "{AAA}",
+                PatchState: 1, FileExists: false),
+            Pkg(@"C:\Windows\Installer\there.msp", "Product A", "{AAA}"),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+
+        var row = Assert.Single(vm.Products);
+        Assert.Same(row, vm.SelectedProduct);
+        Assert.True(row.IsPatchesOnly);
+        Assert.True(row.HasMissingFile);
+        Assert.False(row.IsMissing);
+        Assert.Equal(@"C:\Windows\Installer\there.msp", row.FullPath);
+        Assert.False(vm.ShowMissing);
+    }
+
+    [Fact]
+    public void A_patches_only_row_with_every_patch_gone_is_missing_and_shows_no_note()
+    {
+        var packages = new List<RegisteredPackage>
+        {
+            new(@"C:\Windows\Installer\gone1.msp", "Product A", "{AAA}",
+                PatchState: 1, FileExists: false),
+            new(@"C:\Windows\Installer\gone2.msp", "Product A", "{AAA}",
+                PatchState: 1, FileExists: false),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+
+        var row = Assert.Single(vm.Products);
+        Assert.True(row.IsMissing);
+        Assert.True(row.HasMissingFile);
+        Assert.False(vm.ShowMissing);
     }
 
     [Fact]

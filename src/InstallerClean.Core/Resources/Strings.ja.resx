@@ -974,7 +974,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語</value>
+    <value>InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、実行が InstallerClean とコマンドラインツールのどちらで行われたか、そして表示していた言語</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1223,8 +1223,18 @@ InstallerClean はすでに管理者として実行されていたため、同�
        heading names none and has to stay true of all of them. -->
   <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean は中止しました</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、{InstallerFolder} 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。何も削除していません。</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer が InstallerClean にインストール済みの一覧表示を許可しませんでした。InstallerClean はすでに管理者として実行されていたため、管理者として実行し直しても何も変わりません。この一覧がなければ、キャッシュされたどのファイルがまだ必要なのかを安全に判断する方法はないため、InstallerClean は中止しました。何も削除していません。</value></data>
+  <!-- The closing sentence after the message of a stop at a scan or at the check made
+       before a Move or Delete, joined to it as two sentences. Error.NothingRemoved follows
+       Error.InstallerDbEmpty, Error.MsiAccessDenied, Error.MsiNonSuccess,
+       Error.MsiEnumerationNeverEnded, Error.MsiPatchEnumerationNeverEnded,
+       Error.ScanRecordsUnreadable and Error.ScanCacheRootUnresolved. crash.log leaves it out. -->
+  <data name="Error.NothingRemoved" xml:space="preserve"><value>何も削除していません。</value></data>
+  <!-- As Error.NothingRemoved, after Error.ScanCorrelationFailed,
+       Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
+       Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
+  <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>何も提示されず、何も取り除かれていません。</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、{InstallerFolder} 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer が InstallerClean にインストール済みの一覧表示を許可しませんでした。InstallerClean はすでに管理者として実行されていたため、管理者として実行し直しても何も変わりません。この一覧がなければ、キャッシュされたどのファイルがまだ必要なのかを安全に判断する方法はないため、InstallerClean は中止しました。</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1237,7 +1247,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer は InstallerClean に、読み取り可能なインストール済みプログラムの一覧を渡せませんでした。{1} 個の {2} を読み取ったのち、項目が 1 件読み取り不能で返されました (エラーコード{0})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。何も削除していません。</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer は InstallerClean に、読み取り可能なインストール済みプログラムの一覧を渡せませんでした。{1} 個の {2} を読み取ったのち、項目が 1 件読み取り不能で返されました (エラーコード{0})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1249,7 +1259,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の {3} を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の {3} を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1257,7 +1267,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がひとつのプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の {3} を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がひとつのプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の {3} を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1272,7 +1282,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。登録情報が指しているもののほとんどがそこになく、そこにあるもののほとんどがどの登録情報にも名指しされていないため、どのファイルについても不要であることを示せませんでした。何も提示されず、何も取り除かれていません。</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。登録情報が指しているもののほとんどがそこになく、そこにあるもののほとんどがどの登録情報にも名指しされていないため、どのファイルについても不要であることを示せませんでした。</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1284,7 +1294,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。フォルダーにはファイルがありますが、その中のどれかを指す登録情報が一つもないため、どのファイルについても不要であることを示せませんでした。何も提示されず、何も取り除かれていません。</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。フォルダーにはファイルがありますが、その中のどれかを指す登録情報が一つもないため、どのファイルについても不要であることを示せませんでした。</value></data>
   <!-- Shown when the scan stops before its walk because Windows reports the
        Installer folder at a path other than its own, ignoring case: the folder,
        or a folder above it, is a junction or a directory symbolic link, and a
@@ -1292,13 +1302,13 @@ InstallerClean はすでに管理者として実行されていたため、同�
        reports and no cause for it, because more than one condition produces it.
        {0} is that path, a full folder path such as D:\Cache\Installer. Names the
        folder the app asked about through the {InstallerFolder} token. -->
-  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean はこの PC の {InstallerFolder} をスキャンできません。Windows はこのフォルダーの場所を {0} と報告しており、InstallerClean がスキャンするのは、Windows がそのフォルダー自身のパスで報告する Installer フォルダーだけです。何も提示されず、何も取り除かれていません。</value></data>
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean はこの PC の {InstallerFolder} をスキャンできません。Windows はこのフォルダーの場所を {0} と報告しており、InstallerClean がスキャンするのは、Windows がそのフォルダー自身のパスで報告する Installer フォルダーだけです。</value></data>
   <!-- Shown when the scan stops at its walk because Windows answered that the
        cache folder cannot be found when the app went to list it. Only that answer
        reaches this message; every other failure to list the folder gets
        Error.ScanInstallerFolderListFailed below. Names the folder through the
        {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows は {InstallerFolder} がこの PC に存在しないと報告しているため、InstallerClean は処理を中止しました。何も提示されず、何も取り除かれていません。</value></data>
+  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows は {InstallerFolder} がこの PC に存在しないと報告しているため、InstallerClean は処理を中止しました。</value></data>
   <!-- Shown when the scan stops at its walk because Windows returned an error while
        the app was listing the cache folder, whether when the folder was opened or
        part-way through it: a refusal or any other failed read. Windows answering
@@ -1306,7 +1316,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        instead. States no cause beyond that, because more than one condition
        produces it and naming one would be false of the others. Names the folder
        through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>InstallerClean が {InstallerFolder} 内のファイルを一覧にしようとしたときに Windows がエラーを報告したため、完全な一覧を得られず、処理を中止しました。何も提示されず、何も取り除かれていません。</value></data>
+  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>InstallerClean が {InstallerFolder} 内のファイルを一覧にしようとしたときに Windows がエラーを報告したため、完全な一覧を得られず、処理を中止しました。</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1315,14 +1325,14 @@ InstallerClean はすでに管理者として実行されていたため、同�
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean は、何がまだ必要かを確かめられるだけの Windows Installer の登録情報を読み取れませんでした。インストール済みプログラムの一覧が不足した状態で返され、同じ登録情報をレジストリから直接読み取る方法でもエラーが発生しました。あるファイルを指し示す登録情報が読み取れなかったものの一つだったというだけで、そのファイルが孤立しているように見えてしまうことがあるため、InstallerClean は中止しました。何も削除していません。</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean は、何がまだ必要かを確かめられるだけの Windows Installer の登録情報を読み取れませんでした。インストール済みプログラムの一覧が不足した状態で返され、同じ登録情報をレジストリから直接読み取る方法でもエラーが発生しました。あるファイルを指し示す登録情報が読み取れなかったものの一つだったというだけで、そのファイルが孤立しているように見えてしまうことがあるため、InstallerClean は中止しました。</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean は {InstallerFolder} の実際のパスを Windows に解決させられなかったため、どのファイルについてもその中にあることを示せず、クリーンアップの対象として提示されたものはありません。今回のスキャンで何も見つからなかったのは、フォルダーがきれいだからではなく、その確認が失敗したためです。何も取り除かれていません。</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean は {InstallerFolder} の実際のパスを Windows に解決させられなかったため、どのファイルについてもその中にあることを示せず、クリーンアップの対象として提示されたものはありません。今回のスキャンで何も見つからなかったのは、フォルダーがきれいだからではなく、その確認が失敗したためです。</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1549,8 +1559,8 @@ InstallerClean はすでに管理者として実行されていたため、同�
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub に到達できませんでした。インターネット接続を確認して再試行してください。</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>更新の確認で、GitHub のリリースページではなくエラーが返ってきました。GitHub、またはプロキシなどお使いのネットワーク上の何かから返された可能性があります。後でもう一度試すか、ブラウザーでリリースページを開いてください。</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>更新の確認で、リリースを示していない応答が返ってきました。GitHub、またはプロキシやサインインページなどお使いのネットワーク上の何かから返された可能性があります。後でもう一度試すか、ブラウザーでリリースページを開いてください。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2204,7 +2214,7 @@ InstallerClean を管理者としてもう一度実行してください。</val
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>レポートを送信できませんでした。{0} に保存されています。</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>以前の実行から送信待ちになっているレポートを送信しています。</value></data>
@@ -2282,10 +2292,12 @@ InstallerClean を管理者としてもう一度実行してください。</val
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2439,11 +2451,11 @@ InstallerClean を管理者としてもう一度実行してください。</val
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli は終了までプロンプトを占有するため、&#10;スクリプトやスケジュールされたタスクが完了を待てます。</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>フォルダーはユーザーごと。予約実行や SYSTEM には /m PATH が必要。</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>スキャンの前に、InstallerClean の新しいバージョンがあるか確認します。&#10;自分で実行した場合は、更新する前に確認を求め、1 分以内に応答が&#10;なければ更新します。スケジュールされたタスクやスクリプトで&#10;自動実行される場合は、確認なしで更新します。&#10;確認を省くには /noupdate を付けてください。</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>スキャンの前に、InstallerClean の新しいバージョンがあるか確認します。&#10;ただし、実行しているアカウントで「更新を自動的に確認する」が&#10;オフの場合は確認しません。コンソールのウィンドウが画面上にあり、&#10;入力も出力もリダイレクトされていない場合は、更新する前に確認を&#10;求め、1 分以内に応答がなければ更新します。それ以外の場合は、&#10;たとえばログオンの有無にかかわらず実行するよう設定した&#10;スケジュールされたタスクでは、確認なしで更新します。&#10;更新の確認を省くには /noupdate を付けてください。</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>終了コード：</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

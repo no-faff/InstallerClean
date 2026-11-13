@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Helpers;
@@ -160,7 +161,7 @@ public static class CrashLog
             // user's culture the pattern's ':' is the culture's time separator, '.' in
             // Danish as ICU gives it, and the year is the culture's calendar's.
             var stamp = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture);
-            var entry = $"---- {stamp} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
+            var entry = $"---- {stamp} ----{Environment.NewLine}{TextOf(ex)}{Environment.NewLine}{Environment.NewLine}";
             // The BOM goes in with the header, on a fresh file only: written
             // again on an append it would sit in the log body as a stray
             // U+FEFF. Arrays rather than spans: a copy's start check can write here, and that
@@ -178,6 +179,39 @@ public static class CrashLog
             // Swallow: a crash handler must not itself throw.
             return new CrashLogEntry(path, false);
         }
+    }
+
+    /// <summary>
+    /// The text crash.log records for <paramref name="ex"/>: what <c>ToString()</c> gives,
+    /// type, message, inner exceptions and stack traces as .NET writes them, with the message
+    /// of each exception in the chain that ends in a closing sentence
+    /// (<see cref="IClosingSentenceMessage"/>) written without it.
+    /// </summary>
+    internal static string TextOf(Exception ex)
+    {
+        var text = ex.ToString();
+        foreach (var each in Chain(ex))
+        {
+            if (each is IClosingSentenceMessage closing
+                && closing.MessageWithoutClosingSentence.Length < closing.Message.Length)
+                text = text.Replace(closing.Message, closing.MessageWithoutClosingSentence);
+        }
+        return text;
+    }
+
+    /// <summary>
+    /// <paramref name="ex"/> and every exception <c>ToString()</c> writes beneath it: the
+    /// inner exception, and each one an <see cref="AggregateException"/> holds.
+    /// </summary>
+    private static IEnumerable<Exception> Chain(Exception ex)
+    {
+        yield return ex;
+        var inner = ex is AggregateException aggregate
+            ? aggregate.InnerExceptions
+            : ex.InnerException is { } one ? [one] : (IEnumerable<Exception>)[];
+        foreach (var each in inner)
+            foreach (var below in Chain(each))
+                yield return below;
     }
 
     private static void RotateIfNeeded(string logFile, string archiveFile)

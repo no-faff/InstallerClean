@@ -49,7 +49,7 @@ public enum UpdateCheckFailureReason
     /// <summary>HTTP send failed: DNS, TLS, no network, etc.</summary>
     NetworkUnavailable,
 
-    /// <summary>GitHub answered with a 4xx or 5xx status.</summary>
+    /// <summary>The request was answered with a 4xx or 5xx status, by GitHub or by something on the way.</summary>
     ServerError,
 
     /// <summary>

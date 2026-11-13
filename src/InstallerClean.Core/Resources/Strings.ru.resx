@@ -974,7 +974,7 @@
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>Версия InstallerClean, способ её получения (setup, portable, Scoop, отдельная программа командной строки, сборка из исходного кода или неизвестно), откуда отправлен отчёт (из InstallerClean или из программы командной строки) и язык, на котором он отображался</value>
+    <value>Версия InstallerClean, способ её получения (setup, portable, Scoop, отдельная программа командной строки, сборка из исходного кода или неизвестно), где выполнялся запуск (в InstallerClean или в программе командной строки) и язык, на котором отображался интерфейс</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1223,8 +1223,18 @@ InstallerClean уже был запущен от имени администра
        heading names none and has to stay true of all of them. -->
   <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean остановился</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Сбой сканирования</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи Windows Installer вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
+  <!-- The closing sentence after the message of a stop at a scan or at the check made
+       before a Move or Delete, joined to it as two sentences. Error.NothingRemoved follows
+       Error.InstallerDbEmpty, Error.MsiAccessDenied, Error.MsiNonSuccess,
+       Error.MsiEnumerationNeverEnded, Error.MsiPatchEnumerationNeverEnded,
+       Error.ScanRecordsUnreadable and Error.ScanCacheRootUnresolved. crash.log leaves it out. -->
+  <data name="Error.NothingRemoved" xml:space="preserve"><value>Ничего не было удалено.</value></data>
+  <!-- As Error.NothingRemoved, after Error.ScanCorrelationFailed,
+       Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
+       Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
+  <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>Ничего не предложено и ничего не убрано.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи Windows Installer вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился.</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1237,7 +1247,7 @@ InstallerClean уже был запущен от имени администра
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer не смог предоставить InstallerClean читаемый список установленных программ: он прочитал {1} {2}, а затем одна запись вернулась нечитаемой (код ошибки {0}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer не смог предоставить InstallerClean читаемый список установленных программ: он прочитал {1} {2}, а затем одна запись вернулась нечитаемой (код ошибки {0}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился.</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1249,7 +1259,7 @@ InstallerClean уже был запущен от имени администра
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1257,7 +1267,7 @@ InstallerClean уже был запущен от имени администра
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1272,7 +1282,7 @@ InstallerClean уже был запущен от имени администра
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. Почти ничего из того, на что указывают записи, там нет, и почти ничто из того, что там есть, не названо ни одной записью, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. Почти ничего из того, на что указывают записи, там нет, и почти ничто из того, что там есть, не названо ни одной записью, поэтому ни про один файл не удалось показать, что он не нужен.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1284,7 +1294,7 @@ InstallerClean уже был запущен от имени администра
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен.</value></data>
   <!-- Shown when the scan stops before its walk because Windows reports the
        Installer folder at a path other than its own, ignoring case: the folder,
        or a folder above it, is a junction or a directory symbolic link, and a
@@ -1292,13 +1302,13 @@ InstallerClean уже был запущен от имени администра
        reports and no cause for it, because more than one condition produces it.
        {0} is that path, a full folder path such as D:\Cache\Installer. Names the
        folder the app asked about through the {InstallerFolder} token. -->
-  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean не может просканировать {InstallerFolder} на этом ПК. Windows сообщает, что эта папка находится в {0}, а InstallerClean сканирует папку Installer, только если Windows указывает для неё её собственный путь. Ничего не предложено и ничего не убрано.</value></data>
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean не может просканировать {InstallerFolder} на этом ПК. Windows сообщает, что эта папка находится в {0}, а InstallerClean сканирует папку Installer, только если Windows указывает для неё её собственный путь.</value></data>
   <!-- Shown when the scan stops at its walk because Windows answered that the
        cache folder cannot be found when the app went to list it. Only that answer
        reaches this message; every other failure to list the folder gets
        Error.ScanInstallerFolderListFailed below. Names the folder through the
        {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows сообщает, что {InstallerFolder} на этом ПК не существует, поэтому InstallerClean остановился. Ничего не предложено и ничего не убрано.</value></data>
+  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows сообщает, что {InstallerFolder} на этом ПК не существует, поэтому InstallerClean остановился.</value></data>
   <!-- Shown when the scan stops at its walk because Windows returned an error while
        the app was listing the cache folder, whether when the folder was opened or
        part-way through it: a refusal or any other failed read. Windows answering
@@ -1306,7 +1316,7 @@ InstallerClean уже был запущен от имени администра
        instead. States no cause beyond that, because more than one condition
        produces it and naming one would be false of the others. Names the folder
        through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows сообщил об ошибке, когда InstallerClean попытался получить список файлов в {InstallerFolder}, поэтому InstallerClean не смог получить полный список и остановился. Ничего не предложено и ничего не убрано.</value></data>
+  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows сообщил об ошибке, когда InstallerClean попытался получить список файлов в {InstallerFolder}, поэтому InstallerClean не смог получить полный список и остановился.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1315,14 +1325,14 @@ InstallerClean уже был запущен от имени администра
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не смог получить от Windows настоящий путь к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был предложен для очистки. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста. Ничего не убрано.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не смог получить от Windows настоящий путь к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был предложен для очистки. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1549,8 +1559,8 @@ InstallerClean уже был запущен от имени администра
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Не удалось подключиться к GitHub. Проверьте подключение к интернету и повторите попытку.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub вернул ответ с ошибкой. Повторите попытку через несколько минут.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>В ответе GitHub не оказалось распознаваемого выпуска. Повторите попытку позже или откройте страницу выпусков напрямую.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>Проверка обновлений получила ошибку вместо страницы выпусков GitHub. Она могла прийти от GitHub или от чего-то в вашей сети, например от прокси-сервера. Повторите попытку позже или откройте страницу выпусков в браузере.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Проверка обновлений получила ответ, в котором не назван ни один выпуск. Он мог прийти от GitHub или от чего-то в вашей сети, например от прокси-сервера или страницы входа. Повторите попытку позже или откройте страницу выпусков в браузере.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Время ожидания проверки истекло. Возможно, соединение с GitHub медленное; повторите попытку.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2135,7 +2145,7 @@ InstallerClean уже был запущен от имени администра
        Cli.ReportNotSent. -->
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <!-- After Cli.UpdateRunningNewer, where the person typed /d or /m and answered yes: the newer
@@ -2201,10 +2211,12 @@ InstallerClean уже был запущен от имени администра
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2332,7 +2344,7 @@ InstallerClean уже был запущен от имени администра
        breaks rather than where every language must. A translation breaks where
        its own grammar allows, at a space or after punctuation and never inside a
        word, or not at all if it fits. -->
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
@@ -2460,7 +2472,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.UpdateListsOnlyAfterMove" xml:space="preserve"><value>Новая версия просканирует и покажет список найденного, ничего не перемещая. Чтобы переместить, затем снова запустите /m.</value></data>
   <data name="Cli.UpdateRunningInstead" xml:space="preserve"><value>Вместо этого команда {0} будет выполнена в InstallerClean {1}.</value></data>
   <data name="Cli.UpdateDownloadLink" xml:space="preserve"><value>{0}: {1}</value></data>
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Перед сканированием проверяет, есть ли более новая версия InstallerClean.&#10;При запуске вручную спрашивает перед обновлением и обновляется, если в&#10;течение минуты никто не ответил. При запуске без участия человека, в&#10;запланированной задаче или скрипте, обновляется без вопросов.&#10;Добавьте /noupdate, чтобы пропустить проверку.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Перед сканированием проверяет, есть ли более новая версия InstallerClean,&#10;если только параметр «Автоматически проверять обновления» не отключён для&#10;учётной записи, от имени которой запущена программа. Если её окно открыто&#10;на экране, а ввод и вывод не перенаправлены, спрашивает перед обновлением&#10;и обновляется, если в течение минуты никто не ответил. Во всех остальных&#10;случаях, например в запланированной задаче, настроенной на запуск&#10;независимо от того, вошёл ли кто-нибудь в систему, обновляется без&#10;вопросов. Добавьте /noupdate, чтобы пропустить проверку.</value></data>
   <data name="Cli.UpdateInUse" xml:space="preserve"><value>InstallerClean используется, поэтому сейчас не может обновиться.</value></data>
   <data name="Cli.UpdateNeedsNetFramework48" xml:space="preserve"><value>Для этой версии нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean, чтобы выполнить обновление.</value></data>
   <data name="Cli.ReportPrompt" xml:space="preserve"><value>Отправить анонимный отчёт об этом запуске? Он сохранён в {0}. Введите ?, чтобы увидеть, что в нём. [{1}/{2}/?]</value></data>

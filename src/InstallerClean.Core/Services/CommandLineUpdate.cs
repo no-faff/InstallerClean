@@ -511,7 +511,7 @@ internal sealed class CommandLineUpdate
         // the other line nor the run with it.
         void SayRunningNewer()
         {
-            SayLine(string.Format(Strings.Cli_UpdateRunningNewer, run[0], latest));
+            SayLine(string.Format(Strings.Cli_UpdateRunningNewer, canAsk ? "/s" : command, latest));
             if (token.IsCancellationRequested) return;
             if (canAsk && command == "/d") SayLine(Strings.Cli_UpdateListsOnlyAfterDelete);
             if (canAsk && command == "/m") SayLine(Strings.Cli_UpdateListsOnlyAfterMove);
