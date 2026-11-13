@@ -472,13 +472,14 @@ internal static class Program
         using var onCtrlC = CancelKey.Process.Answer(CancelRun);
 
         // Runs once, on the thread that brings the cancel: a thread-pool thread for Ctrl+C,
-        // which the runtime queues there while the console's control-handler thread waits,
-        // Windows' own handler thread for a console being closed, the thread
-        // CancelKey.Watch starts for the event a newer version sets, or, where the cancel
-        // came before the registration, this one. Nothing in here may throw: on any of the first
-        // three Main's try/catch does not cover it, so an escape is unhandled, a runtime abort and a stack trace on stderr in place of the
-        // documented exit code and the single Application-log entry, on a surface that
-        // deliberately keeps ex.Message out.
+        // which the runtime queues there while the console's control-handler thread waits;
+        // Windows' own handler thread for a console being closed; the thread CancelKey.Watch
+        // starts for the event the version that started this one sets; or, where the cancel
+        // came before the registration, this one. Nothing in here may throw: on any of the
+        // first three, Main's try/catch does not cover it, so an escape is unhandled, a
+        // runtime abort and a stack trace on stderr in place of the documented exit code and
+        // the single Application-log entry, on a surface that deliberately keeps ex.Message
+        // out.
         void CancelRun()
         {
             // Once the newer version this run updated to is being started or running in this
