@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
@@ -30,16 +31,36 @@ internal static class Program
     private const int ExitTransient = CliExitCode.Transient;
     private const int ExitCancelled = CliExitCode.Cancelled;
 
+    /// <remarks>
+    /// On a PC without .NET Framework 4.8 the command line says what to install and ends,
+    /// before it reads its arguments. The download carries no config naming the runtime, so
+    /// .NET Framework starts it on any 4.x. The runtime compiles a method whole the first
+    /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
+    /// names only the check and <see cref="Start"/>, each in a method of its own that is
+    /// never compiled into Main: nothing <see cref="Start"/> names is compiled before the
+    /// check has run.
+    /// </remarks>
     public static int Main(string[] args)
     {
         InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
+        if (RefuseWithoutNetFramework48() is { } refused) return refused;
+        return Start(args);
+    }
 
-        // On a PC without .NET Framework 4.8 the command line says what to install and
-        // ends, before it reads its arguments. The download carries no config naming the
-        // runtime, so .NET Framework starts it on any 4.x.
-        if (NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: true) is { } needsNetFramework48)
-            return Refuse(needsNetFramework48);
+    /// <summary>
+    /// The exit code of the refusal where the PC does not have .NET Framework 4.8, having
+    /// printed it, or null where it does.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int? RefuseWithoutNetFramework48() =>
+        NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: true) is { } message
+            ? Refuse(message)
+            : null;
 
+    /// <summary>The run, on a PC that has .NET Framework 4.8.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int Start(string[] args)
+    {
         // A .exe.config beside the command line that says more than the build's own is a
         // file somebody else wrote, which on .NET Framework the runtime would read. Refuse
         // before anything else runs, printing the message and ending; a config beside the
