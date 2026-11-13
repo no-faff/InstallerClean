@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Licence: Apache 2.0"></a>
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet-framework/net48"><img src="https://img.shields.io/badge/.NET_Framework-4.8-purple.svg" alt=".NET Framework 4.8"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="GitHub Release"></a>
@@ -207,9 +207,11 @@ Having said all that, the app encourages you to move the files to a backup folde
 
 Three builds, choose one:
 
-- **Portable** (`InstallerClean-portable.exe`): one file, with the .NET 10 runtime inside it. No install, no uninstaller: double-click it and it runs. Keep the file somewhere for next time, or delete it when you're done.
-- **Setup** (`InstallerClean-3.7.0-setup.exe`): a regular Windows installer with the .NET 10 runtime bundled. Adds a Start Menu entry and uninstalls cleanly. Tucked into Programs so it's easy to find six months from now, or to run more often than that if you install and uninstall a lot of software.
-- **CLI** (`installerclean-cli.exe`): the command-line version on its own, one file with the runtime inside it. No install, no uninstaller. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
+- **Portable** (`InstallerClean-portable.exe`): one file. No install, no uninstaller: double-click it and it runs. Keep the file somewhere for next time, or delete it when you're done.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): a regular Windows installer. Adds a Start Menu entry and uninstalls cleanly. Tucked into Programs so it's easy to find six months from now, or to run more often than that if you install and uninstall a lot of software.
+- **CLI** (`installerclean-cli.exe`): the command-line version on its own, one file. No install, no uninstaller. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
+
+The release also carries **Slim** (`InstallerClean-slim.exe`). From 3.8.0 it is the same file as the portable, under the name a slim copy from an earlier release updates to.
 
 From 2.2.0 the setup and portable filenames carry their version number, so a downloaded copy always says what it is; the CLI keeps its plain `installerclean-cli.exe` name so scheduled tasks and scripts that point at it keep working across updates.
 
@@ -251,7 +253,7 @@ InstallerClean is unsigned. Here's what you can check before you run it:
 
 **Why does Windows say "Unknown publisher"?** InstallerClean isn't code-signed, and Windows marks files downloaded from the internet, so on first run SmartScreen usually shows "Windows protected your PC" with the publisher listed as unknown. A paid signing certificate costs money every year and I'd rather keep the app free than pay for one, so I applied to SignPath Foundation, who sign open source software for nothing, and InstallerClean has been accepted (see [Code signing policy](#code-signing-policy)). The certificate hasn't been issued yet so, for now, click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
-**Does it work on Windows 7 or 8?** No. It needs Windows 10 version 1607 or later, which is the oldest build the .NET 10 runtime supports. The setup refuses to install on anything older and the portable build won't start.
+**Does it work on Windows 7 or 8?** No. It needs Windows 10 version 1607 or later, or Windows 11. The setup refuses to install on anything older.
 
 ## Command line
 
@@ -400,7 +402,7 @@ The difference between the two tools here is what each asks Windows for, not a d
 |---|---|---|
 | Last updated | 2026 (active) | 3 March 2016 |
 | Source code | Open source (Apache 2.0) | Closed source |
-| Runtime | .NET 10 (self-contained) | .NET Framework 4.5.2 + VBScript |
+| Runtime | .NET Framework 4.8 | .NET Framework 4.5.2 + VBScript |
 | API | Windows Installer API in `msi.dll` (in-process) | Windows Installer COM (out-of-process via VBScript) |
 | Superseded patches | Identified from Windows' patch records | Not told apart from unclaimed files |
 | Adobe files | Superseded patches detected and labelled | Excluded by a name filter, on by default |
@@ -454,7 +456,8 @@ If InstallerClean is ever the reason a file is missing, I want to know. [Open an
 
 ## Requirements
 
-- Windows 10 (version 1607 / build 14393 or later, the oldest the .NET 10 runtime supports) or Windows 11
+- Windows 10 (version 1607 / build 14393 or later) or Windows 11
+- .NET Framework 4.8, which Windows 10 has included since version 1903 and Windows 11 always has. On an earlier Windows 10 without it, the setup and the app say so and link to Microsoft's download.
 - 64-bit Windows. The setup won't install on 32-bit and will tell you so.
 - Administrator privileges, for the setup and for the app (`C:\Windows\Installer` is admin-only)
 
