@@ -1012,7 +1012,7 @@ const tokenKeys = new Set(
 // is read, since an empty list would pass every language.
 const DESIGNER = `${RESX_DIR}/Strings.Designer.cs`;
 const frameworkCheckKeys = [...readFileSync(DESIGNER, 'utf8').matchAll(
-  /internal\s+static\s+string\s+\w+\s*=>\s*Manager\.GetString\("([^"]+)"/g)].map((m) => m[1]);
+  /internal\s+static\s+string\s+\w+\s*=>\s*StartCheckResources\.GetString\("([^"]+)"/g)].map((m) => m[1]);
 if (frameworkCheckKeys.length === 0) {
   console.error(`No Strings.FrameworkCheck member read from ${DESIGNER}. Refusing to report `
     + 'on keys this check cannot show it read.');

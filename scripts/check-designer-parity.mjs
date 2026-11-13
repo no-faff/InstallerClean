@@ -113,11 +113,11 @@ else if (accessors.length !== declared)
 // without the installer-folder token. Its members are internal so the count
 // above stays one of the Get accessors. Each names a key the resx defines, carries the
 // key's name, and falls back to the key as Get does:
-//     internal static string Window_Main_Title => Manager.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
+//     internal static string Window_Main_Title => StartCheckResources.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
 // Every 'internal static string' in the file is one of these or one of the doors Get and
 // Find, so a door added beside them is reported here.
 const checkAccessors = [...designer.matchAll(
-    /internal\s+static\s+string\s+(\w+)\s*=>\s*Manager\.GetString\("([^"]+)",\s*Localisation\.UiCulture\)\s*\?\?\s*"([^"]+)"\s*;/g,
+    /internal\s+static\s+string\s+(\w+)\s*=>\s*StartCheckResources\.GetString\("([^"]+)",\s*Localisation\.UiCulture\)\s*\?\?\s*"([^"]+)"\s*;/g,
 )].map((m) => ({ property: m[1], key: m[2], fallback: m[3] }));
 
 for (const { property, key, fallback } of checkAccessors) {
