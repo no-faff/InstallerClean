@@ -128,7 +128,6 @@ public sealed class StagedDownloadTests : IDisposable
     [Theory]
     [InlineData(AppCopyKind.Setup)]
     [InlineData(AppCopyKind.Portable)]
-    [InlineData(AppCopyKind.Slim)]
     [InlineData(AppCopyKind.CommandLineDownload)]
     public async Task A_prepared_download_is_held_from_its_check_until_its_undo(AppCopyKind kind)
     {
@@ -325,7 +324,6 @@ public sealed class StagedDownloadTests : IDisposable
 
     [Theory]
     [InlineData(AppCopyKind.Portable)]
-    [InlineData(AppCopyKind.Slim)]
     [InlineData(AppCopyKind.Scoop)]
     [InlineData(AppCopyKind.FromSource)]
     [InlineData(AppCopyKind.Undetermined)]

@@ -3286,7 +3286,7 @@ public class MainViewModelTests : IDisposable
     public async Task A_Move_or_Delete_report_carries_the_region_read_for_the_card_and_the_box_is_ticked(string kind)
     {
         var updater = Substitute.For<IAppUpdater>();
-        updater.Kind.Returns(AppCopyKind.Slim);
+        updater.Kind.Returns(AppCopyKind.Scoop);
         var vm = CreateViewModel(new AppSettings(), updater);
         _windowsRegion.Read().Returns("NO");
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -3320,7 +3320,7 @@ public class MainViewModelTests : IDisposable
         Assert.True(vm.Completion.SendsReport);
         await _resultLogService.Received(1).WriteAsync(
             Arg.Is<ResultLogEntry>(e => e.Operation.Kind == kind && e.App.WindowsRegion == "NO"
-                && e.App.Host == "window" && e.App.CopyKind == "slim"),
+                && e.App.Host == "window" && e.App.CopyKind == "scoop"),
             Arg.Any<CancellationToken>());
     }
 
@@ -4037,7 +4037,6 @@ public class MainViewModelTests : IDisposable
     [Theory]
     [InlineData(AppCopyKind.Setup, "setup")]
     [InlineData(AppCopyKind.Portable, "portable")]
-    [InlineData(AppCopyKind.Slim, "slim")]
     [InlineData(AppCopyKind.Scoop, "scoop")]
     [InlineData(AppCopyKind.FromSource, "fromSource")]
     [InlineData(AppCopyKind.Undetermined, "undetermined")]

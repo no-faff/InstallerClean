@@ -22,7 +22,6 @@ public class UpdateManifestTests
     [Theory]
     [InlineData(AppCopyKind.Setup, "setup")]
     [InlineData(AppCopyKind.Portable, "portable")]
-    [InlineData(AppCopyKind.Slim, "slim")]
     [InlineData(AppCopyKind.CommandLineDownload, "cli")]
     public void A_download_listed_with_nothing_required_may_be_installed(AppCopyKind kind, string key) =>
         Assert.Null(UpdateManifest.Judge(Requiring(key, ""), "3.6.0", kind, Lacks48));

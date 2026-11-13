@@ -1,3 +1,4 @@
+using System.Reflection;
 using InstallerClean.Helpers;
 
 namespace InstallerClean.Services;
@@ -9,8 +10,8 @@ namespace InstallerClean.Services;
 public enum AppCopyKind
 {
     /// <summary>
-    /// Built from source rather than published as a single file. It has no download
-    /// of its own to replace itself with, so it offers the release page alone.
+    /// Built from source rather than merged into one file. It has no download of its own
+    /// to replace itself with, so it offers the release page alone.
     /// </summary>
     FromSource,
 
@@ -27,11 +28,12 @@ public enum AppCopyKind
     /// </summary>
     Scoop,
 
-    /// <summary>The portable download, which carries its own .NET runtime.</summary>
+    /// <summary>
+    /// The portable download. The release also publishes the same file as the slim
+    /// download, which copies of earlier versions update from, so a copy started from
+    /// either name is this kind.
+    /// </summary>
     Portable,
-
-    /// <summary>The slim download, which runs on the .NET Desktop Runtime installed on the PC.</summary>
-    Slim,
 
     /// <summary>
     /// The command line as its own download, outside the setup's folder. It updates by
@@ -40,9 +42,9 @@ public enum AppCopyKind
     CommandLineDownload,
 
     /// <summary>
-    /// A single-file copy on a PC whose setup record could not be read, or is there and
-    /// names no folder that can be compared, so whether the setup installed this copy is
-    /// not known. It does not update itself, so it offers the release page alone.
+    /// A copy merged into one file on a PC whose setup record could not be read, or is
+    /// there and names no folder that can be compared, so whether the setup installed this
+    /// copy is not known. It does not update itself, so it offers the release page alone.
     /// </summary>
     Undetermined,
 }
@@ -161,49 +163,45 @@ public static class AppCopy
     internal const string DownloadRoot = "https://github.com/no-faff/InstallerClean/releases/download/";
 
     /// <summary>
-    /// The kind of copy, in this order: a build that is not a single file is from
+    /// The kind of copy, in this order: a build that is not one merged file is from
     /// source; a copy in the folder the setup recorded is the setup's; a copy beside
     /// the files Scoop writes into each version's folder is Scoop's; a copy on a PC
-    /// whose setup record cannot tell is undetermined; otherwise the build says whether
-    /// it carries its own runtime, which tells the portable from the slim.
+    /// whose setup record cannot tell is undetermined; any other is the portable.
     ///
     /// The setup installs the very file the portable download is, so only the
-    /// setup's record tells those two apart, and it is asked before the build is.
-    /// Scoop's two files are asked before a record that cannot tell, because the setup
-    /// never writes them.
+    /// setup's record tells those two apart. Scoop's two files are asked before a
+    /// record that cannot tell, because the setup never writes them.
     /// </summary>
-    /// <param name="isSingleFile">Whether the running build is a single-file bundle.</param>
-    /// <param name="isSelfContained">Whether the build carries its own .NET runtime.</param>
+    /// <param name="isOneFile">Whether the running exe is the whole app (<see cref="IsOneFileBuild"/>).</param>
     /// <param name="exeFolder">The folder the running exe is in.</param>
     /// <param name="setup">The setup's record (<see cref="ReadSetupRecord"/>).</param>
     /// <param name="fileExists">Answers whether a file exists at a path.</param>
     public static AppCopyKind Decide(
-        bool isSingleFile,
-        bool isSelfContained,
+        bool isOneFile,
         string exeFolder,
         SetupRecord setup,
         Func<string, bool> fileExists)
     {
-        if (!isSingleFile) return AppCopyKind.FromSource;
+        if (!isOneFile) return AppCopyKind.FromSource;
         if (IsSetupFolder(exeFolder, setup)) return AppCopyKind.Setup;
         if (IsScoopFolder(exeFolder, fileExists)) return AppCopyKind.Scoop;
         if (setup.State == SetupRecordState.CannotTell) return AppCopyKind.Undetermined;
-        return isSelfContained ? AppCopyKind.Portable : AppCopyKind.Slim;
+        return AppCopyKind.Portable;
     }
 
     /// <summary>
-    /// The kind of command-line copy, in this order: a build that is not a single file
+    /// The kind of command-line copy, in this order: a build that is not one merged file
     /// is from source; a copy in the folder the setup recorded is the setup's; a copy on
     /// a PC whose setup record cannot tell is undetermined; any other is the command
     /// line's own download. Scoop installs only the window, so no copy of the command
     /// line is Scoop's.
     /// </summary>
-    /// <param name="isSingleFile">Whether the running build is a single-file bundle.</param>
+    /// <param name="isOneFile">Whether the running exe is the whole app (<see cref="IsOneFileBuild"/>).</param>
     /// <param name="exeFolder">The folder the running exe is in.</param>
     /// <param name="setup">The setup's record (<see cref="ReadSetupRecord"/>).</param>
-    public static AppCopyKind DecideCommandLine(bool isSingleFile, string exeFolder, SetupRecord setup)
+    public static AppCopyKind DecideCommandLine(bool isOneFile, string exeFolder, SetupRecord setup)
     {
-        if (!isSingleFile) return AppCopyKind.FromSource;
+        if (!isOneFile) return AppCopyKind.FromSource;
         if (IsSetupFolder(exeFolder, setup)) return AppCopyKind.Setup;
         if (setup.State == SetupRecordState.CannotTell) return AppCopyKind.Undetermined;
         return AppCopyKind.CommandLineDownload;
@@ -222,7 +220,7 @@ public static class AppCopy
             return pretended;
 #endif
         return DecideCommandLine(
-            IsSingleFileBuild(),
+            IsOneFileBuild(),
             PathText.GetDirectoryName(exePath) ?? string.Empty,
             ReadSetupRecord(registry));
     }
@@ -232,34 +230,46 @@ public static class AppCopy
     /// the setup's record and the folder the exe is in.
     /// </summary>
     /// <param name="exePath">The running exe's path.</param>
-    /// <param name="isSelfContained">
-    /// Whether the build carries its own .NET runtime, as the host's build states it.
-    /// </param>
     /// <param name="registry">Reads the setup's record.</param>
-    public static AppCopyKind DetectRunning(string exePath, bool isSelfContained, IRegistryReader registry)
+    public static AppCopyKind DetectRunning(string exePath, IRegistryReader registry)
     {
 #if DEBUG
         if (PretendedKind() is { } pretended)
             return pretended;
 #endif
         return Decide(
-            IsSingleFileBuild(),
-            isSelfContained,
+            IsOneFileBuild(),
             PathText.GetDirectoryName(exePath) ?? string.Empty,
             ReadSetupRecord(registry),
             FrameworkFile.Exists);
     }
 
     /// <summary>
-    /// Whether the running build is a single-file bundle. Inside one, an assembly has
-    /// no file of its own, and its Location is empty; every build from source has one.
+    /// Whether the running exe is the whole app, so that replacing that one file replaces
+    /// every part of it. The release merges InstallerClean.Core and every package into
+    /// each exe (the OneFile build), so this class is then in the exe's own assembly. A
+    /// build from source runs it from InstallerClean.Core.dll beside the exe, where
+    /// replacing the exe alone would leave the rest at the version it was.
+    ///
+    /// Do not replace this with a value the build writes into the assembly: the exe the
+    /// OneFile build merges is compiled with the same properties, so it would carry the
+    /// value too while it is not one file, and an update would replace it and leave its
+    /// InstallerClean.Core.dll as it was.
     /// </summary>
-    private static bool IsSingleFileBuild() =>
-        string.IsNullOrEmpty(typeof(AppCopy).Assembly.Location);
+    internal static bool IsOneFileBuild() =>
+        IsOneFileBuild(typeof(AppCopy).Assembly, Assembly.GetEntryAssembly());
+
+    /// <summary>
+    /// Whether <paramref name="appCopyAssembly"/>, the assembly this class is in, is the
+    /// process's entry assembly. False where there is no entry assembly, as in a process
+    /// started from unmanaged code.
+    /// </summary>
+    internal static bool IsOneFileBuild(Assembly appCopyAssembly, Assembly? entryAssembly) =>
+        entryAssembly is not null && appCopyAssembly == entryAssembly;
 
 #if DEBUG
     /// <summary>
-    /// Set to setup, portable, slim, scoop or undetermined, a Debug build of the window
+    /// Set to setup, portable, scoop or undetermined, a Debug build of the window
     /// takes itself for that kind of copy, and set to setup, cli or undetermined, a Debug
     /// build of the command line takes itself for the setup's copy, its own download or a
     /// copy whose setup record cannot tell, so a build from source can
@@ -275,7 +285,6 @@ public static class AppCopy
         {
             "setup" => AppCopyKind.Setup,
             "portable" => AppCopyKind.Portable,
-            "slim" => AppCopyKind.Slim,
             "scoop" => AppCopyKind.Scoop,
             "undetermined" => AppCopyKind.Undetermined,
             _ => null,
@@ -313,12 +322,12 @@ public static class AppCopy
 
     /// <summary>
     /// Whether this kind of copy can put a newer version in its own place: the setup's
-    /// copy, the portable, the slim and the command line's own download. A build from
+    /// copy, the portable and the command line's own download. A build from
     /// source has no download to do it with, Scoop's copy is updated by Scoop, and an
     /// undetermined copy may be the setup's. A kind not named here does not update itself.
     /// </summary>
     public static bool CanUpdateItself(AppCopyKind kind) =>
-        kind is AppCopyKind.Setup or AppCopyKind.Portable or AppCopyKind.Slim or AppCopyKind.CommandLineDownload;
+        kind is AppCopyKind.Setup or AppCopyKind.Portable or AppCopyKind.CommandLineDownload;
 
     /// <summary>
     /// Whether this kind of copy is updated by Scoop, so a newer version is offered as
@@ -426,15 +435,14 @@ public static class AppCopy
     /// <summary>
     /// The file name of the download a kind updates from, or null for a kind that does
     /// not update itself: a build from source, Scoop's copy and an undetermined copy.
-    /// Only the setup's name carries the version. The portable, the slim and the command
-    /// line's own download keep one name across releases, because each replaces itself
+    /// Only the setup's name carries the version. The portable and the command line's own
+    /// download keep one name across releases, because each replaces itself
     /// where it stands and the release it sits in says which version it is.
     /// </summary>
     public static string? DownloadFileName(AppCopyKind kind, string version) => kind switch
     {
         AppCopyKind.Setup => $"InstallerClean-{version}-setup.exe",
         AppCopyKind.Portable => "InstallerClean-portable.exe",
-        AppCopyKind.Slim => "InstallerClean-slim.exe",
         AppCopyKind.CommandLineDownload => CommandLineFileName,
         _ => null,
     };

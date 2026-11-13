@@ -44,7 +44,7 @@ public class AppCopyTests
     [InlineData("names this folder")]
     [InlineData("none")]
     [InlineData("cannot tell")]
-    public void A_build_that_is_not_a_single_file_is_from_source_whatever_else_holds(string which)
+    public void A_build_that_is_not_one_file_is_from_source_whatever_else_holds(string which)
     {
         var record = which switch
         {
@@ -54,9 +54,9 @@ public class AppCopyTests
         };
 
         Assert.Equal(AppCopyKind.FromSource,
-            AppCopy.Decide(isSingleFile: false, isSelfContained: true, ProgramFilesFolder, record, NoFiles));
+            AppCopy.Decide(isOneFile: false, ProgramFilesFolder, record, NoFiles));
         Assert.Equal(AppCopyKind.FromSource,
-            AppCopy.DecideCommandLine(isSingleFile: false, ProgramFilesFolder, record));
+            AppCopy.DecideCommandLine(isOneFile: false, ProgramFilesFolder, record));
     }
 
     [Theory]
@@ -66,7 +66,7 @@ public class AppCopyTests
     public void A_copy_in_the_folder_the_setup_recorded_is_the_setups(string installLocation)
     {
         var kind = AppCopy.Decide(
-            isSingleFile: true, isSelfContained: true, ProgramFilesFolder, RecordOf(installLocation), NoFiles);
+            isOneFile: true, ProgramFilesFolder, RecordOf(installLocation), NoFiles);
 
         Assert.Equal(AppCopyKind.Setup, kind);
     }
@@ -77,7 +77,7 @@ public class AppCopyTests
         // The setup installs the very file the portable download is, so only the
         // folder tells them apart.
         var kind = AppCopy.Decide(
-            isSingleFile: true, isSelfContained: true, DownloadsFolder,
+            isOneFile: true, DownloadsFolder,
             RecordOf(ProgramFilesFolder + @"\"), NoFiles);
 
         Assert.Equal(AppCopyKind.Portable, kind);
@@ -88,16 +88,15 @@ public class AppCopyTests
     [InlineData(DownloadsFolder)]
     public void A_copy_on_a_PC_whose_setup_record_cannot_tell_is_undetermined(string exeFolder)
     {
-        foreach (var selfContained in new[] { true, false })
-            Assert.Equal(AppCopyKind.Undetermined, AppCopy.Decide(
-                isSingleFile: true, selfContained, exeFolder, SetupRecord.CannotTell, NoFiles));
+        Assert.Equal(AppCopyKind.Undetermined, AppCopy.Decide(
+            isOneFile: true, exeFolder, SetupRecord.CannotTell, NoFiles));
     }
 
     [Fact]
     public void A_copy_beside_Scoops_files_is_Scoops_where_the_setup_record_cannot_tell()
     {
         var kind = AppCopy.Decide(
-            isSingleFile: true, isSelfContained: true, ScoopFolder, SetupRecord.CannotTell,
+            isOneFile: true, ScoopFolder, SetupRecord.CannotTell,
             FilesPresent(Path.Combine(ScoopFolder, "scoop-manifest.json"), Path.Combine(ScoopFolder, "scoop-install.json")));
 
         Assert.Equal(AppCopyKind.Scoop, kind);
@@ -108,7 +107,7 @@ public class AppCopyTests
     [InlineData(DownloadsFolder)]
     public void A_command_line_on_a_PC_whose_setup_record_cannot_tell_is_undetermined(string exeFolder) =>
         Assert.Equal(AppCopyKind.Undetermined,
-            AppCopy.DecideCommandLine(isSingleFile: true, exeFolder, SetupRecord.CannotTell));
+            AppCopy.DecideCommandLine(isOneFile: true, exeFolder, SetupRecord.CannotTell));
 
 
     [Theory]
@@ -117,7 +116,7 @@ public class AppCopyTests
     public void A_copy_beside_both_of_Scoops_files_is_Scoops(string manifest, string install)
     {
         var kind = AppCopy.Decide(
-            isSingleFile: true, isSelfContained: true, ScoopFolder, RecordOf(null),
+            isOneFile: true, ScoopFolder, RecordOf(null),
             FilesPresent(Path.Combine(ScoopFolder, manifest), Path.Combine(ScoopFolder, install)));
 
         Assert.Equal(AppCopyKind.Scoop, kind);
@@ -129,27 +128,55 @@ public class AppCopyTests
     public void One_of_Scoops_files_alone_does_not_make_a_Scoop_copy(string only)
     {
         var kind = AppCopy.Decide(
-            isSingleFile: true, isSelfContained: true, ScoopFolder, RecordOf(null),
+            isOneFile: true, ScoopFolder, RecordOf(null),
             FilesPresent(Path.Combine(ScoopFolder, only)));
 
         Assert.Equal(AppCopyKind.Portable, kind);
     }
 
-    [Theory]
-    [InlineData(true, AppCopyKind.Portable)]
-    [InlineData(false, AppCopyKind.Slim)]
-    public void Otherwise_the_build_tells_the_portable_from_the_slim(bool selfContained, AppCopyKind expected)
+    [Fact]
+    public void Any_other_copy_is_the_portable()
     {
-        var kind = AppCopy.Decide(
-            isSingleFile: true, selfContained, DownloadsFolder, RecordOf(null), NoFiles);
+        var kind = AppCopy.Decide(isOneFile: true, DownloadsFolder, RecordOf(null), NoFiles);
 
-        Assert.Equal(expected, kind);
+        Assert.Equal(AppCopyKind.Portable, kind);
+    }
+
+    [Fact]
+    public void A_copy_whose_code_is_in_the_entry_assembly_is_one_file()
+    {
+        var assembly = typeof(AppCopy).Assembly;
+
+        Assert.True(AppCopy.IsOneFileBuild(assembly, assembly));
+        Assert.False(AppCopy.IsOneFileBuild(assembly, typeof(AppCopyTests).Assembly));
+        Assert.False(AppCopy.IsOneFileBuild(assembly, null));
+    }
+
+    [Fact]
+    public void A_build_from_source_runs_its_code_from_a_library_of_its_own_and_is_not_one_file()
+    {
+        Assert.Equal("InstallerClean.Core", typeof(AppCopy).Assembly.GetName().Name);
+        Assert.False(AppCopy.IsOneFileBuild());
+    }
+
+    [Fact]
+    public void A_build_from_source_is_from_source_even_in_the_folder_the_setup_recorded()
+    {
+        // The answer this build gives, decided with a setup record naming the folder the
+        // exe is in, which alone would make it the setup's copy. Decide is called rather
+        // than DetectRunning, which a Debug build lets an environment variable that
+        // another test sets answer instead.
+        var record = RecordOf(ProgramFilesFolder + @"");
+
+        Assert.Equal(AppCopyKind.FromSource,
+            AppCopy.Decide(AppCopy.IsOneFileBuild(), ProgramFilesFolder, record, NoFiles));
+        Assert.Equal(AppCopyKind.FromSource,
+            AppCopy.DecideCommandLine(AppCopy.IsOneFileBuild(), ProgramFilesFolder, record));
     }
 
     [Theory]
     [InlineData(AppCopyKind.Setup, "https://github.com/no-faff/InstallerClean/releases/download/v3.5.0/InstallerClean-3.5.0-setup.exe")]
     [InlineData(AppCopyKind.Portable, "https://github.com/no-faff/InstallerClean/releases/download/v3.5.0/InstallerClean-portable.exe")]
-    [InlineData(AppCopyKind.Slim, "https://github.com/no-faff/InstallerClean/releases/download/v3.5.0/InstallerClean-slim.exe")]
     [InlineData(AppCopyKind.CommandLineDownload, "https://github.com/no-faff/InstallerClean/releases/download/v3.5.0/installerclean-cli.exe")]
     public void Each_kind_downloads_its_own_file_from_the_releases_tag(AppCopyKind kind, string expected)
     {
@@ -171,7 +198,7 @@ public class AppCopyTests
     {
         Assert.Equal("InstallerClean-3.5.0-setup.exe", AppCopy.DownloadFileName(AppCopyKind.Setup, "3.5.0"));
         Assert.Equal("InstallerClean-3.6.0-setup.exe", AppCopy.DownloadFileName(AppCopyKind.Setup, "3.6.0"));
-        foreach (var kind in new[] { AppCopyKind.Portable, AppCopyKind.Slim, AppCopyKind.CommandLineDownload })
+        foreach (var kind in new[] { AppCopyKind.Portable, AppCopyKind.CommandLineDownload })
         {
             var name = AppCopy.DownloadFileName(kind, "3.5.0");
             Assert.NotNull(name);
@@ -186,7 +213,7 @@ public class AppCopyTests
     public void A_command_line_in_the_folder_the_setup_recorded_is_the_setups(string installLocation)
     {
         Assert.Equal(AppCopyKind.Setup,
-            AppCopy.DecideCommandLine(isSingleFile: true, ProgramFilesFolder, RecordOf(installLocation)));
+            AppCopy.DecideCommandLine(isOneFile: true, ProgramFilesFolder, RecordOf(installLocation)));
     }
 
     [Theory]
@@ -197,18 +224,17 @@ public class AppCopyTests
         // Scoop installs only the window, so even a folder holding Scoop's files is not a
         // Scoop copy of the command line.
         Assert.Equal(AppCopyKind.CommandLineDownload,
-            AppCopy.DecideCommandLine(isSingleFile: true, ScoopFolder, RecordOf(installLocation)));
+            AppCopy.DecideCommandLine(isOneFile: true, ScoopFolder, RecordOf(installLocation)));
         Assert.Equal(AppCopyKind.CommandLineDownload,
-            AppCopy.DecideCommandLine(isSingleFile: true, DownloadsFolder, RecordOf(installLocation)));
+            AppCopy.DecideCommandLine(isOneFile: true, DownloadsFolder, RecordOf(installLocation)));
     }
 
     [Fact]
     public void The_window_is_never_taken_for_the_command_lines_own_download()
     {
-        foreach (var selfContained in new[] { true, false })
         foreach (var folder in new[] { ProgramFilesFolder, ScoopFolder, DownloadsFolder })
             Assert.NotEqual(AppCopyKind.CommandLineDownload,
-                AppCopy.Decide(true, selfContained, folder, RecordOf(ProgramFilesFolder), NoFiles));
+                AppCopy.Decide(true, folder, RecordOf(ProgramFilesFolder), NoFiles));
     }
 
     [Fact]
@@ -290,13 +316,13 @@ public class AppCopyTests
     }
 
     [Fact]
-    public void Only_the_four_kinds_with_a_download_update_themselves()
+    public void Only_the_three_kinds_with_a_download_update_themselves()
     {
         var updating = Enum.GetValues<AppCopyKind>().Where(AppCopy.CanUpdateItself).ToHashSet();
 
         Assert.Equal(new HashSet<AppCopyKind>
             {
-                AppCopyKind.Setup, AppCopyKind.Portable, AppCopyKind.Slim, AppCopyKind.CommandLineDownload,
+                AppCopyKind.Setup, AppCopyKind.Portable, AppCopyKind.CommandLineDownload,
             },
             updating);
         foreach (var kind in Enum.GetValues<AppCopyKind>())
