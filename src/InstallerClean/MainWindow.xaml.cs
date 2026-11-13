@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
@@ -1177,6 +1178,15 @@ public partial class MainWindow : Window
     // Closed has not fired yet at the Click, so the menu reopens in a flicker.)
     private bool _languageMenuOpen;
 
+    /// <summary>
+    /// Tells UI Automation that a language item's tick moved, through the item's own
+    /// peer, as MenuItem does for itself on .NET 10. An item with no
+    /// peer has had no client ask about it, so there is nobody to tell.
+    /// </summary>
+    private static void RaiseToggleStateChanged(MenuItem item, ToggleState from, ToggleState to) =>
+        UIElementAutomationPeer.FromElement(item)?.RaisePropertyChangedEvent(
+            TogglePatternIdentifiers.ToggleStateProperty, from, to);
+
     private void LanguageButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
@@ -1232,6 +1242,12 @@ public partial class MainWindow : Window
                 IsCheckable = true,
                 IsChecked = isActive,
             };
+            // .NET Framework's MenuItem raises Checked and Unchecked and no automation
+            // event, so a screen reader is not told the tick moved while the menu is
+            // open. The item's peer raises the Toggle pattern's change here, where it
+            // has one; with none, nothing is listening for the item yet.
+            item.Checked += (_, _) => RaiseToggleStateChanged(item, ToggleState.Off, ToggleState.On);
+            item.Unchecked += (_, _) => RaiseToggleStateChanged(item, ToggleState.On, ToggleState.Off);
             // A MenuItem takes its spoken name from a string Header, and the
             // header above is a StackPanel, which leaves the item unnamed: a
             // screen reader then has only the list position and the checked

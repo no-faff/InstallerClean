@@ -161,7 +161,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -220,7 +220,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanNoRegisteredFileInFolder, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanNoRegisteredFileInFolder), ex.Message);
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             ScanWithRegisteredSplit(present: 1, missing: 30));
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -395,7 +395,7 @@ public class FileSystemScanServiceTests
 
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             ScanWithRegisteredSplit(present, missing));
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -422,7 +422,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, root).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCacheRootUnresolved, ex.Message);
+        Assert.Equal(StopMessages.NothingRemoved(InstallerClean.Resources.Strings.Error_ScanCacheRootUnresolved), ex.Message);
     }
 
     [Fact]
@@ -1381,7 +1381,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, new MockFileSystem()).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound), ex.Message);
         Assert.IsAssignableFrom<DirectoryNotFoundException>(ex.InnerException);
         await query.DidNotReceive().GetRegisteredPackagesAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -1444,8 +1444,8 @@ public class FileSystemScanServiceTests
     }
 
     private static string StopFor(bool saysNotFound) => saysNotFound
-        ? InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound
-        : InstallerClean.Resources.Strings.Error_ScanInstallerFolderListFailed;
+        ? StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound)
+        : StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanInstallerFolderListFailed);
 
     [Fact]
     public async Task A_walk_cancelled_part_way_ends_as_a_cancellation()

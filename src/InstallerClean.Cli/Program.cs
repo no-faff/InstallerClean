@@ -2026,10 +2026,10 @@ internal static class Program
         {
             // EventLog the cancellation so a Task Scheduler audit can see how far the run
             // got, and pick ExitPartial when work committed before the cancellation
-            // arrived. A run cancelled before any file was processed (a cancel during the
-            // scan, or before the first delete/move) still writes one entry so "each /s,
-            // /d or /m run writes one summary" holds for every run: TransientSkip, not
-            // Partial, since nothing committed and a re-run can succeed. Where the console
+            // arrived. A run cancelled with no file deleted or moved (a cancel during the
+            // scan or the re-check, or after every file it reached failed) still writes one
+            // entry so "each /s, /d or /m run writes one summary" holds for every run:
+            // TransientSkip, not Partial, since nothing committed and a re-run can succeed. Where the console
             // is being closed the entry goes before the lines, the run having only seconds
             // left and a console that may already be gone.
             void WriteEntry()
@@ -2041,7 +2041,9 @@ internal static class Program
                             DisplayHelpers.PluraliseFile(totalToProcess)));
                 else
                     MachineContract.WriteEventLog(CliEventClass.TransientSkip,
-                        () => string.Format(Strings.Cli_EventLogCancelledNoWork, arg));
+                        () => string.Format(arg == "/s"
+                            ? Strings.Cli_EventLogCancelledNoWork
+                            : Strings.Cli_EventLogCancelledNoFileRemoved, arg));
             }
             var closing = CancelKey.Process.Closing;
             if (closing) WriteEntry();

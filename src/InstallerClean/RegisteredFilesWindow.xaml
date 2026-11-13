@@ -127,7 +127,8 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <DockPanel>
-                                        <!-- Warning triangle on a missing row, docked left so
+                                        <!-- Warning triangle on a row with a file missing, its
+                                             own or a patch's, docked left so
                                              the name fills the rest and still ellipsises. On a
                                              present row it is Collapsed and takes no width, so
                                              that name stays flush-left like every other row. -->
@@ -135,7 +136,7 @@
                                               Fill="{StaticResource Status.Warning}" Stretch="Uniform"
                                               Width="{a11y:TextScaled 14}" Height="{a11y:TextScaled 14}"
                                               VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"
-                                              Visibility="{Binding IsMissing, Converter={StaticResource BoolToVis}}"/>
+                                              Visibility="{Binding HasMissingFile, Converter={StaticResource BoolToVis}}"/>
                                         <TextBlock Text="{Binding ProductNameDisplay}" Foreground="{StaticResource Text.Heading}"
                                                    FontSize="{DynamicResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
                                                    VerticalAlignment="Center" ToolTip="{Binding ProductNameDisplay}"/>
