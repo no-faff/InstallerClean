@@ -67,7 +67,7 @@ public class RegistryDataTests
         {
             var written = new byte[] { (byte)'a', 0, (byte)'b', 0, (byte)'c', 0xFF };
             Buffer.BlockCopy(written, 0, buffer, 0, written.Length);
-            return (0, RawRegistryValue.REG_SZ, 5);
+            return new RegistryData.Answer(0, RawRegistryValue.REG_SZ, 5);
         }, doNotExpand: true);
 
         Assert.Equal("abc", value);
@@ -84,16 +84,16 @@ public class RegistryDataTests
         var value = RegistryData.Decode(buffer =>
         {
             calls++;
-            if (buffer.Length < grown.Length) return (234, RawRegistryValue.REG_SZ, grown.Length);
+            if (buffer.Length < grown.Length) return new RegistryData.Answer(234, RawRegistryValue.REG_SZ, grown.Length);
             Buffer.BlockCopy(grown, 0, buffer, 0, grown.Length);
-            return (0, RawRegistryValue.REG_SZ, grown.Length);
+            return new RegistryData.Answer(0, RawRegistryValue.REG_SZ, grown.Length);
         }, doNotExpand: true);
         Assert.Equal(2, calls);
         Assert.StartsWith("x", (string)value!);
 
         calls = 0;
         var removed = RegistryData.Decode(_ =>
-            ++calls == 1 ? (234, RawRegistryValue.REG_DWORD, 4096) : (2, 0, 0), doNotExpand: true);
+            ++calls == 1 ? new RegistryData.Answer(234, RawRegistryValue.REG_DWORD, 4096) : new RegistryData.Answer(2, 0, 0), doNotExpand: true);
         Assert.Null(removed);
     }
 

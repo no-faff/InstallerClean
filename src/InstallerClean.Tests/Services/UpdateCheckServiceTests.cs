@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 using Xunit;
 
@@ -86,7 +87,7 @@ public class UpdateCheckServiceTests
         var service = new UpdateCheckService(new StubHandler(respond), ex =>
         {
             logged.Add(ex);
-            return (crashLogPath, crashLogWritten);
+            return new CrashLogEntry(crashLogPath, crashLogWritten);
         });
         return (service, logged);
     }

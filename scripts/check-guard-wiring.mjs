@@ -10,9 +10,10 @@
 // away while everything stays green. This is what makes those invocations a rule
 // rather than a habit.
 //
-// Each names the workflows that run it. check-native-imports.ps1 reads the two merged
-// exes build-and-test builds and is run by ci.yml alone: the release builds the same
-// projects with the same SDK and merges them the same way.
+// Each names the workflows that run it. check-native-imports.ps1 and
+// check-framework-references.ps1 read the two merged exes build-and-test builds and
+// are run by ci.yml alone: the release builds the same projects with the same SDK and
+// merges them the same way.
 //
 // THE INVOCATION HAS TO OPEN THE COMMAND, after the indent and an optional
 // "run:". A line carrying the name anywhere else is text about the guard rather
@@ -36,6 +37,10 @@ const GUARDS = [
   {
     command: './scripts/check-one-file.ps1',
     workflows: ['.github/workflows/ci.yml', '.github/workflows/release.yml'],
+  },
+  {
+    command: './scripts/check-framework-references.ps1',
+    workflows: ['.github/workflows/ci.yml'],
   },
 ];
 

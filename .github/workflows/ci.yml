@@ -769,6 +769,21 @@ jobs:
         shell: pwsh
         run: ./scripts/check-one-file.ps1
 
+      # Reads each merged exe's own metadata against Microsoft's reference assemblies for .NET
+      # Framework 4.6.2, 4.7, 4.7.1, 4.7.2 and 4.8, downloaded from nuget.org and checked
+      # against their pinned hashes. Fails where a type or member the exe references is not in
+      # 4.8, where anything the runtime compiles or loads on the way to the copy's .NET
+      # Framework 4.8 check is not in 4.6.2, 4.7, 4.7.1 or 4.7.2, so that a PC below 4.8 would
+      # not reach the message saying what to install, or where an assembly merged into the exe
+      # carries a module initializer the merge drops. What the exe needs that 4.6.2 lacks is
+      # printed for the record. The script builds an exe whose check path reaches what those
+      # versions lack, which it has to report, one whose path does not, which it has to leave
+      # alone, and a library with a module initializer, which it has to report.
+      - name: Check the merged exes reach their .NET Framework 4.8 check below 4.8
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-framework-references.ps1
+
       # Here rather than with the other guards because it reads the two merged
       # exes, which do not exist until the steps above have run. A language that
       # never reaches an exe leaves the source resx present and correct, so every
