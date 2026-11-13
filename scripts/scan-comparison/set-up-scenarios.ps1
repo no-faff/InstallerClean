@@ -45,14 +45,14 @@ $patches = [ordered]@{
 $rows = [System.Collections.Generic.List[string]]::new()
 $rows.Add("file`twhat it is")
 
-function Wix([string[]]$wixArgs) {
+function Invoke-Wix([string[]]$wixArgs) {
     $out = & wix @wixArgs 2>&1
     if ($LASTEXITCODE -ne 0) { $out | ForEach-Object { "  $_" }; throw "wix $($wixArgs[0..1] -join ' ') exited $LASTEXITCODE." }
 }
 
 # Runs msiexec quietly with a verbose log and stops the script on any answer but success. A
 # restart-required answer stops it too: the comparison runs on a runner that has not restarted.
-function Msiexec([string]$what, [string[]]$msiArgs) {
+function Invoke-Msiexec([string]$what, [string[]]$msiArgs) {
     $log = Join-Path $logs (($what -replace '[^A-Za-z0-9]+', '-') + '.log')
     $p = Start-Process -FilePath $msiexec -ArgumentList ($msiArgs + @('/qn', '/norestart', '/l*v', "`"$log`"")) -Wait -PassThru
     "msiexec, ${what}: exit code $($p.ExitCode)"
@@ -68,29 +68,39 @@ function Com([object]$on, [string]$name, [System.Reflection.BindingFlags]$kind, 
 $get = [System.Reflection.BindingFlags]::GetProperty
 $call = [System.Reflection.BindingFlags]::InvokeMethod
 
+# The members of one of Windows Installer's collections, read by Count and Item.
+function Members([object]$collection) {
+    $count = Com $collection 'Count' $get @()
+    for ($i = 0; $i -lt $count; $i++) { , (Com $collection 'Item' $get @($i)) }
+}
+
 # The cached package of a product in any account or the machine (MSIINSTALLCONTEXT_ALL), or
 # null where Windows Installer lists none.
 function ProductPackage([string]$code) {
-    $found = Com $wi 'ProductsEx' $get @($code, 's-1-1-0', 7)
-    foreach ($product in $found) { return (Com $product 'InstallProperty' $get @('LocalPackage')) }
+    foreach ($product in @(Members (Com $wi 'ProductsEx' $get @($code, 's-1-1-0', 7)))) {
+        return (Com $product 'InstallProperty' $get @('LocalPackage'))
+    }
     return $null
 }
 
-# The cached package of a patch applied to a product, in any account or the machine and in
-# any state, or null.
-function PatchPackage([string]$productCode, [string]$patchCode) {
-    $found = Com $wi 'PatchesEx' $get @($productCode, 's-1-1-0', 7, 15)
-    foreach ($patch in $found) {
-        if ((Com $patch 'PatchCode' $get @()) -eq $patchCode) { return (Com $patch 'PatchProperty' $get @('LocalPackage')) }
+# The patch object for a patch applied to a product, in any account or the machine and in any
+# state, or null.
+function FindPatch([string]$productCode, [string]$patchCode) {
+    foreach ($patch in @(Members (Com $wi 'PatchesEx' $get @($productCode, 's-1-1-0', 7, 15)))) {
+        if ((Com $patch 'PatchCode' $get @()) -eq $patchCode) { return $patch }
     }
+    return $null
+}
+
+function PatchPackage([string]$productCode, [string]$patchCode) {
+    $patch = FindPatch $productCode $patchCode
+    if ($patch) { return (Com $patch 'PatchProperty' $get @('LocalPackage')) }
     return $null
 }
 
 function PatchState([string]$productCode, [string]$patchCode) {
-    $found = Com $wi 'PatchesEx' $get @($productCode, 's-1-1-0', 7, 15)
-    foreach ($patch in $found) {
-        if ((Com $patch 'PatchCode' $get @()) -eq $patchCode) { return (Com $patch 'State' $get @()) }
-    }
+    $patch = FindPatch $productCode $patchCode
+    if ($patch) { return (Com $patch 'State' $get @()) }
     return $null
 }
 
@@ -130,7 +140,7 @@ foreach ($version in $versions) {
 foreach ($tag in $products.Keys) {
     $p = $products[$tag]
     foreach ($version in $p.Versions) {
-        Wix @('build', '-arch', 'x64', (Join-Path $here 'product.wxs'),
+        Invoke-Wix @('build', '-arch', 'x64', (Join-Path $here 'product.wxs'),
             '-d', "Tag=$tag", '-d', "Version=$version", '-d', "Scope=$($p.Scope)",
             '-d', "PayloadDir=$(Join-Path $payloads $version)",
             '-d', "ProductCode=$($p.Code)", '-d', "UpgradeCode=$($p.Upgrade)", '-d', "ComponentGuid=$($p.Component)",
@@ -147,7 +157,7 @@ foreach ($tag in $patches.Keys) {
     }
     # Every target of one patch moves to the same version, so one pair of payload folders
     # serves them all.
-    Wix (@('build', (Join-Path $here 'patch.wxs')) + $defines + @(
+    Invoke-Wix (@('build', (Join-Path $here 'patch.wxs')) + $defines + @(
             '-bindpath', $build,
             '-bindpath:target', (Join-Path $payloads '1.0.0'),
             '-bindpath:update', (Join-Path $payloads $updated),
@@ -156,12 +166,12 @@ foreach ($tag in $patches.Keys) {
 Get-ChildItem -LiteralPath $build -File | Where-Object Extension -in '.msi', '.msp' | ForEach-Object { "  built $($_.Name), $($_.Length) bytes" }
 
 "Installing"
-Msiexec 'install A' @('/i', "`"$(Join-Path $build 'A-1.0.0.msi')`"")
-Msiexec 'install B' @('/i', "`"$(Join-Path $build 'B-1.0.0.msi')`"")
-Msiexec 'apply P1 to A and B' @('/p', "`"$(Join-Path $build 'P1.msp')`"")
-Msiexec 'apply P2 to A' @('/p', "`"$(Join-Path $build 'P2.msp')`"")
-Msiexec 'install U for this account' @('/i', "`"$(Join-Path $build 'U-1.0.0.msi')`"")
-Msiexec 'install C' @('/i', "`"$(Join-Path $build 'C-1.0.0.msi')`"")
+Invoke-Msiexec 'install A' @('/i', "`"$(Join-Path $build 'A-1.0.0.msi')`"")
+Invoke-Msiexec 'install B' @('/i', "`"$(Join-Path $build 'B-1.0.0.msi')`"")
+Invoke-Msiexec 'apply P1 to A and B' @('/p', "`"$(Join-Path $build 'P1.msp')`"")
+Invoke-Msiexec 'apply P2 to A' @('/p', "`"$(Join-Path $build 'P2.msp')`"")
+Invoke-Msiexec 'install U for this account' @('/i', "`"$(Join-Path $build 'U-1.0.0.msi')`"")
+Invoke-Msiexec 'install C' @('/i', "`"$(Join-Path $build 'C-1.0.0.msi')`"")
 
 # SYSTEM's own per-user install, from a scheduled task, waited on until it ends.
 $taskName = 'InstallerClean scan comparison, S for SYSTEM'
@@ -169,15 +179,17 @@ $sLog = Join-Path $logs 'install-S-for-SYSTEM.log'
 $action = New-ScheduledTaskAction -Execute $msiexec -Argument "/i `"$(Join-Path $build 'S-1.0.0.msi')`" /qn /norestart /l*v `"$sLog`""
 $null = Register-ScheduledTask -TaskName $taskName -Action $action -User 'SYSTEM' -RunLevel Highest -Force
 Start-ScheduledTask -TaskName $taskName
+# 267011 is the task's result before its first run and 267009 its result while it runs.
 $clock = [Diagnostics.Stopwatch]::StartNew()
 do {
     Start-Sleep -Seconds 1
     $task = Get-ScheduledTask -TaskName $taskName
-} while (($task.State -eq 'Running' -or $clock.Elapsed.TotalSeconds -lt 3) -and $clock.Elapsed.TotalSeconds -lt 300)
-$sResult = (Get-ScheduledTaskInfo -TaskName $taskName).LastTaskResult
+    $sResult = (Get-ScheduledTaskInfo -TaskName $taskName).LastTaskResult
+    $ended = $task.State -ne 'Running' -and $sResult -notin 267011, 267009
+} while (-not $ended -and $clock.Elapsed.TotalSeconds -lt 300)
 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
 "msiexec, install S for SYSTEM: exit code $sResult"
-if ($task.State -eq 'Running') { throw "The install of S for SYSTEM had not ended after 300 s." }
+if (-not $ended) { throw "The install of S for SYSTEM had not ended after 300 s." }
 if ($sResult -ne 0) { throw "The install of S for SYSTEM exited $sResult; its log is $sLog." }
 
 "What each test file in the Installer folder is"
@@ -195,7 +207,7 @@ $cPackage = ProductPackage $products.C.Code
 if (-not $cPackage) { throw "Windows Installer lists no cached file for C." }
 $cKept = Join-Path $build 'C-cached-copy.msi'
 Copy-Item -LiteralPath $cPackage -Destination $cKept
-Msiexec 'remove C' @('/x', $products.C.Code)
+Invoke-Msiexec 'remove C' @('/x', $products.C.Code)
 if (Test-Path -LiteralPath $cPackage) { throw "The removal of C left its cached file $cPackage in place." }
 Copy-Item -LiteralPath $cKept -Destination $cPackage
 Record $cPackage 'C, installed and removed, its cached copy put back under the name Windows gave it'

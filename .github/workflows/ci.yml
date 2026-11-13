@@ -2336,3 +2336,14 @@ jobs:
             ${{ runner.temp }}/scan-scenarios/logs
           if-no-files-found: warn
           retention-days: 7
+
+      # The merged command line this job compared, kept so a scan on another PC can run the
+      # same file.
+      - name: Upload the merged command line
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: merged-command-line-${{ github.run_attempt }}
+          path: publish/cli
+          if-no-files-found: error
+          retention-days: 30
