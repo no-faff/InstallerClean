@@ -780,6 +780,14 @@ jobs:
         shell: pwsh
         run: ./scripts/check-architecture.ps1
 
+      # The report written through the merged command line, on this runner's .NET Framework,
+      # against the bytes .NET 10 writes for the same report (FixedReport.net10.json). The
+      # merge rewrites the metadata the report's property order is read from.
+      - name: Check the merged command line writes the report as .NET 10 does
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-report-bytes.ps1
+
       # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
       # command line prints. This reads that resource out of each merged exe against the file,
       # and each merge's input list against the file's table of merged packages, so a package
