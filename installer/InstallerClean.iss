@@ -127,12 +127,11 @@ OutputBaseFilename=InstallerClean-{#AppVersion}-setup
 ; scanning the setup again.
 Compression=bzip
 SolidCompression=no
-; The .NET 10 Desktop Runtime's oldest supported Windows release is
-; Windows 10 version 1607 (build 14393), so an older build is blocked here
-; with a clear message instead of failing cryptically at first launch. Inno
-; Setup reads the true build via RtlGetVersion, which is not subject to the
-; GetVersionEx compatibility cap, so the build-level floor is enforced on
-; Windows 10 and 11.
+; InstallerClean supports Windows 10 version 1607 (build 14393) and later,
+; so an older build is blocked here with a clear message instead of failing
+; at first launch. Inno Setup reads the true build via RtlGetVersion, which
+; is not subject to the GetVersionEx compatibility cap, so the build-level
+; floor is enforced on Windows 10 and 11.
 MinVersion=10.0.14393
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
