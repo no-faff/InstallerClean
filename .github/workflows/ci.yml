@@ -1967,8 +1967,8 @@ jobs:
           # .NET Framework has no single-file publish and a Debug build is not merged
           # (the merge is Release only), so the old copy is a plain build: the exe with
           # its assemblies beside it, which is the copy the update replaces at its path.
-          # Framework seat 34's job 12 builds this from the v3.5.0 tag instead; here it
-          # is the current source, so the start handshake and its timing run every push.
+          # Self-update builds its old copy from the v3.5.0 tag; here it is the current
+          # source, so the start handshake and its timing run every push.
           dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Debug -p:RestoreLockedMode=true --nologo -o publish/old
           if ($LASTEXITCODE -ne 0) { throw "The old copy did not build." }
           # The newer version is the merged 9.9.9 command line, one file as it ships.
