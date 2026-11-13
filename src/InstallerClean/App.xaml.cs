@@ -28,8 +28,9 @@ namespace InstallerClean;
 public partial class App : Application
 {
     /// <summary>
-    /// Runs as Main does, before Application's constructor: writes what the module initializer
-    /// kept for the crash log, then pins the AppContext switches. Application's constructor
+    /// Runs as Main does, before Application's constructor: checks for .NET Framework 4.8,
+    /// writes what the module initializer kept for the crash log, then pins the AppContext
+    /// switches. Application's constructor
     /// creates the Dispatcher, which is WPF's first read of the accessibility switches, and by
     /// this point the domain knows it targets .NET Framework 4.8, so the runtime's own defaults
     /// are those of 4.8.
@@ -39,15 +40,17 @@ public partial class App : Application
     /// message box, and ends, before Application's constructor and before anything scans.
     /// The portable carries no config naming the runtime, so .NET Framework starts it on any
     /// 4.x. The runtime compiles a method whole the first time it runs, and a member the PC's
-    /// .NET Framework lacks fails that compile, so the check runs here, in a method of its
-    /// own, ahead of Application's constructor and every method the window's start compiles. The message is in the
-    /// language Windows displays: the language picked in the app is read later.
+    /// .NET Framework lacks fails that compile, so the check runs first, in a method of its
+    /// own, ahead of Application's constructor and every method the window's start compiles.
+    /// The two calls after it are never compiled into this method, so nothing they name is
+    /// compiled before the check has answered. The message is in the language Windows
+    /// displays: the language picked in the app is read later.
     /// </remarks>
     static App()
     {
+        EndWithoutNetFramework48();
         SystemLibraries.WriteWhatTheInitializerKept();
         FrameworkSwitches.Pin();
-        EndWithoutNetFramework48();
     }
 
     /// <summary>
@@ -62,7 +65,7 @@ public partial class App : Application
         string? message;
         try
         {
-            message = NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: false);
+            message = NetFrameworkCheck.RefusalMessage(commandLine: false);
             if (message is null) return;
             MessageBox.Show(message, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
         }

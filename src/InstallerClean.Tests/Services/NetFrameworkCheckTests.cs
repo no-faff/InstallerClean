@@ -1,5 +1,4 @@
 using System.Globalization;
-using NSubstitute;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Services;
@@ -12,13 +11,7 @@ namespace InstallerClean.Tests.Services;
 /// </summary>
 public class NetFrameworkCheckTests
 {
-    private static IRegistryReader Release(RegistryDwordState state, int value = 0)
-    {
-        var registry = Substitute.For<IRegistryReader>();
-        registry.LocalMachineDwordValue(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full", "Release")
-            .Returns(new RegistryDwordRead(state, value));
-        return registry;
-    }
+    private static RegistryDwordRead Release(RegistryDwordState state, int value = 0) => new(state, value);
 
     [Theory]
     [InlineData(528040, true)]

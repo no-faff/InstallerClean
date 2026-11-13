@@ -59,7 +59,15 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return new RegistryMultiStringRead(RegistryMultiStringState.Unreadable); }
     }
 
-    public RegistryDwordRead LocalMachineDwordValue(string keyPath, string valueName)
+    public RegistryDwordRead LocalMachineDwordValue(string keyPath, string valueName) =>
+        LocalMachineDword(keyPath, valueName);
+
+    /// <summary>
+    /// <see cref="LocalMachineDwordValue"/> without an instance. A copy's start check reads
+    /// through this: creating a RegistryReader would bring every one of its methods into what
+    /// the check compiles.
+    /// </summary>
+    internal static RegistryDwordRead LocalMachineDword(string keyPath, string valueName)
     {
         try
         {

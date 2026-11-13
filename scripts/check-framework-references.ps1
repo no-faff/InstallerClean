@@ -11,8 +11,8 @@
 #    4.7.1 and 4.7.2: nothing the runtime compiles or loads before the check has answered is
 #    missing from any of them. The command line's check is Program.RefuseWithoutNetFramework48,
 #    which Main calls; the window's is App.EndWithoutNetFramework48, which App's static
-#    constructor calls. Each check is followed, and the start it guards (Program.Start,
-#    App.OnStartup) is not.
+#    constructor calls first. Each check is followed, and what runs after it (Program.Start,
+#    App.OnStartup and the rest of App's static constructor) is not.
 #  - No assembly merged into the exe but the exe's own carries a module initializer: the
 #    merge keeps only the primary assembly's, so another's would never run. The exe's own
 #    carries exactly one, and the merged exe's module constructor calls it.
@@ -20,7 +20,9 @@
 # Every run also checks itself: an exe built here whose check path reaches what 4.6 to 4.7.1
 # lack, which must report each one and nothing else, and one whose check path reaches
 # nothing missing, which must report nothing on its path and the misses of its
-# start in the whole-exe list. A reference .NET Framework 4.6.2 defines in mscorlib but the
+# start in the whole-exe list. One whose check is called from its entry type's static
+# constructor must report what that constructor runs before the check and nothing after
+# it. A reference .NET Framework 4.6.2 defines in mscorlib but the
 # exe takes from netstandard must read as missing from 4.6.2, which has no netstandard, and
 # as present in 4.7.1. A library built with a module initializer must be reported, and one
 # without must not. A download whose hash differs, a set with no mscorlib, an exe with no
@@ -169,6 +171,44 @@ $fixtureMain
     }
 }
 "@
+    'staticcheck' = @'
+using System;
+using System.Runtime.CompilerServices;
+
+namespace Fixture
+{
+    internal static class Program
+    {
+        static Program()
+        {
+            Before();
+            Check();
+            After();
+        }
+
+        public static int Main(string[] args) => Start(args);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void Before()
+        {
+            var pair = (1, 2);
+            Console.Write(pair.Item1);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void Check()
+        {
+            if (Environment.Version.Major < 4) Environment.Exit(1);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void After() => Console.Write((1, 2, 3).Item1);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static int Start(string[] args) => (args.Length, 0, 0, 0).Item1;
+    }
+}
+'@
     'initializer' = @'
 namespace System.Runtime.CompilerServices
 {
@@ -200,7 +240,7 @@ namespace Fixture
     $dir = Join-Path $work "fixture-$name"
     New-Item -ItemType Directory -Path $dir | Out-Null
     Set-Content -Path (Join-Path $dir "$name.cs") -Value $sources[$name]
-    $outputType = if ($name -in 'clean', 'faulty') { 'Exe' } else { 'Library' }
+    $outputType = if ($name -in 'clean', 'faulty', 'staticcheck') { 'Exe' } else { 'Library' }
     Set-Content -Path (Join-Path $dir "$name.csproj") -Value @"
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -264,6 +304,28 @@ namespace Fixture
   }
   if (@($lines | Where-Object { $_.Contains('ValueTuple`4') })) { Fail "The faulty exe's Start, which runs after the check, was read as on its path." }
 
+  Write-Host '== Control: an exe whose check is called from its entry type''s static constructor'
+  # The constructor runs before Main, up to the check; what it calls after the check, and
+  # what Main calls, runs only once the check has answered.
+  $static = [FrameworkReferences.Exe]::Open($fixtures['staticcheck'])
+  $walk = Get-Walk $static $fixtureCheck
+  $lines = @(Get-PathLines $walk)
+  $expected = @(foreach ($label in 'net46', 'net461', 'net462') {
+    "$label`: System.ValueTuple``2  [mscorlib]", "$label`: System.ValueTuple``2::.ctor", "$label`: System.ValueTuple``2::Item1"
+  })
+  foreach ($want in $expected) {
+    $hits = @($lines | Where-Object { $_.StartsWith($want) })
+    if ($hits.Count) { Write-Host "  reported, as it should be: $($hits[0])" }
+    else { Fail "The exe checking from its static constructor did not report: $want" }
+  }
+  foreach ($line in $lines) {
+    if (-not @($expected | Where-Object { $line.StartsWith($_) })) { Fail "The exe checking from its static constructor reported what runs after its check: $line" }
+  }
+  if (-not (Test-Followed $static $walk $fixtureCheck)) { Fail "The walk did not follow the check called from the static constructor." }
+  foreach ($after in 'Fixture.Program::After', 'Fixture.Program::Start') {
+    if (Test-Followed $static $walk $after) { Fail "The walk followed $after, which runs after the check." }
+  }
+
   Write-Host '== Control: a reference taken from netstandard'
   # The command line's merged packages take System.Object from netstandard. 4.6.2's mscorlib
   # defines it, and 4.6.2 has no netstandard, so it is missing there and present in 4.7.1.
@@ -285,7 +347,7 @@ namespace Fixture
   else { Write-Host '  the one without reported nothing, as it should' }
 
   $exes = @(
-    [pscustomobject]@{ Label = 'window'; Path = 'window/InstallerClean.exe'; Project = 'src/InstallerClean'; CheckCall = $null
+    [pscustomobject]@{ Label = 'window'; Path = 'window/InstallerClean.exe'; Project = 'src/InstallerClean'; CheckCall = 'InstallerClean.App::EndWithoutNetFramework48'
       Check = 'InstallerClean.App::EndWithoutNetFramework48'; Start = 'InstallerClean.App::OnStartup'; Initializer = 'InstallerClean.ProcessDefaults::SetBeforeMain' }
     [pscustomobject]@{ Label = 'command line'; Path = 'cli/installerclean-cli.exe'; Project = 'src/InstallerClean.Cli'; CheckCall = 'InstallerClean.Cli.Program::RefuseWithoutNetFramework48'
       Check = 'InstallerClean.Cli.Program::RefuseWithoutNetFramework48'; Start = 'InstallerClean.Cli.Program::Start'; Initializer = 'InstallerClean.Cli.LibrarySearch::SetBeforeMain' }

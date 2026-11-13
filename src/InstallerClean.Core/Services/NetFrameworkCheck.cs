@@ -35,10 +35,15 @@ internal static class NetFrameworkCheck
     /// Only a Release value read below 4.8's, or no value at all, refuses: a value that could
     /// not be read or is not a number says nothing about the PC, and the copy starts.
     /// </remarks>
-    internal static string? RefusalMessage(IRegistryReader registry, bool commandLine)
+    internal static string? RefusalMessage(bool commandLine) =>
+        RefusalMessage(RegistryReader.LocalMachineDword(
+            UpdateManifest.NetFrameworkKeyPath, UpdateManifest.NetFrameworkReleaseValueName), commandLine);
+
+    /// <summary>
+    /// <see cref="RefusalMessage(bool)"/> for the Release value <paramref name="release"/>.
+    /// </summary>
+    internal static string? RefusalMessage(RegistryDwordRead release, bool commandLine)
     {
-        var release = registry.LocalMachineDwordValue(
-            UpdateManifest.NetFrameworkKeyPath, UpdateManifest.NetFrameworkReleaseValueName);
         var below48 = release.State switch
         {
             RegistryDwordState.Read => release.Value < UpdateManifest.NetFramework48Release,
@@ -53,7 +58,7 @@ internal static class NetFrameworkCheck
 
         // The link line in the language's own punctuation with no address in it, which then
         // stands on its own line. Every language's link line ends with the address.
-        var name = string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, "").TrimEnd();
+        var name = string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, "").TrimEnd(null);
         return Strings.Startup_NeedsNetFramework48 + Environment.NewLine + Environment.NewLine
             + name + Environment.NewLine + url;
     }
