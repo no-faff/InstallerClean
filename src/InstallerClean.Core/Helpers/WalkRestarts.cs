@@ -90,8 +90,8 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     /// the two reads differ, or the pause between them cannot be made within
     /// <see cref="KeyedPauseLimit"/>, the first read is the answer.
     ///
-    /// A KEY WHOSE READS ANSWERED WITH NOTHING <paramref name="standsAgain"/> ACCEPTS IS NOT
-    /// READ AGAIN FOR THE REST OF THE PASS, and nor is any key whose
+    /// A KEY WHOSE READS MADE AGAIN ANSWERED WITH NOTHING <paramref name="stands"/> ACCEPTS IS
+    /// NOT READ AGAIN FOR THE REST OF THE PASS, and nor is any key whose
     /// <paramref name="within"/> key is spent: a read for either is answered by its first
     /// read alone. The <paramref name="within"/> key is spent too where the first read is one
     /// <paramref name="spendsWithin"/> names. An installation whose registration Windows
@@ -117,18 +117,28 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
         var withinKey = within?.Invoke();
         if (_readsSpent.Contains(spent) || (withinKey is not null && _readsSpent.Contains(withinKey))) return first;
 
+        var answered = false;
         for (var attempt = 1; attempt < Attempts; attempt++)
         {
+            // A read made again is taken only once the read after the longer pause agrees with
+            // it, so where the limit cannot pay for both pauses nothing more is read.
+            if (_keyedPaused + PauseBefore[attempt - 1] + PauseBefore[^1] > KeyedPauseLimit) return first;
+
             Wait(attempt - 1, keyed: true);
             var again = read();
+            answered |= stands(again);
             if (!standsAgain(again)) continue;
 
-            // Two values were read, so the record answers: a disagreement or a pause that
-            // cannot be made leaves the first read standing and spends nothing.
-            if (!Wait(PauseBefore.Length - 1, keyed: true)) return first;
+            // Two values were read, so the record answers, and a disagreement leaves the first
+            // read standing and spends nothing.
+            Wait(PauseBefore.Length - 1, keyed: true);
             var confirmed = read();
             return standsAgain(confirmed) && agrees(again, confirmed) ? confirmed : first;
         }
+
+        // A read made again that answered, with an absence, shows the record answers, so the
+        // key is not spent.
+        if (answered) return first;
 
         _readsSpent.Add(spent);
         if (withinKey is not null && spendsWithin?.Invoke(first) == true) _readsSpent.Add(withinKey);

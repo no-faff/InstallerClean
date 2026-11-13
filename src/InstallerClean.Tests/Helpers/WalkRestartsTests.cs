@@ -304,4 +304,15 @@ public class WalkRestartsTests
             a => !string.IsNullOrEmpty(a), string.Equals, within: () => "installation"));
         Assert.Equal(1, other.Reads);
     }
+
+    [Fact]
+    public void An_absence_read_after_an_error_spends_no_key()
+    {
+        // The record answers, with an absence, so a later read of the same key is read again.
+        var restarts = new WalkRestarts(_ => { });
+
+        Assert.Null(Read(restarts, new ScriptedRead(null, "")));
+
+        Assert.Equal("v", Read(restarts, new ScriptedRead(null, "v")));
+    }
 }
