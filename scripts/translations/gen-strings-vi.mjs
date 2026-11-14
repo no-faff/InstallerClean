@@ -588,7 +588,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Windows là bản 10 hay 11, x64 hay Arm, và đang đặt ngôn ngữ cùng quốc gia hoặc khu vực nào`,
   'Completion.ReportPanel.AppVersion': `Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), lần chạy là trong InstallerClean hay trong công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị`,
   'Completion.ReportPanel.Errors': `Số lần xảy ra bất kỳ sự cố nào`,
-  'Completion.ReportPanel.Closing': `Mỗi mục này là một con số hoặc một nhãn. Không có gì trong báo cáo nêu tên bạn, máy tính, tệp hay chương trình của bạn, và tôi không bao giờ thấy địa chỉ IP của bạn.`,
+  'Completion.ReportPanel.ReportId': `Một mã ngẫu nhiên được tạo cho báo cáo này, để báo cáo chỉ được tính một lần nếu được gửi nhiều lần`,
+  'Completion.ReportPanel.Closing': `Ngoài mã đó, mỗi mục này là một con số hoặc một nhãn. Không có gì trong báo cáo nêu tên bạn, máy tính, tệp hay chương trình của bạn, và tôi không bao giờ thấy địa chỉ IP của bạn.`,
   'Automation.ReportInfo': `Báo cáo chứa những gì`,
   'Automation.Scroll.ReportContents': `Báo cáo chứa những gì`,
   'Completion.ReportPanel.SeeReport': `Xem chính xác những gì được gửi`,
@@ -652,6 +653,7 @@ const MAP = {
   'About.Link.Notices': `Thông báo của bên thứ ba`,
   'Automation.About.Notices.HelpText': `Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices     In ra thông báo của bên thứ ba`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean cần Windows 10 phiên bản 1607 trở lên hoặc Windows 11.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

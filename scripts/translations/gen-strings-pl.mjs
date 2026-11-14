@@ -629,7 +629,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Czy Windows to wersja 10 czy 11, x64 czy Arm, i jaki ma ustawiony język oraz kraj lub region`,
   'Completion.ReportPanel.AppVersion': `Wersja InstallerClean, sposób jego uzyskania (setup, portable, Scoop, samo narzędzie wiersza poleceń, kompilacja ze źródeł lub nieznany), informacja, czy uruchomienie odbyło się w InstallerClean, czy w narzędziu wiersza poleceń, oraz język, w którym był wyświetlany`,
   'Completion.ReportPanel.Errors': `Liczniki wszystkiego, co poszło nie tak`,
-  'Completion.ReportPanel.Closing': `Każda z tych rzeczy jest liczbą albo etykietą. Nic w raporcie nie wskazuje ciebie, twojego komputera, twoich plików ani programów, a twojego adresu IP nigdy nie widzę.`,
+  'Completion.ReportPanel.ReportId': `Losowy kod utworzony dla tego raportu, żeby był liczony tylko raz, jeśli zostanie wysłany więcej niż raz`,
+  'Completion.ReportPanel.Closing': `Poza tym kodem każda z tych rzeczy jest liczbą albo etykietą. Nic w raporcie nie wskazuje ciebie, twojego komputera, twoich plików ani programów, a twojego adresu IP nigdy nie widzę.`,
   'Automation.ReportInfo': `Co zawiera raport`,
   'Automation.Scroll.ReportContents': `Co zawiera raport`,
   'Completion.ReportPanel.SeeReport': `Zobacz dokładnie, co jest wysyłane`,
@@ -693,6 +694,7 @@ const MAP = {
   'About.Link.Notices': `Powiadomienia innych firm`,
   'Automation.About.Notices.HelpText': `Pokazuje licencje czcionek, ikon i kodu, które zawiera InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices   Wypisz powiadomienia innych firm`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean wymaga systemu Windows 10 w wersji 1607 lub nowszej albo systemu Windows 11.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

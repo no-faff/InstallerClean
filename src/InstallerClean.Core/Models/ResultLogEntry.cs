@@ -15,17 +15,26 @@ namespace InstallerClean.Models;
 /// with its report box ticked.
 ///
 /// Schema is intentionally narrow. Every field is either categorical
-/// or a count; no file paths, no usernames, no machine identifiers,
-/// no time-of-day, nothing that could correlate two runs from the
-/// same machine.
+/// or a count, apart from <see cref="ReportId"/>; no file paths, no usernames,
+/// no machine identifiers, no time-of-day, nothing that could correlate two runs
+/// from the same machine.
 /// </summary>
+/// <param name="ReportId">
+/// A random GUID made when the report is made, so the receiver keeps one copy of a
+/// report sent more than once. The window and the command line send the report again
+/// from a later start whenever they did not see it accepted, and the server may have
+/// stored it already. Every send reads <c>last-run.json</c>, so every copy carries the
+/// same id. It is made from nothing on the PC and is written nowhere but the report.
+/// Last in the record, so it is the report's last key.
+/// </param>
 public sealed record ResultLogEntry(
     int SchemaVersion,
     AppInfo App,
     string Os,
     MachineInfo Machine,
     ScanInfo Scan,
-    OperationInfo Operation)
+    OperationInfo Operation,
+    Guid ReportId)
 {
     /// <summary>
     /// Schema 2 separates <see cref="ScanInfo.ObsoletedCount"/>
@@ -168,6 +177,12 @@ public sealed record ResultLogEntry(
     /// <c>InstallProperties</c> key one of whose source lists did not read
     /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
     ///
+    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND ONE UNDER <c>machine</c>, AND TAKES NONE
+    /// AWAY: <c>reportId</c>, last (<see cref="ReportId"/>), and the installations found by
+    /// name whose patch set the scan left unestablished, last under <c>machine</c>
+    /// (<see cref="MachineInfo.RecoveredPatchSetUnestablishedCount"/>). A new top-level key,
+    /// so the receiver deploys before a release sends it.
+    ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
     /// never loses data even if the allowlist has not caught up. THAT LENIENCE
@@ -176,7 +191,7 @@ public sealed record ResultLogEntry(
     /// <c>machine</c> arriving before the receiving end knows the name is a
     /// rejected report and a user told sending failed. The receiver ships first.
     /// </summary>
-    public const int CurrentSchemaVersion = 12;
+    public const int CurrentSchemaVersion = 13;
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it when the
     // report box was put on the card, so the report carries that reading. The host is the
@@ -193,7 +208,8 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.ScanOnly());
+            OperationInfo.ScanOnly(),
+            NewReportId());
 
     public static ResultLogEntry ForMove(
         ScanResult scan,
@@ -212,7 +228,8 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.FromMove(move, bytesFreed, operationDurationMs, moveDestinationKind, check));
+            OperationInfo.FromMove(move, bytesFreed, operationDurationMs, moveDestinationKind, check),
+            NewReportId());
 
     public static ResultLogEntry ForDelete(
         ScanResult scan,
@@ -230,7 +247,14 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.FromDelete(delete, bytesFreed, operationDurationMs, check));
+            OperationInfo.FromDelete(delete, bytesFreed, operationDurationMs, check),
+            NewReportId());
+
+    /// <summary>
+    /// A new random GUID. The serialiser writes a Guid in its 36-character form, lower
+    /// case, which is the form the receiver accepts.
+    /// </summary>
+    internal static Guid NewReportId() => Guid.NewGuid();
 
     private static string ResolveOs()
     {
@@ -650,6 +674,13 @@ public sealed record AppInfo(
 ///
 /// Appended after the identity groups for the reason given above.
 /// </param>
+/// <param name="RecoveredPatchSetUnestablishedCount">
+/// Installations the recovery found by name whose patch set the scan left unestablished on
+/// Windows Installer's own answers, each holding its product's superseded patches back
+/// (<see cref="EnumerationCensus.RecoveredPatchSetUnestablishedCount"/>). Apart from
+/// <see cref="ProductsWithPatchSetUnestablishedCount"/>, which counts the registry's own
+/// reading. Appended last, after the registry's read failures.
+/// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
     int LongFileNameCount,
@@ -691,7 +722,8 @@ public sealed record MachineInfo(
     int CandidateIdentityOpenRefusedCount,
     int CandidateIdentityUnavailableCount,
     int CandidateIdentityFaultedCount,
-    int RegistryKeyReadFailureCount)
+    int RegistryKeyReadFailureCount,
+    int RecoveredPatchSetUnestablishedCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -739,7 +771,8 @@ public sealed record MachineInfo(
             scan.CandidateIdentityReads.OpenRefusedCount,
             scan.CandidateIdentityReads.IdentityUnavailableCount,
             scan.CandidateIdentityReads.FaultedCount,
-            scan.Census.RegistryKeyReadFailures);
+            scan.Census.RegistryKeyReadFailures,
+            scan.Census.RecoveredPatchSetUnestablishedCount);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused

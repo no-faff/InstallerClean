@@ -514,7 +514,8 @@ Ayrıntılar şuraya yazıldı:
   'Completion.ReportPanel.Windows': `Windows'un 10 mu 11 mi, x64 mü Arm mı olduğu ve hangi dile ve ülke veya bölgeye ayarlandığı`,
   'Completion.ReportPanel.AppVersion': `InstallerClean'in sürümü, nasıl edinildiği (setup, taşınabilir, Scoop, tek başına komut satırı aracı, kaynaktan derlenmiş veya bilinmiyor), çalıştırmanın InstallerClean'de mi yoksa komut satırı aracında mı yapıldığı ve gösterildiği dil`,
   'Completion.ReportPanel.Errors': `Ters giden her şeyin sayısı`,
-  'Completion.ReportPanel.Closing': `Bunların her biri bir sayı ya da etikettir. Raporda hiçbir şey sizi, bilgisayarınızı, dosyalarınızı veya programlarınızı tanımlamaz ve IP adresinizi asla görmem.`,
+  'Completion.ReportPanel.ReportId': `Rapor birden fazla kez gönderilirse yalnızca bir kez sayılması için bu rapora özel oluşturulan rastgele bir kod`,
+  'Completion.ReportPanel.Closing': `Bu kod dışında, bunların her biri bir sayı ya da etikettir. Raporda hiçbir şey sizi, bilgisayarınızı, dosyalarınızı veya programlarınızı tanımlamaz ve IP adresinizi asla görmem.`,
   'Automation.ReportInfo': `Raporun içeriği`,
   'Automation.Scroll.ReportContents': `Raporun içeriği`,
   'Completion.ReportPanel.SeeReport': `Tam olarak neyin gönderildiğini gör`,
@@ -578,6 +579,7 @@ Ayrıntılar şuraya yazıldı:
   'About.Link.Notices': `Üçüncü taraf bildirimleri`,
   'Automation.About.Notices.HelpText': `InstallerClean'in içerdiği yazı tiplerinin, simgelerin ve kodun lisanslarını gösterir.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Üçüncü taraf bildirimlerini yazdır`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean için Windows 10 sürüm 1607 veya üzeri ya da Windows 11 gerekiyor.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

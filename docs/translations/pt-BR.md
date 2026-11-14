@@ -201,7 +201,8 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Se o Windows é 10 ou 11 e x64 ou Arm, e em que idioma e país ou região está configurado |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | A versão do InstallerClean, como você o obteve (setup, portable, Scoop, a ferramenta de linha de comando sozinha, compilado a partir do código-fonte ou desconhecido), se a execução foi no InstallerClean ou na ferramenta de linha de comando, e o idioma em que ele estava sendo exibido |
 | Counts of anything that went wrong | Contagens de qualquer coisa que tenha dado errado |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Cada um desses itens é um número ou um rótulo. Nada no relatório identifica você, seu PC, seus arquivos ou seus programas, e eu nunca vejo seu endereço IP. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Um código aleatório criado para este relatório, para que ele seja contado só uma vez se for enviado mais de uma vez |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Tirando esse código, cada um desses itens é um número ou um rótulo. Nada no relatório identifica você, seu PC, seus arquivos ou seus programas, e eu nunca vejo seu endereço IP. |
 | See exactly what's sent | Ver exatamente o que é enviado |
 
 ## Summaries and counts
@@ -365,6 +366,7 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Ocorreu um erro inesperado e o InstallerClean precisa fechar.<br><br>{0}<br><br>Não foi possível gravar o crash.log. |
 | Startup error | Erro de inicialização |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | O InstallerClean não vai iniciar porque há um arquivo chamado {0} ao lado dele, e o InstallerClean não vem com nenhum. Exclua esse arquivo e abra o InstallerClean novamente.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | O InstallerClean precisa do Windows 10 versão 1607 ou posterior, ou do Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | O InstallerClean precisa do .NET Framework 4.8. Instale-o pelo site da Microsoft, reinicie o PC e depois abra o InstallerClean de novo. |
 | Failed to start ({0}). Details written to:<br>{1} | Falha ao iniciar ({0}). Detalhes gravados em:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Falha ao iniciar ({0}). Não foi possível gravar o crash.log. |

@@ -514,7 +514,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Windows が 10 か 11 か、x64 か Arm か、そしてどの言語と国または地域に設定されているか`,
   'Completion.ReportPanel.AppVersion': `InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、実行が InstallerClean とコマンドラインツールのどちらで行われたか、そして表示していた言語`,
   'Completion.ReportPanel.Errors': `うまくいかなかったことの件数`,
-  'Completion.ReportPanel.Closing': `これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。`,
+  'Completion.ReportPanel.ReportId': `複数回送信されても 1 回だけ数えられるよう、このレポート用に作られるランダムなコード`,
+  'Completion.ReportPanel.Closing': `そのコードを除き、これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。`,
   'Automation.ReportInfo': `レポートの内容`,
   'Automation.Scroll.ReportContents': `レポートの内容`,
   'Completion.ReportPanel.SeeReport': `送信される内容をそのまま見る`,
@@ -578,6 +579,7 @@ const MAP = {
   'About.Link.Notices': `サードパーティ通知`,
   'Automation.About.Notices.HelpText': `InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  サードパーティ通知を表示`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean には Windows 10 バージョン 1607 以降、または Windows 11 が必要です。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

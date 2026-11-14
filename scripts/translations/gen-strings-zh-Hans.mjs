@@ -493,7 +493,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Windows 是 10 还是 11，是 x64 还是 Arm，以及设置的是哪种语言和哪个国家或地区`,
   'Completion.ReportPanel.AppVersion': `InstallerClean 的版本、获取方式（setup、portable、Scoop、单独的命令行工具、从源代码构建，或未知）、本次运行是在 InstallerClean 还是命令行工具中进行的，以及其显示的语言`,
   'Completion.ReportPanel.Errors': `所有出错情况的计数`,
-  'Completion.ReportPanel.Closing': `这些内容都是数字或标签。报告中没有任何内容会指明您、您的电脑、文件或程序，我也永远看不到您的 IP 地址。`,
+  'Completion.ReportPanel.ReportId': `为这份报告生成的随机代码，这样即使报告发送多次也只计一次`,
+  'Completion.ReportPanel.Closing': `除了这个代码，这些内容都是数字或标签。报告中没有任何内容会指明您、您的电脑、文件或程序，我也永远看不到您的 IP 地址。`,
   'Automation.ReportInfo': `报告包含哪些内容`,
   'Automation.Scroll.ReportContents': `报告包含哪些内容`,
   'Completion.ReportPanel.SeeReport': `查看发送的确切内容`,
@@ -557,6 +558,7 @@ const MAP = {
   'About.Link.Notices': `第三方声明`,
   'Automation.About.Notices.HelpText': `显示 InstallerClean 所含字体、图标和代码的许可证。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  显示第三方声明`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean 需要 Windows 10 版本 1607 或更高版本，或 Windows 11。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

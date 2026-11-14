@@ -651,7 +651,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to`,
   'Completion.ReportPanel.AppVersion': `InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing`,
   'Completion.ReportPanel.Errors': `Counts of anything that went wrong`,
-  'Completion.ReportPanel.Closing': `Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address.`,
+  'Completion.ReportPanel.ReportId': `A random code made for this report, so that it's only counted once if it's sent more than once`,
+  'Completion.ReportPanel.Closing': `Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address.`,
   'Automation.ReportInfo': `What the report holds`,
   'Automation.Scroll.ReportContents': `What the report holds`,
   'Completion.ReportPanel.SeeReport': `See exactly what's sent`,
@@ -714,6 +715,7 @@ const MAP = {
   'About.Link.Notices': `Third-party notices`,
   'Automation.About.Notices.HelpText': `Shows the licences of the fonts, icons and code InstallerClean includes.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Print the third-party notices`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean needs Windows 10 version 1607 or later, or Windows 11.`,
   'Error.NothingRemoved': `Nothing has been removed.`,
   'Error.NothingOfferedNothingRemoved': `Nothing has been offered and nothing has been removed.`,
 };

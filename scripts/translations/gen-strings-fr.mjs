@@ -596,7 +596,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Si Windows est en version 10 ou 11, x64 ou Arm, et la langue et le pays ou la région qui y sont définis`,
   'Completion.ReportPanel.AppVersion': `La version d'InstallerClean, la façon dont vous l'avez obtenu (setup, portable, Scoop, l'outil en ligne de commande seul, compilé depuis les sources, ou inconnu), si l'exécution s'est faite dans InstallerClean ou dans l'outil en ligne de commande, et la langue dans laquelle il s'affichait`,
   'Completion.ReportPanel.Errors': `Le décompte de tout ce qui a échoué`,
-  'Completion.ReportPanel.Closing': `Chacun de ces éléments est un nombre ou un libellé. Rien dans le rapport ne désigne ni vous, ni votre PC, ni vos fichiers, ni vos programmes, et je ne vois jamais votre adresse IP.`,
+  'Completion.ReportPanel.ReportId': `Un code aléatoire créé pour ce rapport, afin qu'il ne soit compté qu'une fois s'il est envoyé plusieurs fois`,
+  'Completion.ReportPanel.Closing': `À part ce code, chacun de ces éléments est un nombre ou un libellé. Rien dans le rapport ne désigne ni vous, ni votre PC, ni vos fichiers, ni vos programmes, et je ne vois jamais votre adresse IP.`,
   'Automation.ReportInfo': `Ce que contient le rapport`,
   'Automation.Scroll.ReportContents': `Ce que contient le rapport`,
   'Completion.ReportPanel.SeeReport': `Voir exactement ce qui est envoyé`,
@@ -660,6 +661,7 @@ const MAP = {
   'About.Link.Notices': `Avis de tiers`,
   'Automation.About.Notices.HelpText': `Affiche les licences des polices, des icônes et du code inclus dans InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Affiche les avis de tiers`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean nécessite Windows 10 version 1607 ou ultérieure, ou Windows 11.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

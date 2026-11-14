@@ -32,22 +32,30 @@ internal static class Program
     private const int ExitCancelled = CliExitCode.Cancelled;
 
     /// <remarks>
-    /// On a PC without .NET Framework 4.8 the command line says what to install and ends,
+    /// On a PC older than Windows 10 version 1607 the command line says which Windows it
+    /// needs, and on a PC without .NET Framework 4.8 it says what to install, and ends,
     /// before it reads its arguments. The download carries no config naming the runtime, so
     /// .NET Framework starts it on any 4.x. The runtime compiles a method whole the first
     /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
-    /// names only the check, the crash log's write of what the module initializer kept and
+    /// names only the checks, their refusal in English where a check fails to load what it
+    /// needs, the crash log's write of what the module initializer kept and
     /// <see cref="Start"/>, each in a method of its own that is never compiled into Main:
-    /// nothing the last two name is compiled before the check has run.
+    /// nothing the last two name is compiled before the checks have run.
     /// </remarks>
     public static int Main(string[] args)
     {
-        // A check that throws lets the run go on, as the window's does, where the run's own
-        // handlers catch what follows.
+        // A check that fails to load what it needs is on a PC whose .NET Framework is older
+        // than 4.8, which ends the run with the message in English, the strings being
+        // unreadable there. A check that throws anything else lets the run go on, as the
+        // window's does, where the run's own handlers catch what follows.
         int? refused;
         try
         {
-            refused = RefuseWithoutNetFramework48();
+            refused = RefuseOnAPcThatCannotRunIt();
+        }
+        catch (Exception ex) when (StartChecks.IsLoadFailure(ex))
+        {
+            refused = RefuseWithoutRecording(NetFrameworkCheck.EnglishMessage(commandLine: true));
         }
         catch (Exception)
         {
@@ -59,13 +67,14 @@ internal static class Program
     }
 
     /// <summary>
-    /// The exit code of the refusal where the PC does not have .NET Framework 4.8, having
-    /// printed it, or null where it does.
+    /// The exit code of the refusal where the PC runs Windows older than Windows 10 version
+    /// 1607, or does not have .NET Framework 4.8, having printed it, or null where it can run
+    /// the copy. The message is in the language Windows displays, as the whole command line is.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static int? RefuseWithoutNetFramework48() =>
-        NetFrameworkCheck.RefusalMessage(commandLine: true) is { } message
-            ? Refuse(message)
+    private static int? RefuseOnAPcThatCannotRunIt() =>
+        StartChecks.OfThisPc() is var refusal && refusal != StartRefusal.None
+            ? RefuseWithoutRecording(StartChecks.Message(refusal, commandLine: true))
             : null;
 
     /// <summary>The run, on a PC that has .NET Framework 4.8.</summary>
@@ -201,6 +210,37 @@ internal static class Program
         try
         {
             new ConsoleGuard(error ?? Console.Error).WriteLine(message);
+        }
+        finally
+        {
+            RestoreOutputEncoding(previousOutputEncoding);
+        }
+        return ExitError;
+    }
+
+    /// <summary>
+    /// <see cref="Refuse"/> for the refusals on a PC older than Windows 10 version 1607 or
+    /// without .NET Framework 4.8, where a write that fails loses its text and is not recorded
+    /// in crash.log. Recording it asks the crash
+    /// log for its folder, which can move an earlier version's folder into place and runs
+    /// code needing more than the .NET Framework NetFrameworkCheck's remarks name, on a PC
+    /// that cannot run the app. The window records nothing where its message cannot be shown
+    /// either.
+    /// </summary>
+    /// <param name="message">What the refusal says.</param>
+    /// <param name="error">
+    /// The error stream, or null for the console's, which is read once the code page is set.
+    /// </param>
+    internal static int RefuseWithoutRecording(string message, TextWriter? error = null)
+    {
+        var previousOutputEncoding = TrySetUtf8Output();
+        try
+        {
+            (error ?? Console.Error).WriteLine(message);
+        }
+        catch (Exception)
+        {
+            // The text is lost, and the copy ends with the error code as it would have.
         }
         finally
         {
@@ -485,7 +525,7 @@ internal static class Program
 
         // Runs once, on the thread that brings the cancel: a thread-pool thread for Ctrl+C,
         // which the runtime queues there while the console's control-handler thread waits;
-        // Windows' own handler thread for a console being closed; the thread CancelKey.Watch
+        // the handler thread Windows starts for a console being closed; the thread CancelKey.Watch
         // starts for the event the version that started this one sets; or, where the cancel
         // came before the registration, this one. Nothing in here may throw: on any of the
         // first three, Main's try/catch does not cover it, so an escape is unhandled, a
