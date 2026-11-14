@@ -6,7 +6,8 @@
 # Each question is put three ways. The answer is read beside every candidate value. The calls
 # are made under Process Monitor, and the registry events between two marker lookups are
 # printed. And a candidate value is changed, the question asked again in a new process, and the
-# value put back, which shows whether the answer follows the value.
+# value put back, which shows whether the answer follows the value. The questions are asked
+# by the account the script runs as and, from a scheduled task, by SYSTEM.
 #
 # What it installs, from product.wxs and patch.wxs beside it:
 #  - PU, per user, installed by the account the script runs as.
@@ -44,8 +45,10 @@ param(
     [string]$Procmon = '',
     [switch]$SecondAccount,
     [switch]$TeardownOnly,
-    # Set by the script itself, on the child process that answers one installation's questions.
-    [string]$Ask = ''
+    # Set by the script itself, on the child process that answers one installation's questions,
+    # and where that process writes its answers to a file.
+    [string]$Ask = '',
+    [string]$AskOut = ''
 )
 
 Set-StrictMode -Version 2.0
@@ -173,7 +176,8 @@ function Read-Answers([string]$productCode, [string]$sid, [int]$context, [string
 # The child process: answers for one installation, as JSON on the output stream.
 if ($Ask) {
     $parts = $Ask -split ';'
-    Read-Answers $parts[0] $parts[1] ([int]$parts[2]) @($parts[3] -split ',') | ConvertTo-Json -Depth 6 -Compress
+    $json = Read-Answers $parts[0] $parts[1] ([int]$parts[2]) @($parts[3] -split ',') | ConvertTo-Json -Depth 6 -Compress
+    if ($AskOut) { Set-Content -LiteralPath $AskOut -Value $json -Encoding utf8 } else { $json }
     return
 }
 
@@ -417,25 +421,35 @@ function Assert-Msiexec([string]$what, [string[]]$msiArgs) {
     $code = Invoke-Msiexec $what $msiArgs
     if ($code -ne 0) { throw "msiexec, $what, exited $code; its log is in $logs." }
 }
-# One msiexec run as another account, from a scheduled task, waited on until it ends. Answers
-# the task's result, or -1 where it had not ended after 300 s.
-function Invoke-MsiexecAs([string]$what, [string]$msiArgs, [string]$account, [string]$password) {
-    $taskName = 'InstallerClean patch records, ' + ($what -replace '[^A-Za-z0-9 ]+', '')
-    $log = Join-Path $logs (($what -replace '[^A-Za-z0-9]+', '-') + '.log')
-    $action = New-ScheduledTaskAction -Execute $msiexec -Argument "$msiArgs /qn /norestart /l*v `"$log`""
-    $null = Register-ScheduledTask -TaskName $taskName -Action $action -User $account -Password $password -RunLevel Highest -Force
-    Start-ScheduledTask -TaskName $taskName
-    # 267011 is the task's result before its first run and 267009 its result while it runs.
-    $clock = [Diagnostics.Stopwatch]::StartNew()
-    do {
-        Start-Sleep -Seconds 1
-        $task = Get-ScheduledTask -TaskName $taskName
-        $taskResult = (Get-ScheduledTaskInfo -TaskName $taskName).LastTaskResult
-        $ended = $task.State -ne 'Running' -and $taskResult -notin 267011, 267009
-    } while (-not $ended -and $clock.Elapsed.TotalSeconds -lt 300)
-    Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
-    Say "msiexec as $account, ${what}: $(if ($ended) { "exit code $taskResult" } else { 'had not ended after 300 s' })"
+# One program run as another account, from a scheduled task, waited on until it ends. Answers
+# the task's result, or -1 where it had not ended after 300 s. SYSTEM takes no password. Every
+# task's name starts as $taskPrefix does, and the task is removed once it has ended.
+$taskPrefix = 'InstallerClean patch records, '
+function Invoke-TaskAs([string]$what, [string]$execute, [string]$argument, [string]$account, [string]$password) {
+    $taskName = $taskPrefix + ($what -replace '[^A-Za-z0-9 ]+', '')
+    $action = New-ScheduledTaskAction -Execute $execute -Argument $argument
+    if ($password) { $null = Register-ScheduledTask -TaskName $taskName -Action $action -User $account -Password $password -RunLevel Highest -Force }
+    else { $null = Register-ScheduledTask -TaskName $taskName -Action $action -User $account -RunLevel Highest -Force }
+    try {
+        Start-ScheduledTask -TaskName $taskName
+        # 267011 is the task's result before its first run and 267009 its result while it runs.
+        $clock = [Diagnostics.Stopwatch]::StartNew()
+        do {
+            Start-Sleep -Milliseconds 500
+            $task = Get-ScheduledTask -TaskName $taskName
+            $taskResult = (Get-ScheduledTaskInfo -TaskName $taskName).LastTaskResult
+            $ended = $task.State -ne 'Running' -and $taskResult -notin 267011, 267009
+        } while (-not $ended -and $clock.Elapsed.TotalSeconds -lt 300)
+    }
+    finally { Unregister-ScheduledTask -TaskName $taskName -Confirm:$false }
     if ($ended) { return $taskResult } else { return -1 }
+}
+# One msiexec run as another account. Answers what Invoke-TaskAs answers.
+function Invoke-MsiexecAs([string]$what, [string]$msiArgs, [string]$account, [string]$password) {
+    $log = Join-Path $logs (($what -replace '[^A-Za-z0-9]+', '-') + '.log')
+    $taskResult = Invoke-TaskAs $what $msiexec "$msiArgs /qn /norestart /l*v `"$log`"" $account $password
+    Say "msiexec as $account, ${what}: $(if ($taskResult -ne -1) { "exit code $taskResult" } else { 'had not ended after 300 s' })"
+    return $taskResult
 }
 
 # ---- What the programs can leave behind, read by what is there.
@@ -613,6 +627,12 @@ function Invoke-Teardown {
         else { Say "CLEAN: the Installer folder holds no .msi or .msp file it did not hold when the probe started ($($atStart.Count) then)." }
     }
     else { $notClean++; Say "NOT CLEAN: the list of the Installer folder's files at the start, $startList, is not there, so what the probe added to the folder is not known." }
+    $tasks = @(Get-ScheduledTask | Where-Object { $_.TaskName -like "$taskPrefix*" })
+    foreach ($task in $tasks) {
+        try { Unregister-ScheduledTask -TaskName $task.TaskName -Confirm:$false; Say "CLEAN: the scheduled task '$($task.TaskName)' was still registered and is removed." }
+        catch { $notClean++; Say "NOT CLEAN: the scheduled task '$($task.TaskName)' is still registered: $($_.Exception.Message)" }
+    }
+    if (-not $tasks.Count) { Say "CLEAN: no scheduled task named '$taskPrefix...' is registered." }
     $running = @(Get-Process -Name 'Procmon*' -ErrorAction SilentlyContinue)
     if ($running.Count) { $notClean++; Say "NOT CLEAN: Process Monitor is still running ($(($running | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', '))." }
     else { Say 'CLEAN: Process Monitor is not running.' }
@@ -702,9 +722,31 @@ function Read-Here($installation) { return Format-Answers (Read-Answers $install
 # The same answers from a new PowerShell process, which has read nothing before.
 function Read-Fresh($installation) {
     $spec = "$($installation.Code);$($installation.Sid);$($installation.Context);$((Get-PatchCodes $installation.Tag) -join ',')"
-    $json = & $pwshExe -NoProfile -File $PSCommandPath -OutDir $OutDir -Ask $spec
+    $json = & $pwshExe -NoProfile -ExecutionPolicy Bypass -File $PSCommandPath -OutDir $OutDir -Ask $spec
     if ($LASTEXITCODE -ne 0 -or -not $json) { throw "The child process that asks about $($installation.Tag) exited $LASTEXITCODE and answered '$json'." }
     return Format-Answers (($json | Select-Object -Last 1) | ConvertFrom-Json -AsHashtable)
+}
+
+# The same answers from a new PowerShell process run as SYSTEM, from a scheduled task.
+function Read-AsSystem($installation) {
+    $spec = "$($installation.Code);$($installation.Sid);$($installation.Context);$((Get-PatchCodes $installation.Tag) -join ',')"
+    $file = Join-Path $OutDir 'asked-as-system.json'
+    Remove-Item -LiteralPath $file -ErrorAction SilentlyContinue
+    $taskResult = Invoke-TaskAs 'ask as SYSTEM' $pwshExe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -OutDir `"$OutDir`" -Ask `"$spec`" -AskOut `"$file`"" 'SYSTEM' ''
+    if ($taskResult -ne 0 -or -not (Test-Path -LiteralPath $file)) { throw "The task that asks about $($installation.Tag) as SYSTEM ended with $taskResult and wrote $(if (Test-Path -LiteralPath $file) { 'its answers' } else { 'no answers' })." }
+    return Format-Answers (Get-Content -LiteralPath $file -Raw | ConvertFrom-Json -AsHashtable)
+}
+# Read-AsSystem's line for the result: the answers, and whether they are $beside's, the
+# answers the account the script runs as got to the same questions.
+function Show-AsSystem($installation, [string]$beside) {
+    try {
+        $asSystem = Read-AsSystem $installation
+        return "$asSystem | $(if ($asSystem -ceq $beside) { 'THE SAME AS THIS ACCOUNT''S' } else { 'DIFFERENT FROM THIS ACCOUNT''S' })"
+    }
+    catch {
+        $failures.Add("Asking as SYSTEM about $($installation.Tag): $($_.Exception.Message)")
+        return "UNREAD: $($_.Exception.Message)"
+    }
 }
 
 # ==== The run.
@@ -938,6 +980,9 @@ try {
         $asScan = @([PatchRecordsMsi]::Patches($installation.Code, $installation.Sid, $installation.Context, 15, $false))
         Say "    MsiEnumPatchesEx as the scan calls it (every bit, no buffer for the account) lists $($asScan.Count): $(($asScan | ForEach-Object { if ($_ -like 'ERROR*') { $_ } else { (NameOf (($_ -split '\|')[0])) -replace ' \{.*$', '' } }) -join ', ')"
         $walked = @([PatchRecordsMsi]::Patches($installation.Code, $installation.Sid, $installation.Context, 15, $true) | Where-Object { $_ -notlike 'ERROR*' } | ForEach-Object { ($_ -split '\|')[0] })
+        $asThisAccount = Read-Fresh $installation
+        Say "    every question at once, a new process run as this account: $asThisAccount"
+        Say "    every question at once, a new process run as SYSTEM: $(Show-AsSystem $installation $asThisAccount)"
 
         # Every key that could hold this installation's patch list, whatever its context.
         $recordsKey = Get-RecordsKey $installation
@@ -1019,6 +1064,13 @@ try {
                 Set-Marker "$n-end"
                 $calls += [pscustomobject]@{ N = $n; What = "MsiEnumPatchesEx as the scan calls it on $(Get-Label $installation) listed $($rows.Count): $($rows -join ', ')"; Words = @((Packed $installation.Code), '\Patches') }
             }
+            foreach ($installation in $installations) {
+                $n++
+                Set-Marker "$n-begin"
+                $asSystem = try { Read-AsSystem $installation } catch { "UNREAD: $($_.Exception.Message)" }
+                Set-Marker "$n-end"
+                $calls += [pscustomobject]@{ N = $n; AsSystem = $true; What = "every question at once, asked by a process run as SYSTEM, about $(Get-Label $installation): $asSystem"; Words = @((Packed $installation.Code), 'Uninstallable') + @($patchesOf[$installation.Tag] | ForEach-Object { Packed $patches[$_].Code }) }
+            }
             foreach ($tag in @($installations | ForEach-Object { $_.Tag } | Select-Object -Unique)) {
                 $n++
                 Set-Marker "$n-begin"
@@ -1052,7 +1104,9 @@ try {
                 if ($open.Call.Words | Where-Object { $path.IndexOf($_, [StringComparison]::OrdinalIgnoreCase) -ge 0 }) {
                     $open.Lines.Add("    [$process $($_.PID)] $($_.Operation) $path -> $($_.Result) $($_.Detail)")
                 }
-                elseif ("$($_.PID)" -eq "$PID" -and $_.Operation -notin 'RegCloseKey', 'RegQueryKey') {
+                elseif ($_.Operation -notin 'RegCloseKey', 'RegQueryKey' -and $(
+                        if ($open.Call.PSObject.Properties['AsSystem']) { $process -eq 'pwsh.exe' -and "$($_.PID)" -ne "$PID" -and $path -match 'Installer|^HKU\\S-1-5-21' }
+                        else { "$($_.PID)" -eq "$PID" })) {
                     $other = "$($_.Operation) $path -> $($_.Result)"
                     if (-not $open.Others.Contains($other)) { $open.Others.Add($other) }
                 }
@@ -1066,7 +1120,7 @@ try {
             if (-not $slot.Began -or -not $slot.Ended) { Say '    UNREAD: the capture does not hold both of this call''s markers.'; $failures.Add("Process Monitor: call $($call.N) has no markers in the capture."); continue }
             foreach ($line in ($slot.Lines | Select-Object -First 300)) { Say $line }
             if ($slot.Lines.Count -gt 300) { Say "    ... and $($slot.Lines.Count - 300) more such events, not printed." }
-            Say "    Every other key the probe's own process opened or read between the markers ($($slot.Others.Count)):"
+            Say "    $(if ($call.PSObject.Properties['AsSystem']) { 'Every other key naming Installer or a user''s hive that the process run as SYSTEM opened or read' } else { 'Every other key the probe''s own process opened or read' }) between the markers ($($slot.Others.Count)):"
             foreach ($line in ($slot.Others | Select-Object -First 80)) { Say "        $line" }
             if ($slot.Others.Count -gt 80) { Say "        ... and $($slot.Others.Count - 80) more, not printed." }
             Say "    $($slot.Lines.Count) registry events naming the program, the patch or the property are printed, of these registry events between the markers: $(($slot.Processes.Keys | Sort-Object | ForEach-Object { "$_ $($slot.Processes[$_])" }) -join ', ')."
@@ -1098,6 +1152,7 @@ try {
             $with = Read-Fresh $installation
             Say "    changed, a new process: $with"
             Say "    changed, this process: $(Read-Here $installation)"
+            Say "    changed, a new process run as SYSTEM: $(Show-AsSystem $installation $with)"
         }
         catch { Say "    REFUSED: the change was not made or not read: $($_.Exception.Message)"; $failures.Add("Change '$what' on $($installation.Tag): $($_.Exception.Message)") }
         finally {
