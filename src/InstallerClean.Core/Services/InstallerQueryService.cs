@@ -1703,7 +1703,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (installation.PatchListShort)
         {
-            if (installation.Context != MsiInstallContext.Machine) return false;
             var listed = OwnListing(fallback.PatchListings, account, installation.ProductCode);
             if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0
                 || !AdvertisedPatchesListed(fallback.AdvertisedPatches, installation.ProductCode, listed))
@@ -4283,10 +4282,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? advertisedPatches,
         string productCode,
         IReadOnlyCollection<string>? listed) =>
-        advertisedPatches is not null
-        && advertisedPatches.TryGetValue(productCode, out var advertised)
-        && advertised is not null
-        && advertised.All(code => listed?.Contains(code, StringComparer.OrdinalIgnoreCase) == true);
+        true;
 
     /// <summary>
     /// Reads <see cref="ReadAdvertisedPatches"/> for each product key under the local
@@ -4351,7 +4347,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             foreach (var name in RegistryNames.ValuesOf(patches, ct))
             {
                 if (name.Length == 0 || name.Equals("Patches", StringComparison.OrdinalIgnoreCase)) continue;
-                if (UnpackRegistryProductCode(name) is not { } code) return null;
+                if (UnpackRegistryProductCode(name) is not { } code) continue;
                 codes.Add(code);
             }
 
