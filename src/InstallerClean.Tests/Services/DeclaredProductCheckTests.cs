@@ -1425,6 +1425,45 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
     }
 
+    /// <summary>
+    /// The copy screened beside a recorded package that names nothing on drive E:, with E:
+    /// answering <paramref name="kindOfE"/> and every other drive as fixed.
+    /// </summary>
+    private static DeclaredProductOutcome ScreenBesideARecordedPackageNamingNothingOnDriveE(DriveType kindOfE)
+    {
+        var f = ARecordedPackageNamingNothingAt(@"E:\Windows\Installer\b.msi");
+
+        return new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+        {
+            DriveKindOf = drive => drive.StartsWith('E') ? kindOfE : DriveType.Fixed,
+            NamesInFolderOf = NameOnly,
+        }.Screen(new[] { Package(Candidate) }, [], [], default, null, InInstallerFolder).Outcomes[0];
+    }
+
+    [Fact]
+    public void A_recorded_package_naming_nothing_on_a_removable_drive_is_judged_by_its_package_code()
+    {
+        Assert.Equal(
+            DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile,
+            ScreenBesideARecordedPackageNamingNothingOnDriveE(DriveType.Removable));
+    }
+
+    [Fact]
+    public void A_recorded_package_naming_nothing_on_an_optical_drive_is_judged_by_its_package_code()
+    {
+        Assert.Equal(
+            DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile,
+            ScreenBesideARecordedPackageNamingNothingOnDriveE(DriveType.CDRom));
+    }
+
+    [Fact]
+    public void A_recorded_package_naming_nothing_on_a_RAM_disk_is_judged_by_its_package_code()
+    {
+        Assert.Equal(
+            DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile,
+            ScreenBesideARecordedPackageNamingNothingOnDriveE(DriveType.Ram));
+    }
+
     [Fact]
     public void A_copy_kept_beside_a_recorded_package_naming_nothing_on_a_drive_that_does_not_answer_is_counted_against_it()
     {
@@ -1658,6 +1697,20 @@ public class DeclaredProductCheckTests
         f.Msi.Registry.Holds(ProductAProperties,
             new RegistryValue(MsiInstallProperty.LocalPackage, RegistryValueKind.String, Recorded),
             new RegistryValue("ManagedLocalPackage", RegistryValueKind.String, Recorded),
+            TheInstallSource);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+        Assert.Contains(ProductAProperties, f.Msi.Registry.Reads);
+    }
+
+    [Fact]
+    public void A_copy_is_let_through_where_the_InstallProperties_key_holds_the_recorded_path_under_names_of_another_case()
+    {
+        // The registry compares value names without case.
+        var f = ACopyBesideARecordedPackageThatNamesNothing();
+        f.Msi.Registry.Holds(ProductAProperties,
+            new RegistryValue("localpackage", RegistryValueKind.String, Recorded),
+            new RegistryValue("MANAGEDLOCALPACKAGE", RegistryValueKind.String, Recorded),
             TheInstallSource);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
@@ -2905,6 +2958,26 @@ public class DeclaredProductCheckTests
         f.Msi.Registry.Answers(ProductAKey + @"\Media", RegistryKeyPresence.Absent);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+    }
+
+    [Fact]
+    public void A_copy_the_package_name_could_be_is_let_through_when_the_media_key_holds_no_disk_and_the_list_holds_none()
+    {
+        // The media key is there and names no disk, and no media package path, so the list's
+        // media disks are asked for and there is none.
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "c.msi", SetupFolder);
+        f.Files.Answers(SetupFolder + "c.msi", FileIdentityRead.NamesNothing);
+        AddSecondCandidate(f);
+        f.Msi.Registry.Holds(ProductAKey + @"\Media", Sz("MediaPackage", ""));
+        f.Msi.HoldsNoMediaDisk(ProductA, null, MsiInstallContext.Machine);
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
+
+        Assert.Equal(
+            new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile },
+            screening.Outcomes);
     }
 
     // ---- A disc or a stick: a media source, a media package path, and a drive letter with no drive ----
@@ -7065,6 +7138,27 @@ public class DeclaredProductCheckTests
                 DeclaredProductOutcome.DeclaredProductNotInstalled,
             },
             outcomes);
+    }
+
+    [Fact]
+    public void A_source_list_no_walk_read_is_walked_again_for_a_later_candidate_and_that_walk_is_taken()
+    {
+        // The first candidate asks for the second copy's network list while it is linked to
+        // product A, and every walk meets an error, so that candidate is kept. The second
+        // candidate asks for the same list as a package a second copy opens, and a walk that
+        // reaches the end is the list.
+        var f = AMarkedSecondCopy();
+        f.Packages.Declares(SecondCopysPackage, ProductA);
+        f.Msi.SourceListEntryAnswersOnce(SecondCopy, f.Listed[0].UserSid, MsiInstallContext.Machine, 0,
+            MsiError.BadConfiguration, WalkRestarts.Attempts);
+
+        var screening = ScreeningBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
+
+        Assert.Equal(
+            new[] { DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.DeclaredProductNotInstalled },
+            screening.Outcomes);
+        Assert.Equal(DeclaredProductInstalledCause.SourcesWouldNotRead, screening.InstalledCauses[0]);
+        Assert.Equal(WalkRestarts.Attempts + 1, f.Msi.SourceListWalks.Count);
     }
 
     [Fact]
