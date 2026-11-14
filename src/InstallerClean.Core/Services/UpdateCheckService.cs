@@ -88,6 +88,11 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
     private static readonly Uri ReleasesPage = new(ReleasesPageUrl);
 
+    // How a crash.log entry for a failed check opens. It names what was asked
+    // for, because whatever answered may have been a proxy, a filter or a sign-in
+    // page rather than GitHub.
+    private const string RequestNamed = "The request for the GitHub releases page";
+
     /// <summary>
     /// The path a usable Location has to sit under, built from
     /// <see cref="ReleasesPageUrl"/> so a repository move cannot leave the
@@ -207,7 +212,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
                 // after the fact, and nothing in the breadcrumb names a
                 // user, a path or a machine.
                 LogIfUserIsWaiting(origin, new HttpRequestException(
-                    $"GitHub releases page returned {status} " +
+                    $"{RequestNamed} got {status} " +
                     $"({response.StatusCode}).{DescribeThrottling(response.Headers)}"));
                 return new CheckFailed(response.IsSuccessStatusCode
                     ? UpdateCheckFailureReason.ResponseParseError
@@ -221,7 +226,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
                 // GitHub having changed how /latest answers, which is the
                 // one assumption this check rests on.
                 LogIfUserIsWaiting(origin, new HttpRequestException(
-                    $"GitHub releases page returned {status} with an unusable " +
+                    $"{RequestNamed} got {status} with an unusable " +
                     $"Location: {Clamp(response.Headers.Location?.ToString() ?? "(absent)")}"));
                 return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
             }
@@ -229,7 +234,8 @@ public sealed class UpdateCheckService : IUpdateCheckService
             if (Compare(tagName, currentVersion) is { } answer)
                 return answer;
             LogIfUserIsWaiting(origin, new HttpRequestException(
-                $"GitHub redirected to a tag that is not a version: {Clamp(tagName)}"));
+                $"{RequestNamed} got {status}, a redirect to a tag that is not a version: " +
+                $"{Clamp(tagName)}"));
             return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
