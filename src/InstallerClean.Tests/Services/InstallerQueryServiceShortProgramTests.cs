@@ -240,9 +240,9 @@ public class InstallerQueryServiceShortProgramTests
     /// short, in a scan run as another account, or as an account that was not read where
     /// <paramref name="runningAs"/> is null. Windows Installer lists another account's
     /// program's patches from that account's <c>UserData</c> key alone, so the program's
-    /// own listing stands in by itself, and a listing under any other account does not.
-    /// Where the scan runs as the local system or does not know which account it runs as,
-    /// nothing stands in.
+    /// own listing stands in by itself, and a listing under any other account does not. The
+    /// local system is such another account. Where the scan does not know which account it
+    /// runs as, nothing stands in.
     /// </summary>
     [Theory]
     [InlineData(OwnerAccount, OtherAccount, 0)]
@@ -250,7 +250,7 @@ public class InstallerQueryServiceShortProgramTests
     [InlineData(MachineAccount, OtherAccount, 1)]
     [InlineData(null, OtherAccount, 1)]
     [InlineData(OwnerAccount, null, 1)]
-    [InlineData(OwnerAccount, MachineAccount, 1)]
+    [InlineData(OwnerAccount, MachineAccount, 0)]
     public async Task Another_accounts_per_user_programs_short_patch_list_holds_every_superseded_patch_unless_its_own_accounts_listing_names_every_patch_it_returned(
         string? listedUnder, string? runningAs, int unsettled)
     {
@@ -750,9 +750,9 @@ public class InstallerQueryServiceShortProgramTests
     /// than the one the scan runs as, the listing is all Windows Installer's own list reads,
     /// and the registry's reading stands. For the running account's own, it stands only
     /// where that account's advertised key lists no patch the listing leaves out, and not
-    /// where that key has no entry or was not read. Where the scan runs as the local system
-    /// or does not know which account it runs as, and for a managed installation, the
-    /// superseded patch is held back.
+    /// where that key has no entry or was not read. A scan run as the local system is run
+    /// as another account. Where the scan does not know which account it runs as, and for a
+    /// managed installation, the superseded patch is held back.
     /// </summary>
     [Theory]
     [InlineData(MsiInstallContext.UserUnmanaged, OtherAccount, false, null, true, false)]
@@ -767,8 +767,8 @@ public class InstallerQueryServiceShortProgramTests
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, false, null, false, true)]
     [InlineData(MsiInstallContext.UserUnmanaged, null, false, null, true, true)]
     [InlineData(MsiInstallContext.UserUnmanaged, null, false, null, false, true)]
-    [InlineData(MsiInstallContext.UserUnmanaged, MachineAccount, false, null, true, true)]
-    [InlineData(MsiInstallContext.UserUnmanaged, MachineAccount, false, null, false, true)]
+    [InlineData(MsiInstallContext.UserUnmanaged, MachineAccount, false, null, true, false)]
+    [InlineData(MsiInstallContext.UserUnmanaged, MachineAccount, false, null, false, false)]
     [InlineData(MsiInstallContext.UserManaged, OtherAccount, false, null, true, true)]
     [InlineData(MsiInstallContext.UserManaged, OtherAccount, false, null, false, true)]
     public async Task A_per_user_recovered_programs_patch_list_Windows_refuses_holds_the_superseded_one_unless_its_own_listing_is_all_Windows_Installer_reads(
@@ -983,8 +983,9 @@ public class InstallerQueryServiceShortProgramTests
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, OtherAccount, null, true)]
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, OtherAccount, new[] { AdvertisedOnly }, true)]
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, null, new string[0], false)]
-    [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, MachineAccount, new string[0], false)]
-    [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, "s-1-5-18", new string[0], false)]
+    [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, MachineAccount, null, true)]
+    [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, "s-1-5-18", new[] { AdvertisedOnly }, true)]
+    [InlineData(MsiInstallContext.UserUnmanaged, MachineAccount, MachineAccount, new string[0], false)]
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, OwnerAccount, new string[0], true)]
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, "s-1-5-21-1111111111-2222222222-3333333333-1002", new[] { AdvertisedOnly }, false)]
     [InlineData(MsiInstallContext.UserUnmanaged, OwnerAccount, OwnerAccount, new[] { AdvertisedOnly }, false)]

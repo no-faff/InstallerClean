@@ -4358,11 +4358,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>Software\Microsoft\Installer\Products\{product}\Patches</c> beside the
     /// <c>UserData</c> key, in the same way. For a per-user unmanaged installation of any
     /// other account it reads the <c>UserData</c> key alone, so that listing answers by
-    /// itself.
+    /// itself. A process running as the local system is another account to every user's
+    /// installation.
     ///
     /// A per-user managed installation is not answered for, nor is a per-user installation
-    /// under the local system's account, nor any per-user installation where the process
-    /// runs as the local system or the result does not say which account it runs as
+    /// under the local system's account, nor any per-user installation where the result
+    /// does not say which account the process runs as
     /// (<see cref="FallbackRead.RunningAccount"/>).
     ///
     /// <see cref="ReadEveryAdvertisedPatchList"/> reads the advertised lists this asks
@@ -4387,7 +4388,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (context != MsiInstallContext.UserUnmanaged
             || fallback.RunningAccount is not { } running
-            || string.Equals(running, LocalSystemAccount, StringComparison.OrdinalIgnoreCase)
             || string.Equals(account, LocalSystemAccount, StringComparison.OrdinalIgnoreCase))
             return false;
 
