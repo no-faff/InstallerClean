@@ -481,6 +481,35 @@ function Get-OtherAccountSid {
     try { return ([Security.Principal.NTAccount]::new("$env:COMPUTERNAME\$otherAccountName")).Translate([Security.Principal.SecurityIdentifier]).Value }
     catch { return '' }
 }
+# Waits for an account's hive to leave HKU, and says what it took. A hive still loaded after
+# $seconds is waited on again once the Windows Installer service is stopped, and after that is
+# unloaded with reg.exe. Answers whether the hive is loaded at the end.
+function Wait-HiveUnloaded([string]$sid, [int]$seconds) {
+    $isLoaded = { $hku.GetSubKeyNames() -contains $sid }
+    $wait = {
+        $clock = [Diagnostics.Stopwatch]::StartNew()
+        while ((& $isLoaded) -and $clock.Elapsed.TotalSeconds -lt $seconds) { Start-Sleep -Seconds 2 }
+        [int]$clock.Elapsed.TotalSeconds
+    }
+    $waited = & $wait
+    if (-not (& $isLoaded)) { Say "The hive HKU\$sid left by itself, $waited s after the account's last task ended."; return $false }
+    Say "The hive HKU\$sid was still loaded $waited s after the account's last task ended."
+    $service = Get-Service -Name msiserver
+    if ($service.Status -ne 'Stopped') {
+        try { Stop-Service -Name msiserver -Force; Say 'The Windows Installer service was running and is stopped.' }
+        catch { Say "The Windows Installer service was not stopped: $($_.Exception.Message)" }
+    }
+    else { Say 'The Windows Installer service was not running.' }
+    $waited = & $wait
+    if (-not (& $isLoaded)) { Say "The hive HKU\$sid left $waited s after that."; return $false }
+    foreach ($name in "${sid}_Classes", $sid) {
+        $out = & reg.exe unload "HKU\$name" 2>&1
+        Say "reg unload HKU\${name}: exit code $LASTEXITCODE ($(($out | Out-String).Trim()))"
+    }
+    $loaded = & $isLoaded
+    Say "After reg unload the hive HKU\$sid is loaded: $loaded."
+    return $loaded
+}
 function New-Password { return (-join (1..10 | ForEach-Object { [char](Get-Random -Minimum 97 -Maximum 123) })) + 'A9!x' }
 
 # The keys Windows Installer or a program makes for an account the first time it needs them. The
@@ -527,10 +556,12 @@ function Invoke-Teardown {
         & net.exe user $otherAccountName $password | Out-Null
         $code = Invoke-MsiexecAs 'remove PO as the second account' "/x $($programs.PO.Code) $fast" "$env:COMPUTERNAME\$otherAccountName" $password
         if ($code -notin 0, 1605) { $notClean++; Say "NOT CLEAN: removing PO as the second account ended with $code." }
+        $null = Wait-HiveUnloaded $otherSid 30
         & net.exe user $otherAccountName /delete | Out-Null
         Get-CimInstance -ClassName Win32_UserProfile -Filter "SID='$otherSid'" | ForEach-Object {
             $profilePath = $_.LocalPath
-            try { $_ | Remove-CimInstance } catch { $notClean++; Say "NOT CLEAN: the second account's profile $profilePath was not removed: $($_.Exception.Message)" }
+            try { $_ | Remove-CimInstance; Say "CLEAN: the second account's profile $profilePath is removed." }
+            catch { $notClean++; Say "NOT CLEAN: the second account's profile $profilePath was not removed: $($_.Exception.Message)" }
         }
         if (Get-OtherAccountSid) { $notClean++; Say "NOT CLEAN: the account $otherAccountName is still there." }
         else { Say "CLEAN: the account $otherAccountName is not there." }
@@ -813,14 +844,11 @@ try {
             (Invoke-MsiexecAs 'install PO as the second account' "/i $(Package 'PO-1.0.0.msi') $fast" $account $password),
             (Invoke-MsiexecAs 'apply O1 as the second account' "/p $(Package 'O1.msp') $fast" $account $password),
             (Invoke-MsiexecAs 'apply O2 as the second account' "/p $(Package 'O2.msp') $fast" $account $password))
-        $clock = [Diagnostics.Stopwatch]::StartNew()
-        while (($hku.GetSubKeyNames() -contains $otherSid) -and $clock.Elapsed.TotalSeconds -lt 120) { Start-Sleep -Seconds 2 }
-        $loaded = $hku.GetSubKeyNames() -contains $otherSid
-        Say "The second account's hive, HKU\$otherSid, is loaded: $loaded (read $([int]$clock.Elapsed.TotalSeconds) s after its last task ended)."
+        $loaded = Wait-HiveUnloaded $otherSid 30
         $poList = Get-Installations 'PO' $otherSid 2
         $installations += $poList
         if ($poSteps | Where-Object { $_ -ne 0 }) { $failures.Add("PO: a step of its install ended with other than 0 ($($poSteps -join ', ')), so PO is read as it stands and is not changed.") }
-        elseif ($loaded) { $failures.Add('PO: the second account''s hive was still loaded after 120 s, so what follows about PO is not about an account whose hive is not loaded.') }
+        elseif ($loaded) { $failures.Add('PO: the second account''s hive is still loaded, so what follows about PO is not about an account whose hive is not loaded.') }
         $poRecords = "$installerKey\UserData\$otherSid\Products\$(Packed $programs.PO.Code)\Patches"
         if (-not ($poSteps | Where-Object { $_ -ne 0 }) -and (Test-Location $poRecords)) { $inShape += @($poList | Where-Object { $_.Context -eq 2 -and $_.Sid -eq $otherSid })[0] }
     }
@@ -830,8 +858,8 @@ try {
     Say '==== 1. WHAT WINDOWS INSTALLER LISTS FOR EACH PROGRAM, AND WHICH REGISTRY KEYS HOLD IT'
     $everyRow = @([PatchRecordsMsi]::Products('', $everyone, 7))
     Say "MsiEnumProductsEx with no product code, every account and every context returns $($everyRow.Count) rows$(if ($everyRow | Where-Object { $_ -like 'ERROR*' }) { ', the last an error: ' + $everyRow[-1] })."
-    $accounts = @(Get-Names "$installerKey\UserData" $true | Where-Object { $_ })
-    $managedAccounts = @(Get-Names "$installerKey\Managed" $true | Where-Object { $_ })
+    $accounts = @((Get-Names "$installerKey\UserData" $true) | Where-Object { $_ })
+    $managedAccounts = @((Get-Names "$installerKey\Managed" $true) | Where-Object { $_ })
     $loadedHives = @($hku.GetSubKeyNames() | Where-Object { $_ -notlike '*_Classes' })
     Say "Accounts with a key under UserData: $($accounts -join ', '). Accounts with a key under Managed: $(if ($managedAccounts) { $managedAccounts -join ', ' } else { 'none' }). Hives loaded under HKU: $($loadedHives -join ', ')."
     foreach ($tag in $programs.Keys) {
