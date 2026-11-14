@@ -65,17 +65,28 @@ public class RegistryFallbackCachedPackageTests
             using (var props = ProductValues(f))
                 props.SetValue("LocalPackage", f.Files.Create("msi"), RegistryValueKind.String);
             if (patchesKey)
-                f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+            {
+                using var patch = f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!;
+                patch.SetValue("Uninstallable", 0, RegistryValueKind.DWord);
+            }
 
             var (read, _) = Read(f);
 
             var product = InstallerQueryService.UnpackRegistryProductCode(PackedProduct)!;
             Assert.NotNull(read.PatchListings);
+            Assert.NotNull(read.PatchesReadAsZero);
             if (patchesKey)
+            {
                 Assert.Equal(new[] { PatchCode },
                     read.PatchListings[new InstallerQueryService.AccountCode(Sid, product)]);
+                Assert.Equal(new[] { PatchCode },
+                    read.PatchesReadAsZero[new InstallerQueryService.AccountCode(Sid, product)]);
+            }
             else
+            {
                 Assert.Empty(read.PatchListings);
+                Assert.Empty(read.PatchesReadAsZero);
+            }
             // The product's package record carries the account it was read under.
             Assert.Equal(Sid, Assert.Single(read.PackageRecords!, r => !r.IsPatch).Account);
         });
