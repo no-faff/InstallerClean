@@ -1105,7 +1105,7 @@ public class ResultLogEntryTests
     [InlineData(ReportHost.Window, AppCopyKind.Portable, "window", "portable")]
     [InlineData(ReportHost.CommandLine, AppCopyKind.CommandLineDownload, "commandLine", "commandLine")]
     [InlineData(ReportHost.CommandLine, AppCopyKind.Setup, "commandLine", "setup")]
-    public void The_report_names_the_program_that_sends_it_and_its_kind_of_copy(
+    public void The_report_names_the_program_that_made_the_run_and_its_kind_of_copy(
         ReportHost host, AppCopyKind copy, string expectedHost, string expectedCopy)
     {
         var scan = new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0);
