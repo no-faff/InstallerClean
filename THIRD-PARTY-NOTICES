@@ -39,7 +39,15 @@ every language whose letters they carry.
 
   https://github.com/itfoundry/Poppins
 
-Their own name table declares:
+They are a modified version of the files in the ofl/poppins/ folder of
+https://github.com/google/fonts at commit
+7dc16b7de42db624b902f2292b68ed9e489e5053: the Devanagari block (U+0900 to
+U+097F) is out of them, and they carry only the glyphs their characters reach
+through the OpenType features WPF uses. scripts/fonts/make-fonts.py in this
+repository makes them. Poppins has no Reserved Font Name, so they keep the name.
+
+Their own name table, and the licence file in that folder at that commit,
+declare:
 
   Copyright 2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)
 
@@ -150,9 +158,10 @@ sort arrows in the Details windows.
 
 They are a modified version of the files in that repository's fonts/ttf/
 folder at commit 555facfb2a18c72c3c0380f0d9c0f060453a9058: their line spacing
-is Poppins's, and the Greek letters are out of their character maps.
-scripts/fonts/make-montserrat.py in this repository makes them. Montserrat has
-no Reserved Font Name, so they keep the name.
+is Poppins's, the Greek letters are out of their character maps, and they
+carry only the glyphs their characters reach through the OpenType features
+WPF uses. scripts/fonts/make-fonts.py in this repository makes them.
+Montserrat has no Reserved Font Name, so they keep the name.
 
 Their own name table declares:
 
