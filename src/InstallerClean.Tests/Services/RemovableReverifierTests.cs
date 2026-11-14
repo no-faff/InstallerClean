@@ -520,12 +520,12 @@ public class RemovableReverifierTests
 
     /// <summary>
     /// A sibling whose Uninstallable Windows Installer gives no answer for. Where the read
-    /// fails and the sibling is per machine, the registry value Windows Installer answers it
-    /// from is read in its place: a zero lets the batch through, any other number holds the
-    /// path back as a claim, and no number holds it back as unread. An empty answer, an
-    /// answer that the record is not there, a per-user sibling and a per-machine pairing
-    /// carrying an account are never read from the registry, and hold the path back as
-    /// unread.
+    /// fails and the sibling is per machine or per user and unmanaged, the registry value
+    /// Windows Installer answers it from is read in its place, under the sibling's own
+    /// account: a zero lets the batch through, any other number holds the path back as a
+    /// claim, and no number holds it back as unread. An empty answer, an answer that the
+    /// record is not there, a per-user managed sibling and a per-machine pairing carrying an
+    /// account are never read from the registry, and hold the path back as unread.
     /// </summary>
     [Theory]
     [InlineData("fails", "machine", 0, null, true)]
@@ -533,9 +533,14 @@ public class RemovableReverifierTests
     [InlineData("fails", "machine", null, HeldBackReason.RecordsUnreadable, true)]
     [InlineData("empty", "machine", 0, HeldBackReason.RecordsUnreadable, false)]
     [InlineData("absent", "machine", 0, HeldBackReason.RecordsUnreadable, false)]
-    [InlineData("fails", "user", 0, HeldBackReason.RecordsUnreadable, false)]
+    [InlineData("fails", "user", 0, null, true)]
+    [InlineData("fails", "user", 1, HeldBackReason.Reclaimed, true)]
+    [InlineData("fails", "user", null, HeldBackReason.RecordsUnreadable, true)]
+    [InlineData("empty", "user", 0, HeldBackReason.RecordsUnreadable, false)]
+    [InlineData("absent", "user", 0, HeldBackReason.RecordsUnreadable, false)]
+    [InlineData("fails", "managed user", 0, HeldBackReason.RecordsUnreadable, false)]
     [InlineData("fails", "machine with an account", 0, HeldBackReason.RecordsUnreadable, false)]
-    public void A_siblings_failed_Uninstallable_read_is_answered_from_the_registry_for_a_per_machine_sibling(
+    public void A_siblings_failed_Uninstallable_read_is_answered_from_the_registry_for_a_per_machine_or_per_user_unmanaged_sibling(
         string answer, string installedAs, int? registryValue, HeldBackReason? reason, bool registryAsked)
     {
         const string path = @"C:\Windows\Installer\superseded.msp";
@@ -544,17 +549,18 @@ public class RemovableReverifierTests
         msi.Set(PatchB, ProductOne, state: "2", uninstallable: answer == "empty" ? "" : "0");
         if (answer == "fails") msi.FailProperty(PatchB, ProductOne, "Uninstallable");
         if (answer == "absent") msi.AbsentRecord(PatchB, ProductOne, "Uninstallable", 1647);
-        var asked = new List<(string Product, string Patch)>();
+        var asked = new List<(string? Account, string Product, string Patch)>();
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi,
             null, null, null, null, null, null,
-            (product, patch) => { asked.Add((product, patch)); return registryValue; });
+            (account, product, patch) => { asked.Add((account, product, patch)); return registryValue; });
 
-        const string account = "S-1-5-21-1111111111-2222222222-3333333333-1002";
+        const string user = "S-1-5-21-1111111111-2222222222-3333333333-1002";
         var sibling = installedAs switch
         {
             "machine" => Claim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne),
-            "user" => new PatchClaim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne, account, 2),
-            _ => new PatchClaim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne, account, 4),
+            "user" => new PatchClaim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne, user, 2),
+            "managed user" => new PatchClaim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne, user, 1),
+            _ => new PatchClaim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne, user, 4),
         };
         var recheck = svc.RecheckUnderLease(new UnderLeaseClaims(
             new[] { Claim(path, PatchA, ProductOne) },
@@ -571,7 +577,9 @@ public class RemovableReverifierTests
         }
 
         Assert.Equal(
-            registryAsked ? new[] { (ProductOne, PatchB) } : Array.Empty<(string, string)>(),
+            registryAsked
+                ? new[] { ((string?)(installedAs == "machine" ? "S-1-5-18" : user), ProductOne, PatchB) }
+                : Array.Empty<(string?, string, string)>(),
             asked);
     }
 

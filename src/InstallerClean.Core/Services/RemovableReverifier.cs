@@ -36,7 +36,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
     private readonly IPendingRebootService? _installerActivity;
     private readonly TimeProvider _clock;
     private readonly string? _installerFolderOverride;
-    private readonly Func<string, string, int?> _machinePatchUninstallable;
+    private readonly Func<string?, string, string, int?> _patchUninstallable;
 
     /// <summary>
     /// Production constructor. The query service answers the pre-lease pass and the
@@ -52,15 +52,14 @@ public sealed class RemovableReverifier : IRemovableReverifier
         IFileIdentityReader fileIdentities, IDeclaredProductCheck declaredProducts,
         IFileTimesReader fileTimes, TimeProvider clock, IPendingRebootService installerActivity)
         : this(queryService, msi, fileIdentities, declaredProducts, fileTimes, clock, null,
-            installerActivity, InstallerQueryService.ReadMachinePatchUninstallable) { }
+            installerActivity, InstallerQueryService.ReadAccountPatchUninstallable) { }
 
     /// <summary>
     /// Test constructor for the tests whose subject is the registrations: no file
     /// is opened, so a file no registration names is judged on the enumeration's
     /// own two legs alone. A pass built this way can only keep back less than one
     /// built with its readers, never more, except under the lease: it finds no registry
-    /// value for a per-machine sibling whose read failed, so it keeps that sibling's batch
-    /// paths back.
+    /// value for a sibling whose read failed, so it keeps that sibling's batch paths back.
     /// </summary>
     internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi)
         : this(queryService, msi, null, null, null, null, null, null) { }
@@ -69,7 +68,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// A registry read that finds no value, for the test constructors: a test's verdict
     /// never turns on what the machine running it has registered.
     /// </summary>
-    private static int? NoRegistryValue(string productCode, string patchCode) => null;
+    private static int? NoRegistryValue(string? account, string productCode, string patchCode) => null;
 
     /// <summary>
     /// Test constructor for the steps that open a file.
@@ -94,11 +93,12 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// then judges every file by its times alone, and the result carries no read, so no
     /// host has one to stop on.
     /// </param>
-    /// <param name="machinePatchUninstallable">
-    /// What the re-read under the lease reads a per-machine sibling's Uninstallable
-    /// registry value through, where Windows Installer's read of it failed, taking a
+    /// <param name="patchUninstallable">
+    /// What the re-read under the lease reads a sibling's Uninstallable registry value
+    /// through, where Windows Installer's read of it failed, taking the account the
+    /// sibling's records sit under (<see cref="InstallerQueryService.UserDataAccount"/>), a
     /// product code and a patch code. The production constructor passes the registry read
-    /// (<see cref="InstallerQueryService.ReadMachinePatchUninstallable"/>). Null finds no
+    /// (<see cref="InstallerQueryService.ReadAccountPatchUninstallable"/>). Null finds no
     /// value, so a test's verdict never turns on what the machine running it has
     /// registered.
     /// </param>
@@ -106,7 +106,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         IFileIdentityReader? fileIdentities, IDeclaredProductCheck? declaredProducts,
         IFileTimesReader? fileTimes, TimeProvider? clock, string? installerFolderOverride,
         IPendingRebootService? installerActivity = null,
-        Func<string, string, int?>? machinePatchUninstallable = null)
+        Func<string?, string, string, int?>? patchUninstallable = null)
     {
         _queryService = queryService;
         _msi = msi;
@@ -116,7 +116,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         _installerActivity = installerActivity;
         _clock = clock ?? TimeProvider.System;
         _installerFolderOverride = installerFolderOverride;
-        _machinePatchUninstallable = machinePatchUninstallable ?? NoRegistryValue;
+        _patchUninstallable = patchUninstallable ?? NoRegistryValue;
     }
 
     /// <summary>
@@ -771,8 +771,9 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
                 // A read that failed and an answer that came back empty are an
                 // inability, since neither says whether the patch can be uninstalled.
-                // Where a per-machine sibling's read failed, the registry value Windows
-                // Installer answers it from is read in its place, as the scan reads it
+                // Where the read of a per-machine sibling or a per-user unmanaged one
+                // failed, the registry value Windows Installer answers it from is read in
+                // its place, under the sibling's own account, as the scan reads it
                 // (InstallerQueryService.RegistryMayStandIn and RegistryAnswersFor): a
                 // zero there passes, any other number is a live claim on the rollback, and
                 // a value that is not there or will not read leaves the inability standing.
@@ -788,7 +789,9 @@ public sealed class RemovableReverifier : IRemovableReverifier
                     var fromRegistry = InstallerQueryService.RegistryValueIsTheSource(
                             onThisProduct.UserSid, siblingContext)
                         && InstallerQueryService.RegistryMayStandIn(siblingUninstallable)
-                            ? _machinePatchUninstallable(onThisProduct.ProductCode, onThisProduct.PatchCode)
+                            ? _patchUninstallable(
+                                InstallerQueryService.UserDataAccount(onThisProduct.UserSid, siblingContext),
+                                onThisProduct.ProductCode, onThisProduct.PatchCode)
                             : null;
                     if (fromRegistry == 0) continue;
                     if (fromRegistry is null)

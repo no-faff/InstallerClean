@@ -220,11 +220,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// no reader.
     /// </param>
     /// <param name="AdvertisedPatches">
-    /// The patch codes each per-machine product's advertised key lists as values of its
-    /// <c>Patches</c> key (<see cref="ReadAdvertisedPatches"/>), by product code, for the
-    /// product keys under the local system's account. An entry is null where the list was
-    /// not read, and a product has no entry where the reads stopped before it; both hold
-    /// (<see cref="AdvertisedPatchesListed"/>). Null where the caller supplied no reader.
+    /// The patch codes a product's advertised key lists as values of its <c>Patches</c> key
+    /// (<see cref="ReadAdvertisedPatches"/>), keyed as <see cref="PatchListings"/> is: for
+    /// the product keys under the local system's account, read from the machine's
+    /// <c>Classes\Installer\Products</c>, and for those under
+    /// <paramref name="RunningAccount"/>, read from that account's own hive. An entry is
+    /// null where the list was not read, and a product has no entry where the reads stopped
+    /// before it; both hold (<see cref="AdvertisedPatchesListed"/>). A product key under any
+    /// other account has no entry, and what answers for it is
+    /// <see cref="ListingCoversTheWalk"/>'s to say. Null where the caller supplied no reader.
+    /// </param>
+    /// <param name="RunningAccount">
+    /// The account this process runs as, or null where it was not read. Windows Installer
+    /// lists that account's per-user unmanaged programs' patches from the account's own
+    /// hive as well as from <c>UserData</c>, and another account's from <c>UserData</c>
+    /// alone, so which of the two a program is decides what its listing must be read
+    /// beside (<see cref="ListingCoversTheWalk"/>).
     /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
@@ -246,7 +257,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyList<RegistryProductEntry>? ProductEntries = null,
         int PatchListFailures = 0,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchesReadAsZero = null,
-        IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? AdvertisedPatches = null)
+        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>?>? AdvertisedPatches = null,
+        string? RunningAccount = null)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -695,10 +707,37 @@ public sealed class InstallerQueryService : IInstallerQueryService
     public InstallerQueryService(IMsiApi msi) : this(msi, ReadRegistryFallback) { }
 
     /// <summary>
-    /// Production constructor for the composed graph: DI supplies both seams.
+    /// A constructor for a graph that does not say which account the process runs as. The
+    /// registry fallback then names no running account, and no per-user installation's
+    /// listing stands in for its patch list (<see cref="ListingCoversTheWalk"/>).
     /// </summary>
     public InstallerQueryService(IMsiApi msi, IPackageIdentityReader identityReader)
         : this(msi, ReadRegistryFallback, null, identityReader) { }
+
+    /// <summary>
+    /// Production constructor for the composed graph: DI supplies the three seams. The
+    /// account is read when a scan reads the registry fallback, and a read that throws
+    /// leaves the fallback naming no running account.
+    /// </summary>
+    public InstallerQueryService(IMsiApi msi, IPackageIdentityReader identityReader,
+        IRunningAccount runningAccount)
+        : this(msi, (claimed, ct) => ReadRegistryFallback(claimed, SidOrNull(runningAccount), ct),
+            null, identityReader) { }
+
+    /// <summary>
+    /// The account <paramref name="runningAccount"/> names, or null where reading it throws.
+    /// </summary>
+    private static string? SidOrNull(IRunningAccount runningAccount)
+    {
+        try
+        {
+            return runningAccount.Sid;
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            return null;
+        }
+    }
 
     /// <summary>
     /// Full seam constructor, for the tests that drive both sources. See
@@ -1658,9 +1697,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Whether the registry holds, under the installation's own account subtree, what
     /// each of its failed reads would have returned: a package record for the product
     /// where its <c>LocalPackage</c> read failed; where its patch enumeration came back
-    /// short and the installation is per machine, a <c>Patches</c> key whose listing was
-    /// established, names every patch the enumeration did return and every patch its
-    /// advertised key lists, and names at least one; and a package record for each patch
+    /// short, a <c>Patches</c> key whose listing was established, names every patch the
+    /// enumeration did return, names at least one, and is all Windows Installer's own
+    /// patch list reads (<see cref="ListingCoversTheWalk"/>); and a package record for each patch
     /// whose <c>LocalPackage</c> read failed.
     ///
     /// WHERE IT DOES, WHAT THE INSTALLATION LOST IS ON RECORD. Windows Installer finds a
@@ -1672,11 +1711,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// per-product condition reads this product's patch set from where the enumeration's
     /// own reading is short.
     ///
-    /// ONLY A PER-MACHINE INSTALLATION'S LISTING STANDS IN FOR A SHORT ENUMERATION, and only
-    /// where its advertised key lists no patch the listing leaves out
-    /// (<see cref="AdvertisedPatchesListed"/>): for a per-machine installation, Windows
-    /// Installer lists patches from those two keys, and a per-user installation's listing
-    /// answers for nothing here.
+    /// A LISTING STANDS IN FOR A SHORT ENUMERATION ONLY WHERE IT IS ALL WINDOWS INSTALLER'S
+    /// OWN PATCH LIST READS (<see cref="ListingCoversTheWalk"/>): for a per-machine
+    /// installation, and a per-user unmanaged one of the account this process runs as,
+    /// where its advertised key lists no patch the listing leaves out; and for a per-user
+    /// unmanaged installation of any other account. A per-user managed installation's
+    /// listing answers for nothing here.
     ///
     /// A LISTING THAT LEAVES OUT A PATCH THE ENUMERATION RETURNED IS NOT THE WHOLE
     /// REGISTRATION, and nor is a product key with no <c>Patches</c> key, which says the
@@ -1705,10 +1745,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (installation.PatchListShort)
         {
-            if (installation.Context != MsiInstallContext.Machine) return false;
             var listed = OwnListing(fallback.PatchListings, account, installation.ProductCode);
             if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0
-                || !AdvertisedPatchesListed(fallback.AdvertisedPatches, installation.ProductCode, listed))
+                || !ListingCoversTheWalk(fallback, account, installation.Context, installation.ProductCode, listed))
                 return false;
         }
 
@@ -3687,6 +3726,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private static FallbackRead ReadRegistryFallback(
         Dictionary<string, RegisteredPackage> claimed,
+        CancellationToken ct) =>
+        ReadRegistryFallback(claimed, runningAccount: null, ct);
+
+    /// <summary>
+    /// The registry fallback, read by a process running as <paramref name="runningAccount"/>,
+    /// or as an account that was not read where that is null
+    /// (<see cref="FallbackRead.RunningAccount"/>).
+    /// </summary>
+    private static FallbackRead ReadRegistryFallback(
+        Dictionary<string, RegisteredPackage> claimed,
+        string? runningAccount,
         CancellationToken ct)
     {
         var failures = 0;
@@ -3697,7 +3747,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var packageRecords = new List<RegistryPackageRecord>();
         var patchListings = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
         var patchesReadAsZero = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
-        var advertisedPatches = new Dictionary<string, IReadOnlyCollection<string>?>(StringComparer.OrdinalIgnoreCase);
+        var advertisedPatches = new Dictionary<AccountCode, IReadOnlyCollection<string>?>();
         var productEntries = new List<RegistryProductEntry>();
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
@@ -3788,7 +3838,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                                     : paths;
                 }
 
-                ReadEveryAdvertisedPatchList(hklm, productEntries, advertisedPatches, failureLog, ct);
+                using var users = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                    Microsoft.Win32.RegistryHive.Users,
+                    Microsoft.Win32.RegistryView.Registry64);
+                ReadEveryAdvertisedPatchList(hklm, users, runningAccount, productEntries, advertisedPatches,
+                    failureLog, ct);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -3824,7 +3878,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             productEntries,
             patchListFailures,
             patchesReadAsZero,
-            advertisedPatches);
+            advertisedPatches,
+            runningAccount);
     }
 
     /// <summary>
@@ -4163,19 +4218,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// could be uninstalled, which holds its superseded patches.
     ///
     /// A PATCH WHOSE UNINSTALLABLE READ FAILS IS ANSWERED FOR ONLY BY A ZERO THE REGISTRY
-    /// READ FOR IT UNDER A PER-MACHINE INSTALLATION'S OWN PRODUCT KEY
-    /// (<see cref="RegistryAnswersFor"/>), as in the product loop. It adds nothing where
-    /// that zero was read and marks the product Unestablished everywhere else: a patch the
-    /// key does not list or whose value was not read, a product key with no
-    /// <c>Patches</c> key, and any per-user installation. An empty answer, and an answer
+    /// READ FOR IT UNDER THE OWN PRODUCT KEY OF A PER-MACHINE OR PER-USER UNMANAGED
+    /// INSTALLATION (<see cref="RegistryAnswersFor"/>), as in the product loop. It adds
+    /// nothing where that zero was read and marks the product Unestablished everywhere
+    /// else: a patch the key does not list or whose value was not read, a product key with
+    /// no <c>Patches</c> key, and any per-user managed installation. An empty answer, and an answer
     /// that the record is not there, mark the product Unestablished
     /// (<see cref="RegistryMayStandIn"/>).
     ///
-    /// A WALK THAT IS NOT WHOLE LEAVES THE REGISTRY'S VERDICT STANDING ONLY FOR A
-    /// PER-MACHINE INSTALLATION WHOSE OWN LISTING NAMES EVERY ROW WINDOWS RETURNED AND EVERY
-    /// PATCH ITS ADVERTISED KEY LISTS (<see cref="AdvertisedPatchesListed"/>), on the same
-    /// ground. A per-user installation's walk that is not whole marks the product
-    /// Unestablished. A walk Windows refused,
+    /// A WALK THAT IS NOT WHOLE LEAVES THE REGISTRY'S VERDICT STANDING ONLY FOR AN
+    /// INSTALLATION WHOSE OWN LISTING NAMES EVERY ROW WINDOWS RETURNED AND IS ALL WINDOWS
+    /// INSTALLER'S OWN PATCH LIST READS (<see cref="ListingCoversTheWalk"/>). A per-user
+    /// managed installation's walk that is not whole marks the product Unestablished. A
+    /// walk Windows refused,
     /// one that never ended and one abandoned after a run of unreadable rows each keep the
     /// rows they returned, and those rows are read as a whole walk's are. A row that did not
     /// read is a patch Windows holds and did not name, so a walk that met one needs an
@@ -4225,8 +4280,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (walk.Refusal is not null || walk.Incomplete)
         {
-            var answered = context == MsiInstallContext.Machine
-                && AdvertisedPatchesListed(fallback.AdvertisedPatches, productCode, listed)
+            var answered = ListingCoversTheWalk(fallback, account, context, productCode, listed)
                 && (rows.Count == 0 && !walk.Incomplete
                     ? ReadOwnProductKey(fallback.ProductEntries, account, productCode)
                     : NamesEvery(listed, rows.Select(p => p.PatchCode))
@@ -4268,69 +4322,165 @@ public sealed class InstallerQueryService : IInstallerQueryService
         && patchCodes.All(code => listed.Contains(code, StringComparer.OrdinalIgnoreCase));
 
     /// <summary>
-    /// Whether every patch <paramref name="productCode"/>'s advertised key lists
-    /// (<see cref="FallbackRead.AdvertisedPatches"/>) is named in <paramref name="listed"/>,
-    /// its listing under the local system's account, which is null where that listing was
-    /// not established or the product key has no <c>Patches</c> key. False where the
-    /// advertised list was not read.
+    /// Whether every patch the advertised key of <paramref name="productCode"/> under
+    /// <paramref name="account"/> lists (<see cref="FallbackRead.AdvertisedPatches"/>) is
+    /// named in <paramref name="listed"/>, the installation's listing under that account,
+    /// which is null where that listing was not established or the product key has no
+    /// <c>Patches</c> key. False where the advertised list was not read.
     ///
-    /// WINDOWS INSTALLER LISTS A PER-MACHINE PRODUCT'S PATCHES FROM BOTH KEYS: the values of
-    /// <c>HKCR\Installer\Products\{product}\Patches</c>, its applied patches, and the
-    /// subkeys of <c>UserData\S-1-5-18\Products\{product}\Patches</c>. So a listing read
-    /// from the second stands in for the patches Windows did not return only where the first
-    /// names none it leaves out. A product whose two keys disagree holds a patch the listing
+    /// WINDOWS INSTALLER LISTS SUCH A PRODUCT'S PATCHES FROM BOTH KEYS: the values of the
+    /// advertised product key's <c>Patches</c> key, its applied patches, and the subkeys of
+    /// <c>UserData\{account}\Products\{product}\Patches</c>. So a listing read from the
+    /// second stands in for the patches Windows did not return only where the first names
+    /// none it leaves out. A product whose two keys disagree holds a patch the listing
     /// cannot answer for, and its superseded patches are held back.
     /// </summary>
     internal static bool AdvertisedPatchesListed(
-        IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? advertisedPatches,
+        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>?>? advertisedPatches,
+        string account,
         string productCode,
         IReadOnlyCollection<string>? listed) =>
         advertisedPatches is not null
-        && advertisedPatches.TryGetValue(productCode, out var advertised)
+        && advertisedPatches.TryGetValue(new AccountCode(account, productCode), out var advertised)
         && advertised is not null
         && advertised.All(code => listed?.Contains(code, StringComparer.OrdinalIgnoreCase) == true);
 
     /// <summary>
-    /// Reads <see cref="ReadAdvertisedPatches"/> for each product key under the local
-    /// system's account in <paramref name="productEntries"/> into
-    /// <paramref name="advertisedPatches"/>. Where <c>Classes\Installer\Products</c> is not
-    /// there or will not open, or the reads stop on any other failure, the products not yet
-    /// read have no entry, which every reader takes as a list that was not read. A failure
-    /// is written to <paramref name="failureLog"/> under its own cause and not counted
-    /// among the fallback's failures: this key records no cached file.
+    /// Whether <paramref name="listed"/>, the registry's listing of an installation's
+    /// patches under <paramref name="account"/>, its <see cref="UserDataAccount"/>, names
+    /// every patch Windows Installer's own patch list for that installation reads from any
+    /// other key. Where it does, the listing is all that list could have returned.
+    ///
+    /// WHICH KEYS WINDOWS INSTALLER READS TURNS ON THE CONTEXT AND ON WHOSE THE PROGRAM IS.
+    /// For a per-machine installation it reads the machine's advertised key beside the
+    /// <c>UserData</c> key (<see cref="AdvertisedPatchesListed"/>). For a per-user unmanaged
+    /// installation of the account the calling process runs as, it reads that account's own
+    /// <c>Software\Microsoft\Installer\Products\{product}\Patches</c> beside the
+    /// <c>UserData</c> key, in the same way. For a per-user unmanaged installation of any
+    /// other account it reads the <c>UserData</c> key alone, so that listing answers by
+    /// itself.
+    ///
+    /// A per-user managed installation is not answered for, nor is a per-user installation
+    /// under the local system's account, nor any per-user installation where the process
+    /// runs as the local system or the result does not say which account it runs as
+    /// (<see cref="FallbackRead.RunningAccount"/>).
+    ///
+    /// <see cref="ReadEveryAdvertisedPatchList"/> reads the advertised lists this asks
+    /// for, for the same accounts. Change the two together: a list this asks for and that
+    /// does not read holds every program it is asked about.
+    ///
+    /// Do not widen this to a per-user managed installation without establishing which keys
+    /// Windows Installer lists its patches from: a listing that is not all the list reads
+    /// leaves out a patch the installation holds, and the product's superseded patches are
+    /// offered on it.
     /// </summary>
-    private static void ReadEveryAdvertisedPatchList(
-        Microsoft.Win32.RegistryKey hklm,
+    internal static bool ListingCoversTheWalk(
+        FallbackRead fallback,
+        string? account,
+        MsiInstallContext context,
+        string productCode,
+        IReadOnlyCollection<string>? listed)
+    {
+        if (account is null) return false;
+        if (context == MsiInstallContext.Machine)
+            return AdvertisedPatchesListed(fallback.AdvertisedPatches, account, productCode, listed);
+
+        if (context != MsiInstallContext.UserUnmanaged
+            || fallback.RunningAccount is not { } running
+            || string.Equals(running, LocalSystemAccount, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(account, LocalSystemAccount, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        return !string.Equals(account, running, StringComparison.OrdinalIgnoreCase)
+            || AdvertisedPatchesListed(fallback.AdvertisedPatches, account, productCode, listed);
+    }
+
+    /// <summary>
+    /// Reads the advertised patch lists the scan compares a listing with
+    /// (<see cref="ListingCoversTheWalk"/>) into <paramref name="advertisedPatches"/>: for
+    /// the product keys under the local system's account, from
+    /// <c>SOFTWARE\Classes\Installer\Products</c> under <paramref name="machine"/>, the
+    /// machine's hive, and for those under <paramref name="runningAccount"/>, from
+    /// <c>{account}\Software\Microsoft\Installer\Products</c> under
+    /// <paramref name="users"/>, the hive of every loaded account. The second is not read
+    /// where the process runs as the local system, whose product keys are the machine's, or
+    /// as an account that was not read. Each of the two reads fails by itself: a key that
+    /// will not open, or reads that stop on any other failure, leave the products not yet
+    /// read with no entry, which every reader takes as a list that was not read. A failure
+    /// is written to <paramref name="failureLog"/> under its own cause and not counted among
+    /// the fallback's failures: these keys record no cached file.
+    /// </summary>
+    internal static void ReadEveryAdvertisedPatchList(
+        Microsoft.Win32.RegistryKey machine,
+        Microsoft.Win32.RegistryKey users,
+        string? runningAccount,
         IReadOnlyList<RegistryProductEntry> productEntries,
-        Dictionary<string, IReadOnlyCollection<string>?> advertisedPatches,
-        PerItemFailureLog failureLog,
+        Dictionary<AccountCode, IReadOnlyCollection<string>?> advertisedPatches,
+        PerItemFailureLog? failureLog,
         CancellationToken ct)
     {
-        var machineAccount = UserDataAccount(null, MsiInstallContext.Machine);
         try
         {
-            using var advertisedProducts = hklm.OpenSubKeyEarned(@"SOFTWARE\Classes\Installer\Products");
-            if (advertisedProducts is null) return;
-
-            foreach (var entry in productEntries)
-            {
-                ct.ThrowIfCancellationRequested();
-                if (!string.Equals(entry.Account, machineAccount, StringComparison.OrdinalIgnoreCase)) continue;
-                advertisedPatches[entry.Code] = ReadAdvertisedPatches(advertisedProducts, entry.Code, ct, failureLog);
-            }
+            using var machineProducts = machine.OpenSubKeyEarned(@"SOFTWARE\Classes\Installer\Products");
+            ReadAdvertisedPatchLists(machineProducts, LocalSystemAccount, productEntries, advertisedPatches,
+                failureLog, ct);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            failureLog.Record(ex, cause: "advertised-patches");
+            failureLog?.Record(ex, cause: "advertised-patches");
+        }
+
+        if (!IsAccount(runningAccount)
+            || string.Equals(runningAccount, LocalSystemAccount, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        try
+        {
+            using var ownProducts = users.OpenSubKeyEarned(
+                $@"{runningAccount}\Software\Microsoft\Installer\Products");
+            ReadAdvertisedPatchLists(ownProducts, runningAccount!, productEntries, advertisedPatches,
+                failureLog, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            failureLog?.Record(ex, cause: "advertised-patches");
+        }
+    }
+
+    /// <summary>
+    /// Reads <see cref="ReadAdvertisedPatches"/> under <paramref name="advertisedProducts"/>
+    /// for each product key under <paramref name="account"/> in
+    /// <paramref name="productEntries"/> into <paramref name="advertisedPatches"/>, and for
+    /// no product key under any other account. Reads nothing where
+    /// <paramref name="advertisedProducts"/> is null, a key that is not there.
+    /// </summary>
+    internal static void ReadAdvertisedPatchLists(
+        Microsoft.Win32.RegistryKey? advertisedProducts,
+        string account,
+        IReadOnlyList<RegistryProductEntry> productEntries,
+        Dictionary<AccountCode, IReadOnlyCollection<string>?> advertisedPatches,
+        PerItemFailureLog? failureLog,
+        CancellationToken ct)
+    {
+        if (advertisedProducts is null) return;
+
+        foreach (var entry in productEntries)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (!string.Equals(entry.Account, account, StringComparison.OrdinalIgnoreCase)) continue;
+            advertisedPatches[new AccountCode(entry.Account, entry.Code)] =
+                ReadAdvertisedPatches(advertisedProducts, entry.Code, ct, failureLog);
         }
     }
 
     /// <summary>
     /// The patch codes the advertised key of <paramref name="productCode"/> lists as value
     /// names of its <c>Patches</c> key, under <paramref name="advertisedProducts"/>, the
-    /// <c>Classes\Installer\Products</c> key or a key standing in for it. Empty where the
+    /// machine's <c>Classes\Installer\Products</c> key, an account's own
+    /// <c>Software\Microsoft\Installer\Products</c> key or a key standing in for one. Empty where the
     /// product key has no <c>Patches</c> key. Null where the product key is not there, which
-    /// disagrees with Windows Installer listing the product; where either key will not open
+    /// leaves the list unread for a product whose records the registry holds; where either
+    /// key will not open
     /// or the values will not list; where the code will not pack; and where a value name is
     /// neither a packed code nor the key's own <c>Patches</c> list or default value. A failure
     /// to read is written to <paramref name="failureLog"/> where one is given.
@@ -4395,26 +4545,28 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Whether the registry's reading of <paramref name="productCode"/>'s patch set
     /// answers for <paramref name="patchCode"/>, a patch whose Uninstallable read failed
-    /// (<see cref="RegistryMayStandIn"/>). True only where the
-    /// installation and the pairing are both per machine and the registry's read of the
+    /// (<see cref="RegistryMayStandIn"/>). True only where the installation and the pairing
+    /// are in one context, the pairing is one whose value the registry holds
+    /// (<see cref="RegistryValueIsTheSource"/>), and the registry's read of the
     /// installation's own product key took that patch's <c>Uninstallable</c> as a zero
     /// (<see cref="FallbackRead.PatchesReadAsZero"/>).
     ///
-    /// FOR A PER-MACHINE PAIRING, WINDOWS INSTALLER ANSWERS UNINSTALLABLE FROM THE
-    /// REGISTRY VALUE <see cref="ReadProductPatchSet"/> READS:
-    /// <c>UserData\S-1-5-18\Products\{product}\Patches\{patch}\Uninstallable</c>, read in
-    /// the calling process. A zero read there is the answer Windows Installer did not
-    /// give. A patch the listing names whose value was not read is not answered for: a key
-    /// gone by the time it was opened, and every patch after the first that can be
-    /// uninstalled, where the registry's verdict for the product holds its superseded
-    /// patches already. A per-user pairing is not answered for here, and marks its product
-    /// Unestablished.
+    /// FOR A PER-MACHINE PAIRING AND FOR A PER-USER UNMANAGED ONE, WINDOWS INSTALLER ANSWERS
+    /// UNINSTALLABLE FROM THE REGISTRY VALUE <see cref="ReadProductPatchSet"/> READS:
+    /// <c>UserData\{account}\Products\{product}\Patches\{patch}\Uninstallable</c>, read
+    /// in the calling process, the account being the local system's for a per-machine
+    /// pairing and the user's own for a per-user one. A zero read there is the answer
+    /// Windows Installer did not give. A patch the listing names whose value was not read
+    /// is not answered for: a key gone by the time it was opened, and every patch after the
+    /// first that can be uninstalled, where the registry's verdict for the product holds its
+    /// superseded patches already. A per-user managed pairing is not answered for here, and
+    /// marks its product Unestablished.
     ///
-    /// Do not widen this to the per-user contexts without establishing where Windows
-    /// Installer reads a per-user patch's Uninstallable from: a value that is not the
-    /// source of the answer cannot stand in for it, and the superseded patches of the
-    /// product are offered on it. Do not test it against the listing either: the listing
-    /// names patches whose value was never read.
+    /// Do not widen this to the per-user managed context without establishing where Windows
+    /// Installer reads a managed patch's Uninstallable from: a value that is not the source
+    /// of the answer cannot stand in for it, and the superseded patches of the product are
+    /// offered on it. Do not test it against the listing either: the listing names patches
+    /// whose value was never read.
     /// </summary>
     internal static bool RegistryAnswersFor(
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? patchesReadAsZero,
@@ -4423,7 +4575,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string patchCode,
         string? patchSid,
         MsiInstallContext patchContext) =>
-        installationContext == MsiInstallContext.Machine
+        installationContext == patchContext
         && RegistryValueIsTheSource(patchSid, patchContext)
         && OwnListing(patchesReadAsZero, UserDataAccount(patchSid, patchContext), productCode)
             ?.Contains(patchCode, StringComparer.OrdinalIgnoreCase) == true;
@@ -4431,26 +4583,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Whether a pairing of a patch in <paramref name="patchContext"/> under
     /// <paramref name="patchSid"/> is one whose Uninstallable Windows Installer answers from
-    /// the value <see cref="ReadMachinePatchUninstallable"/> reads: a per-machine pairing,
-    /// with no account. The scan (<see cref="RegistryAnswersFor"/>) and the check under the
-    /// lease (<see cref="RemovableReverifier"/>) both ask it, so the two never stand the
-    /// registry in for different pairings.
+    /// the value <see cref="ReadAccountPatchUninstallable"/> reads: a per-machine pairing,
+    /// with no account, or a per-user unmanaged pairing under a user's account, which the
+    /// local system's is not. The scan
+    /// (<see cref="RegistryAnswersFor"/>) and the check under the lease
+    /// (<see cref="RemovableReverifier"/>) both ask it, so the two never stand the registry
+    /// in for different pairings.
     /// </summary>
     internal static bool RegistryValueIsTheSource(string? patchSid, MsiInstallContext patchContext) =>
-        patchContext == MsiInstallContext.Machine && patchSid is null;
+        (patchContext == MsiInstallContext.Machine && patchSid is null)
+        || (patchContext == MsiInstallContext.UserUnmanaged && IsAccount(patchSid)
+            && !string.Equals(patchSid, LocalSystemAccount, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
-    /// The Uninstallable value of a per-machine pairing of <paramref name="productCode"/>
-    /// and <paramref name="patchCode"/>, read from the registry key Windows Installer
-    /// answers it from (<see cref="RegistryAnswersFor"/>), or null for anything but a
-    /// <c>REG_DWORD</c> that reads: a code that will not pack, a key or value that is not
-    /// there, a key that will not open and a value of any other type.
+    /// The Uninstallable value of a pairing of <paramref name="productCode"/> and
+    /// <paramref name="patchCode"/> under <paramref name="account"/>, the pairing's
+    /// <see cref="UserDataAccount"/>, read from the registry key Windows Installer answers it
+    /// from (<see cref="RegistryAnswersFor"/>), or null for anything but a <c>REG_DWORD</c>
+    /// that reads: an account that is none, a code that will not pack, a key or value that
+    /// is not there, a key that will not open and a value of any other type.
     ///
     /// The type is held as strictly as <see cref="ReadProductPatchSet"/> holds it, and
     /// every null holds the file it is asked for.
     /// </summary>
-    internal static int? ReadMachinePatchUninstallable(string productCode, string patchCode)
+    internal static int? ReadAccountPatchUninstallable(string? account, string productCode, string patchCode)
     {
+        if (!IsAccount(account)) return null;
         if (PackRegistryCode(productCode) is null || PackRegistryCode(patchCode) is null) return null;
 
         try
@@ -4458,9 +4616,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);
-            using var account = hklm.OpenSubKeyEarned(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18");
-            return account is null ? null : ReadPatchUninstallable(account, productCode, patchCode);
+            using var accountKey = hklm.OpenSubKeyEarned(
+                $@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\{account}");
+            return accountKey is null ? null : ReadPatchUninstallable(accountKey, productCode, patchCode);
         }
         catch (Exception ex) when (ex is IOException or System.Security.SecurityException
                                        or UnauthorizedAccessException)
@@ -4470,7 +4628,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
-    /// <see cref="ReadMachinePatchUninstallable"/>'s read, under an account's
+    /// <see cref="ReadAccountPatchUninstallable"/>'s read, under an account's
     /// <c>UserData</c> key handed in: the <c>Uninstallable</c> value of
     /// <c>Products\{product}\Patches\{patch}</c> where it is a <c>REG_DWORD</c> that reads,
     /// and null for anything else, a key that will not open included.
@@ -4560,8 +4718,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// missed and the recovery found has its API side from a walk of each recovered
     /// installation's own patches (<see cref="FoldRecoveredPatchSet"/>).
     ///
-    /// ONE PAIRING RESTS ON THE REGISTRY ALONE: a per-machine pairing whose Uninstallable
-    /// read failed, where the registry read a zero for it (<see cref="RegistryAnswersFor"/>).
+    /// ONE PAIRING RESTS ON THE REGISTRY ALONE: a per-machine or per-user unmanaged pairing
+    /// whose Uninstallable read failed, where the registry read a zero for it (<see cref="RegistryAnswersFor"/>).
     /// That zero is the value Windows Installer answers the read from, so it is the answer
     /// the failed read did not give, and the pairing adds nothing to the API side. Every
     /// other pairing whose read gave no answer marks its product Unestablished there.
@@ -5290,9 +5448,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// (<see cref="IsAccount"/>), so no account names a key outside its own.
     /// </summary>
     internal static string? UserDataAccount(string? sid, MsiInstallContext context) =>
-        context == MsiInstallContext.Machine && sid is null ? "S-1-5-18"
+        context == MsiInstallContext.Machine && sid is null ? LocalSystemAccount
         : (context is MsiInstallContext.UserManaged or MsiInstallContext.UserUnmanaged) && IsAccount(sid) ? sid
         : null;
+
+    /// <summary>
+    /// The local system's account, whose <c>UserData</c> subtree holds every per-machine
+    /// installation's records.
+    /// </summary>
+    internal const string LocalSystemAccount = "S-1-5-18";
 
     /// <summary>Whether <paramref name="sid"/> is 'S-' followed by digits and hyphens.</summary>
     internal static bool IsAccount(string? sid)

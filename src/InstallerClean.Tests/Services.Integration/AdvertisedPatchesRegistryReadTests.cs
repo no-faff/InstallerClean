@@ -105,6 +105,84 @@ public class AdvertisedPatchesRegistryReadTests
             Assert.Null(InstallerQueryService.ReadAdvertisedPatches(products, "not-a-code", CancellationToken.None)));
     }
 
+    /// <summary>
+    /// One key stands for one account's advertised products: the product keys the registry
+    /// read under that account are read from it, in whatever case the account is spelled,
+    /// and a product key under any other account gets no list.
+    /// </summary>
+    [Fact]
+    public void An_accounts_advertised_key_is_read_for_the_product_keys_under_that_account_alone()
+    {
+        const string account = "S-1-5-21-1111111111-2222222222-3333333333-1002";
+        const string other = "S-1-5-21-1111111111-2222222222-3333333333-1001";
+        WithProducts(products =>
+        {
+            using (var patches = products.CreateSubKey(PatchesKey, writable: true)!)
+                patches.SetValue(PackedPatch, ":SP1.1;:#SP1.1", RegistryValueKind.String);
+            var lists = new Dictionary<InstallerQueryService.AccountCode, IReadOnlyCollection<string>?>();
+
+            InstallerQueryService.ReadAdvertisedPatchLists(products, account.ToLowerInvariant(),
+                [new(account, ProductCode, []), new(other, ProductCode, [])], lists, null, CancellationToken.None);
+
+            var read = Assert.Single(lists);
+            Assert.Equal(new InstallerQueryService.AccountCode(account, ProductCode), read.Key);
+            Assert.Equal(new[] { PatchCode }, read.Value);
+        });
+    }
+
+    /// <summary>
+    /// One key stands in for the machine's hive and for the hive of every loaded account.
+    /// A per-machine product is read from the machine's advertised products, the running
+    /// account's from that account's own, and another account's product gets no list.
+    /// </summary>
+    [Theory]
+    [InlineData(RunningAs, true)]
+    [InlineData("S-1-5-18", false)]
+    [InlineData(null, false)]
+    public void The_machines_advertised_key_and_the_running_accounts_own_are_each_read_for_their_own_product_keys(
+        string? runningAs, bool readsTheRunningAccounts)
+    {
+        const string other = "S-1-5-21-1111111111-2222222222-3333333333-1001";
+        const string otherPatch = "{AC76BA86-7AD7-0000-2550-AC17014E6000}";
+        const string otherPackedPatch = "68AB67CA7DA700005205CA7110E40600";
+        WithProducts(root =>
+        {
+            using (var machinePatches = root.CreateSubKey(
+                       $@"SOFTWARE\Classes\Installer\Products\{PatchesKey}", writable: true)!)
+                machinePatches.SetValue(PackedPatch, "", RegistryValueKind.String);
+            using (var ownPatches = root.CreateSubKey(
+                       $@"{RunningAs}\Software\Microsoft\Installer\Products\{PatchesKey}", writable: true)!)
+                ownPatches.SetValue(otherPackedPatch, "", RegistryValueKind.String);
+            var lists = new Dictionary<InstallerQueryService.AccountCode, IReadOnlyCollection<string>?>();
+
+            InstallerQueryService.ReadEveryAdvertisedPatchList(root, root, runningAs,
+                [new("S-1-5-18", ProductCode, []), new(RunningAs, ProductCode, []), new(other, ProductCode, [])],
+                lists, null, CancellationToken.None);
+
+            Assert.Equal(new[] { PatchCode },
+                lists[new InstallerQueryService.AccountCode("S-1-5-18", ProductCode)]);
+            Assert.False(lists.ContainsKey(new InstallerQueryService.AccountCode(other, ProductCode)));
+            if (readsTheRunningAccounts)
+                Assert.Equal(new[] { otherPatch },
+                    lists[new InstallerQueryService.AccountCode(RunningAs, ProductCode)]);
+            else
+                Assert.False(lists.ContainsKey(new InstallerQueryService.AccountCode(RunningAs, ProductCode)));
+        });
+    }
+
+    private const string RunningAs = "S-1-5-21-1111111111-2222222222-3333333333-1002";
+
+    [Fact]
+    public void An_advertised_key_that_is_not_there_gives_no_product_a_list()
+    {
+        var lists = new Dictionary<InstallerQueryService.AccountCode, IReadOnlyCollection<string>?>();
+
+        InstallerQueryService.ReadAdvertisedPatchLists(null, "S-1-5-18",
+            [new("S-1-5-18", ProductCode, [])], lists, null, CancellationToken.None);
+
+        Assert.Empty(lists);
+    }
+
     private static readonly RegistryRights DeniedRights =
         RegistryRights.QueryValues | RegistryRights.EnumerateSubKeys;
 

@@ -8,12 +8,12 @@ namespace InstallerClean.Tests.Services.Integration;
 /// <summary>
 /// What <see cref="InstallerQueryService.ReadPatchUninstallable"/> answers for each shape the
 /// <c>Uninstallable</c> value of one pairing can take, read from a real <c>RegistryKey</c>.
-/// The account's subtree is built under a GUID-named key in HKCU standing in for
-/// <c>UserData\S-1-5-18</c> and removed in a finally, so nothing needs elevation and nothing
+/// The account's subtree is built under a GUID-named key in HKCU standing in for an
+/// account's key under <c>UserData</c> and removed in a finally, so nothing needs elevation and nothing
 /// outlives the test.
 ///
 /// Only a <c>REG_DWORD</c> that reads gives a number. The check before a Move or Delete passes
-/// a per-machine sibling on a zero alone, so every other shape answers null and holds the
+/// a sibling whose read failed on a zero alone, so every other shape answers null and holds the
 /// file.
 /// </summary>
 public class PatchUninstallableRegistryReadTests
