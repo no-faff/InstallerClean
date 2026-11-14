@@ -214,6 +214,31 @@ internal static class Msi
         ref uint pcchValueBuf);
 
     /// <summary>
+    /// Starts a Windows Installer multiple-package transaction owned by this process.
+    /// While it is open the Windows Installer service refuses every other installation,
+    /// patch application and patch removal on the machine with
+    /// ERROR_INSTALL_ALREADY_RUNNING, and this call itself returns that code while
+    /// another installation or transaction is in progress. On success it hands back a
+    /// transaction handle, closed with <see cref="MsiCloseHandle"/>, and an event that
+    /// is set if another process joins the transaction.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "MsiBeginTransactionW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiBeginTransaction(
+        string szName,
+        uint dwTransactionAttributes,
+        out uint phTransactionHandle,
+        out Microsoft.Win32.SafeHandles.SafeWaitHandle phChangeOfOwnerEvent);
+
+    /// <summary>
+    /// Ends the transaction this process began. It takes no handle, and one made
+    /// with no transaction of this process's open reaches the operation the
+    /// service is running instead, so it is called only after this process's own
+    /// <see cref="MsiBeginTransaction"/> returned success, and only once.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "MsiEndTransaction", ExactSpelling = true)]
+    public static extern uint MsiEndTransaction(uint dwTransactionState);
+
+    /// <summary>
     /// Closes any handle returned by an Msi* function.
     /// </summary>
     [DllImport(Library, EntryPoint = "MsiCloseHandle", ExactSpelling = true)]
