@@ -265,6 +265,8 @@ public class InstallerQueryServicePatchTruncationTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     /// <summary>

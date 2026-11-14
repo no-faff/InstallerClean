@@ -66,6 +66,17 @@ public interface IPackageIdentityReader
     /// comparing package codes keeps the file then.
     /// </summary>
     string? PackageCodeOf(string filePath);
+
+    /// <summary>
+    /// Whether the installation package at <paramref name="filePath"/> has no summary information
+    /// at all: its summary information opens and holds no property, its Revision Number, the
+    /// package code, among them (VT_EMPTY). Windows Installer will not take such a file as an
+    /// installation's source, answering that the package is missing or cannot be opened, so it is
+    /// no installation's source. False for every other answer: a summary that will not open, one
+    /// holding any property, a Revision Number that is not empty and a read that fails, and from a
+    /// reader that does not read package codes.
+    /// </summary>
+    bool HoldsNoSummaryInformation(string filePath);
 }
 
 /// <summary>Reads made through <see cref="IPackageIdentityReader"/>'s own members.</summary>

@@ -1357,7 +1357,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             SourcePackageNotRuledOut: By(DeclaredProductInstalledCause.SourcePackageNotRuledOut),
             MissingSparePackageCodeUnread: By(DeclaredProductInstalledCause.MissingSparePackageCodeUnread),
             MissingSpareIsIt: By(DeclaredProductInstalledCause.MissingSpareIsIt),
-            ByName: By(DeclaredProductInstalledCause.ByName));
+            ByName: By(DeclaredProductInstalledCause.ByName),
+            UndeclaredPackageCodeIsIt: By(DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt),
+            UndeclaredPackageCodeUnread: By(DeclaredProductInstalledCause.UndeclaredPackageCodeUnread));
 
         private int By(DeclaredProductInstalledCause cause) => _declaredProductInstalledBy[(int)cause];
 

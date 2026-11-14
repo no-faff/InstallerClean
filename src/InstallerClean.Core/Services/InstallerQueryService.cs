@@ -747,6 +747,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     /// <inheritdoc />

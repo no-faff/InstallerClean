@@ -893,6 +893,8 @@ public class FileSystemScanServiceTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     private static void PutOnDisk(MockFileSystem fs, string path)
