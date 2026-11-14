@@ -84,6 +84,7 @@ const OVERRIDES = {
   'Cli.FoundOrphans.One': `{0} {1} inutile à nettoyer a été trouvé ({2}).`,
   'Cli.DeletingFiles.One': `Suppression de {0} {1} inutile...`,
   'Cli.DeletedFiles.One': `{0} {1} inutile a été supprimé définitivement.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean n'a pas pu empêcher d'autres installations de démarrer pour le {0} {1} restant, il l'a donc laissé de côté.`,
   'Cli.MovingFiles.One': `Déplacement de {0} {1} inutile vers {2}...`,
   'Cli.MovedFiles.One': `{0} {1} inutile a été déplacé.`,
 };
@@ -662,6 +663,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Affiche les licences des polices, des icônes et du code inclus dans InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Affiche les avis de tiers`,
   'Startup.NeedsWindows10Version1607': `InstallerClean nécessite Windows 10 version 1607 ou ultérieure, ou Windows 11.`,
+  'Error.InstallerRollbackDisabled': `La stratégie « Interdire la restauration » de Windows Installer est activée. InstallerClean ne peut donc pas empêcher d'autres installations de démarrer pendant la suppression, et rien n'a été supprimé.`,
+  'Cli.InstallerRollbackDisabled': `Erreur : la stratégie « Interdire la restauration » de Windows Installer est activée. InstallerClean ne peut donc pas empêcher d'autres installations de démarrer pendant la suppression. Rien n'a été supprimé.`,
+  'Completion.PermanentDeleteStoppedSummary': `Supprimé définitivement {0} sur {1} {2}. InstallerClean n'a pas pu empêcher d'autres installations de démarrer pendant le traitement du reste, il l'a donc laissé de côté.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean n'a pas pu empêcher d'autres installations de démarrer pour les {0} {1} restants, il les a donc laissés de côté.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

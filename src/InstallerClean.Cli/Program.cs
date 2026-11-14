@@ -1701,10 +1701,17 @@ internal static class Program
                 if (result.InstallerLockAccessRefused)
                     return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexAccessRefused, null);
 
-                // The service could not take Global\_MSIExecute and nothing was
-                // shown to be holding it, so it refused and touched nothing.
-                if (result.InstallerLockUnavailable)
+                // Windows Installer would not open the service's transaction before the
+                // first file, so it touched nothing. Once a file has been reached the
+                // run is reported as stopped part-way below, with what it did.
+                if (result.InstallerLockUnavailable && result.RefusedBeforeFirstFile)
                     return EmitInstallerLockUnavailable(arg);
+
+                // The DisableRollback policy keeps Windows Installer from opening the
+                // service's transaction, so nothing was touched. A setting of the
+                // machine, not a passing state, so the run is an error and not a skip.
+                if (result.InstallerRollbackDisabled && result.RefusedBeforeFirstFile)
+                    return EmitInstallerRollbackDisabled(arg);
 
                 // THE RUN'S ONE HELD-BACK LINE, printed here because this is the
                 // last of the two producers to answer: the service takes the
@@ -1765,6 +1772,14 @@ internal static class Program
                         Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
 
+                // Stopped part-way: the files after the first Reached were never
+                // touched, so they are named as left alone, and the run's bytes cover
+                // only the files it reached.
+                if (result.StoppedPartWay)
+                    Console.WriteLine(string.Format(
+                        DisplayHelpers.Pluralise(result.NotReached, Strings.Cli_DeleteStoppedPartWay, "Cli.DeleteStoppedPartWay"),
+                        DisplayHelpers.FormatCount(result.NotReached), DisplayHelpers.PluraliseFile(result.NotReached)));
+
                 // The service returns its partial result on a mid-batch cancel
                 // rather than throwing, so re-enter the OCE catch by hand: a
                 // cancelled run gets one cancelled-run event-log entry and a
@@ -1782,16 +1797,26 @@ internal static class Program
                 // list. Reporting the scan total on a partial failure
                 // would overstate the freed-space figure for every run
                 // that didn't process every file.
-                long actualBytes = result.Errors.Count == 0
+                var reachedFiles = result.StoppedPartWay
+                    ? survivingFiles.Take(result.Reached).ToList()
+                    : survivingFiles;
+                long actualBytes = result.Errors.Count == 0 && !result.StoppedPartWay
                     ? totalBytes
-                    : SumBytesExcludingErrors(survivingFiles, result.Errors);
-                var outcome = CliContract.ClassifyFileOperation(result.DeletedCount, result.Errors.Count);
+                    : SumBytesExcludingErrors(reachedFiles, result.Errors);
+                // A run stopped part-way is classed as an aborted batch is: Partial where
+                // it deleted something, an error where it deleted nothing.
+                var outcome = result.StoppedPartWay
+                    ? CliContract.ClassifyAbortedMove(result.DeletedCount)
+                    : CliContract.ClassifyFileOperation(result.DeletedCount, result.Errors.Count);
                 // The folded check, so the under-lease re-read's own held-back files are
-                // counted with the pre-act ones, as the window's report counts them.
-                await CarryReportAsync(() => ResultLogEntry.ForDelete(
-                    scanResult, scanDurationMs, result, actualBytes, operationDurationMs,
-                    reverify.WithHeldBack(result.HeldBack, result.HeldBackReasons),
-                    WindowsRegion(), ReportHost.CommandLine, RunningCopy(services)));
+                // counted with the pre-act ones, as the window's report counts them. A run
+                // stopped part-way carries none: the report's outcome is decided from the
+                // deleted and failed counts alone, which would record it as finished.
+                if (!result.StoppedPartWay)
+                    await CarryReportAsync(() => ResultLogEntry.ForDelete(
+                        scanResult, scanDurationMs, result, actualBytes, operationDurationMs,
+                        reverify.WithHeldBack(result.HeldBack, result.HeldBackReasons),
+                        WindowsRegion(), ReportHost.CommandLine, RunningCopy(services)));
 
                 // After the cancel re-entry, so a cancelled run never prints it: there
                 // the undo, or the cancellation itself, stays the last line.
@@ -2736,6 +2761,28 @@ internal static class Program
         MachineContract.WriteEventLog(CliEventClass.TransientSkip,
             () => InstallerLockUnavailableEventLogLine(arg));
         return ExitTransient;
+    }
+
+    /// <summary>
+    /// The Application-channel line for a run refused because the DisableRollback policy
+    /// keeps Windows Installer from opening the app's transaction. Built outside the en-GB
+    /// scope, like <see cref="InstallerLockUnavailableEventLogLine"/>.
+    /// </summary>
+    internal static string InstallerRollbackDisabledEventLogLine(string arg) =>
+        string.Format(Strings.Cli_EventLogInstallerRollbackDisabled, arg);
+
+    /// <summary>
+    /// Reports a <c>/d</c> the action service refused before its first file because the
+    /// DisableRollback policy is set, and returns the exit code for it: HardError and
+    /// ExitError, the policy being a setting of the machine that stays until somebody
+    /// changes it, so a scheduler coming back finds the same refusal.
+    /// </summary>
+    private static int EmitInstallerRollbackDisabled(string arg)
+    {
+        Console.WriteLine(Strings.Cli_InstallerRollbackDisabled);
+        MachineContract.WriteEventLog(CliEventClass.HardError,
+            () => InstallerRollbackDisabledEventLogLine(arg));
+        return ExitError;
     }
 
     /// <summary>

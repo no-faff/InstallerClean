@@ -904,6 +904,19 @@
        sentence there; here it does not. -->
   <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Перемещено {0}/{1} {2} в {3} до отмены.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Удалено безвозвратно {0}/{1} {2} до отмены.</value></data>
+  <!-- The completion overlay's summary for a permanent delete that stopped
+       part-way because InstallerClean could not keep other installations from
+       starting for the rest (Windows Installer would not open or end the
+       transaction that does that), where
+       Completion.PermanentDeleteCancelledSummary is the same overlay after the
+       user pressed Cancel. 0 = the count deleted
+       before the stop, 1 = the total that was being processed, 2 = pluralised
+       "file"/"files" for the total. Counted in the same way as that sibling
+       (Grammatical, DisplayHelpers.QuestionFor), so it is set up the same way:
+       one string, no .Singular/.Plural pair, and a language may add its own
+       satellite-only .One/.Few/.Many override for its count grammar. The
+       sentence after the count says the files not reached were left alone. -->
+  <data name="Completion.PermanentDeleteStoppedSummary" xml:space="preserve"><value>Удалено безвозвратно {0}/{1} {2}. InstallerClean не смог помешать запуску других установок, поэтому остальное оставлено нетронутым.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a
        run that finished leaves the reader deciding when to delete the backup, and
@@ -1391,6 +1404,17 @@ InstallerClean уже был запущен от имени администра
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.</value></data>
+  <!-- Shown when a Delete was refused before it reached a file because the
+       Windows Installer policy "Prohibit rollback" (DisableRollback) is on.
+       InstallerClean keeps other installations from starting while it deletes
+       by taking a Windows Installer transaction, and Windows Installer does not
+       allow a transaction while that policy is set, so the delete cannot be run
+       safely and is refused instead. A separate sentence from
+       Error.InstallerLockUnavailable because the cause is a setting on this PC
+       and trying again will not change it, so unlike that one it carries no
+       advice to retry. Takes the "Nothing was deleted" heading,
+       Error.InstallerLockUnavailableTitle. No placeholders. -->
+  <data name="Error.InstallerRollbackDisabled" xml:space="preserve"><value>Параметр политики Windows Installer «Запретить откат» включён, поэтому во время удаления InstallerClean не может помешать запуску других установок, и ничего не удалено.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недопустимая папка назначения</value></data>
   <!-- The heading over Error.DestinationChangedMidBatch, which is the one
        destination message that is not about a path being wrong. The guard behind
@@ -1968,6 +1992,13 @@ InstallerClean уже был запущен от имени администра
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
+  <!-- 0 = count left alone, 1 = pluralised noun "file"/"files". The command
+       line's counterpart of Completion.PermanentDeleteStoppedSummary, printed on
+       /d after Cli.DeletedFiles when the run stopped part-way because
+       InstallerClean could not keep other installations from starting for the
+       rest. Counted in the same way as Cli.DeletedFiles (Grammatical), so a
+       language may add its own satellite-only .One/.Few/.Many override. Never
+       printed at a count of zero. -->
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -2044,6 +2075,10 @@ InstallerClean уже был запущен от имени администра
        same refusal, /d. No placeholders. -->
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
+  <!-- The command line's twin of Error.InstallerRollbackDisabled, /d only, and a
+       separate string for the same reason Cli.InstallerLockUnavailable is: the
+       family opens "Error: " and goes lower case after it, which is the
+       console's shape and not the window's. Written to stdout. No placeholders. -->
   <!-- The console pair of Error.InstallerLockAccessRefused, /d then /m. Opens
        "Error: " like the rest of this family, and like it says nothing about
        trying again. Printed for a refused lock wherever it is met, at the
@@ -2087,6 +2122,13 @@ InstallerClean уже был запущен от имени администра
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
        the other. -->
+  <!-- 0 = arg ("/d" or "/m"). The audit twin of Cli.InstallerRollbackDisabled,
+       written to the Application event log. Machine-read like every
+       Cli.EventLog* line, so it is forced English at the emit site and states
+       the condition rather than the advice. ONE line for both modes, as
+       Cli.EventLogInstallerLockUnavailable is, because {0} already carries which
+       mode ran; the tail names both actions because naming one would be false of
+       a run in the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <!-- 0 = moved count, 1 = pluralised noun. "Unneeded" describes the files, not
@@ -2400,6 +2442,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Найден {0} ненужный {1} для очистки ({2}).</value></data>
   <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Идёт удаление: {0} ненужный {1}...</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Безвозвратно удалён {0} ненужный {1}.</value></data>
+  <data name="Cli.DeleteStoppedPartWay.One" xml:space="preserve"><value>InstallerClean не смог помешать запуску других установок, поэтому остальной {0} {1} оставлен нетронутым.</value></data>
   <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Идёт перемещение в {2}: {0} ненужный {1}...</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Перемещён {0} ненужный {1}.</value></data>
   <data name="Completion.HeldBack.Few" xml:space="preserve"><value>Задержано {0} файла. Сканирование сочло их ненужными. Итоговая проверка не смогла это подтвердить.</value></data>
@@ -2504,4 +2547,6 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>Ответа нет уже минуту.</value></data>
   <data name="Cli.NeedsNetFramework48" xml:space="preserve"><value>Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.</value></data>
   <data name="Cli.Help.Notices" xml:space="preserve"><value>  installerclean-cli --notices    Показать уведомления третьих сторон</value></data>
+  <data name="Cli.InstallerRollbackDisabled" xml:space="preserve"><value>Ошибка: параметр политики Windows Installer «Запретить откат» включён, поэтому во время удаления InstallerClean не может помешать запуску других установок. Ничего не удалено.</value></data>
+  <data name="Cli.DeleteStoppedPartWay" xml:space="preserve"><value>InstallerClean не смог помешать запуску других установок, поэтому остальные {0} {1} оставлены нетронутыми.</value></data>
 </root>

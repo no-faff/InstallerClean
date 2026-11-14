@@ -175,6 +175,7 @@ public static class Strings
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_CoverLostNoWorkDelete => Get("Cli.CoverLostNoWorkDelete");
     public static string Cli_CoverLostNoWorkMove => Get("Cli.CoverLostNoWorkMove");
+    public static string Cli_DeleteStoppedPartWay => Get("Cli.DeleteStoppedPartWay");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
     public static string Cli_DeletingFiles => Get("Cli.DeletingFiles");
     public static string Cli_DestinationChangedMidBatch => Get("Cli.DestinationChangedMidBatch");
@@ -189,6 +190,7 @@ public static class Strings
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
     public static string Cli_EventLogInstallerLockUnavailable => Get("Cli.EventLogInstallerLockUnavailable");
+    public static string Cli_EventLogInstallerRollbackDisabled => Get("Cli.EventLogInstallerRollbackDisabled");
     public static string Cli_EventLogMissingFromDisk_Plural => Get("Cli.EventLogMissingFromDisk.Plural");
     public static string Cli_EventLogMissingFromDisk_Singular => Get("Cli.EventLogMissingFromDisk.Singular");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
@@ -279,6 +281,7 @@ public static class Strings
     public static string Cli_Help_Version => Get("Cli.Help.Version");
     public static string Cli_InstallerLockAccessRefused => Get("Cli.InstallerLockAccessRefused");
     public static string Cli_InstallerLockUnavailable => Get("Cli.InstallerLockUnavailable");
+    public static string Cli_InstallerRollbackDisabled => Get("Cli.InstallerRollbackDisabled");
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
     public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
     public static string Cli_MoveCancelledRestoreHint => Get("Cli.MoveCancelledRestoreHint");
@@ -364,6 +367,7 @@ public static class Strings
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PermanentDeleteCancelledSummary => Get("Completion.PermanentDeleteCancelledSummary");
+    public static string Completion_PermanentDeleteStoppedSummary => Get("Completion.PermanentDeleteStoppedSummary");
     public static string Completion_PermanentDeleteSummary_Plural => Get("Completion.PermanentDeleteSummary.Plural");
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
     public static string Completion_RecentChange_Plural => Get("Completion.RecentChange.Plural");
@@ -430,6 +434,7 @@ public static class Strings
     public static string Error_InstallerLockAccessRefused => Get("Error.InstallerLockAccessRefused");
     public static string Error_InstallerLockUnavailable => Get("Error.InstallerLockUnavailable");
     public static string Error_InstallerLockUnavailableTitle => Get("Error.InstallerLockUnavailableTitle");
+    public static string Error_InstallerRollbackDisabled => Get("Error.InstallerRollbackDisabled");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
     public static string Error_MoveFailedTitle => Get("Error.MoveFailedTitle");

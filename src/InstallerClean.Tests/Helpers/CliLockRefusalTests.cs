@@ -58,6 +58,17 @@ public class CliLockRefusalTests
         Assert.StartsWith(arg, line, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData("/d")]
+    [InlineData("/m")]
+    public void The_rollback_policy_line_opens_with_the_flag_and_is_one_line(string arg)
+    {
+        var line = MachineContract.English(() => Program.InstallerRollbackDisabledEventLogLine(arg));
+
+        Assert.StartsWith(arg, line, StringComparison.Ordinal);
+        Assert.DoesNotContain('\n', line);
+    }
+
     [Fact]
     public void The_event_log_line_is_one_line_and_its_remainder_serves_both_flags()
     {

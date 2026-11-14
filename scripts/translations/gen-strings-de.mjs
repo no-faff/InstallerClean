@@ -672,6 +672,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Zeigt die Lizenzen der Schriften, Symbole und des Codes, die InstallerClean enthält.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Die Hinweise zu Drittanbietern ausgeben`,
   'Startup.NeedsWindows10Version1607': `InstallerClean benötigt Windows 10 ab Version 1607 oder Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Die Richtlinie „Rollback verhindern“ von Windows Installer ist aktiviert. Dadurch kann InstallerClean beim Löschen nicht verhindern, dass andere Installationen starten, und es wurde nichts gelöscht.`,
+  'Cli.InstallerRollbackDisabled': `Fehler: Die Richtlinie „Rollback verhindern“ von Windows Installer ist aktiviert. Dadurch kann InstallerClean beim Löschen nicht verhindern, dass andere Installationen starten. Es wurde nichts gelöscht.`,
+  'Completion.PermanentDeleteStoppedSummary': `{0} von {1} {2} endgültig gelöscht. InstallerClean konnte für den Rest nicht verhindern, dass andere Installationen starten, und hat ihn deshalb unangetastet gelassen.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean konnte bei {0} weiteren {1} nicht verhindern, dass andere Installationen starten, und hat sie deshalb unangetastet gelassen.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

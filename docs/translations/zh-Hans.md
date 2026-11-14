@@ -182,6 +182,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | 已保留 {0} 个文件。扫描认为它们不需要，但最终检查无法确认这一点。 |
 | Moved {0} of {1} {2} to {3} before you cancelled. | 在您取消前，已将 {1} 个{2}中的 {0} 个移动到 {3}。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
+| Permanently deleted {0} of {1} {2}. InstallerClean couldn't keep other installations from starting for the rest, so it left them alone. | 已永久删除 {1} 个{2}中的 {0} 个。InstallerClean 无法在处理其余文件期间阻止其他安装开始，因此没有动它们。 |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 撤销很简单。把它们移回 {InstallerFolder}，一切就会恢复原样。 |
 | {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
 | {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
@@ -278,6 +279,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要，没有移动任何文件。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有删除任何内容。请重试，若一直如此请重启 Windows。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有移动任何内容。请重试，若一直如此请重启 Windows。 |
+| Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes, so nothing has been deleted. | Windows Installer 的“禁止回滚”策略已启用，InstallerClean 因此无法在删除期间阻止其他安装开始，所以没有删除任何内容。 |
 | Invalid destination | 目标无效 |
 | Move stopped | 移动已停止 |
 | Couldn't use that backup folder | 无法使用该备份文件夹 |
@@ -515,6 +517,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean 已停止等待多个驱动器或共享（{0}），并将仍需与其中某一个核对的文件都原样保留。待它们恢复正常响应后，请重新运行该命令。 |
 | Deleting {0} unneeded {1}... | 正在删除 {0} 个不需要的{1}… |
 | Permanently deleted {0} unneeded {1}. | 已永久删除 {0} 个不需要的{1}。 |
+| InstallerClean couldn't keep other installations from starting for the other {0} {1}, so it left them alone. | InstallerClean 无法在处理其余 {0} 个{1}期间阻止其他安装开始，因此没有动它们。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 错误：未指定移动目标位置。请使用 /m 路径。（在 GUI 中设置的默认位置是按用户保存的，不适用于计划任务或服务账户下的运行。） |
 | Error: destination cannot be inside the Windows Installer folder. | 错误：目标位置不能位于 Windows Installer 文件夹内。 |
 | Error: destination must be a fully qualified path. Got: {0} | 错误：目标位置必须是完整路径。收到：{0} |
@@ -540,6 +543,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Run it again. | 扫描期间这台计算机的时钟倒退或变慢了，因此 InstallerClean 没有提供 {InstallerFolder} 中任何已安装程序的记录都未提及的文件，而是把它们保留了下来。请重新运行该命令。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | 错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有删除任何内容。请重试，若一直如此请重启 Windows。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | 错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有移动任何内容。请重试，若一直如此请重启 Windows。 |
+| Error: Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes. Nothing has been deleted. | 错误：Windows Installer 的“禁止回滚”策略已启用，InstallerClean 因此无法在删除期间阻止其他安装开始。没有删除任何内容。 |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | 错误：Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要。没有删除任何文件。 |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | 错误：Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要。没有移动任何文件。 |
 | Moving {0} unneeded {1} to {2}... | 正在把 {0} 个不需要的{1}移动到 {2}… |

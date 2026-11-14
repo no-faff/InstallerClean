@@ -659,6 +659,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Mostra as licenças das fontes, dos ícones e do código que o InstallerClean inclui.`,
   'Cli.Help.Notices': `  installerclean-cli --notices   Mostra os avisos de terceiros`,
   'Startup.NeedsWindows10Version1607': `O InstallerClean precisa do Windows 10 versão 1607 ou posterior, ou do Windows 11.`,
+  'Error.InstallerRollbackDisabled': `A política “Proibir reversão” do Windows Installer está ativada. Por isso, o InstallerClean não consegue impedir que outras instalações comecem durante a exclusão, e nada foi excluído.`,
+  'Cli.InstallerRollbackDisabled': `Erro: a política “Proibir reversão” do Windows Installer está ativada. Por isso, o InstallerClean não consegue impedir que outras instalações comecem durante a exclusão. Nada foi excluído.`,
+  'Completion.PermanentDeleteStoppedSummary': `Excluídos permanentemente {0} de {1} {2}. O InstallerClean não conseguiu impedir que outras instalações começassem durante o restante, então o deixou de lado.`,
+  'Cli.DeleteStoppedPartWay': `O InstallerClean não conseguiu impedir que outras instalações começassem para os outros {0} {1}, então os deixou de lado.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
@@ -675,6 +679,7 @@ const OVERRIDES = {
   'Cli.FoundOrphans.One': `Foi encontrado {0} {1} desnecessário para limpar ({2}).`,
   'Cli.DeletingFiles.One': `Excluindo {0} {1} desnecessário...`,
   'Cli.DeletedFiles.One': `Foi excluído permanentemente {0} {1} desnecessário.`,
+  'Cli.DeleteStoppedPartWay.One': `O InstallerClean não conseguiu impedir que outras instalações começassem para o outro {0} {1}, então o deixou de lado.`,
   'Cli.MovingFiles.One': `Movendo {0} {1} desnecessário para {2}...`,
   'Cli.MovedFiles.One': `Foi movido {0} {1} desnecessário.`,
 };

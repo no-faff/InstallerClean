@@ -674,12 +674,33 @@ public partial class CompletionViewModel : ObservableObject
     /// over a line saying a file could not be processed.
     /// </summary>
     public void ShowDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
+        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null) =>
+        ShowDeletePartSummary(deletedCount, totalCount, deletedBytes, errors, reverify,
+            DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"));
+
+    /// <summary>
+    /// Shows the completion overlay for a Delete that stopped part-way because Windows
+    /// Installer would not open or end a later group's transaction: the files reached are
+    /// dealt with and the rest were left alone. Laid out as the cancelled card, with a
+    /// summary saying why the rest were left.
+    /// </summary>
+    public void ShowDeleteStoppedSummary(int deletedCount, int totalCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null) =>
+        ShowDeletePartSummary(deletedCount, totalCount, deletedBytes, errors, reverify,
+            DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteStoppedSummary, "Completion.PermanentDeleteStoppedSummary"));
+
+    /// <summary>
+    /// The card for a Delete that ended before its last file, cancelled or stopped:
+    /// <paramref name="summary"/>, already in its counted form for the total, is the only
+    /// line saying the run did not finish.
+    /// </summary>
+    private void ShowDeletePartSummary(int deletedCount, int totalCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify, string summary)
     {
         // See ShowMoveCancelledSummary, which this mirrors line for line: the
-        // warning heading only where the cancel reached no file AND something
-        // failed, and the cancelled summary sentence kept either way because it is
-        // the only line saying the run was stopped.
+        // warning heading only where the run deleted no file AND something failed,
+        // and the summary sentence kept either way, being the only line saying the
+        // run did not finish.
         HeadingIsWarning = errors.Count > 0 && deletedCount == 0;
         Heading = HeadingIsWarning
             ? Strings.Completion_NothingDeleted
@@ -687,7 +708,7 @@ public partial class CompletionViewModel : ObservableObject
         FailedCount = FailedCountText(errors.Count, deleting: true);
         SummaryDestination = string.Empty;
         Summary = string.Format(
-            DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"),
+            summary,
             DisplayHelpers.FormatCount(deletedCount), DisplayHelpers.FormatCount(totalCount),
             DisplayHelpers.PluraliseFile(totalCount));
         Restore = string.Empty;

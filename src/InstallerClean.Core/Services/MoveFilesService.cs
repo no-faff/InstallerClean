@@ -669,16 +669,17 @@ public sealed class MoveFilesService : IMoveFilesService
     /// moved, and returns null when the file really has gone or the error to
     /// file when it has not.
     ///
-    /// A move that returns without throwing is not proof the source is gone. The
-    /// move calls MoveFileEx with MOVEFILE_COPY_ALLOWED, as .NET 10's File.Move
-    /// does (dotnet/runtime, Interop.MoveFileEx.cs), and Win32 documents that flag
-    /// as simulating a cross-volume move with CopyFile plus DeleteFile, then says
-    /// outright: "If the file is successfully copied to a different volume and the
-    /// original file is unable to be deleted, the function succeeds leaving the
-    /// source file intact." A read-only source is exactly that case, DeleteFile
-    /// being documented to fail with ERROR_ACCESS_DENIED on one, and a file another
-    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive moves
-    /// never reach this state: a rename either happens or throws.
+    /// A move that returns without throwing is not proof the source is gone. On
+    /// .NET Framework File.Move calls MoveFile, which moves a file to another volume
+    /// by copying it there and deleting the source. Win32 documents that copy and
+    /// delete for MoveFileEx's MOVEFILE_COPY_ALLOWED, and says of it: "If the file is
+    /// successfully copied to a different volume and the original file is unable to
+    /// be deleted, the function succeeds leaving the source file intact." A read-only
+    /// source is that case, DeleteFile being documented to fail with
+    /// ERROR_ACCESS_DENIED on one, and a file another program holds open without
+    /// FILE_SHARE_DELETE is a second. The source is therefore checked after every
+    /// move, whichever call made it. Same-drive moves never reach this state: a
+    /// rename either happens or throws.
     ///
     /// Checked after the fact rather than pre-empted, because pre-clearing the
     /// attribute would mutate sources that never needed it and would need a

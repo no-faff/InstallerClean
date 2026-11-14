@@ -182,6 +182,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | {0}개 파일을 보류했습니다. 검사는 필요 없다고 했지만, 최종 확인은 그것을 확인해 주지 못했습니다. |
 | Moved {0} of {1} {2} to {3} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 {3}(으)로 이동했습니다. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다. |
+| Permanently deleted {0} of {1} {2}. InstallerClean couldn't keep other installations from starting for the rest, so it left them alone. | {2} {1}개 중 {0}개를 영구 삭제했습니다. 나머지는 InstallerClean이 다른 설치가 시작되지 않게 막을 수 없어서 그대로 두었습니다. |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 되돌리기는 간단합니다. {InstallerFolder}로 다시 옮기면 모든 것이 원래대로 돌아갑니다. |
 | {0} {1} permanently deleted | {1} {0}개 영구 삭제됨 |
 | {0} {1} permanently deleted | {1} {0}개 영구 삭제됨 |
@@ -278,6 +279,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows가 InstallerClean에 Windows Installer가 사용 중인지 확인할 권한을 주지 않아, 도중에 파일이 필요해질 가능성을 배제할 수 없었고, 아무것도 이동되지 않았습니다. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 Windows Installer가 사용하는 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었고 아무것도 삭제하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 Windows Installer가 사용하는 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었고 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요. |
+| Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes, so nothing has been deleted. | Windows Installer의 “롤백 금지” 정책이 사용하도록 설정되어 있어서, InstallerClean이 삭제하는 동안 다른 설치가 시작되지 않게 막을 수 없으므로 아무것도 삭제하지 않았습니다. |
 | Invalid destination | 잘못된 대상 |
 | Move stopped | 이동 중지됨 |
 | Couldn't use that backup folder | 해당 백업 폴더를 사용할 수 없음 |
@@ -515,6 +517,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean이 여러 드라이브 또는 공유 ({0})에 대한 대기를 중단했으며, 아직 그중 하나와 대조해야 했던 파일은 모두 그대로 두었습니다. 정상적으로 응답하게 되면 명령을 다시 실행하세요. |
 | Deleting {0} unneeded {1}... | 불필요한 {1} {0}개 삭제 중... |
 | Permanently deleted {0} unneeded {1}. | 불필요한 {1} {0}개를 영구 삭제했습니다. |
+| InstallerClean couldn't keep other installations from starting for the other {0} {1}, so it left them alone. | 나머지 {1} {0}개는 InstallerClean이 다른 설치가 시작되지 않게 막을 수 없어서 그대로 두었습니다. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.) |
 | Error: destination cannot be inside the Windows Installer folder. | 오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다. |
 | Error: destination must be a fully qualified path. Got: {0} | 오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0} |
@@ -540,6 +543,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Run it again. | 검사하는 동안 이 PC의 시계가 뒤로 돌아가거나 느려져서, InstallerClean은 설치된 어떤 프로그램의 기록에도 이름이 없는 {InstallerFolder}의 파일을 제시하지 않고 보류했습니다. 명령을 다시 실행하세요. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | 오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 삭제하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | 오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요. |
+| Error: Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes. Nothing has been deleted. | 오류: Windows Installer의 “롤백 금지” 정책이 사용하도록 설정되어 있어서, InstallerClean이 삭제하는 동안 다른 설치가 시작되지 않게 막을 수 없습니다. 아무것도 삭제하지 않았습니다. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | 오류: Windows가 InstallerClean에 Windows Installer가 사용 중인지 확인할 권한을 주지 않아, 도중에 파일이 필요해질 가능성을 배제할 수 없었습니다. 아무것도 삭제되지 않았습니다. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | 오류: Windows가 InstallerClean에 Windows Installer가 사용 중인지 확인할 권한을 주지 않아, 도중에 파일이 필요해질 가능성을 배제할 수 없었습니다. 아무것도 이동되지 않았습니다. |
 | Moving {0} unneeded {1} to {2}... | 불필요한 {1} {0}개를 {2}(으)로 이동 중... |

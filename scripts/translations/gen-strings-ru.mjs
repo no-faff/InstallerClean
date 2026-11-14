@@ -546,6 +546,8 @@ const MAP = {
   'About.Link.Notices': `Уведомления третьих сторон`,
   'Automation.About.Notices.HelpText': `Показывает лицензии шрифтов, значков и кода, входящих в InstallerClean.`,
   'Startup.NeedsWindows10Version1607': `Для InstallerClean нужна Windows 10 версии 1607 или новее либо Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Параметр политики Windows Installer «Запретить откат» включён, поэтому во время удаления InstallerClean не может помешать запуску других установок, и ничего не удалено.`,
+  'Completion.PermanentDeleteStoppedSummary': `Удалено безвозвратно {0}/{1} {2}. InstallerClean не смог помешать запуску других установок, поэтому остальное оставлено нетронутым.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -588,6 +590,7 @@ const OVERRIDES = {
   'Cli.FoundOrphans.One': `Найден {0} ненужный {1} для очистки ({2}).`,
   'Cli.DeletingFiles.One': `Идёт удаление: {0} ненужный {1}...`,
   'Cli.DeletedFiles.One': `Безвозвратно удалён {0} ненужный {1}.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean не смог помешать запуску других установок, поэтому остальной {0} {1} оставлен нетронутым.`,
   'Cli.MovingFiles.One': `Идёт перемещение в {2}: {0} ненужный {1}...`,
   'Cli.MovedFiles.One': `Перемещён {0} ненужный {1}.`,
   'Completion.HeldBack.Few': `Задержано {0} файла. Сканирование сочло их ненужными. Итоговая проверка не смогла это подтвердить.`,
@@ -725,6 +728,8 @@ const CLI = {
   'Cli.ReportNoAnswer': `Ответа нет уже минуту.`,
   'Cli.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices    Показать уведомления третьих сторон`,
+  'Cli.InstallerRollbackDisabled': `Ошибка: параметр политики Windows Installer «Запретить откат» включён, поэтому во время удаления InstallerClean не может помешать запуску других установок. Ничего не удалено.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean не смог помешать запуску других установок, поэтому остальные {0} {1} оставлены нетронутыми.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

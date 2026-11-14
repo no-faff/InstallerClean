@@ -655,6 +655,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `InstallerClean에 포함된 글꼴, 아이콘, 코드의 라이선스를 표시합니다.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  타사 고지 사항 출력`,
   'Startup.NeedsWindows10Version1607': `InstallerClean에는 Windows 10 버전 1607 이상 또는 Windows 11이 필요합니다.`,
+  'Error.InstallerRollbackDisabled': `Windows Installer의 “롤백 금지” 정책이 사용하도록 설정되어 있어서, InstallerClean이 삭제하는 동안 다른 설치가 시작되지 않게 막을 수 없으므로 아무것도 삭제하지 않았습니다.`,
+  'Cli.InstallerRollbackDisabled': `오류: Windows Installer의 “롤백 금지” 정책이 사용하도록 설정되어 있어서, InstallerClean이 삭제하는 동안 다른 설치가 시작되지 않게 막을 수 없습니다. 아무것도 삭제하지 않았습니다.`,
+  'Completion.PermanentDeleteStoppedSummary': `{2} {1}개 중 {0}개를 영구 삭제했습니다. 나머지는 InstallerClean이 다른 설치가 시작되지 않게 막을 수 없어서 그대로 두었습니다.`,
+  'Cli.DeleteStoppedPartWay': `나머지 {1} {0}개는 InstallerClean이 다른 설치가 시작되지 않게 막을 수 없어서 그대로 두었습니다.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

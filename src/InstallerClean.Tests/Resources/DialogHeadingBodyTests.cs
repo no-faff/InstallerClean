@@ -44,6 +44,7 @@ public class DialogHeadingBodyTests
         // causes, and the heading is true of both because the outcome is the same.
         { Strings.Error_MoveInstallerLockUnavailableTitle, Strings.Error_MoveInstallerLockAccessRefused },
         { Strings.Error_InstallerLockUnavailableTitle, Strings.Error_InstallerLockAccessRefused },
+        { Strings.Error_InstallerLockUnavailableTitle, Strings.Error_InstallerRollbackDisabled },
         { Strings.Error_MoveFailedTitle, Strings.Status_MoveFailed },
         { Strings.Error_MoveFailedTitle, Strings.Status_MoveFailed_NoLog },
         { Strings.Error_DeleteFailedTitle, Strings.Status_DeleteFailed },

@@ -105,6 +105,7 @@ const OVERRIDES = {
   'Cli.DeletingFiles.One': `Trwa usuwanie: {0} niepotrzebny {1}...`,
   'Cli.DeletingFiles.Few': `Trwa usuwanie: {0} niepotrzebne {1}...`,
   'Cli.DeletedFiles.One': `Trwale usunięto {0} niepotrzebny {1}.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean nie zdołał powstrzymać innych instalacji przed uruchomieniem, więc pozostały {0} {1} zostawił bez zmian.`,
   'Cli.DeletedFiles.Few': `Trwale usunięto {0} niepotrzebne {1}.`,
   'Cli.MovingFiles.One': `Trwa przenoszenie: {0} niepotrzebny {1} do {2}...`,
   'Cli.MovingFiles.Few': `Trwa przenoszenie: {0} niepotrzebne {1} do {2}...`,
@@ -695,6 +696,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Pokazuje licencje czcionek, ikon i kodu, które zawiera InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices   Wypisz powiadomienia innych firm`,
   'Startup.NeedsWindows10Version1607': `InstallerClean wymaga systemu Windows 10 w wersji 1607 lub nowszej albo systemu Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Ustawienie zasad „Prohibit rollback” Instalatora Windows jest włączone, więc InstallerClean nie może podczas usuwania powstrzymać innych instalacji przed uruchomieniem i niczego nie usunięto.`,
+  'Cli.InstallerRollbackDisabled': `Błąd: ustawienie zasad „Prohibit rollback” Instalatora Windows jest włączone, więc InstallerClean nie może podczas usuwania powstrzymać innych instalacji przed uruchomieniem. Niczego nie usunięto.`,
+  'Completion.PermanentDeleteStoppedSummary': `Usunięto trwale {0}/{1} {2}. InstallerClean nie zdołał powstrzymać innych instalacji przed uruchomieniem, więc resztę zostawił bez zmian.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean nie zdołał powstrzymać innych instalacji przed uruchomieniem, więc pozostałe {0} {1} zostawił bez zmian.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

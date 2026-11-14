@@ -904,6 +904,19 @@ Untuk mengembalikannya, Anda butuh pemasang versi yang sudah Anda miliki. Dapatk
        sentence there; here it does not. -->
   <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dipindahkan ke {3} sebelum Anda membatalkan.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.</value></data>
+  <!-- The completion overlay's summary for a permanent delete that stopped
+       part-way because InstallerClean could not keep other installations from
+       starting for the rest (Windows Installer would not open or end the
+       transaction that does that), where
+       Completion.PermanentDeleteCancelledSummary is the same overlay after the
+       user pressed Cancel. 0 = the count deleted
+       before the stop, 1 = the total that was being processed, 2 = pluralised
+       "file"/"files" for the total. Counted in the same way as that sibling
+       (Grammatical, DisplayHelpers.QuestionFor), so it is set up the same way:
+       one string, no .Singular/.Plural pair, and a language may add its own
+       satellite-only .One/.Few/.Many override for its count grammar. The
+       sentence after the count says the files not reached were left alone. -->
+  <data name="Completion.PermanentDeleteStoppedSummary" xml:space="preserve"><value>{0} dari {1} {2} dihapus permanen. InstallerClean tidak bisa mencegah pemasangan lain dimulai selama menangani sisanya, jadi sisanya dibiarkan saja.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a
        run that finished leaves the reader deciding when to delete the backup, and
@@ -1391,6 +1404,17 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean tidak bisa mengambil kunci yang dipakai Windows Installer untuk mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan, dan tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi.</value></data>
+  <!-- Shown when a Delete was refused before it reached a file because the
+       Windows Installer policy "Prohibit rollback" (DisableRollback) is on.
+       InstallerClean keeps other installations from starting while it deletes
+       by taking a Windows Installer transaction, and Windows Installer does not
+       allow a transaction while that policy is set, so the delete cannot be run
+       safely and is refused instead. A separate sentence from
+       Error.InstallerLockUnavailable because the cause is a setting on this PC
+       and trying again will not change it, so unlike that one it carries no
+       advice to retry. Takes the "Nothing was deleted" heading,
+       Error.InstallerLockUnavailableTitle. No placeholders. -->
+  <data name="Error.InstallerRollbackDisabled" xml:space="preserve"><value>Pengaturan kebijakan “Prohibit rollback” milik Windows Installer sedang aktif, sehingga InstallerClean tidak bisa mencegah pemasangan lain dimulai saat menghapus, dan tidak ada yang dihapus.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Tujuan tidak valid</value></data>
   <!-- The heading over Error.DestinationChangedMidBatch, which is the one
        destination message that is not about a path being wrong. The guard behind
@@ -1986,6 +2010,14 @@ Jalankan InstallerClean lagi sebagai administrator.</value></data>
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} {1} yang tidak diperlukan telah dihapus permanen.</value></data>
+  <!-- 0 = count left alone, 1 = pluralised noun "file"/"files". The command
+       line's counterpart of Completion.PermanentDeleteStoppedSummary, printed on
+       /d after Cli.DeletedFiles when the run stopped part-way because
+       InstallerClean could not keep other installations from starting for the
+       rest. Counted in the same way as Cli.DeletedFiles (Grammatical), so a
+       language may add its own satellite-only .One/.Few/.Many override. Never
+       printed at a count of zero. -->
+  <data name="Cli.DeleteStoppedPartWay" xml:space="preserve"><value>InstallerClean tidak bisa mencegah pemasangan lain dimulai untuk {0} {1} lainnya, jadi dibiarkan saja.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -2087,6 +2119,11 @@ Jalankan InstallerClean lagi sebagai administrator.</value></data>
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
   <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi.</value></data>
+  <!-- The command line's twin of Error.InstallerRollbackDisabled, /d only, and a
+       separate string for the same reason Cli.InstallerLockUnavailable is: the
+       family opens "Error: " and goes lower case after it, which is the
+       console's shape and not the window's. Written to stdout. No placeholders. -->
+  <data name="Cli.InstallerRollbackDisabled" xml:space="preserve"><value>Kesalahan: pengaturan kebijakan “Prohibit rollback” milik Windows Installer sedang aktif, sehingga InstallerClean tidak bisa mencegah pemasangan lain dimulai saat menghapus. Tidak ada yang dihapus.</value></data>
   <!-- The console pair of Error.InstallerLockAccessRefused, /d then /m. Opens
        "Error: " like the rest of this family, and like it says nothing about
        trying again. Printed for a refused lock wherever it is met, at the
@@ -2132,6 +2169,13 @@ Jalankan InstallerClean lagi sebagai administrator.</value></data>
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
        the other. -->
+  <!-- 0 = arg ("/d" or "/m"). The audit twin of Cli.InstallerRollbackDisabled,
+       written to the Application event log. Machine-read like every
+       Cli.EventLog* line, so it is forced English at the emit site and states
+       the condition rather than the advice. ONE line for both modes, as
+       Cli.EventLogInstallerLockUnavailable is, because {0} already carries which
+       mode ran; the tail names both actions because naming one would be false of
+       a run in the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Memindahkan {0} {1} yang tidak diperlukan ke {2}...</value></data>

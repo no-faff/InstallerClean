@@ -85,6 +85,7 @@ const OVERRIDES = {
   'Cli.FoundOrphans.One': `Se encontró {0} {1} innecesario para limpiar ({2}).`,
   'Cli.DeletingFiles.One': `Eliminando {0} {1} innecesario...`,
   'Cli.DeletedFiles.One': `Se eliminó definitivamente {0} {1} innecesario.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean no pudo impedir que se iniciaran otras instalaciones al procesar el {0} {1} restante, así que lo dejó sin tocar.`,
   'Cli.MovingFiles.One': `Moviendo {0} {1} innecesario a {2}...`,
   'Cli.MovedFiles.One': `Se movió {0} {1} innecesario.`,
 };
@@ -581,6 +582,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Muestra las licencias de las fuentes, los iconos y el código que incluye InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Muestra los avisos de terceros`,
   'Startup.NeedsWindows10Version1607': `InstallerClean necesita Windows 10 versión 1607 o posterior, o Windows 11.`,
+  'Error.InstallerRollbackDisabled': `La directiva “Prohibir reversión” de Windows Installer está activada. Por eso, InstallerClean no puede impedir que se inicien otras instalaciones mientras elimina archivos, y no se ha eliminado nada.`,
+  'Cli.InstallerRollbackDisabled': `Error: la directiva “Prohibir reversión” de Windows Installer está activada. Por eso, InstallerClean no puede impedir que se inicien otras instalaciones mientras elimina archivos. No se ha eliminado nada.`,
+  'Completion.PermanentDeleteStoppedSummary': `Eliminados definitivamente {0} de {1} {2}. InstallerClean no pudo impedir que se iniciaran otras instalaciones al procesar el resto, así que lo dejó sin tocar.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean no pudo impedir que se iniciaran otras instalaciones al procesar los {0} {1} restantes, así que los dejó sin tocar.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

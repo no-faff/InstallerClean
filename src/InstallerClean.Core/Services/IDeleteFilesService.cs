@@ -54,7 +54,7 @@ public interface IDeleteFilesService
 /// sum rather than a footnote to it, because it is the term a caller is most likely to
 /// forget. When <see cref="Cancelled"/> is <c>true</c> the batch was stopped mid-way,
 /// so the three account for the files reached before the cancel and the rest of the
-/// input was never touched.
+/// input was never touched; the same holds where <see cref="StoppedPartWay"/> is true.
 /// </summary>
 /// <param name="InstallerBusy">
 /// Windows Installer was busy with another installation for the whole of the wait
@@ -96,8 +96,39 @@ public record DeleteResult(
     public IReadOnlyList<string> HeldBack { get; init; } = HeldBack ?? Array.Empty<string>();
 
     /// <summary>
-    /// The DisableRollback policy is set, so Windows Installer opens no transaction and
-    /// nothing was deleted.
+    /// The DisableRollback policy is set, so Windows Installer opens no transaction for
+    /// the app. Before the first file nothing was touched; later, <see cref="DeletedCount"/>
+    /// says what was done and the rest was left alone.
     /// </summary>
     public bool InstallerRollbackDisabled { get; init; }
+
+    /// <summary>
+    /// How many files of the batch the service reached, in the order given, those held back
+    /// by a re-check taken out: each was deleted or recorded as an error, or, on a cancel,
+    /// stopped in hand.
+    /// </summary>
+    public int Reached { get; init; }
+
+    /// <summary>
+    /// How many files of the batch were never reached: not deleted, not recorded as an
+    /// error and not held back. Zero for a batch that ran to its end.
+    /// </summary>
+    public int NotReached { get; init; }
+
+    /// <summary>
+    /// Windows Installer would not open or end the app's transaction
+    /// (<see cref="InstallerLockUnavailable"/> or <see cref="InstallerRollbackDisabled"/>)
+    /// before the first file, so nothing was touched.
+    /// </summary>
+    public bool RefusedBeforeFirstFile =>
+        (InstallerLockUnavailable || InstallerRollbackDisabled) && Reached == 0;
+
+    /// <summary>
+    /// The batch stopped between files for the same reasons: the first <see cref="Reached"/>
+    /// files were dealt with and <see cref="NotReached"/> were left alone. A batch whose last
+    /// transaction would not end after every file was reached is not stopped part-way: every
+    /// file was dealt with.
+    /// </summary>
+    public bool StoppedPartWay =>
+        (InstallerLockUnavailable || InstallerRollbackDisabled) && Reached > 0 && NotReached > 0;
 }

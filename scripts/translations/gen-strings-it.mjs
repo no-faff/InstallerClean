@@ -84,6 +84,7 @@ const OVERRIDES = {
   'Cli.FoundOrphans.One': `Trovato {0} {1} non necessario da eliminare ({2}).`,
   'Cli.DeletingFiles.One': `Eliminazione di {0} {1} non necessario...`,
   'Cli.DeletedFiles.One': `Eliminato definitivamente {0} {1} non necessario.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean non ha potuto impedire l'avvio di altre installazioni per l'altro {0} {1}, quindi lo ha lasciato stare.`,
   'Cli.MovingFiles.One': `Spostamento di {0} {1} non necessario in {2}...`,
   'Cli.MovedFiles.One': `Spostato {0} {1} non necessario.`,
 };
@@ -580,6 +581,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Mostra le licenze di caratteri, icone e codice inclusi in InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices    Mostra gli avvisi di terze parti`,
   'Startup.NeedsWindows10Version1607': `InstallerClean richiede Windows 10 versione 1607 o successiva, oppure Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Il criterio “Proibisci rollback” di Windows Installer è attivo, quindi InstallerClean non può impedire l'avvio di altre installazioni durante l'eliminazione e non è stato eliminato nulla.`,
+  'Cli.InstallerRollbackDisabled': `Errore: il criterio “Proibisci rollback” di Windows Installer è attivo, quindi InstallerClean non può impedire l'avvio di altre installazioni durante l'eliminazione. Non è stato eliminato nulla.`,
+  'Completion.PermanentDeleteStoppedSummary': `Eliminati definitivamente {0} di {1} {2}. InstallerClean non ha potuto impedire l'avvio di altre installazioni per il resto, quindi lo ha lasciato stare.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean non ha potuto impedire l'avvio di altre installazioni per gli altri {0} {1}, quindi li ha lasciati stare.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

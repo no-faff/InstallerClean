@@ -567,6 +567,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `顯示 InstallerClean 所含字型、圖示和程式碼的授權條款。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  顯示第三方聲明`,
   'Startup.NeedsWindows10Version1607': `InstallerClean 需要 Windows 10 版本 1607 或更新版本，或 Windows 11。`,
+  'Error.InstallerRollbackDisabled': `Windows Installer 的「禁止復原」原則已啟用，InstallerClean 因此無法在刪除期間阻止其他安裝開始，所以沒有刪除任何檔案。`,
+  'Cli.InstallerRollbackDisabled': `錯誤：Windows Installer 的「禁止復原」原則已啟用，InstallerClean 因此無法在刪除期間阻止其他安裝開始。沒有刪除任何檔案。`,
+  'Completion.PermanentDeleteStoppedSummary': `已永久刪除 {1} 個{2}中的 {0} 個。InstallerClean 無法在處理其餘檔案期間阻止其他安裝開始，因此沒有動它們。`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean 無法在處理其餘 {0} 個{1}期間阻止其他安裝開始，因此沒有動它們。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

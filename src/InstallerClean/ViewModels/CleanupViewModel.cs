@@ -1783,20 +1783,29 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            if (result.InstallerLockUnavailable)
+            if (result.InstallerLockUnavailable && result.RefusedBeforeFirstFile)
             {
-                // The service could not take Global\_MSIExecute and nothing was
-                // shown to be holding it, so it refused and touched nothing. No
-                // gate re-check here, unlike the arm above, and that is the whole
-                // reason this is a separate flag rather than a second cause behind
-                // the same one: the gate has no account of this condition, its
-                // probe reading such a failure as not held, so a re-check would
-                // come back clean and leave a refusal with no reason on screen. A
-                // dialog carries the reason instead. The service's own acquire has
-                // the detail.
+                // Windows Installer would not open the service's transaction before the
+                // first file, so it touched nothing. No gate re-check here, unlike the
+                // arm above: the gate has no account of this condition, so a re-check
+                // would come back clean and leave a refusal with no reason on screen. A
+                // dialog carries the reason instead, and the crash log has Windows
+                // Installer's code. Once a file has been reached the run is shown as
+                // stopped part-way below, with what it did.
                 OperationProgress = string.Empty;
                 _dialogService.ShowWarning(
                     Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
+                return;
+            }
+
+            if (result.InstallerRollbackDisabled && result.RefusedBeforeFirstFile)
+            {
+                // The DisableRollback policy keeps Windows Installer from opening the
+                // service's transaction, so nothing was touched. The gate has no account
+                // of the policy either, so a dialog carries the reason, as above.
+                OperationProgress = string.Empty;
+                _dialogService.ShowWarning(
+                    Strings.Error_InstallerRollbackDisabled, Strings.Error_InstallerLockUnavailableTitle);
                 return;
             }
 
@@ -1849,6 +1858,24 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // nothing rather than a run that never was.
                 await RefreshAfterBatchAsync();
                 _completion.ShowReverifyAllSkipped(reverify, deleting: true);
+                OperationProgress = string.Empty;
+                return;
+            }
+
+            if (result.StoppedPartWay)
+            {
+                // Windows Installer would not open or end a later group's transaction,
+                // so the run stopped with the files it reached dealt with and the rest
+                // left alone. Its card says what it did and what it left. No result-log
+                // entry: the report's outcome is decided from the deleted and failed
+                // counts alone, which would record this run as one that finished. A run
+                // where files went counts as the PC's first, as a cancelled one does.
+                await RefreshAfterBatchAsync();
+                if (result.DeletedCount > 0) _completion.RecordFirstRun();
+                _completion.ShowDeleteStoppedSummary(
+                    result.DeletedCount, survivingFiles.Count,
+                    CompletedBytes(survivingFiles, result.DeletedCount, result.Errors),
+                    result.Errors, reverify);
                 OperationProgress = string.Empty;
                 return;
             }

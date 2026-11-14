@@ -121,6 +121,72 @@ public class DeleteFilesServiceUnitTests
         Assert.Equal(new[] { true, true, true }, finished);
     }
 
+    // A hold Windows Installer will not open after the first group has run: the files
+    // reached are counted, the rest are counted as never reached, and the batch is
+    // stopped part-way rather than refused.
+    [Fact]
+    public async Task A_hold_refused_after_the_first_group_stops_the_batch_part_way()
+    {
+        var fs = new MockFileSystem();
+        var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var api = new FakeInstallerTransactionApi(0, 1601);
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint(),
+            limits: HoldRunnerLimits.Default with { GroupFiles = 1 });
+        var svc = new DeleteFilesService(fs, runner, Dir);
+
+        var result = await svc.DeleteFilesAsync(files, HoldRunnerFixture.CheckedAgainst("A"));
+
+        Assert.True(result.InstallerLockUnavailable);
+        Assert.Equal(1, result.DeletedCount);
+        Assert.Equal(1, result.Reached);
+        Assert.Equal(2, result.NotReached);
+        Assert.True(result.StoppedPartWay);
+        Assert.False(result.RefusedBeforeFirstFile);
+        Assert.False(fs.File.Exists(files[0]));
+        Assert.True(fs.File.Exists(files[1]));
+        Assert.True(fs.File.Exists(files[2]));
+    }
+
+    // Every file reached and then the hold will not end: nothing was left, so the batch
+    // is neither stopped part-way nor refused.
+    [Fact]
+    public async Task A_hold_that_will_not_end_after_the_last_file_leaves_no_file_unreached()
+    {
+        var fs = new MockFileSystem();
+        var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var api = new FakeInstallerTransactionApi(0) { CommitCode = 1603 };
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint());
+        var svc = new DeleteFilesService(fs, runner, Dir);
+
+        var result = await svc.DeleteFilesAsync(files, HoldRunnerFixture.CheckedAgainst("A"));
+
+        Assert.True(result.InstallerLockUnavailable);
+        Assert.Equal(3, result.DeletedCount);
+        Assert.Equal(3, result.Reached);
+        Assert.Equal(0, result.NotReached);
+        Assert.False(result.StoppedPartWay);
+        Assert.False(result.RefusedBeforeFirstFile);
+    }
+
+    [Fact]
+    public async Task The_rollback_policy_refuses_the_batch_before_its_first_file()
+    {
+        var fs = new MockFileSystem();
+        var files = new[] { "a.msi", "b.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var api = new FakeInstallerTransactionApi(1653);
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint());
+        var svc = new DeleteFilesService(fs, runner, Dir);
+
+        var result = await svc.DeleteFilesAsync(files, HoldRunnerFixture.CheckedAgainst("A"));
+
+        Assert.True(result.InstallerRollbackDisabled);
+        Assert.Equal(0, result.Reached);
+        Assert.Equal(2, result.NotReached);
+        Assert.True(result.RefusedBeforeFirstFile);
+        Assert.False(result.StoppedPartWay);
+        Assert.All(files, f => Assert.True(fs.File.Exists(f)));
+    }
+
     [Fact]
     public async Task A_progress_handler_that_throws_costs_the_batch_nothing()
     {

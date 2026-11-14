@@ -904,6 +904,19 @@
        sentence there; here it does not. -->
   <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>취소하기 전까지 {2} {1}개 중 {0}개를 {3}(으)로 이동했습니다.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다.</value></data>
+  <!-- The completion overlay's summary for a permanent delete that stopped
+       part-way because InstallerClean could not keep other installations from
+       starting for the rest (Windows Installer would not open or end the
+       transaction that does that), where
+       Completion.PermanentDeleteCancelledSummary is the same overlay after the
+       user pressed Cancel. 0 = the count deleted
+       before the stop, 1 = the total that was being processed, 2 = pluralised
+       "file"/"files" for the total. Counted in the same way as that sibling
+       (Grammatical, DisplayHelpers.QuestionFor), so it is set up the same way:
+       one string, no .Singular/.Plural pair, and a language may add its own
+       satellite-only .One/.Few/.Many override for its count grammar. The
+       sentence after the count says the files not reached were left alone. -->
+  <data name="Completion.PermanentDeleteStoppedSummary" xml:space="preserve"><value>{2} {1}개 중 {0}개를 영구 삭제했습니다. 나머지는 InstallerClean이 다른 설치가 시작되지 않게 막을 수 없어서 그대로 두었습니다.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a
        run that finished leaves the reader deciding when to delete the backup, and
@@ -1391,6 +1404,17 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 Windows Installer가 사용하는 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었고 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.</value></data>
+  <!-- Shown when a Delete was refused before it reached a file because the
+       Windows Installer policy "Prohibit rollback" (DisableRollback) is on.
+       InstallerClean keeps other installations from starting while it deletes
+       by taking a Windows Installer transaction, and Windows Installer does not
+       allow a transaction while that policy is set, so the delete cannot be run
+       safely and is refused instead. A separate sentence from
+       Error.InstallerLockUnavailable because the cause is a setting on this PC
+       and trying again will not change it, so unlike that one it carries no
+       advice to retry. Takes the "Nothing was deleted" heading,
+       Error.InstallerLockUnavailableTitle. No placeholders. -->
+  <data name="Error.InstallerRollbackDisabled" xml:space="preserve"><value>Windows Installer의 “롤백 금지” 정책이 사용하도록 설정되어 있어서, InstallerClean이 삭제하는 동안 다른 설치가 시작되지 않게 막을 수 없으므로 아무것도 삭제하지 않았습니다.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>잘못된 대상</value></data>
   <!-- The heading over Error.DestinationChangedMidBatch, which is the one
        destination message that is not about a path being wrong. The guard behind
@@ -1986,6 +2010,14 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>불필요한 {1} {0}개를 영구 삭제했습니다.</value></data>
+  <!-- 0 = count left alone, 1 = pluralised noun "file"/"files". The command
+       line's counterpart of Completion.PermanentDeleteStoppedSummary, printed on
+       /d after Cli.DeletedFiles when the run stopped part-way because
+       InstallerClean could not keep other installations from starting for the
+       rest. Counted in the same way as Cli.DeletedFiles (Grammatical), so a
+       language may add its own satellite-only .One/.Few/.Many override. Never
+       printed at a count of zero. -->
+  <data name="Cli.DeleteStoppedPartWay" xml:space="preserve"><value>나머지 {1} {0}개는 InstallerClean이 다른 설치가 시작되지 않게 막을 수 없어서 그대로 두었습니다.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -2087,6 +2119,11 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
   <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.</value></data>
+  <!-- The command line's twin of Error.InstallerRollbackDisabled, /d only, and a
+       separate string for the same reason Cli.InstallerLockUnavailable is: the
+       family opens "Error: " and goes lower case after it, which is the
+       console's shape and not the window's. Written to stdout. No placeholders. -->
+  <data name="Cli.InstallerRollbackDisabled" xml:space="preserve"><value>오류: Windows Installer의 “롤백 금지” 정책이 사용하도록 설정되어 있어서, InstallerClean이 삭제하는 동안 다른 설치가 시작되지 않게 막을 수 없습니다. 아무것도 삭제하지 않았습니다.</value></data>
   <!-- The console pair of Error.InstallerLockAccessRefused, /d then /m. Opens
        "Error: " like the rest of this family, and like it says nothing about
        trying again. Printed for a refused lock wherever it is met, at the
@@ -2132,6 +2169,13 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
        the other. -->
+  <!-- 0 = arg ("/d" or "/m"). The audit twin of Cli.InstallerRollbackDisabled,
+       written to the Application event log. Machine-read like every
+       Cli.EventLog* line, so it is forced English at the emit site and states
+       the condition rather than the advice. ONE line for both modes, as
+       Cli.EventLogInstallerLockUnavailable is, because {0} already carries which
+       mode ran; the tail names both actions because naming one would be false of
+       a run in the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>불필요한 {1} {0}개를 {2}(으)로 이동 중...</value></data>

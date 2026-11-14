@@ -242,7 +242,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // accounts for what its failures cost the log.
             failureLog.WriteClosingEntry();
 
-            return Result(deleted, errors, cancelled, run, tally);
+            var result = Result(deleted, errors, cancelled, run, tally);
+            return result with
+            {
+                Reached = tally.Reached,
+                NotReached = Math.Max(0, pathList.Count - tally.HeldBack.Count - tally.Reached),
+            };
         }, cancellationToken);
     }
 

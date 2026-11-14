@@ -559,6 +559,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `显示 InstallerClean 所含字体、图标和代码的许可证。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  显示第三方声明`,
   'Startup.NeedsWindows10Version1607': `InstallerClean 需要 Windows 10 版本 1607 或更高版本，或 Windows 11。`,
+  'Error.InstallerRollbackDisabled': `Windows Installer 的“禁止回滚”策略已启用，InstallerClean 因此无法在删除期间阻止其他安装开始，所以没有删除任何内容。`,
+  'Cli.InstallerRollbackDisabled': `错误：Windows Installer 的“禁止回滚”策略已启用，InstallerClean 因此无法在删除期间阻止其他安装开始。没有删除任何内容。`,
+  'Completion.PermanentDeleteStoppedSummary': `已永久删除 {1} 个{2}中的 {0} 个。InstallerClean 无法在处理其余文件期间阻止其他安装开始，因此没有动它们。`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean 无法在处理其余 {0} 个{1}期间阻止其他安装开始，因此没有动它们。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

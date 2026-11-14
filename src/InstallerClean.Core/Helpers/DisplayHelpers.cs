@@ -399,7 +399,7 @@ internal static class DisplayHelpers
 
         // A numeral governing a noun. The one-form spells {0} out, so it has to agree
         // with the number the reader can see, whatever that language's rule is.
-        "Cli.DeletedFiles" or "Cli.DeletingFiles" or "Cli.EventLogMissingFromDisk"
+        "Cli.DeletedFiles" or "Cli.DeleteStoppedPartWay" or "Cli.DeletingFiles" or "Cli.EventLogMissingFromDisk"
             or "Cli.EventLogScanWithheld" or "Cli.EventLogScanWithheldPatchFiles"
             or "Cli.EventLogSupersededHeldBack"
             or "Cli.EventLogSourcesGivenUp" or "Cli.EventLogSourcesGivenUpScanNotice"
@@ -410,6 +410,7 @@ internal static class DisplayHelpers
             or "Completion.HeldBack"
             or "Completion.MoveCancelledSummary" or "Completion.MoveSummary"
             or "Completion.PermanentDeleteCancelledSummary"
+            or "Completion.PermanentDeleteStoppedSummary"
             or "Completion.PermanentDeleteSummary"
             or "Summary.MissingFromDisk" or "Summary.MissingFromDisk.OtherPrograms"
             or "Summary.MissingFromDisk.Unnamed" or "Summary.OrphanedToCleanUp"

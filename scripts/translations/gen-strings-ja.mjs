@@ -580,6 +580,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  サードパーティ通知を表示`,
   'Startup.NeedsWindows10Version1607': `InstallerClean には Windows 10 バージョン 1607 以降、または Windows 11 が必要です。`,
+  'Error.InstallerRollbackDisabled': `Windows Installer のポリシー「ロールバックを禁止する」が有効になっているため、InstallerClean は削除中にほかのインストールが開始されるのを防げません。そのため、何も削除していません。`,
+  'Cli.InstallerRollbackDisabled': `エラー：Windows Installer のポリシー「ロールバックを禁止する」が有効になっているため、InstallerClean は削除中にほかのインストールが開始されるのを防げません。何も削除されていません。`,
+  'Completion.PermanentDeleteStoppedSummary': `{1} 個中 {0} 個の {2} を完全に削除しました。残りについては、InstallerClean がほかのインストールの開始を防げなかったため、手を付けていません。`,
+  'Cli.DeleteStoppedPartWay': `残りの {0} 個の {1} については、InstallerClean がほかのインストールの開始を防げなかったため、手を付けていません。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,
@@ -645,6 +649,7 @@ const STRIPPED = new Set([
   'Cli.EventLogMoveNotEnoughSpace',
   'Cli.EventLogMoveAborted',
   'Cli.EventLogInstallerLockUnavailable',
+  'Cli.EventLogInstallerRollbackDisabled',
   // By the rule in the paragraph above: both are machine Cli keys that postdate
   // coolvitto's PR, so nobody wrote a Japanese line for them and nobody should.
   'Cli.EventLogNothingOffered',

@@ -102,6 +102,7 @@ const OVERRIDES = {
   'Cli.FoundOrphans.One': `{0} overbodig {1} gevonden om op te ruimen ({2}).`,
   'Cli.DeletingFiles.One': `{0} overbodig {1} verwijderen...`,
   'Cli.DeletedFiles.One': `{0} overbodig {1} definitief verwijderd.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean kon voor het overige {0} {1} niet voorkomen dat andere installaties startten en heeft het daarom met rust gelaten.`,
   'Cli.MovingFiles.One': `{0} overbodig {1} verplaatsen naar {2}...`,
   'Cli.MovedFiles.One': `{0} overbodig {1} verplaatst.`,
 };
@@ -634,6 +635,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Toont de licenties van de lettertypen, pictogrammen en code die InstallerClean bevat.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  De kennisgevingen van derden weergeven`,
   'Startup.NeedsWindows10Version1607': `InstallerClean heeft Windows 10 versie 1607 of nieuwer, of Windows 11 nodig.`,
+  'Error.InstallerRollbackDisabled': `De beleidsinstelling “Prohibit rollback” van Windows Installer staat aan, waardoor InstallerClean tijdens het verwijderen niet kan voorkomen dat andere installaties starten, dus er is niets verwijderd.`,
+  'Cli.InstallerRollbackDisabled': `Fout: de beleidsinstelling “Prohibit rollback” van Windows Installer staat aan, waardoor InstallerClean tijdens het verwijderen niet kan voorkomen dat andere installaties starten. Er is niets verwijderd.`,
+  'Completion.PermanentDeleteStoppedSummary': `{0} van {1} {2} definitief verwijderd. InstallerClean kon voor de rest niet voorkomen dat andere installaties startten en heeft die daarom met rust gelaten.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean kon voor de overige {0} {1} niet voorkomen dat andere installaties startten en heeft ze daarom met rust gelaten.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

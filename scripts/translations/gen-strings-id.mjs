@@ -679,6 +679,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Menampilkan lisensi font, ikon, dan kode yang disertakan dalam InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Cetak pemberitahuan pihak ketiga`,
   'Startup.NeedsWindows10Version1607': `InstallerClean memerlukan Windows 10 versi 1607 atau yang lebih baru, atau Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Pengaturan kebijakan “Prohibit rollback” milik Windows Installer sedang aktif, sehingga InstallerClean tidak bisa mencegah pemasangan lain dimulai saat menghapus, dan tidak ada yang dihapus.`,
+  'Cli.InstallerRollbackDisabled': `Kesalahan: pengaturan kebijakan “Prohibit rollback” milik Windows Installer sedang aktif, sehingga InstallerClean tidak bisa mencegah pemasangan lain dimulai saat menghapus. Tidak ada yang dihapus.`,
+  'Completion.PermanentDeleteStoppedSummary': `{0} dari {1} {2} dihapus permanen. InstallerClean tidak bisa mencegah pemasangan lain dimulai selama menangani sisanya, jadi sisanya dibiarkan saja.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean tidak bisa mencegah pemasangan lain dimulai untuk {0} {1} lainnya, jadi dibiarkan saja.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

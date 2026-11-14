@@ -654,6 +654,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices     In ra thông báo của bên thứ ba`,
   'Startup.NeedsWindows10Version1607': `InstallerClean cần Windows 10 phiên bản 1607 trở lên hoặc Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Chính sách “Prohibit rollback” của Windows Installer đang bật, nên InstallerClean không thể ngăn các lượt cài đặt khác bắt đầu trong khi xóa, và không có gì bị xóa.`,
+  'Cli.InstallerRollbackDisabled': `Lỗi: chính sách “Prohibit rollback” của Windows Installer đang bật, nên InstallerClean không thể ngăn các lượt cài đặt khác bắt đầu trong khi xóa. Không có gì bị xóa.`,
+  'Completion.PermanentDeleteStoppedSummary': `Đã xóa vĩnh viễn {0}/{1} {2}. InstallerClean không thể ngăn các lượt cài đặt khác bắt đầu trong phần còn lại, nên đã để yên phần đó.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean không thể ngăn các lượt cài đặt khác bắt đầu đối với {0} {1} còn lại, nên đã để yên chúng.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

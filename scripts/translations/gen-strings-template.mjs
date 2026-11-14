@@ -718,6 +718,10 @@ const MAP = {
   'Startup.NeedsWindows10Version1607': `InstallerClean needs Windows 10 version 1607 or later, or Windows 11.`,
   'Error.NothingRemoved': `Nothing has been removed.`,
   'Error.NothingOfferedNothingRemoved': `Nothing has been offered and nothing has been removed.`,
+  'Error.InstallerRollbackDisabled': `Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes, so nothing has been deleted.`,
+  'Cli.InstallerRollbackDisabled': `Error: Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes. Nothing has been deleted.`,
+  'Completion.PermanentDeleteStoppedSummary': `Permanently deleted {0} of {1} {2}. InstallerClean couldn't keep other installations from starting for the rest, so it left them alone.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean couldn't keep other installations from starting for the other {0} {1}, so it left them alone.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

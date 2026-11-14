@@ -182,6 +182,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | {0} 件のファイルを保留しました。スキャンでは不要と判断されましたが、最終チェックではそれを確認できませんでした。 |
 | Moved {0} of {1} {2} to {3} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を {3} へ移動しました。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。 |
+| Permanently deleted {0} of {1} {2}. InstallerClean couldn't keep other installations from starting for the rest, so it left them alone. | {1} 個中 {0} 個の {2} を完全に削除しました。残りについては、InstallerClean がほかのインストールの開始を防げなかったため、手を付けていません。 |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 元に戻すのは簡単です。{InstallerFolder} に戻せば、すべて元どおりになります。 |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
@@ -278,6 +279,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できず、何も移動されませんでした。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | 二つのプログラムが同時にインストール済みソフトウェアを変更しないよう Windows Installer が使うロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できず、何も削除していません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | 二つのプログラムが同時にインストール済みソフトウェアを変更しないよう Windows Installer が使うロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できず、何も移動していません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
+| Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes, so nothing has been deleted. | Windows Installer のポリシー「ロールバックを禁止する」が有効になっているため、InstallerClean は削除中にほかのインストールが開始されるのを防げません。そのため、何も削除していません。 |
 | Invalid destination | 無効な移動先 |
 | Move stopped | 移動を停止しました |
 | Couldn't use that backup folder | そのバックアップフォルダーは使えませんでした |
@@ -515,6 +517,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean は複数のドライブまたは共有 ({0}) の待機をやめ、まだそのいずれかと照合する必要があったファイルはすべてそのままにしました。正常に応答するようになったら、コマンドをもう一度実行してください。 |
 | Deleting {0} unneeded {1}... | {0} 個の不要な {1} を削除しています... |
 | Permanently deleted {0} unneeded {1}. | {0} 個の不要な {1} を完全に削除しました。 |
+| InstallerClean couldn't keep other installations from starting for the other {0} {1}, so it left them alone. | 残りの {0} 個の {1} については、InstallerClean がほかのインストールの開始を防げなかったため、手を付けていません。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | エラー：移動先が指定されていません。/m PATH を使用してください (GUI で設定したデフォルトはユーザーごとのもので、スケジュール実行やサービスアカウントでの実行には適用されません)。 |
 | Error: destination cannot be inside the Windows Installer folder. | エラー：移動先を Windows Installer フォルダー内にすることはできません。 |
 | Error: destination must be a fully qualified path. Got: {0} | エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0} |
@@ -540,6 +543,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Run it again. | スキャン中にこの PC の時計が戻ったか遅れたため、InstallerClean はインストール済みのどのプログラムの登録情報にも記載されていない {InstallerFolder} 内のファイルを、提示せずに保留しました。コマンドをもう一度実行してください。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | エラー：二つのプログラムが同時にインストール済みソフトウェアを変更しないようにする Windows Installer のロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も削除されていません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | エラー：二つのプログラムが同時にインストール済みソフトウェアを変更しないようにする Windows Installer のロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も移動されていません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
+| Error: Windows Installer's Prohibit rollback setting is on, which stops InstallerClean keeping other installations from starting while it deletes. Nothing has been deleted. | エラー：Windows Installer のポリシー「ロールバックを禁止する」が有効になっているため、InstallerClean は削除中にほかのインストールが開始されるのを防げません。何も削除されていません。 |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | エラー: Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も削除されていません。 |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | エラー: Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も移動されていません。 |
 | Moving {0} unneeded {1} to {2}... | {0} 個の不要な {1} を {2} へ移動しています... |

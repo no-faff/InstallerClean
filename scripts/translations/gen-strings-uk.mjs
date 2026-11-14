@@ -83,6 +83,7 @@ const OVERRIDES = {
   'Cli.DeletingFiles.One': `Триває видалення: {0} непотрібний {1}...`,
   'Cli.DeletingFiles.Few': `Триває видалення: {0} непотрібні {1}...`,
   'Cli.DeletedFiles.One': `Остаточно видалено {0} непотрібний {1}.`,
+  'Cli.DeleteStoppedPartWay.One': `InstallerClean не зміг завадити запуску інших встановлень, тож інший {0} {1} залишено без змін.`,
   'Cli.DeletedFiles.Few': `Остаточно видалено {0} непотрібні {1}.`,
   'Cli.MovingFiles.One': `Триває переміщення до {2}: {0} непотрібний {1}...`,
   'Cli.MovingFiles.Few': `Триває переміщення до {2}: {0} непотрібні {1}...`,
@@ -673,6 +674,10 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Показує ліцензії шрифтів, значків і коду, що входять до InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Вивести повідомлення третіх сторін`,
   'Startup.NeedsWindows10Version1607': `Для InstallerClean потрібна Windows 10 версії 1607 або новішої чи Windows 11.`,
+  'Error.InstallerRollbackDisabled': `Параметр політики Windows Installer «Prohibit rollback» увімкнено, тож під час видалення InstallerClean не може завадити запуску інших встановлень, і нічого не видалено.`,
+  'Cli.InstallerRollbackDisabled': `Помилка: параметр політики Windows Installer «Prohibit rollback» увімкнено, тож під час видалення InstallerClean не може завадити запуску інших встановлень. Нічого не видалено.`,
+  'Completion.PermanentDeleteStoppedSummary': `Безповоротно видалено {0} з {1} {2}. InstallerClean не зміг завадити запуску інших встановлень, тож решту залишено без змін.`,
+  'Cli.DeleteStoppedPartWay': `InstallerClean не зміг завадити запуску інших встановлень, тож інші {0} {1} залишено без змін.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

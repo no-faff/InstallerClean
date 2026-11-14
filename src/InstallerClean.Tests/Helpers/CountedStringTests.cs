@@ -52,7 +52,7 @@ public class CountedStringTests
     /// </summary>
     private static readonly string[] CountedPrefixes =
     {
-        "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.EventLogMissingFromDisk",
+        "Cli.DeletedFiles", "Cli.DeleteStoppedPartWay", "Cli.DeletingFiles", "Cli.EventLogMissingFromDisk",
         "Cli.EventLogScanWithheld", "Cli.EventLogScanWithheldPatchFiles",
         "Cli.EventLogSupersededHeldBack",
         "Cli.EventLogSourcesGivenUp", "Cli.EventLogSourcesGivenUpScanNotice",
@@ -62,7 +62,8 @@ public class CountedStringTests
         "Completion.FailedCount", "Completion.FailedCountDelete",
         "Completion.HeldBack",
         "Completion.MoveCancelledSummary", "Completion.MoveSummary",
-        "Completion.PermanentDeleteCancelledSummary", "Completion.PermanentDeleteSummary",
+        "Completion.PermanentDeleteCancelledSummary", "Completion.PermanentDeleteStoppedSummary",
+        "Completion.PermanentDeleteSummary",
         "Confirm.DeletePermanently", "Confirm.MoveDestination",
         "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
         "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
@@ -79,7 +80,7 @@ public class CountedStringTests
     /// </summary>
     private static readonly string[] NewInThisRelease =
     {
-        "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.EventLogMissingFromDisk",
+        "Cli.DeletedFiles", "Cli.DeleteStoppedPartWay", "Cli.DeletingFiles", "Cli.EventLogMissingFromDisk",
         "Cli.EventLogScanWithheld", "Cli.EventLogScanWithheldPatchFiles",
         "Cli.EventLogSupersededHeldBack",
         "Cli.EventLogSourcesGivenUp", "Cli.EventLogSourcesGivenUpScanNotice",
@@ -87,6 +88,7 @@ public class CountedStringTests
         "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles",
         "Completion.HeldBack",
+        "Completion.PermanentDeleteStoppedSummary",
         "Completion.PermanentDeleteSummary",
         "Confirm.DeletePermanently", "Confirm.MoveDestination", "Error.FileInUse",
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
