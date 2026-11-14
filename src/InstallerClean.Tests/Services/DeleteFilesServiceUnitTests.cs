@@ -394,221 +394,168 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
-    public async Task Refuses_when_the_installer_mutex_is_held()
+    public async Task Refuses_when_Windows_Installer_stays_busy_and_touches_nothing()
     {
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.HeldByAnother);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
+        var api = new FakeInstallerTransactionApi(Enumerable.Repeat(1618u, 100).ToArray());
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint(),
+            limits: HoldRunnerLimits.Default with { BusyWait = TimeSpan.FromSeconds(5) });
+        var svc = new DeleteFilesService(fs, runner, installerFolderOverride: null);
 
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(new[] { a }, HoldRunnerFixture.CheckedAgainst("A"));
 
         Assert.True(result.InstallerBusy);
         Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
         Assert.True(fs.File.Exists(a));
+        Assert.Equal(0, api.Commits);
+        Assert.True(api.Begins > 1);
     }
 
     [Fact]
-    public async Task Refuses_when_the_installer_mutex_cannot_be_acquired_and_nobody_holds_it()
+    public async Task Refuses_under_the_DisableRollback_policy_and_touches_nothing()
     {
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
+        var api = new FakeInstallerTransactionApi(1653);
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint()), null);
 
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(new[] { a }, HoldRunnerFixture.CheckedAgainst("A"));
 
-        // A delete without the hold has nothing stopping a program registering a
-        // package part-way through it, and no bin to fetch a wrongly-removed file
-        // back from, so the batch does not run. The Move path answers this input
-        // the same way, for a reason of its own that its test states.
+        Assert.True(result.InstallerRollbackDisabled);
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(0, result.DeletedCount);
+        Assert.True(fs.File.Exists(a));
+        Assert.Equal(0, api.Commits);
+    }
+
+    [Fact]
+    public async Task Refuses_when_the_hold_cannot_be_taken_and_touches_nothing()
+    {
+        var fs = new MockFileSystem();
+        var a = AddFile(fs, "a.msi");
+        var api = new FakeInstallerTransactionApi(1601);
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint()), null);
+
+        var result = await svc.DeleteFilesAsync(new[] { a }, HoldRunnerFixture.CheckedAgainst("A"));
+
         Assert.True(result.InstallerLockUnavailable);
+        Assert.False(result.InstallerBusy);
         Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
         Assert.True(fs.File.Exists(a));
-        // Distinguishable from the held case, because the caller answers them
-        // differently: the pending-reboot gate can explain that one and can
-        // account for this one neither way.
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(0, mutex.Released);
+        Assert.Equal(0, api.Commits);
     }
 
     [Fact]
-    public async Task Refuses_when_the_installer_mutex_refuses_it_the_rights_to_open_it()
+    public async Task The_reading_is_taken_inside_the_hold_before_any_file_is_touched()
     {
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.AccessRefused);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
+        var api = new FakeInstallerTransactionApi(0);
+        bool? heldAtReading = null;
+        bool? presentAtReading = null;
+        var fingerprint = new FakeRecordsFingerprint
+        {
+            OnTake = () => { heldAtReading = api.Open; presentAtReading = fs.File.Exists(a); },
+        };
+        bool? heldAtDelete = null;
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, fingerprint), null);
 
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(new[] { a }, HoldRunnerFixture.CheckedAgainst("A"),
+            mayAct: _ => { heldAtDelete ??= api.Open; return true; });
 
-        // Refused, touching nothing, and under its own flag: the app was not allowed
-        // to look, which is neither the lock being held nor an acquire that failed
-        // some other way, and the caller tells the user each in different words.
-        Assert.True(result.InstallerLockAccessRefused);
-        Assert.False(result.InstallerBusy);
-        Assert.False(result.InstallerLockUnavailable);
-        Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(a));
-        Assert.Equal(1, mutex.AcquireAttempts);
-        Assert.Equal(0, mutex.Released);
-    }
-
-    [Fact]
-    public async Task Holds_and_releases_the_installer_mutex_when_acquired()
-    {
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
-
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        Assert.Equal(1, result.DeletedCount);
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(1, mutex.Acquired);
-        Assert.Equal(1, mutex.Released);
-    }
-
-    [Fact]
-    public async Task The_under_lease_re_read_runs_inside_the_hold_and_before_any_file_is_touched()
-    {
-        // The property the whole check rests on. A re-read taken after the lease
-        // was released, or before it was taken, would satisfy every other
-        // assertion in this file and be worth nothing: the window it exists to
-        // close is exactly the one outside the hold.
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        bool? sourcePresentAtRecheck = null;
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex,
-            atRecheck: () => sourcePresentAtRecheck = fs.File.Exists(a));
-        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
-
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
-        Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
-        // The other half of the name, and it needs a real observation rather than
-        // a lease count: a re-read taken after the first delete holds the lease
-        // just as truthfully. The Move twin makes it on the destination folder;
-        // here the batch's own file is what a delete would have taken.
-        Assert.True(sourcePresentAtRecheck);
-        // Without these the assertion above passes on a batch that deleted
-        // nothing at all, which is the shape of vacuous pass this file exists to
-        // keep out.
+        Assert.True(heldAtReading);
+        Assert.True(presentAtReading);
+        Assert.True(heldAtDelete);
         Assert.Equal(1, result.DeletedCount);
         Assert.False(fs.File.Exists(a));
+        Assert.Equal(1, api.Commits);
+        Assert.Equal(0, api.StrayEnds);
+        Assert.False(api.Open);
     }
 
     [Fact]
-    public async Task A_re_read_that_throws_still_releases_the_installer_mutex()
+    public async Task Progress_is_reported_after_the_hold_has_ended()
     {
-        // The lease is released by a finally that encloses the re-read, so this
-        // holds today. Nothing exercised it, and the identity work is about to
-        // build in this exact region: a refactor narrowing that try would leave
-        // the machine-wide installer mutex held until the process exits, with the
-        // suite green.
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex,
-            atRecheck: () => throw new InvalidOperationException("the re-read failed"));
-        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
+        var b = AddFile(fs, "b.msi");
+        var api = new FakeInstallerTransactionApi(0);
+        var heldAtReport = new List<bool>();
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint()), null);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None));
+        var result = await svc.DeleteFilesAsync(new[] { a, b }, HoldRunnerFixture.CheckedAgainst("A"),
+            new RecordingProgress<OperationProgress>(_ => heldAtReport.Add(api.Open)));
 
-        Assert.Equal(1, mutex.Acquired);
-        Assert.Equal(1, mutex.Released);
-        // A re-read that could not answer is not permission to act.
-        Assert.True(fs.File.Exists(a));
+        Assert.Equal(2, result.DeletedCount);
+        Assert.Equal(new[] { false, false }, heldAtReport);
     }
 
     [Fact]
-    public async Task A_path_reclaimed_under_the_lease_is_kept_back_and_the_rest_go()
+    public async Task A_reading_that_differs_touches_nothing_and_the_re_check_decides()
     {
         var fs = new MockFileSystem();
         var keep = AddFile(fs, "reclaimed.msp");
         var go = AddFile(fs, "orphan.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, null,
-            new FakeReclaimingReverifier(new[] { keep }));
+        var api = new FakeInstallerTransactionApi(0, 0);
+        var fingerprint = new FakeRecordsFingerprint { Digest = "B" };
+        var reverifier = new FakeRecheckingReverifier(new[] { keep }, newReading: "B");
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, fingerprint, reverifier), null);
 
-        var result = await svc.DeleteFilesAsync(new[] { keep, go }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(new[] { keep, go }, HoldRunnerFixture.CheckedAgainst("A"));
 
-        Assert.Equal(1, result.DeletedCount);
         Assert.Equal(new[] { keep }, result.HeldBack);
-        // Held back is not failed: nothing went wrong with this file, a program
-        // simply wants it again, so it is not in the per-file error list.
-        Assert.Empty(result.Errors);
+        Assert.Equal(1, result.HeldBackReasons.Reclaimed);
+        Assert.Equal(1, result.DeletedCount);
         Assert.True(fs.File.Exists(keep));
         Assert.False(fs.File.Exists(go));
+        Assert.Single(reverifier.Calls);
+        Assert.Equal(2, api.Commits);
+        Assert.Equal(0, api.StrayEnds);
     }
 
     [Fact]
-    public async Task A_batch_the_re_read_empties_reports_what_it_kept_back()
+    public async Task A_batch_checked_against_no_reading_deletes_nothing()
     {
         var fs = new MockFileSystem();
-        var only = AddFile(fs, "reclaimed.msp");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, null,
-            new FakeReclaimingReverifier(new[] { only }));
+        var a = AddFile(fs, "a.msi");
+        var api = new FakeInstallerTransactionApi(0, 0, 0, 0);
+        var reverifier = new FakeRecheckingReverifier(newReading: "never");
+        var svc = new DeleteFilesService(fs,
+            HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint(), reverifier), null);
 
-        var result = await svc.DeleteFilesAsync(new[] { only }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
-        Assert.Equal(new[] { only }, result.HeldBack);
-        Assert.True(fs.File.Exists(only));
-        // The lease is still released on the short-circuit: the batch ended, and
-        // an unreleased machine-wide installer mutex would outlive it.
-        Assert.Equal(1, mutex.Released);
+        Assert.True(fs.File.Exists(a));
+        Assert.Equal(new[] { a }, result.HeldBack);
+        Assert.Equal(1, result.HeldBackReasons.RecordsChanged + result.HeldBackReasons.RecordsUnreadable);
     }
 
     [Fact]
-    public async Task The_claims_are_handed_to_the_re_read_untouched()
+    public async Task Each_hold_begins_and_ends_on_one_thread()
     {
         var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msp");
-        var claims = new[]
-        {
-            new PatchClaim(a, "{AAAA0000-0000-0000-0000-000000000001}",
-                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
-        };
-        // The siblings half is a list of its own, so each half is pinned to its own.
-        var siblings = new[]
-        {
-            new PatchClaim(a.Replace("a.msp", "b.msp"), "{AAAA0000-0000-0000-0000-000000000002}",
-                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
-        };
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
-        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
+        var a = AddFile(fs, "a.msi");
+        var api = new FakeInstallerTransactionApi(0);
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint()), null);
 
-        await svc.DeleteFilesAsync(new[] { a }, new UnderLeaseClaims(claims, siblings));
+        await svc.DeleteFilesAsync(new[] { a }, HoldRunnerFixture.CheckedAgainst("A"));
 
-        Assert.Equal(claims, reverifier.ClaimsSeen);
-        Assert.Equal(siblings, reverifier.SiblingsSeen);
+        Assert.Equal(api.BeginThreads, api.CommitThreads);
     }
 
     [Fact]
-    public async Task Zero_files_returns_an_empty_result_without_taking_the_mutex()
+    public async Task Zero_files_returns_an_empty_result_without_taking_a_hold()
     {
         var fs = new MockFileSystem();
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
+        var api = new FakeInstallerTransactionApi(0);
+        var svc = new DeleteFilesService(fs, HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint()), null);
 
         var result = await svc.DeleteFilesAsync(Array.Empty<string>(), UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);
-        // An empty batch mutates nothing, so it never takes the machine-wide
-        // installer lock: taking it would block every installer on the machine
-        // for a run with no work in it.
-        Assert.Equal(0, mutex.AcquireAttempts);
+        Assert.Equal(0, api.Begins);
     }
 }

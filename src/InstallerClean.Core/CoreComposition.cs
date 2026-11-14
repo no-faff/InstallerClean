@@ -80,10 +80,16 @@ public static class CoreComposition
         // stamped in (FileStampClock). The scan and the check before a Move or Delete
         // are the only consumers of the registered TimeProvider.
         services.AddSingleton<TimeProvider, FileStampClock>();
+        // The reading of Windows Installer's records a Move or Delete is checked
+        // against, and the transaction it acts inside.
+        services.AddSingleton<IInstallerRegistrySnapshot, InstallerRegistrySnapshot>();
+        services.AddSingleton<IInstallerRecordsFingerprint, InstallerRecordsFingerprint>();
+        services.AddSingleton<IInstallerTransactionApi, InstallerTransactionApi>();
         // Re-checks a batch just before a Move or Delete: the records again, and
         // the scan's own steps on every file no record names, which is why it
         // takes the scan's readers.
         services.AddSingleton<IRemovableReverifier, RemovableReverifier>();
+        services.AddSingleton<HoldRunner>();
 
         // File-mutating services.
         services.AddSingleton<IFileSystemScanService, FileSystemScanService>();

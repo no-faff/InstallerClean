@@ -22,6 +22,8 @@ public sealed class FakeInstallerTransactionApi : IInstallerTransactionApi
     public int Releases { get; private set; }
     public bool Open { get; private set; }
     public uint CommitCode { get; set; }
+    public List<int> BeginThreads { get; } = new();
+    public List<int> CommitThreads { get; } = new();
     public Exception? BeginThrows { get; set; }
     public List<string> Names { get; } = new();
 
@@ -31,6 +33,7 @@ public sealed class FakeInstallerTransactionApi : IInstallerTransactionApi
     public uint Begin(string name, out InstallerTransactionHandles handles)
     {
         Begins++;
+        BeginThreads.Add(Environment.CurrentManagedThreadId);
         Names.Add(name);
         if (BeginThrows is not null)
             throw BeginThrows;
@@ -46,6 +49,7 @@ public sealed class FakeInstallerTransactionApi : IInstallerTransactionApi
         if (!Open)
             StrayEnds++;
         Commits++;
+        CommitThreads.Add(Environment.CurrentManagedThreadId);
         Open = false;
         OnCommit?.Invoke();
         return CommitCode;

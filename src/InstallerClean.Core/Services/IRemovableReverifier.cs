@@ -126,7 +126,14 @@ public readonly record struct UnderLeaseClaims(
     /// two lists always come from one enumeration and one another.
     /// </summary>
     public static UnderLeaseClaims From(ReverifyResult reverify) =>
-        new(reverify.SurvivingPatchClaims, reverify.SiblingPatchClaims);
+        new(reverify.SurvivingPatchClaims, reverify.SiblingPatchClaims) { Print = reverify.Print };
+
+    /// <summary>
+    /// The reading of Windows Installer's records the check held for
+    /// (<see cref="ReverifyResult.Print"/>). Each hold compares its own reading with this
+    /// one before acting on any file, and acts on none where it is missing.
+    /// </summary>
+    public InstallerRecordsPrint? Print { get; init; }
 }
 
 /// <summary>
@@ -421,6 +428,13 @@ public record ReverifyResult(
     int SourceWaitCount = 0,
     PendingRebootResult? InstallerActivity = null)
 {
+    /// <summary>
+    /// The reading of Windows Installer's records this result holds for: taken before the
+    /// check and again after it, and set only where the two matched. A hold compares its
+    /// own reading with this one before acting on any file. Null where no reading was taken.
+    /// </summary>
+    public InstallerRecordsPrint? Print { get; init; }
+
     /// <summary>Never null: an absent list reads as nothing to re-read rather than as a fault.</summary>
     public IReadOnlyList<PatchClaim> SurvivingPatchClaims { get; init; }
         = SurvivingPatchClaims ?? Array.Empty<PatchClaim>();

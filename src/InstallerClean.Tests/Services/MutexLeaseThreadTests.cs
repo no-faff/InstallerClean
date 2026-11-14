@@ -53,17 +53,6 @@ public class MutexLeaseThreadTests
     }
 
     [Fact]
-    public async Task A_delete_releases_the_installer_mutex_on_the_thread_that_took_it()
-    {
-        var (fs, path, mutex, reverifier) = BatchTheReReadEmpties();
-        var service = new DeleteFilesService(fs, mutex, installerFolderOverride: null, reverifier);
-
-        await service.DeleteFilesAsync(new[] { path }, UnderLeaseClaims.None);
-
-        AssertReleasedWhereItWasTaken(mutex);
-    }
-
-    [Fact]
     public async Task A_move_releases_the_installer_mutex_on_the_thread_that_took_it()
     {
         var (fs, path, mutex, reverifier) = BatchTheReReadEmpties();

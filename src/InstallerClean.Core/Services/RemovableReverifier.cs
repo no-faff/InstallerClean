@@ -34,6 +34,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
     private readonly IDeclaredProductCheck? _declaredProducts;
     private readonly IFileTimesReader? _fileTimes;
     private readonly IPendingRebootService? _installerActivity;
+    private readonly IInstallerRecordsFingerprint? _fingerprint;
     private readonly TimeProvider _clock;
     private readonly string? _installerFolderOverride;
 
@@ -49,9 +50,10 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// </summary>
     public RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
         IFileIdentityReader fileIdentities, IDeclaredProductCheck declaredProducts,
-        IFileTimesReader fileTimes, TimeProvider clock, IPendingRebootService installerActivity)
+        IFileTimesReader fileTimes, TimeProvider clock, IPendingRebootService installerActivity,
+        IInstallerRecordsFingerprint fingerprint)
         : this(queryService, msi, fileIdentities, declaredProducts, fileTimes, clock, null,
-            installerActivity) { }
+            installerActivity, fingerprint) { }
 
     /// <summary>
     /// Test constructor for the tests whose subject is the registrations: no file
@@ -88,7 +90,8 @@ public sealed class RemovableReverifier : IRemovableReverifier
     internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
         IFileIdentityReader? fileIdentities, IDeclaredProductCheck? declaredProducts,
         IFileTimesReader? fileTimes, TimeProvider? clock, string? installerFolderOverride,
-        IPendingRebootService? installerActivity = null)
+        IPendingRebootService? installerActivity = null,
+        IInstallerRecordsFingerprint? fingerprint = null)
     {
         _queryService = queryService;
         _msi = msi;
@@ -96,6 +99,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         _declaredProducts = declaredProducts;
         _fileTimes = fileTimes;
         _installerActivity = installerActivity;
+        _fingerprint = fingerprint;
         _clock = clock ?? TimeProvider.System;
         _installerFolderOverride = installerFolderOverride;
     }
@@ -121,10 +125,46 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// </summary>
     internal bool JudgesOnTheFileStampClock => _clock is FileStampClock;
 
+    /// <summary>
+    /// How many times the check runs again because Windows Installer's records changed
+    /// while it ran, before its result is returned with no reading it holds for.
+    /// </summary>
+    internal const int ReadingAttempts = 3;
+
     public async Task<ReverifyResult> ReverifyAsync(
         IReadOnlyList<string> candidatePaths,
         CancellationToken cancellationToken = default,
         IProgress<ScanProgressUpdate>? progress = null)
+    {
+        if (_fingerprint is null || candidatePaths.Count == 0)
+            return await ReverifyOnceAsync(candidatePaths, cancellationToken, progress).ConfigureAwait(false);
+
+        // The result holds for a reading only where the records read the same before the
+        // check began and after it ended, so a change made and undone while it ran still
+        // sends it round again. A result whose readings never matched carries the empty
+        // reading, which no hold matches, so its files are acted on by no hold. A reading
+        // that could not be completed, or a check that found Windows Installer busy, is
+        // not gone round again: neither can come out otherwise on a second pass made at once.
+        ReverifyResult result;
+        var attempt = 0;
+        while (true)
+        {
+            var before = _fingerprint.Take();
+            result = await ReverifyOnceAsync(candidatePaths, cancellationToken, progress).ConfigureAwait(false);
+            if (!before.Complete || result.InstallerActivity is { IsBlocked: true })
+                return result with { Print = InstallerRecordsPrint.None };
+            var after = _fingerprint.Take();
+            if (before.Matches(after))
+                return result with { Print = after };
+            if (++attempt == ReadingAttempts)
+                return result with { Print = InstallerRecordsPrint.None };
+        }
+    }
+
+    private async Task<ReverifyResult> ReverifyOnceAsync(
+        IReadOnlyList<string> candidatePaths,
+        CancellationToken cancellationToken,
+        IProgress<ScanProgressUpdate>? progress)
     {
         if (candidatePaths.Count == 0)
             return new ReverifyResult(candidatePaths, Array.Empty<string>());

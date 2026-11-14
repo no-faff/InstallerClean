@@ -7,14 +7,13 @@ namespace InstallerClean.Services;
 public sealed class DeleteFilesService : IDeleteFilesService
 {
     private readonly IFileSystem _fs;
-    private readonly IMutexProbe _mutex;
-
     /// <summary>
-    /// Re-reads the batch's patch claims once the installer mutex is held. Held
-    /// by the service rather than called by the caller because the hold is taken
-    /// here: a check that has to happen inside it cannot live outside it.
+    /// Acts on the batch inside Windows Installer transactions of the app's own, a group
+    /// of files at a time, after comparing Windows Installer's records with the reading
+    /// the batch was checked against. Held by the service rather than the caller because
+    /// the act has to happen inside the hold.
     /// </summary>
-    private readonly IRemovableReverifier _reverifier;
+    private readonly HoldRunner _runner;
 
     /// <summary>
     /// Test-only real-folder override for the containment guard's cache root
@@ -25,27 +24,20 @@ public sealed class DeleteFilesService : IDeleteFilesService
     /// </summary>
     private readonly string? _installerFolderOverride;
 
-    /// <summary>
-    /// Constructor. The DI container injects the registered
-    /// <see cref="IFileSystem"/> and <see cref="IMutexProbe"/> singletons in
-    /// production; the mutex is taken for the batch, and a batch refuses where a
-    /// live install owns it.
-    /// </summary>
-    public DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex, IRemovableReverifier reverifier)
-        : this(fileSystem, mutex, null, reverifier) { }
+    /// <summary>Constructor. The DI container injects the registered singletons in production.</summary>
+    public DeleteFilesService(IFileSystem fileSystem, HoldRunner runner)
+        : this(fileSystem, runner, null) { }
 
-    /// <summary>Test constructor. No mutex hold and no under-lease re-read (both are exercised via the seam constructor below).</summary>
+    /// <summary>Test constructor. Acts through <see cref="HoldRunner.ForTests"/>, which takes no hold on the machine.</summary>
     internal DeleteFilesService(IFileSystem fileSystem)
-        : this(fileSystem, NullMutexProbe.Instance, null, NullRemovableReverifier.Instance) { }
+        : this(fileSystem, HoldRunner.ForTests(), null) { }
 
-    /// <summary>Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.</summary>
-    internal DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride,
-        IRemovableReverifier? reverifier = null)
+    /// <summary>Seam constructor: an injected <see cref="HoldRunner"/> plus the sandbox override.</summary>
+    internal DeleteFilesService(IFileSystem fileSystem, HoldRunner runner, string? installerFolderOverride)
     {
         _fs = fileSystem;
-        _mutex = mutex;
+        _runner = runner;
         _installerFolderOverride = installerFolderOverride;
-        _reverifier = reverifier ?? NullRemovableReverifier.Instance;
     }
 
     public Task<DeleteResult> DeleteFilesAsync(
@@ -64,105 +56,6 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Take Global\_MSIExecute for the batch on this worker thread. The
-            // acquire refuses the batch where a live install owns it, and for the
-            // batch the object reads owned to anything that opens it. Acquired
-            // here and released in the finally on the SAME thread
-            // (Win32 owner-thread rule); the body is synchronous, so no await hops
-            // threads between acquire and release.
-            //
-            // No way of missing the hold proceeds, and they are reported separately
-            // because the caller owes the user a different sentence for each. Held
-            // by a live transaction => the pending-reboot gate the caller re-runs
-            // meets the same mutex and paints its banner, which says an install is
-            // in progress, which it is. Refused because the object's security would
-            // not let us open it => the app was not allowed to look, and the caller
-            // says so in those words. The gate's probe asks for the rights this
-            // acquire asks for, so a refusal standing when the gate ran stopped the
-            // batch there, and one met here began after it. Refused any other way
-            // with nothing shown to be holding it => the gate has no account of it,
-            // its probe reading such a failure as not held, so this result carries
-            // its own sentence.
-            //
-            // Both refusals stop the batch rather than letting it run without the
-            // hold, and the delete being permanent is why: nothing deleted here can
-            // be fetched back from a bin. MoveFilesService refuses on the same
-            // answers, for reasons it states at its own acquire.
-            //
-            // What the hold costs, so nobody widens it and nobody removes it:
-            // _MSIExecute is the machine-wide Windows Installer serialisation
-            // mutex, which Windows Installer's client takes at the start of every
-            // install, so for as long as this batch runs that client cannot take
-            // it.
-            //
-            // What it is NOT is bounded by the batch's file count, and the one
-            // thing inside the hold that breaks that bound is not a file
-            // operation at all. The progress callback hands control to a consumer
-            // that can run for as long as it likes, which is the property the
-            // destination re-check in MoveFilesService is ordered around; in this
-            // host's command-line sibling that consumer is a console write, and a
-            // console in QuickEdit selection blocks one until the operator clears
-            // it.
-            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var outcome);
-            if (lease is null && outcome == MutexAcquireOutcome.HeldByAnother)
-                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
-            if (lease is null && outcome == MutexAcquireOutcome.AccessRefused)
-            {
-                // The object is there and its security refused us the rights to
-                // open it, so ownership was never sampled. Reported apart from the
-                // arm below because the user is owed a different sentence: this one
-                // is a setting somebody can go and look at, and saying the lock was
-                // busy would name a cause nothing here established.
-                //
-                // Recorded as well as refused, on the same terms as the arm below.
-                Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Delete refused: access to the Windows Installer mutex was denied, so whether an installation was in progress could not be established."));
-                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockAccessRefused: true);
-            }
-            if (lease is null)
-            {
-                // Every other non-fatal way the acquire can fail, with nothing
-                // shown to be holding the object. Recorded as well as refused: the
-                // refusal is what the user is told, and the crash log is the only
-                // place the machine's own condition is written down. Once per
-                // batch, so it costs nothing at any file count.
-                //
-                // An outcome added to MutexAcquireOutcome later arrives here and
-                // is refused with this general wording, which is the safe
-                // direction. One that owes the user something else takes an arm of
-                // its own above, which is the failure worth having.
-                Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Delete refused: the Windows Installer mutex could not be acquired and nothing could be shown to be holding it."));
-                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);
-            }
-
-            try
-            {
-            // The act-time re-read, and the reason it is HERE and not at the
-            // caller. The caller's full re-verify runs before this method is
-            // entered, so this is the read of the records made closest to the
-            // first file operation: a verdict that moved while that enumeration
-            // ran is read again here.
-            //
-            // Only the claims, never the enumeration. An enumeration is kept
-            // outside the machine-wide installer lock, so what this re-reads is
-            // the set of claims the caller's enumeration built, each asked about
-            // by key.
-            //
-            // Synchronous on the acquiring thread by necessity, not by taste: the
-            // lease is released by the thread that took it, so nothing between
-            // the acquire and the release may await.
-            var recheck = _reverifier.RecheckUnderLease(underLeaseClaims);
-            var heldBack = recheck.HeldBack;
-            if (heldBack.Count > 0)
-            {
-                var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
-                pathList = pathList.Where(p => !reclaimed.Contains(p)).ToList();
-                total = pathList.Count;
-                if (total == 0)
-                    return new DeleteResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
-            }
-
             int deleted = 0;
             var errors = new List<FileOperationError>();
             var failureLog = new PerItemFailureLog("Delete",
@@ -171,39 +64,26 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // file against it (see InstallerCacheRoot).
             var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
             bool cancelled = false;
+            HoldRunResult? run = null;
+            var tally = new HoldRunTally();
 
-            try
+            // Called inside a hold, so everything in it reads or changes only the
+            // local file. Every check that reads the file is in here, inside the same
+            // hold as the delete, so nothing Windows Installer does can come between
+            // the check and the act.
+            void DeleteOne(string filePath)
             {
-            for (int i = 0; i < total; i++)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var filePath = pathList[i];
-
                 try
                 {
-                    // The host's question is asked before the report as well as last before
-                    // the act, so a batch the host has stopped covering stops before this
-                    // file's progress line rather than after it.
+                    // The host's question is asked before the checks as well as last
+                    // before the act, so a batch the host has stopped covering stops
+                    // before this file is read.
                     if (mayAct is not null && !mayAct(filePath)) throw new BatchStoppedException();
-                    // First statement inside the per-file try after that question,
-                    // and both halves of that are load-bearing. Before the skip check
-                    // below, so a missing file still advances the visible counter,
-                    // matching MoveFilesService. Inside the try, so a progress
-                    // consumer that throws costs this one file an UnknownError
-                    // instead of costing the batch: from outside the try the throw
-                    // leaves the loop altogether, and the files already deleted are
-                    // never reported, the result and the failure log's closing entry
-                    // both being built past the loop.
-                    progress?.Report(new OperationProgress(i + 1, total, PathText.GetFileName(filePath)));
-                    // Asked again after the report, which can block on the console: a cancel
-                    // that came meanwhile leaves this file alone. The catch-all below lets the
-                    // batch's own cancellation through (BatchStop.EndsBatch).
-                    cancellationToken.ThrowIfCancellationRequested();
 
                     if (!_fs.File.Exists(filePath))
                     {
                         errors.Add(new MissingSourceFile(filePath));
-                        continue;
+                        return;
                     }
 
                     // Refuse a reparse-point source, matching MoveFilesService:
@@ -217,13 +97,13 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     if (reparse == Helpers.StorageHelpers.ReparseCheck.Yes)
                     {
                         errors.Add(new SourceIsReparsePoint(filePath));
-                        continue;
+                        return;
                     }
                     if (reparse == Helpers.StorageHelpers.ReparseCheck.Unreadable)
                     {
                         failureLog.Record(reparseError!);
                         errors.Add(new UnknownError(filePath));
-                        continue;
+                        return;
                     }
 
                     // Containment guard at the service boundary: never delete a
@@ -268,7 +148,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                                 errors.Add(new UnknownError(filePath));
                                 break;
                         }
-                        continue;
+                        return;
                     }
 
                     // The last thing before the act, after every check on the file.
@@ -306,7 +186,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                         {
                             _fs.File.Delete(filePath);
                             deleted++;
-                            continue;
+                            return;
                         }
                         catch (Exception retry)
                         {
@@ -317,7 +197,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                             failureLog.Record(retry);
                             RestoreReadOnly(filePath, failureLog);
                             errors.Add(new AccessDenied(filePath));
-                            continue;
+                            return;
                         }
                     }
                     failureLog.Record(ex);
@@ -342,14 +222,19 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     errors.Add(new UnknownError(filePath));
                 }
             }
+
+            try
+            {
+                run = _runner.Run(pathList, underLeaseClaims.Print ?? InstallerRecordsPrint.None, DeleteOne,
+                    (done, batch, filePath) => Report(progress, done + 1, batch, filePath, failureLog),
+                    cancellationToken, tally);
             }
             catch (OperationCanceledException)
             {
-                // Return what was deleted before the cancel rather than
-                // throwing the tally away. The loop's ThrowIfCancellationRequested and
-                // the host's mayAct answering no are the only sources, and the inner
-                // per-file catch-all lets only those through (BatchStop.EndsBatch), so
-                // only a real cancel or stop lands here.
+                // Return what was deleted before the cancel rather than throwing the
+                // tally away. The runner's cancellation checks and the host's mayAct
+                // answering no are the only sources, and the per-file catch-all lets
+                // only those through (BatchStop.EndsBatch).
                 cancelled = true;
             }
 
@@ -357,17 +242,51 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // accounts for what its failures cost the log.
             failureLog.WriteClosingEntry();
 
-            return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
-            }
-            finally
-            {
-                // Release on this same worker thread (Win32 owner-thread rule).
-                // Non-null by the time this try is entered: both ways of failing
-                // to acquire return above, so a batch that reaches here holds the
-                // mutex and a batch that does not never started.
-                lease.Dispose();
-            }
+            return Result(deleted, errors, cancelled, run, tally);
         }, cancellationToken);
+    }
+
+    /// <summary>
+    /// Reports one file outside the hold. A consumer that throws costs the batch nothing:
+    /// the file has already been dealt with, and the throw is recorded once.
+    /// </summary>
+    private static void Report(IProgress<OperationProgress>? progress, int done, int total,
+        string filePath, PerItemFailureLog failureLog)
+    {
+        try
+        {
+            progress?.Report(new OperationProgress(done, total, PathText.GetFileName(filePath)));
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            failureLog.Record(ex);
+        }
+    }
+
+    /// <summary>
+    /// The result of a run. A run that could not take a hold before its first file says
+    /// so with the flag its hosts read as "nothing was deleted"; a run stopped later keeps
+    /// its count, and the flag then sits beside files that were deleted.
+    /// </summary>
+    private static DeleteResult Result(int deleted, List<FileOperationError> errors, bool cancelled,
+        HoldRunResult? run, HoldRunTally tally)
+    {
+        var heldBack = tally.HeldBack;
+        var reasons = tally.Reasons;
+        return run?.End switch
+        {
+            HoldRunEnd.InstallerBusy or HoldRunEnd.InstallerActivity =>
+                new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, InstallerBusy: true,
+                    HeldBack: heldBack, HeldBackReasons: reasons),
+            HoldRunEnd.RollbackDisabled =>
+                new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled,
+                    HeldBack: heldBack, HeldBackReasons: reasons) { InstallerRollbackDisabled = true },
+            HoldRunEnd.HoldUnavailable or HoldRunEnd.EndFailed =>
+                new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, InstallerLockUnavailable: true,
+                    HeldBack: heldBack, HeldBackReasons: reasons),
+            _ => new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled,
+                HeldBack: heldBack, HeldBackReasons: reasons),
+        };
     }
 
     /// <summary>

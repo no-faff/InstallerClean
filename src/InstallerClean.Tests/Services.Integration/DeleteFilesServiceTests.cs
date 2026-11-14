@@ -3,6 +3,7 @@ using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using InstallerClean.Tests.Helpers;
+using InstallerClean.Tests.Services;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -27,7 +28,7 @@ public class DeleteFilesServiceTests : IDisposable
     // root; point that root at the test run's sandbox folder so the real files these tests
     // delete are not refused as out-of-bounds, without touching the real cache.
     private DeleteFilesService NewService() =>
-        new(new System.IO.Abstractions.FileSystem(), NullMutexProbe.Instance, _tempDir);
+        new(new System.IO.Abstractions.FileSystem(), HoldRunner.ForTests(), _tempDir);
 
     [Fact]
     public async Task DeleteFilesAsync_deletes_file()
@@ -281,21 +282,11 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteFilesAsync_refuses_and_records_a_batch_it_could_not_hold_the_mutex_for()
+    public async Task DeleteFilesAsync_refuses_and_records_a_batch_it_could_not_take_a_hold_for()
     {
-        // A hold that could not be taken, with nobody else holding it, stops the
-        // batch. Without the hold nothing prevents a program registering a package
-        // part-way through, so the act-time proof can go stale underneath a delete
-        // that no longer has a Recycle Bin to take the mistake back out of.
-        //
-        // Its Move twin asserts the same outcome on the same input, and the pair
-        // is where that is pinned: a file moved out of the cache is as absent
-        // from it as a deleted one, so the exposure is shared and only the
-        // recovery differs.
-        //
-        // Real filesystem because the record is a real crash-log write, which is
-        // half the behaviour under test: the user is told the run refused, and the
-        // log is the only place the machine's own condition is written down.
+        // A hold Windows Installer would not open stops the batch before any file, and
+        // the machine's answer goes to the crash log, the only place it is written down.
+        // Real filesystem because the record is a real crash-log write.
         var logPath = CrashLog.TryWrite(
             new InvalidOperationException("baseline for the mutex fall-back record")).Path;
         var baseline = new FileInfo(logPath).Length;
@@ -303,20 +294,20 @@ public class DeleteFilesServiceTests : IDisposable
         var fs = new MockFileSystem();
         var source = @"C:\Windows\Installer\never-reached.msi";
         fs.AddFile(source, new MockFileData("payload"));
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
+        var api = new FakeInstallerTransactionApi(1601);
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint());
 
-        var result = await new DeleteFilesService(fs, mutex, installerFolderOverride: null).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var result = await new DeleteFilesService(fs, runner, installerFolderOverride: null)
+            .DeleteFilesAsync(new[] { source }, HoldRunnerFixture.CheckedAgainst("A"));
 
-        // Refused, and distinguishably so: nothing was shown to hold the mutex, so
-        // the pending-reboot gate the busy case is answered by can account for this
-        // one neither way.
+        // Refused, and apart from the busy case, which the host words differently.
         Assert.True(result.InstallerLockUnavailable);
         Assert.False(result.InstallerBusy);
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);
         Assert.True(fs.File.Exists(source), "A refused batch touches nothing");
-        Assert.Equal(1, mutex.AcquireAttempts);
-        Assert.Equal(0, mutex.Acquired);
+        Assert.Equal(1, api.Begins);
+        Assert.Equal(0, api.Commits);
 
         // Read from the baseline on, so a note left by an earlier run cannot
         // pass for this one's. A rotation between the two reads shortens the
@@ -325,8 +316,7 @@ public class DeleteFilesServiceTests : IDisposable
         using var reader = new StreamReader(stream);
         var written = await reader.ReadToEndAsync();
         var appended = written.Length >= baseline ? written[(int)baseline..] : written;
-        Assert.Contains("Delete refused", appended);
-        Assert.Contains("could not be acquired and nothing could be shown to be holding it", appended);
+        Assert.Contains("A batch stopped with 0 file(s) reached: HoldUnavailable, Windows Installer code 1601.", appended);
     }
 
     public void Dispose()
