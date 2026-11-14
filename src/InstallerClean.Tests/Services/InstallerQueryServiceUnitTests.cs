@@ -146,9 +146,11 @@ public class InstallerQueryServiceUnitTests
     /// <see cref="Run(FakeMsiApi)"/> against an ordinary machine: the same
     /// enumeration, with the registry's per-product patch verdicts supplied.
     /// </summary>
-    private static async Task<InstallerQueryResult> RunHealthy(FakeMsiApi msi, int fallbackFailures = 0) =>
+    private static async Task<InstallerQueryResult> RunHealthy(
+        FakeMsiApi msi, int fallbackFailures = 0, int patchListFailures = 0) =>
         await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(
-                fallbackFailures, 0, ProductPatchSets: HealthyPatchSets(msi)))
+                fallbackFailures, 0, ProductPatchSets: HealthyPatchSets(msi),
+                PatchListFailures: patchListFailures))
             .GetRegisteredPackagesAsync();
 
     /// <summary>
@@ -807,8 +809,8 @@ public class InstallerQueryServiceUnitTests
         int fallbackFailures, int patchListFailures, bool refused)
     {
         // A program's own Patches key records no cached file, so its failure leaves every
-        // claim the API lost to the keys that record one. Every superseded patch is still
-        // held, the short program's among whatever it holds.
+        // claim the API lost to the keys that record one. A superseded patch of another
+        // program is still held, here by the short program's patch list.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
@@ -832,7 +834,7 @@ public class InstallerQueryServiceUnitTests
             Assert.False(result.Census.RegistryRecordsUnread);
             var superseded = Assert.Single(result.Packages, r => r.PatchState == 2);
             Assert.False(superseded.IsRemovable);
-            Assert.True(superseded.WithheldScanWide);
+            Assert.True(superseded.RemovableWithheld);
         }
     }
 
@@ -2250,19 +2252,23 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
-    [Fact]
-    public async Task A_failing_fallback_with_a_clean_enumeration_scans_and_holds_every_removable_patch()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    public async Task A_failing_fallback_with_a_clean_enumeration_scans_and_holds_every_removable_patch(
+        int patchListFailures)
     {
         // The scan goes ahead, because the API read every product cleanly. A key in
         // UserData that would not read may be the only record of a program no walk
         // lists, whose listing could name the patch, so every removable patch is held
-        // back, scan wide.
+        // back, scan wide. A program's own patch list is such a listing, so the rows are
+        // held where every failure is one.
         const string dead = @"C:\Windows\Installer\fallback-noise.msp";
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
 
-        var result = await RunHealthy(msi, fallbackFailures: 3);
+        var result = await RunHealthy(msi, fallbackFailures: 3, patchListFailures);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
         Assert.False(row.IsRemovable);
