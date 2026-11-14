@@ -145,4 +145,174 @@ public class WalkRestartsTests
         Assert.Throws<OperationCanceledException>(() => restarts.Walk(walk.Once, w => w.Stands));
         Assert.Equal(1, walk.Walks);
     }
+
+    /// <summary>
+    /// A read answering one scripted answer per call, and repeating the last: null for an
+    /// error, "" for an absence, and anything else for a value.
+    /// </summary>
+    private sealed class ScriptedRead(params string?[] answers)
+    {
+        public int Reads { get; private set; }
+
+        public string? Once() => answers[Math.Min(Reads++, answers.Length - 1)];
+    }
+
+    private static string? Read(WalkRestarts restarts, ScriptedRead read, string key = "one") =>
+        restarts.KeyedRead(() => key, read.Once,
+            stands: answer => answer is not null,
+            standsAgain: answer => !string.IsNullOrEmpty(answer),
+            agrees: string.Equals);
+
+    [Fact]
+    public void A_read_whose_first_answer_stands_is_made_once_with_no_pause()
+    {
+        var pauses = new List<TimeSpan>();
+        var read = new ScriptedRead("");
+
+        Assert.Equal("", Read(new WalkRestarts(pauses.Add), read));
+        Assert.Equal(1, read.Reads);
+        Assert.Empty(pauses);
+    }
+
+    [Fact]
+    public void A_value_read_after_an_error_is_taken_where_the_read_after_the_longer_pause_gives_it_again()
+    {
+        var pauses = new List<TimeSpan>();
+        var read = new ScriptedRead(null, "v");
+
+        Assert.Equal("v", Read(new WalkRestarts(pauses.Add), read));
+        Assert.Equal(3, read.Reads);
+        Assert.Equal(new[] { First, Second }, pauses);
+    }
+
+    [Fact]
+    public void A_value_read_after_an_error_that_the_next_read_does_not_give_again_leaves_the_first_read()
+    {
+        var read = new ScriptedRead(null, "v", "w");
+
+        Assert.Null(Read(new WalkRestarts(_ => { }), read));
+        Assert.Equal(3, read.Reads);
+    }
+
+    [Fact]
+    public void An_absence_read_after_an_error_does_not_stand_and_the_first_read_is_the_answer()
+    {
+        var pauses = new List<TimeSpan>();
+        var read = new ScriptedRead(null, "");
+
+        Assert.Null(Read(new WalkRestarts(pauses.Add), read));
+        Assert.Equal(WalkRestarts.Attempts, read.Reads);
+        Assert.Equal(new[] { First, Second }, pauses);
+    }
+
+    [Fact]
+    public void An_error_on_the_second_read_leaves_the_third_and_one_more_to_agree()
+    {
+        var pauses = new List<TimeSpan>();
+        var read = new ScriptedRead(null, null, "v");
+
+        Assert.Equal("v", Read(new WalkRestarts(pauses.Add), read));
+        Assert.Equal(4, read.Reads);
+        Assert.Equal(new[] { First, Second, Second }, pauses);
+    }
+
+    [Fact]
+    public void A_key_whose_reads_never_stood_is_read_once_on_every_later_ask()
+    {
+        var restarts = new WalkRestarts(_ => { });
+
+        var spent = new ScriptedRead((string?)null);
+        Assert.Null(Read(restarts, spent));
+        Assert.Equal(WalkRestarts.Attempts, spent.Reads);
+
+        // The same key in another case, as product codes and accounts come.
+        var later = new ScriptedRead(null, "v");
+        Assert.Null(Read(restarts, later, "ONE"));
+        Assert.Equal(1, later.Reads);
+
+        // A key within it is read once too.
+        var within = new ScriptedRead(null, "v");
+        Assert.Null(restarts.KeyedRead(() => "two", within.Once, a => a is not null, a => !string.IsNullOrEmpty(a),
+            string.Equals, within: () => "one"));
+        Assert.Equal(1, within.Reads);
+
+        // Another key is read again as before.
+        var other = new ScriptedRead(null, "v");
+        Assert.Equal("v", Read(restarts, other, "three"));
+    }
+
+    [Fact]
+    public void A_key_whose_read_was_answered_on_a_later_attempt_is_read_again_on_its_next_ask()
+    {
+        var restarts = new WalkRestarts(_ => { });
+
+        Read(restarts, new ScriptedRead(null, "v"));
+
+        Assert.Equal("v", Read(restarts, new ScriptedRead(null, "v")));
+    }
+
+    [Fact]
+    public void Keyed_reads_and_keyed_walks_share_one_pause_limit()
+    {
+        var pauses = new List<TimeSpan>();
+        var restarts = new WalkRestarts(pauses.Add);
+
+        for (var key = 0; key < 20; key++)
+            Read(restarts, new ScriptedRead((string?)null), $"read {key}");
+        restarts.KeyedWalk(new ScriptedWalk(false, true).Once, w => w.Stands);
+
+        var paused = pauses.Aggregate(TimeSpan.Zero, (sum, wait) => sum + wait);
+        Assert.True(paused <= WalkRestarts.KeyedPauseLimit, $"paused {paused}");
+    }
+
+    [Fact]
+    public void A_value_read_after_an_error_is_not_taken_where_the_pause_before_the_read_agreeing_with_it_cannot_be_made()
+    {
+        var pauses = new List<TimeSpan>();
+        var restarts = new WalkRestarts(pauses.Add);
+
+        // Reads that never stand spend the pause limit.
+        for (var key = 0; key < 20; key++)
+            Read(restarts, new ScriptedRead((string?)null), $"read {key}");
+        var paused = pauses.Count;
+
+        var read = new ScriptedRead(null, "v");
+        Assert.Null(Read(restarts, read, "last"));
+        Assert.Equal(paused, pauses.Count);
+    }
+
+    [Fact]
+    public void Two_values_that_differ_spend_no_key()
+    {
+        var restarts = new WalkRestarts(_ => { });
+
+        Assert.Null(Read(restarts, new ScriptedRead(null, "v", "w")));
+
+        Assert.Equal("v", Read(restarts, new ScriptedRead(null, "v")));
+    }
+
+    [Fact]
+    public void A_first_read_the_rule_names_spends_the_key_it_is_within()
+    {
+        var restarts = new WalkRestarts(_ => { });
+
+        restarts.KeyedRead(() => "pairing", new ScriptedRead("gone").Once, a => a is not "gone",
+            a => a is not "gone", string.Equals, within: () => "installation", spendsWithin: a => a == "gone");
+
+        var other = new ScriptedRead(null, "v");
+        Assert.Null(restarts.KeyedRead(() => "another pairing", other.Once, a => a is not null,
+            a => !string.IsNullOrEmpty(a), string.Equals, within: () => "installation"));
+        Assert.Equal(1, other.Reads);
+    }
+
+    [Fact]
+    public void An_absence_read_after_an_error_spends_no_key()
+    {
+        // The record answers, with an absence, so a later read of the same key is read again.
+        var restarts = new WalkRestarts(_ => { });
+
+        Assert.Null(Read(restarts, new ScriptedRead(null, "")));
+
+        Assert.Equal("v", Read(restarts, new ScriptedRead(null, "v")));
+    }
 }

@@ -520,6 +520,13 @@ public sealed class RemovableReverifier : IRemovableReverifier
     private static bool IsPatchFile(string path) =>
         PathText.GetExtension(path).Equals(".msp", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// The longest the reads made again under the lease pause, in all: one pause of each
+    /// length. The lease holds Windows Installer's own mutex, so no installation runs while
+    /// it reads, and the pauses add to the time every installation waits for it.
+    /// </summary>
+    internal static readonly TimeSpan UnderLeasePauseLimit = Durations.FromMilliseconds(300);
+
     /// <inheritdoc />
     /// <remarks>
     /// IT HAS REAL WORK ON ANY BATCH HOLDING A SUPERSEDED PATCH. Its input is both
@@ -597,6 +604,10 @@ public sealed class RemovableReverifier : IRemovableReverifier
         var causes = new Dictionary<string, HeldBackReason>(StringComparer.OrdinalIgnoreCase);
         var condemnedInOrder = new List<string>();
 
+        // The reads below are made again where one fails, within UnderLeasePauseLimit, so
+        // that the time the lease is held grows by no more than that and the reads.
+        var restarts = WalkRestarts.For(CancellationToken.None, keyedPauseLimit: UnderLeasePauseLimit);
+
         void Condemn(string path, HeldBackReason reason)
         {
             if (causes.TryGetValue(path, out var already))
@@ -625,10 +636,10 @@ public sealed class RemovableReverifier : IRemovableReverifier
             var context = (Interop.MsiInstallContext)claim.Context;
             var state = InstallerQueryService.GetPatchProperty(
                 _msi, claim.PatchCode, claim.ProductCode, claim.UserSid, context,
-                Interop.MsiInstallProperty.State);
+                Interop.MsiInstallProperty.State, restarts, InstallerQueryService.PropertyRead.StandsUnderTheLease);
             var uninstallable = InstallerQueryService.GetPatchProperty(
                 _msi, claim.PatchCode, claim.ProductCode, claim.UserSid, context,
-                Interop.MsiInstallProperty.Uninstallable);
+                Interop.MsiInstallProperty.Uninstallable, restarts, InstallerQueryService.PropertyRead.StandsUnderTheLease);
 
             var notRegistered = state.NotRegistered || uninstallable.NotRegistered;
             var unreadable = (state.Unreadable && !state.NotRegistered)
@@ -724,7 +735,8 @@ public sealed class RemovableReverifier : IRemovableReverifier
                 var siblingUninstallable = InstallerQueryService.GetPatchProperty(
                     _msi, onThisProduct.PatchCode, onThisProduct.ProductCode,
                     onThisProduct.UserSid, siblingContext,
-                    Interop.MsiInstallProperty.Uninstallable);
+                    Interop.MsiInstallProperty.Uninstallable, restarts,
+                    InstallerQueryService.PropertyRead.StandsWhereListedAsHeld);
 
                 // A POSITIVE ZERO IS THE ONLY CLEAN ANSWER, and the scan reads a
                 // zero the same way. Anything else condemns: a read that failed, an

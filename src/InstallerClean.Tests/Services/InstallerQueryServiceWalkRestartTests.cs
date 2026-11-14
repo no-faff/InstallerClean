@@ -16,20 +16,21 @@ namespace InstallerClean.Tests.Services;
 /// the scan then offers exactly what it offers with nothing planted. An error that stays
 /// leaves the scan holding or refusing as a single walk that met it does.
 ///
-/// The pause is recorded and never slept.
+/// The pause is recorded and never slept. <see cref="InstallerQueryServiceKeyedReadRetryTests"/>
+/// scans the same machine.
 /// </summary>
 public class InstallerQueryServiceWalkRestartTests
 {
     private const uint AccessDenied = 5, BadConfiguration = 1610;
 
-    private const string First = "{A}";
-    private const string FirstFile = @"C:\Windows\Installer\restart-first.msi";
-    private const string FirstPatchFile = @"C:\Windows\Installer\restart-first.msp";
-    private const string Second = "{B}";
-    private const string SecondFile = @"C:\Windows\Installer\restart-second.msi";
-    private const string SecondPatchFile = @"C:\Windows\Installer\restart-second.msp";
+    internal const string First = "{A}";
+    internal const string FirstFile = @"C:\Windows\Installer\restart-first.msi";
+    internal const string FirstPatchFile = @"C:\Windows\Installer\restart-first.msp";
+    internal const string Second = "{B}";
+    internal const string SecondFile = @"C:\Windows\Installer\restart-second.msi";
+    internal const string SecondPatchFile = @"C:\Windows\Installer\restart-second.msp";
 
-    private static readonly TimeSpan[] BothPauses =
+    internal static readonly TimeSpan[] BothPauses =
         [TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(250)];
 
     /// <summary>
@@ -51,10 +52,10 @@ public class InstallerQueryServiceWalkRestartTests
         public string? PackageCodeOf(string filePath) => null;
     }
 
-    private sealed record Scanned(
+    internal sealed record Scanned(
         InstallerQueryResult? Result, Exception? Refusal, FakeMsiApi Msi, List<TimeSpan> Pauses, List<Exception> Logged);
 
-    private static async Task<Scanned> Scan(Action<FakeMsiApi>? plant = null)
+    internal static async Task<Scanned> Scan(Action<FakeMsiApi>? plant = null)
     {
         var msi = new FakeMsiApi();
         msi.AddProduct(First);
@@ -94,7 +95,7 @@ public class InstallerQueryServiceWalkRestartTests
         }
     }
 
-    private static RegisteredPackage[] Offered(Scanned scanned) =>
+    internal static RegisteredPackage[] Offered(Scanned scanned) =>
         scanned.Result!.Packages.Where(p => p.IsRemovable).ToArray();
 
     [Fact]

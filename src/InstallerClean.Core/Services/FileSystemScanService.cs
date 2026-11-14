@@ -544,7 +544,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // keys and contributes the same paths. When the fallback is ALSO failing
         // reads, the scan does not offer the file: it refuses outright, at
         // InstallerQueryService's records-unreadable gate, on one unreadable
-        // product and any fallback failure. And a recorded path holding an
+        // product and any fallback failure but a program's own patch list, which
+        // records no cached file. And a recorded path holding an
         // environment variable is expanded before it is resolved, so it is compared
         // as the path it names.
         //
@@ -647,10 +648,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // question is asked of the census, where its members live, on the same rule as
         // the two above.
         //
-        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED. The key that
-        // would not read may be the only claim on a cached file, and it may be a program no
-        // walk lists, so the keys handed to the screen below can be short by it. It is
-        // asked of the census too.
+        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED, on any key but a program's
+        // own Patches key, which records no cached file. The key that would not read may be
+        // the only claim on a cached file, and it may be a program no walk lists, so the
+        // keys handed to the screen below can be short by it. It is asked of the census too.
         //
         // A SECOND COPY THE SCAN LISTED IS NOT A CONDITION HERE. Each listed
         // installation carries whether its own InstanceType reading ruled it out as one,

@@ -4,11 +4,12 @@
 // picks up as a glob, so a new one is run by the release on the day it is
 // written and no list can fall out of step.
 //
-// The guards held here read built files, so none can be in that glob, which runs
-// before anything is built. Each is invoked by name after the publish steps
-// instead, and a line invoked by name is a line that can be deleted or renamed
-// away while everything stays green. This is what makes those invocations a rule
-// rather than a habit.
+// The guards held here cannot be in that glob. Most read built files, and the
+// glob runs before anything is built, so each is invoked by name after the
+// publish steps. check-framework-ascii-search.ps1 reads no built file but runs on
+// Windows PowerShell, which the glob does not. A line invoked by name is a line
+// that can be deleted or renamed away while everything stays green. This is what
+// makes those invocations a rule rather than a habit.
 //
 // Each names the workflows that run it. check-native-imports.ps1 and
 // check-framework-references.ps1 read the two merged exes build-and-test builds and
@@ -60,6 +61,10 @@ const GUARDS = [
     workflows: ['.github/workflows/ci.yml'],
   },  {
     command: './scripts/check-update-download.ps1',
+    workflows: ['.github/workflows/ci.yml'],
+  },
+  {
+    command: './scripts/check-framework-ascii-search.ps1',
     workflows: ['.github/workflows/ci.yml'],
   },
 ];
@@ -196,16 +201,16 @@ for (const { command, workflows } of GUARDS) {
 
 for (const w of wired) console.log(w);
 if (problems.length) {
-  console.error('check-guard-wiring: a guard that reads built files is not run where it has to be, or cannot fail its run.\n');
+  console.error('check-guard-wiring: a guard invoked by name is not run where it has to be, or cannot fail its run.\n');
   for (const p of problems) console.error(`  ${p}`);
-  console.error('\nFix: add a step running the command above after the publish steps in the');
-  console.error('workflow named. The guard reads built files, so it has to run after they');
-  console.error('exist, which is why it is invoked by name rather than picked up with the');
-  console.error('check-*.mjs guards that run before the build. The command has to open the');
+  console.error('\nFix: add a step running the command above in the workflow named, after the');
+  console.error('publish steps where the guard reads built files. It is invoked by name');
+  console.error('rather than picked up with the check-*.mjs guards that run before the build.');
+  console.error('The command has to open the');
   console.error('step, either straight after "run:" or alone on a line in a block scalar,');
   console.error('be its last command, and run in a step and a job that neither skip it nor');
   console.error('pass the run when it fails.');
   process.exit(1);
 }
 
-console.log('check-guard-wiring: OK, every guard that reads built files is invoked, and fails its run when it fails.');
+console.log('check-guard-wiring: OK, every guard invoked by name is invoked, and fails its run when it fails.');

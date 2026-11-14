@@ -30,6 +30,7 @@ public class InstallerQueryServiceShortProgramTests
 {
     private const uint BadConfiguration = 1610;
     private const uint AccessDenied = 5;
+    private const uint UnknownPatch = 1647;
 
     private const string Listed = "{AAAAAAAA-0000-0000-0000-00000000000A}";
     private const string Short = "{BBBBBBBB-0000-0000-0000-00000000000B}";
@@ -589,6 +590,67 @@ public class InstallerQueryServiceShortProgramTests
 
         AssertOfferedOrWithheld(Row(result), withheld);
         Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
+    }
+
+    /// <summary>
+    /// Windows Installer answers <see cref="OtherPatch"/>'s Uninstallable with an error once,
+    /// an answer that the program holds no record of the patch included, and with "0" on
+    /// the reads after it. The read is made again, the patch counts as one that cannot be
+    /// uninstalled, and the superseded patch is offered though the program's own listing
+    /// leaves <see cref="OtherPatch"/> out.
+    /// </summary>
+    [Theory]
+    [InlineData(BadConfiguration)]
+    [InlineData(UnknownPatch)]
+    public async Task A_recovered_programs_patch_whose_uninstallable_meets_an_error_once_is_read_again(uint error)
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "0");
+        msi.PassingReadError(OtherPatch, Recovered, "Uninstallable", error);
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded]));
+
+        Assert.Equal(0, result.Census.RecoveredPatchSetUnestablishedCount);
+        AssertOffered(Row(result));
+    }
+
+    /// <summary>
+    /// After the error <see cref="OtherPatch"/>'s Uninstallable reads "0" and then "1". The
+    /// two reads do not agree, so the error stands and the superseded patch is held back.
+    /// </summary>
+    [Fact]
+    public async Task A_recovered_programs_uninstallable_read_after_an_error_that_the_next_read_does_not_give_again_leaves_the_error_standing()
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "0");
+        msi.PassingReadError(OtherPatch, Recovered, "Uninstallable", BadConfiguration);
+        msi.PassingReadValues(OtherPatch, Recovered, "Uninstallable", "0", "1");
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded]));
+
+        Assert.Equal(1, result.Census.RecoveredPatchSetUnestablishedCount);
+        AssertOfferedOrWithheld(Row(result), withheld: true);
+    }
+
+    /// <summary>
+    /// The scan's restart budget is spent before the recovered program is reached, by
+    /// <see cref="Short"/>'s patches, whose State never reads. <see cref="OtherPatch"/>'s
+    /// Uninstallable meets an error once and is still read again, on the budget the
+    /// recovered programs' reads share.
+    /// </summary>
+    [Fact]
+    public async Task A_recovered_programs_uninstallable_is_read_again_after_the_scans_restart_budget_is_spent()
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "0");
+        for (var i = 0; i < 20; i++)
+        {
+            var patch = $"{{{i + 1:X8}-9999-0000-0000-000000000009}}";
+            msi.AddPatch(Short, patch, $@"C:\Windows\Installer\short-program-unread-{i}.msp", state: "1", uninstallable: "0");
+            msi.PatchPropertyResult[(patch, Short, "State")] = BadConfiguration;
+        }
+        msi.PassingReadError(OtherPatch, Recovered, "Uninstallable", BadConfiguration);
+
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded]));
+
+        Assert.Equal(0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     [Theory]

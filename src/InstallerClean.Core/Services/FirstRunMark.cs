@@ -63,7 +63,7 @@ internal sealed class FirstRunMark : IFirstRunMark
         try
         {
             using var hive = RegistryKey.OpenBaseKey(_hive, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(_keyPath);
+            using var key = hive.OpenSubKeyEarned(_keyPath);
             if (key is null) return FirstRunMarkState.NotSet;
 
             // Not expanded and not converted: whatever is stored under the name, of

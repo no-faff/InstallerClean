@@ -562,22 +562,32 @@ public class InstallerQueryServiceUnclaimedEntryTests
     }
 
     [Theory]
-    [InlineData(0, false)]
-    [InlineData(1, true)]
-    [InlineData(2, true)]
-    public async Task The_superseded_rows_and_the_census_read_a_failed_registry_read_alike(
-        int failures, bool unread)
+    [InlineData(0, 0, false, false)]
+    [InlineData(1, 0, true, true)]
+    [InlineData(2, 0, true, true)]
+    [InlineData(1, 1, true, false)]
+    [InlineData(2, 2, true, false)]
+    [InlineData(2, 1, true, true)]
+    public async Task A_failed_registry_read_holds_every_superseded_patch_and_the_files_no_record_names_unless_it_is_only_a_programs_patch_list(
+        int failures, int patchListFailures, bool supersededHeld, bool recordsUnread)
     {
         // The fallback hands over no key the walks leave out, so the failed read is the only
-        // thing that can take the row scan wide. The rows and the census's leg each ask one
-        // rule of the same count.
+        // thing that can take the row scan wide. A program's own Patches key records no
+        // cached file, so its failure holds the superseded rows and not the walk-derived
+        // offer.
         var msi = MachineWithAnUnlistedProgram();
 
-        var result = await Scan(msi, UnlistedProgramFallback() with { Failures = failures });
+        var result = await Scan(msi, UnlistedProgramFallback() with
+        {
+            Failures = failures,
+            PatchListFailures = patchListFailures,
+        });
 
-        Assert.Equal(unread, result.Census.RegistryRecordsUnread);
-        Assert.Equal(unread, Row(result).WithheldScanWide);
-        Assert.Equal(!unread, Row(result).IsRemovable);
+        Assert.Equal(recordsUnread, result.Census.RegistryRecordsUnread);
+        Assert.Equal(failures, result.Census.RegistryKeyReadFailures);
+        Assert.Equal(patchListFailures, result.Census.ProductPatchListReadFailures);
+        Assert.Equal(supersededHeld, Row(result).WithheldScanWide);
+        Assert.Equal(!supersededHeld, Row(result).IsRemovable);
     }
 
     [Fact]

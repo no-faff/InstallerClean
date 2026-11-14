@@ -84,7 +84,8 @@ public interface IRemovableReverifier
     /// adds two keyed reads there, and one read for each registration on a product
     /// holding more. Against that, this method already makes two keyed reads per claim
     /// in the batch, and the pre-lease pass runs a whole enumeration moments earlier
-    /// outside the lease.
+    /// outside the lease. A read that fails is made again, within
+    /// <see cref="RemovableReverifier.UnderLeasePauseLimit"/> of pauses for the whole call.
     /// </param>
     UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims claims);
 }

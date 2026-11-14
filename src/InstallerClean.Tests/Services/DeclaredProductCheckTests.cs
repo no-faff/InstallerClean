@@ -4552,7 +4552,9 @@ public class DeclaredProductCheckTests
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
         Assert.True(outcome.Withholds());
-        Assert.Single(msi.PatchStateReads);
+
+        // The answer contradicts the listing, so it is read again, and it never changes.
+        Assert.Equal(WalkRestarts.Attempts, msi.PatchStateReads.Count);
     }
 
     [Fact]
@@ -9700,6 +9702,151 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.Empty(f.Msi.Registry.LinkSettingReads);
     }
+
+    // ---- Keyed reads made again where one read fails (WalkRestarts.KeyedRead) ----
+
+    [Theory]
+    [InlineData(MsiError.BadConfiguration)]
+    [InlineData(MsiError.AccessDenied)]
+    [InlineData(MsiError.UnknownProduct)]
+    public void A_recorded_package_read_that_meets_an_error_once_leaves_the_copy_as_a_clean_read_does(uint error)
+    {
+        var clean = ACopyBesideTheRecordedPackage();
+        var cleanOutcome = ScreenTheCopy(clean);
+
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.ReadMeetsError("product", ProductA, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.LocalPackage, error);
+
+        Assert.Equal(cleanOutcome, ScreenTheCopy(f));
+        Assert.Equal(clean.Msi.PackageReads.Count + 2, f.Msi.PackageReads.Count);
+    }
+
+    [Fact]
+    public void A_recorded_package_read_that_meets_an_error_on_every_read_keeps_the_copy()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.ReadMeetsError("product", ProductA, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.LocalPackage, MsiError.BadConfiguration, calls: WalkRestarts.Attempts);
+
+        AssertKeptFor(DeclaredProductInstalledCause.PathUnreadable, f);
+    }
+
+    [Fact]
+    public void A_recorded_package_read_as_none_after_an_error_keeps_the_copy()
+    {
+        // After the error the installation reads as recording no package, which would send
+        // the check to its sources.
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, "");
+        f.Msi.ReadMeetsError("product", ProductA, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.LocalPackage, MsiError.BadConfiguration);
+
+        AssertKeptFor(DeclaredProductInstalledCause.PathUnreadable, f);
+    }
+
+    [Fact]
+    public void A_package_name_read_that_meets_an_error_once_leaves_the_sources_read_as_a_clean_read_does()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        RecordsNoPackage(f, MsiError.Success);
+        f.Msi.ReadMeetsError("product", ProductA, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.PackageName, MsiError.BadConfiguration);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+        Assert.Contains(SetupPackage, f.Files.Reads);
+    }
+
+    [Fact]
+    public void A_package_name_read_that_meets_an_error_on_every_read_keeps_the_copy()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        RecordsNoPackage(f, MsiError.Success);
+        f.Msi.ReadMeetsError("product", ProductA, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.PackageName, MsiError.BadConfiguration, calls: WalkRestarts.Attempts);
+
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
+    }
+
+    [Fact]
+    public void Offices_feature_registration_asked_once_answers_that_it_has_no_source_list_on_that_read_alone()
+    {
+        var f = ACopyBesideOfficesFeatureRegistration();
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Single(f.Msi.SourceListPackageNameReads);
+    }
+
+    [Fact]
+    public void Offices_feature_registration_answering_an_error_where_it_is_asked_for_a_source_list_keeps_the_copy()
+    {
+        // The answer that it has no source list, which leads towards offering, is taken from
+        // a first read alone, so the question is put once.
+        var f = ACopyBesideOfficesFeatureRegistration();
+        f.Msi.ReadMeetsError("source list", OfficeFeatures, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.PackageName, MsiError.AccessDenied);
+        var recorded = new List<Exception>();
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate)], f.Listed, [], default, (ex, _) => recorded.Add(ex), InInstallerFolder);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Single(recorded);
+        Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptOtherAnswer: 1),
+            screening.CachedPackages);
+        Assert.Single(f.Msi.SourceListPackageNameReads);
+    }
+
+    [Theory]
+    [InlineData("source list", MsiInstallProperty.LastUsedSource)]
+    [InlineData("source list", MsiInstallProperty.LastUsedType)]
+    [InlineData("source list", MsiInstallProperty.MediaPackagePath)]
+    [InlineData("product", MsiInstallProperty.InstallSource)]
+    public void A_property_compared_with_the_registry_is_read_once_and_an_error_there_keeps_the_copy(
+        string kind, string property)
+    {
+        // Each is compared with registry keys read before it, so it is not read again.
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.ReadMeetsError(kind, ProductA, null, null, MsiInstallContext.Machine, property, MsiError.AccessDenied);
+
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
+    }
+
+    [Fact]
+    public void A_package_code_read_that_meets_an_error_once_leaves_the_copy_let_through()
+    {
+        var f = ACopyBesideARecordedPackageThatNamesNothing();
+        f.Msi.ReadMeetsError("product", ProductA, null, null, MsiInstallContext.Machine,
+            MsiInstallProperty.PackageCode, MsiError.BadConfiguration);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+    }
+
+    [Theory]
+    [InlineData(MsiError.BadConfiguration)]
+    [InlineData(MsiError.UnknownPatch)]
+    public void A_patch_copy_read_that_meets_an_error_once_is_let_through_as_a_clean_read_is(uint error)
+    {
+        var f = APatchCopyBesideTheRecordedCopy();
+        f.Msi.ReadMeetsError("patch", PatchQ, ProductA, null, MsiInstallContext.Machine,
+            MsiInstallProperty.LocalPackage, error);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, ScreenThePatchCopy(f));
+        Assert.Equal(3, f.Msi.PatchPackageReads.Count);
+    }
+
+    [Fact]
+    public void A_patch_copy_read_that_meets_an_error_on_every_read_keeps_the_copy()
+    {
+        var f = APatchCopyBesideTheRecordedCopy();
+        f.Msi.ReadMeetsError("patch", PatchQ, ProductA, null, MsiInstallContext.Machine,
+            MsiInstallProperty.LocalPackage, MsiError.BadConfiguration, calls: WalkRestarts.Attempts);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredPatchRegistered, ScreenThePatchCopy(f));
+    }
 }
 
 /// <summary>
@@ -10204,6 +10351,33 @@ internal sealed class ScriptedMsiProducts : IMsiApi
     public void InstanceTypeAnswers(string productCode, string? sid, MsiInstallContext context, uint error) =>
         _instanceTypes[(productCode, sid, context)] = (error, string.Empty);
 
+    private readonly Dictionary<(string Kind, string Code, string? ProductCode, string? Sid, MsiInstallContext Context, string Property), (int Calls, uint Error)>
+        _passingReads = new();
+
+    /// <summary>
+    /// An error that passes, on a property read: the next <paramref name="calls"/> reads of
+    /// <paramref name="property"/> answer <paramref name="error"/>, and every read after them
+    /// answers as the fixture scripts it. <paramref name="kind"/> is "product", "source list",
+    /// "patch source list" or "patch"; <paramref name="productCode"/> is the product a patch
+    /// read names, and null for the others.
+    /// </summary>
+    public void ReadMeetsError(string kind, string code, string? productCode, string? sid,
+        MsiInstallContext context, string property, uint error, int calls = 1) =>
+        _passingReads[(kind, code, productCode, sid, context, property)] = (calls, error);
+
+    // A passing error answers a sizing call, so the value call after it is never made.
+    private bool PassingErrorAt(string kind, string code, string? productCode, string? sid,
+        MsiInstallContext context, string property, char[]? value, out uint error)
+    {
+        var key = (kind, code, productCode, sid, context, property);
+        error = MsiError.Success;
+        if (value is not null || !_passingReads.TryGetValue(key, out var passing) || passing.Calls <= 0) return false;
+
+        _passingReads[key] = (passing.Calls - 1, passing.Error);
+        error = passing.Error;
+        return true;
+    }
+
     /// <summary>
     /// Answers LocalPackage, PackageName, InstallSource, PackageCode and InstanceType, the
     /// product properties the check reads, with the real API's two-call shape: a null
@@ -10245,6 +10419,8 @@ internal sealed class ScriptedMsiProducts : IMsiApi
         if (value is null && property == MsiInstallProperty.PackageName) PackageNameReads.Add((productCode, userSid, context));
         if (value is null && property is MsiInstallProperty.PackageCode or MsiInstallProperty.InstanceType)
             RecordReads.Add((property, productCode, userSid, context));
+        if (PassingErrorAt("product", productCode, null, userSid, context, property, value, out var passing))
+            return passing;
         if (scripted.Error != MsiError.Success) return scripted.Error;
 
         if (value is not null)
@@ -10742,6 +10918,15 @@ internal sealed class ScriptedMsiProducts : IMsiApi
                 + $"and was asked with options {options}"),
         };
 
+        // A passing error answers before any scripted answer is taken, so it uses none up.
+        if (property == MsiInstallProperty.PackageName && !isPatch
+            && PassingErrorAt("source list", productCodeOrPatchCode, null, userSid, context, property, value,
+                out var passingName))
+        {
+            SourceListPackageNameReads.Add((productCodeOrPatchCode, userSid, context));
+            return passingName;
+        }
+
         (uint Error, string Value) scripted;
         if (property == MsiInstallProperty.PackageName && !isPatch)
         {
@@ -10773,6 +10958,9 @@ internal sealed class ScriptedMsiProducts : IMsiApi
                 $"the declared-product check reads no source-list property {property}");
         }
 
+        if (PassingErrorAt(isPatch ? "patch source list" : "source list", productCodeOrPatchCode, null, userSid,
+                context, property, value, out var passing))
+            return passing;
         if (scripted.Error != MsiError.Success) return scripted.Error;
 
         if (value is not null)
@@ -10848,6 +11036,8 @@ internal sealed class ScriptedMsiProducts : IMsiApi
                 + $"for {userSid ?? "the machine"} in {context}, which no test scripted");
 
         if (value is null) reads.Add((patchCode, productCode, userSid, context));
+        if (PassingErrorAt("patch", patchCode, productCode, userSid, context, property, value, out var passing))
+            return passing;
         if (scripted.Error != MsiError.Success) return scripted.Error;
 
         if (value is not null)

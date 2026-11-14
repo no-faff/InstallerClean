@@ -70,9 +70,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// What one pass of the registry fallback found.
     /// </summary>
     /// <param name="Failures">
-    /// Key reads that failed. Half of the degraded-sources gate: a fallback that
-    /// read almost nothing cannot be the recovery a short API enumeration is
-    /// allowed to lean on.
+    /// Key reads that failed. Less <see cref="PatchListFailures"/>, half of the
+    /// degraded-sources gate: a fallback that read almost nothing cannot be the
+    /// recovery a short API enumeration is allowed to lean on.
     /// </param>
     /// <param name="ProductKeys">
     /// Product subkeys walked under <c>UserData</c>, whether or not the entry
@@ -201,6 +201,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// One member per product key under <c>UserData</c> whose name is a code, by the
     /// account subtree it sits under. Null where the caller supplied no reader.
     /// </param>
+    /// <param name="PatchListFailures">
+    /// The members of <see cref="Failures"/> that are a program's own <c>Patches</c> key
+    /// failing to read, one per key. That key lists the codes of the patches the program
+    /// holds, and under each its <c>Uninstallable</c> value, and records no cached file:
+    /// every cached path is read from a program's <c>InstallProperties</c> or from the
+    /// account's <c>Patches</c> key for the patch. So such a failure leaves the program's
+    /// patch set unestablished and withholds every superseded patch, and is not one of
+    /// the failures that withhold the files no record names
+    /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -218,7 +228,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         EstablishedPatchReach Reach = default,
         IReadOnlyList<RegistryPackageRecord>? PackageRecords = null,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchListings = null,
-        IReadOnlyList<RegistryProductEntry>? ProductEntries = null)
+        IReadOnlyList<RegistryProductEntry>? ProductEntries = null,
+        int PatchListFailures = 0)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -887,8 +898,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             var packageLost = false;
             List<(string PatchCode, string? Sid, MsiInstallContext Context)>? lostPatchRecords = null;
 
-            var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName).Value;
-            var localPackage = GetProductProperty(productCode, userSid, context, MsiInstallProperty.LocalPackage);
+            var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName, restarts).Value;
+            var localPackage = GetProductProperty(productCode, userSid, context, MsiInstallProperty.LocalPackage, restarts);
 
             // Ticker, not milestone: one of these fires per product, up to
             // hundreds in a few seconds, so the consumer must not feed it to a
@@ -920,7 +931,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // check does with an installation that is not shown to be ordinary turns on
             // this one answer, so the row carries the answer it was given rather than
             // having it looked up again later by code, account and context.
-            var instanceReading = ReadInstanceType(_msi, productCode, userSid, context);
+            var instanceReading = ReadInstanceType(_msi, productCode, userSid, context, restarts);
             switch (instanceReading)
             {
                 case InstanceReading.SecondInstance: instanceProducts++; break;
@@ -959,7 +970,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             {
                 ct.ThrowIfCancellationRequested();
 
-                var patchPath = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.LocalPackage);
+                // This product's own patch list names the pairing, so an answer that the
+                // installation holds no record of the patch is read again.
+                var patchPath = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext,
+                    MsiInstallProperty.LocalPackage, restarts, PropertyRead.StandsWhereListedAsHeld);
 
                 // The patch-side half of the same loss: this product holds the
                 // patch, the row naming it came back, and the path it claims
@@ -987,8 +1001,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // three and takes the worst answer rather than the first.
                 else if (patchPath.Value.Length > 0)
                 {
-                    var stateRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State);
-                    var uninstallableRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable);
+                    var stateRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext,
+                        MsiInstallProperty.State, restarts, PropertyRead.StandsWhereListedAsHeld);
+                    var uninstallableRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext,
+                        MsiInstallProperty.Uninstallable, restarts, PropertyRead.StandsWhereListedAsHeld);
                     var stateStr = stateRead.Value;
 
                     // A read that failed leaves nothing established about the
@@ -1098,17 +1114,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // pass exists to rescue. Recovery closes a gap by asking, and this is one more
         // question to the products it recovered.
         //
-        // IT COSTS ONE KEYED PROPERTY READ PER RECOVERED PRODUCT, on a set that is
-        // empty on a machine whose enumeration came back whole, and it fails in the
-        // safe direction by construction: a read that will not answer marks the
-        // installation as a positive reading does.
+        // IT ASKS ONE KEYED PROPERTY OF EACH RECOVERED PRODUCT, on a set that is empty
+        // on a machine whose enumeration came back whole, and it fails in the safe
+        // direction by construction: a read that will not answer marks the installation
+        // as a positive reading does.
+        //
+        // THE RECOVERED PRODUCTS' READS SHARE A RESTART BUDGET OF THEIR OWN: this
+        // question and the Uninstallable reads FoldRecoveredPatchSet makes. Spent on the
+        // scan's budget, they would leave the reads ConfirmRemovableAgainstEveryProduct
+        // makes after them read once. Sharing one keeps an installation whose
+        // registration will not read from being read again for each of its patches.
         //
         // The account and context are the ones the recovery established, because a
         // per-user product answers in its own account and nowhere else.
+        var recoveredReads = WalkRestarts.For(ct, WalkPause);
         foreach (var (recoveredCode, recoveredSid, recoveredContext) in missed.Recovered)
         {
             ct.ThrowIfCancellationRequested();
-            var instanceReading = ReadInstanceType(_msi, recoveredCode, recoveredSid, recoveredContext);
+            var instanceReading = ReadInstanceType(_msi, recoveredCode, recoveredSid, recoveredContext, recoveredReads);
             switch (instanceReading)
             {
                 case InstanceReading.SecondInstance: instanceProducts++; break;
@@ -1119,7 +1142,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 SecondCopyNotRuledOut: instanceReading != InstanceReading.Ordinary));
 
             if (FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets,
-                    fallback, ct, abandonedLog))
+                    fallback, recoveredReads, ct, abandonedLog))
                 recoveredPatchSetUnestablished++;
         }
 
@@ -1135,7 +1158,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
         WithholdOnUnlistedEntries(
             claimed, patchClaims, fallback.PackageRecords, unlistedEntries,
-            EnumerationCensus.RegistryRecordsUnreadAt(fallback.Failures));
+            EnumerationCensus.AnyRegistryRecordUnreadAt(fallback.Failures));
 
         // Both sources degraded at once: the scan is refused outright rather than
         // reported short.
@@ -1156,8 +1179,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // fails an API read can equally make that product's UserData subtree
         // unreadable, so the backup is likeliest to be missing exactly the claim
         // the primary lost.
-        // Neither counter can bound what the other lost, so no narrower rule is
-        // sound.
+        // Neither counter can bound what the other lost, so no rule narrower than
+        // the keys that can record a cached file is sound.
+        //
+        // A FAILED READ OF A PROGRAM'S OWN Patches KEY, A KEY THAT RECORDS NO CACHED
+        // FILE, DOES NOT COUNT HERE (fallback.PatchListFailures). It holds no claim
+        // either source could have lost: a patch's file is claimed from the
+        // account's Patches key for that patch, and a failed read of that key counts
+        // here.
         //
         // On a machine whose records read cleanly both counters are zero and this
         // does not fire.
@@ -1167,7 +1196,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // enumeration itself reported it could not read. The cross-check infers
         // a loss from two counts that can differ for innocent reasons, which is
         // sound enough to withhold on and not to refuse on.
-        if (unreadableProducts > 0 && fallback.Failures > 0)
+        if (unreadableProducts > 0
+            && EnumerationCensus.CachedFileRecordsUnreadAt(fallback.Failures, fallback.PatchListFailures))
             throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
 
         // An enumeration that ends EARLY says nothing about itself: a
@@ -1202,16 +1232,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
         // FEWER keys, and the names asked about are the codes that side handed over.
-        // The failed read is counted in fallback.Failures. One rule,
-        // EnumerationCensus.RegistryRecordsUnreadAt, decides on it for every removable row, at
-        // the call to WithholdOnUnlistedEntries above, and for the walk-derived offer, in the
-        // census. The gate above refuses the scan where it is non-zero beside an unreadable
-        // product, a rule of its own.
+        // The failed read is counted in fallback.Failures. EnumerationCensus.AnyRegistryRecordUnreadAt
+        // decides on every failure for every removable row, at the call to
+        // WithholdOnUnlistedEntries above. The walk-derived offer is decided in the census, on
+        // every failure but a program's own Patches key, which records no cached file
+        // (fallback.PatchListFailures). The gate above refuses the scan on those same failures
+        // beside an unreadable product, a rule of its own.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different
-        // things. fallback.Failures is the registry side's own tally of key reads
-        // that failed. unreadableProducts is what the API said about ITSELF:
+        // things. fallback.Failures less fallback.PatchListFailures is the registry
+        // side's own tally of failed reads of keys that can record a cached file.
+        // unreadableProducts is what the API said about ITSELF:
         // products it returned whose records came back short inside the loop. An
         // enumeration ending on NoMoreItems has said nothing about itself and
         // raises neither term, which is why the products behind a disagreement are
@@ -1354,7 +1386,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             unsettledEnumeratedProducts,
             missed.RecoveredOfEnumerated,
             unattributedPatchFiles,
-            recoveredPatchSetUnestablished);
+            recoveredPatchSetUnestablished,
+            fallback.PatchListFailures);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -2164,8 +2197,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             var key = new Pairing(patchCode, productCode, sid, context);
             if (stateReads.TryGetValue(key, out var read)) return read;
+
+            // An installation the machine-wide patch enumeration lists as holding the patch
+            // answering that it holds no record of it contradicts that list, so for a listed
+            // holder that answer is read again (PropertyRead.StandsWhereListedAsHeld).
+            List<(string ProductCode, string? Sid, MsiInstallContext Context)>? named = null;
+            holders?.TryGetValue(patchCode, out named);
             return stateReads[key] = GetPatchProperty(_msi, patchCode, productCode, sid, context,
-                MsiInstallProperty.State);
+                MsiInstallProperty.State, restarts,
+                IsListedHolder(named, productCode, sid, context)
+                    ? PropertyRead.StandsWhereListedAsHeld
+                    : PropertyRead.StandsInTheScan);
         }
 
         // ONE WAY OF ASKING, SHARED BY THE PER-PAIRING PASS AND BY THE PASS OVER ROWS NO
@@ -2213,7 +2255,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // that it does not hold the patch, so it says nothing about the verdict
                 // either way. From a listed holder it contradicts the listing, which
                 // named the same product, account and context this read is put in, so
-                // it counts with every other read that did not answer.
+                // it is read again (StateOf), and an answer that still says so counts with
+                // every other read that did not answer.
                 //
                 // AN ANSWER THAT THE PRODUCT IS NOT INSTALLED IS NEVER SKIPPED. Every
                 // installation on this list was listed earlier in this scan, by the
@@ -2230,7 +2273,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // installed, contradicts the one before it. Both are unreadable as
                 // well.
                 var uninstallable = GetPatchProperty(_msi, patchCode, productCode, userSid, context,
-                    MsiInstallProperty.Uninstallable);
+                    MsiInstallProperty.Uninstallable, restarts, PropertyRead.StandsWhereListedAsHeld);
 
                 // An empty answer the verdict turns on did not answer either, and counts
                 // with the reads that failed rather than as a claim
@@ -2286,7 +2329,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     continue;
 
                 var name = ReadingRank(held.State) > ReadingRank(row.PatchState)
-                    ? GetProductProperty(held.ProductCode, held.Sid, held.Context, MsiInstallProperty.ProductName).Value
+                    ? GetProductProperty(held.ProductCode, held.Sid, held.Context, MsiInstallProperty.ProductName, restarts).Value
                     : null;
                 row = Hold(row, held.State, held.ProductCode, name);
             }
@@ -3602,6 +3645,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var failures = 0;
+        var patchListFailures = 0;
         var productKeys = 0;
         var unclaimedProductFileCodes = new List<string?>();
         var unclaimedPatchFileCodes = new List<string?>();
@@ -3629,14 +3673,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var failureLog = new PerItemFailureLog("Registry fallback",
             "These add up to the count the scan weighs against its other source: with the "
             + "product enumeration also short of a record, the scan is refused rather than "
-            + "reported. Which keys they were is recorded nowhere else.");
+            + "reported, unless every one is a program's own patch list (product-patches), "
+            + "which records no cached file. Which keys they were is recorded nowhere else.");
 
         try
         {
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);
-            using var udKey = hklm.OpenSubKey(
+            using var udKey = hklm.OpenSubKeyEarned(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {
@@ -3645,6 +3690,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ct.ThrowIfCancellationRequested();
                     var sidRead = ReadFallbackSid(udKey, sidName, claimed, productCodes, ct, failureLog);
                     failures += sidRead.Failures;
+                    patchListFailures += sidRead.PatchListFailures;
                     productKeys += sidRead.ProductKeys;
                     if (sidRead.UnclaimedProductFileCodes is not null)
                         unclaimedProductFileCodes.AddRange(sidRead.UnclaimedProductFileCodes);
@@ -3723,7 +3769,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             packageRecords,
             patchListings,
-            productEntries);
+            productEntries,
+            patchListFailures);
     }
 
     /// <summary>
@@ -3766,6 +3813,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the run's by the caller.
         var pathCensus = new PathCensus();
         var failures = 0;
+        var patchListFailures = 0;
         var productKeys = 0;
         var unclaimedProductFileCodes = new List<string?>();
         var unclaimedPatchFileCodes = new List<string?>();
@@ -3787,7 +3835,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         try
         {
-            using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
+            using var productsKey = udKey.OpenSubKeyEarned($@"{sidName}\Products");
             if (productsKey is not null)
             {
                 foreach (var prodGuid in RegistryNames.SubKeysOf(productsKey, ct))
@@ -3820,8 +3868,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     // The per-product patch set, read here because this loop is
                     // already standing on the key it lives one level below, so it
-                    // costs one OpenSubKey per product and no second walk of
-                    // UserData. Its own try/catch and its own cause: a product whose
+                    // costs one key open per product, two where the key is absent,
+                    // and no second walk of UserData. Its own try/catch and its own cause: a product whose
                     // patch list will not read is a different diagnosis from one
                     // whose InstallProperties will not, and the budget keys on the
                     // cause string.
@@ -3852,7 +3900,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         }
                         catch (Exception ex) when (ex is not OperationCanceledException)
                         {
+                            // ONLY THE PROGRAM'S OWN Patches KEY IS READ IN THE TRY ABOVE, and
+                            // a failure there is counted apart as one that can hide no cached
+                            // file (FallbackRead.PatchListFailures). A read of anything that
+                            // records a path goes in a try of its own, or the files no record
+                            // names are offered beside it.
                             failures++;
+                            patchListFailures++;
                             // The verdict is written rather than left absent, so a
                             // product whose read threw is on record as unestablished
                             // instead of as a product nobody asked about. An absent
@@ -3870,7 +3924,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     try
                     {
-                        using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
+                        using var ipKey = productsKey.OpenSubKeyEarned($@"{prodGuid}\InstallProperties");
                         hasInstallProperties = ipKey is not null;
 
                         // Both names are read, and each one present is claimed: see
@@ -3929,7 +3983,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         try
         {
-            using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
+            using var patchesKey = udKey.OpenSubKeyEarned($@"{sidName}\Patches");
             if (patchesKey is not null)
             {
                 foreach (var patchGuid in RegistryNames.SubKeysOf(patchesKey, ct))
@@ -3965,7 +4019,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     try
                     {
-                        using var patchKey = patchesKey.OpenSubKey(patchGuid);
+                        using var patchKey = patchesKey.OpenSubKeyEarned(patchGuid);
                         var anyValueNamesNoPath = false;
                         var unclaimedFileHere = false;
                         foreach (var valueName in CachedPackageValueNames)
@@ -4038,7 +4092,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             Reach: new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             PackageRecords: packageRecords,
             PatchListings: patchListings,
-            ProductEntries: productEntries);
+            ProductEntries: productEntries,
+            PatchListFailures: patchListFailures);
     }
 
     /// <summary>
@@ -4071,10 +4126,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// registry's verdict for that key stands, a product key with no <c>Patches</c> key
     /// reading as one that holds no patch. Anything else marks the product Unestablished.
     ///
-    /// ITS WALKS HAVE A RESTART BUDGET OF THEIR OWN. The scan's keyed walks share one pause
-    /// budget (<see cref="WalkRestarts.KeyedPauseLimit"/>), and a walk here that spent it
-    /// would leave the walks after it, which can hold a file on a refusal, restarting
-    /// without a pause.
+    /// ITS WALK HAS A RESTART BUDGET OF ITS OWN, AND ITS READS TAKE THE ONE THE RECOVERED
+    /// PRODUCTS' READS SHARE (<paramref name="reads"/>). The scan's keyed walks and reads
+    /// share one pause budget (<see cref="WalkRestarts.KeyedPauseLimit"/>). A walk or read
+    /// here that spent it would leave the walks after it restarting without a pause and the
+    /// reads after it read once, and a refusal or a read that does not answer can hold a
+    /// file. The walk's budget is not the reads', so a walk that spends its own still leaves
+    /// each patch's Uninstallable read made again where it fails. A patch the walk returned
+    /// is one Windows Installer lists the installation as holding, so an answer that the
+    /// installation holds no record of it is read again too
+    /// (<see cref="PropertyRead.StandsWhereListedAsHeld"/>).
     ///
     /// True where it marked the product Unestablished, which
     /// <see cref="EnumerationCensus.RecoveredPatchSetUnestablishedCount"/> counts.
@@ -4085,6 +4146,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         MsiInstallContext context,
         Dictionary<string, ProductPatchSet> apiPatchSets,
         FallbackRead fallback,
+        WalkRestarts reads,
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
@@ -4124,7 +4186,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             ct.ThrowIfCancellationRequested();
             var uninstallable = GetPatchProperty(
-                _msi, patchCode, productCode, patchSid, patchContext, MsiInstallProperty.Uninstallable);
+                _msi, patchCode, productCode, patchSid, patchContext, MsiInstallProperty.Uninstallable,
+                reads, PropertyRead.StandsWhereListedAsHeld);
             if (uninstallable.Unreadable || uninstallable.Value.Length == 0)
             {
                 if (listed?.Contains(patchCode, StringComparer.OrdinalIgnoreCase) != true)
@@ -4555,7 +4618,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         patchCodes = null;
         patchesKeyPresent = false;
 
-        using var patchesKey = productsKey.OpenSubKey($@"{packedProductCode}\Patches");
+        using var patchesKey = productsKey.OpenSubKeyEarned($@"{packedProductCode}\Patches");
 
         // AN ABSENT KEY IS AN ANSWER AND NOT AN INABILITY, and the difference decides
         // whether a file is offered. A product with no Patches key holds no registered
@@ -4637,8 +4700,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unestablished = false;
         foreach (var patchName in patchNames)
         {
-            using var patchKey = patchesKey.OpenSubKey(patchName);
-            if (patchKey is null) { unestablished = true; continue; }
+            // A key that will not open leaves the product unestablished and the code list
+            // built from the listing standing. A key no longer there is a patch no longer
+            // registered, which holds nothing.
+            Microsoft.Win32.RegistryKey? patchKey;
+            try
+            {
+                patchKey = patchesKey.OpenSubKeyEarned(patchName);
+            }
+            catch (Exception ex) when (ex is IOException or System.Security.SecurityException)
+            {
+                unestablished = true;
+                continue;
+            }
+
+            using var opened = patchKey;
+            if (patchKey is null) continue;
 
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three
@@ -5451,7 +5528,52 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// installation is there asks this instead.
     /// </summary>
     internal readonly record struct PropertyRead(
-        string Value, bool Unreadable, bool NotRegistered = false, bool PatchNotHeld = false);
+        string Value, bool Unreadable, bool NotRegistered = false, bool PatchNotHeld = false)
+    {
+        /// <summary>
+        /// The answers that stand in the scan without a second read: a value, a property
+        /// present and empty, a property not set, and the answer that the installation
+        /// asked holds no record of the patch (<see cref="IsPatchNotHeld"/>). Each is
+        /// Windows Installer's answer about the record. Every other answer is read again,
+        /// ERROR_UNKNOWN_PRODUCT among them: the scan asks only about installations it has
+        /// listed, every reader of the scan's reads takes that answer as a read that did not
+        /// answer, and a read made a moment later can answer for the record.
+        ///
+        /// Most installations a scan asks about a patch hold no record of it, so were that
+        /// answer read again, nearly every pairing would be read three times.
+        /// </summary>
+        internal static bool StandsInTheScan(PropertyRead read) => !read.Unreadable || read.PatchNotHeld;
+
+        /// <summary>
+        /// The answers that stand for a read about a patch that a list Windows Installer gave
+        /// this scan names the installation as holding: a value, a property present and
+        /// empty, and a property not set. The answer that the installation holds no record of
+        /// the patch contradicts that list, which is why every reader of such a read takes it
+        /// as a read that did not answer, and it is read again.
+        /// </summary>
+        internal static bool StandsWhereListedAsHeld(PropertyRead read) => !read.Unreadable;
+
+        /// <summary>
+        /// The answers that stand for a read under the lease of a batch's own pairing: a value, a
+        /// property present and empty, a property not set, and the answer that the record is not
+        /// there (<see cref="NotRegistered"/>). That last is the finding that the registration has
+        /// gone, and it holds the file back. Every other answer is read again.
+        /// </summary>
+        internal static bool StandsUnderTheLease(PropertyRead read) => !read.Unreadable || read.NotRegistered;
+
+        /// <summary>
+        /// The answers that stand for a read made after one that did not: a value, and
+        /// nothing else. A record that a transaction is rewriting can read as absent for a
+        /// moment, so an answer that the property is not set, is empty, or that the
+        /// installation holds no record of the patch, read just after an error, stands for
+        /// nothing, and the first read's answer is the one taken.
+        /// </summary>
+        internal static bool StandsAfterAnError(PropertyRead read) => !read.Unreadable && read.Value.Length > 0;
+
+        /// <summary>Whether two reads of one property gave the same value, compared exactly.</summary>
+        internal static bool Agree(PropertyRead one, PropertyRead other) =>
+            string.Equals(one.Value, other.Value, StringComparison.Ordinal);
+    }
 
     /// <summary>
     /// HALF the rule that decides whether a patch's cached file is offered, from its
@@ -5685,9 +5807,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// would read as ordinary on a string test.
     /// </summary>
     internal static InstanceReading ReadInstanceType(
-        IMsiApi msi, string productCode, string? userSid, MsiInstallContext context)
+        IMsiApi msi, string productCode, string? userSid, MsiInstallContext context, WalkRestarts restarts)
     {
-        var read = ReadProductProperty(msi, productCode, userSid, context, MsiInstallProperty.InstanceType);
+        var read = ReadProductProperty(msi, productCode, userSid, context, MsiInstallProperty.InstanceType, restarts);
         if (read.Unreadable) return InstanceReading.Unreadable;
         return int.TryParse(read.Value.TrimEnd('\0').Trim(), out var instanceType) && instanceType != 0
             ? InstanceReading.SecondInstance
@@ -5702,8 +5824,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string productCode,
         string? userSid,
         MsiInstallContext context,
-        string propertyName) =>
-        ReadProductProperty(_msi, productCode, userSid, context, propertyName);
+        string propertyName,
+        WalkRestarts restarts) =>
+        ReadProductProperty(_msi, productCode, userSid, context, propertyName, restarts);
 
     /// <summary>
     /// Retrieves a product property using the double-call buffer pattern,
@@ -5714,8 +5837,30 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <see cref="ResolveProductInstances"/> is: <see cref="DeclaredProductCheck"/>
     /// reads the same property of the same records, and which returns count as an
     /// absence rather than a failed read is decided here once.
+    ///
+    /// A read whose answer does not stand is made again, the sizing call and the value
+    /// call both, with <paramref name="restarts"/>' pauses (<see cref="ReadAgainWhereItFails"/>),
+    /// and where no read made again stands the first is the answer
+    /// (<see cref="WalkRestarts.ReadsOnce"/> makes none). The reads of one installation share a key,
+    /// except its name's, which has its own: the name labels a row, so a name that will not
+    /// read never stops the installation's other properties being read again.
     /// </summary>
     internal static PropertyRead ReadProductProperty(
+        IMsiApi msi,
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        string propertyName,
+        WalkRestarts restarts) =>
+        ReadAgainWhereItFails(
+            restarts,
+            () => ReadProductPropertyOnce(msi, productCode, userSid, context, propertyName),
+            stands: null,
+            () => propertyName == MsiInstallProperty.ProductName
+                ? InstallationKey(productCode, userSid, context) + "|" + propertyName
+                : InstallationKey(productCode, userSid, context));
+
+    private static PropertyRead ReadProductPropertyOnce(
         IMsiApi msi,
         string productCode,
         string? userSid,
@@ -5769,9 +5914,31 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Retrieves a patch property using the double-call buffer pattern,
     /// reporting whether an empty result is an absence or a failed read (see
-    /// <see cref="PropertyRead"/>).
+    /// <see cref="PropertyRead"/>), and reading it again where its answer does not
+    /// stand, as <see cref="ReadProductProperty"/> does. Each pairing of a patch and an
+    /// installation has its own key, so one patch whose record never reads leaves the
+    /// installation's other patches read again where they fail. None is read again once the
+    /// installation's key is spent, by its own reads or by a pairing whose first answer was
+    /// that the product is not installed, which is an answer about the installation.
     /// </summary>
     internal static PropertyRead GetPatchProperty(
+        IMsiApi msi,
+        string patchCode,
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        string propertyName,
+        WalkRestarts restarts,
+        Func<PropertyRead, bool>? stands = null) =>
+        ReadAgainWhereItFails(
+            restarts,
+            () => GetPatchPropertyOnce(msi, patchCode, productCode, userSid, context, propertyName),
+            stands,
+            () => PairingKey(patchCode, productCode, userSid, context),
+            within: () => InstallationKey(productCode, userSid, context),
+            spendsWithin: read => read.NotRegistered && !read.PatchNotHeld);
+
+    private static PropertyRead GetPatchPropertyOnce(
         IMsiApi msi,
         string patchCode,
         string productCode,
@@ -5829,9 +5996,62 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <see cref="ReadProductProperty"/> is: <see cref="DeclaredProductCheck"/> reads the
     /// source used last, its type and the media package path of a product's source list
     /// through it, and which returns count as an absence rather than a failed read is
-    /// decided here once.
+    /// decided here once. It reads again where its answer does not stand, as
+    /// <see cref="ReadProductProperty"/> does.
     /// </summary>
     internal static PropertyRead ReadSourceListProperty(
+        IMsiApi msi,
+        string code,
+        string? userSid,
+        MsiInstallContext context,
+        uint codeKind,
+        string propertyName,
+        WalkRestarts restarts) =>
+        ReadAgainWhereItFails(
+            restarts,
+            () => ReadSourceListPropertyOnce(msi, code, userSid, context, codeKind, propertyName),
+            stands: null,
+            () => SourceListKey(code, userSid, context, codeKind));
+
+    /// <summary>
+    /// One property read, made again where its answer does not stand
+    /// (<see cref="WalkRestarts.KeyedRead"/>).
+    /// <paramref name="stands"/> says which first answers stand,
+    /// <see cref="PropertyRead.StandsInTheScan"/> where none is given; after one that did
+    /// not, only a value stands (<see cref="PropertyRead.StandsAfterAnError"/>).
+    /// </summary>
+    private static PropertyRead ReadAgainWhereItFails(
+        WalkRestarts restarts,
+        Func<PropertyRead> once,
+        Func<PropertyRead, bool>? stands,
+        Func<string> key,
+        Func<string>? within = null,
+        Func<PropertyRead, bool>? spendsWithin = null) =>
+        restarts.KeyedRead(key, once, stands ?? PropertyRead.StandsInTheScan,
+            PropertyRead.StandsAfterAnError, PropertyRead.Agree, within, spendsWithin);
+
+    /// <summary>
+    /// The key one installation's reads share in <see cref="WalkRestarts.KeyedRead"/>:
+    /// its product code, account and context, compared without regard to case.
+    /// </summary>
+    internal static string InstallationKey(string productCode, string? userSid, MsiInstallContext context) =>
+        $"installation|{productCode}|{userSid}|{(int)context}";
+
+    /// <summary>
+    /// The key the reads of one patch of one installation share in
+    /// <see cref="WalkRestarts.KeyedRead"/>: the patch code, then the installation's.
+    /// </summary>
+    internal static string PairingKey(string patchCode, string productCode, string? userSid, MsiInstallContext context) =>
+        $"pairing|{patchCode}|{productCode}|{userSid}|{(int)context}";
+
+    /// <summary>
+    /// The key the reads of one source list share in <see cref="WalkRestarts.KeyedRead"/>:
+    /// whether it is a product's or a patch's, its code, account and context.
+    /// </summary>
+    internal static string SourceListKey(string code, string? userSid, MsiInstallContext context, uint codeKind) =>
+        $"source list|{codeKind}|{code}|{userSid}|{(int)context}";
+
+    private static PropertyRead ReadSourceListPropertyOnce(
         IMsiApi msi,
         string code,
         string? userSid,

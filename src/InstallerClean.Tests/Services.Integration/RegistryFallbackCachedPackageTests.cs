@@ -167,18 +167,66 @@ public class RegistryFallbackCachedPackageTests
         });
     }
 
+    [Theory]
+    [InlineData("the product's patch list", 1)]
+    [InlineData("the product's entry", 0)]
+    [InlineData("a patch's entry", 0)]
+    public void A_failed_read_is_counted_and_only_a_products_own_patch_list_is_counted_apart(
+        string listing, int patchListFailures)
+    {
+        // A product's Patches key records no cached file, so its failure is counted apart
+        // from the failures that can hide one. The product's InstallProperties and the
+        // patch's own key each record a cached package.
+        WithSubtree(f =>
+        {
+            using (var values = ProductValues(f))
+                values.SetValue("LocalPackage", f.Files.Create("msi"), RegistryValueKind.String);
+            using (var values = PatchValues(f))
+                values.SetValue("LocalPackage", f.Files.Create("msp"), RegistryValueKind.String);
+            f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+            var keyEnd = listing switch
+            {
+                "the product's patch list" => $@"\{Sid}\Products\{PackedProduct}\Patches",
+                "the product's entry" => $@"\{Sid}\Products\{PackedProduct}\InstallProperties",
+                _ => $@"\{Sid}\Patches\{PackedPatch}",
+            };
+            var disagreed = 0;
+
+            RegistryNames.CallsForTests = (key, calls) =>
+            {
+                if (!key.Name.EndsWith(keyEnd, StringComparison.OrdinalIgnoreCase))
+                    return calls;
+                disagreed++;
+                return new DisagreeingCalls(calls, cts: null);
+            };
+            InstallerQueryService.FallbackRead read;
+            try
+            {
+                (read, _) = Read(f);
+            }
+            finally
+            {
+                RegistryNames.CallsForTests = null;
+            }
+
+            Assert.Equal(1, disagreed);
+            Assert.Equal(1, read.Failures);
+            Assert.Equal(patchListFailures, read.PatchListFailures);
+        });
+    }
+
     /// <summary>
     /// A key's real calls with a count one higher at every reading, so no two readings
-    /// agree, and the token cancelled at the first.
+    /// agree, and the token, where there is one, cancelled at the first.
     /// </summary>
-    private sealed class DisagreeingCalls(RegistryNames.IKeyCalls calls, CancellationTokenSource cts)
+    private sealed class DisagreeingCalls(RegistryNames.IKeyCalls calls, CancellationTokenSource? cts)
         : RegistryNames.IKeyCalls
     {
         private int _readings;
 
         public int QueryCounts(out int subKeys, out int values)
         {
-            cts.Cancel();
+            cts?.Cancel();
             var result = calls.QueryCounts(out subKeys, out values);
             _readings++;
             subKeys += _readings;
