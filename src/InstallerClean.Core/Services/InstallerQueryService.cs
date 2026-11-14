@@ -211,6 +211,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// the failures that withhold the files no record names
     /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
     /// </param>
+    /// <param name="PatchesReadAsZero">
+    /// The patch codes under each product key's own <c>Patches</c> key whose
+    /// <c>Uninstallable</c> the read took as a <c>REG_DWORD</c> zero, keyed as
+    /// <see cref="PatchListings"/> is. A listed patch whose key had gone by the time it was
+    /// opened is in the listing and not here, as are a patch whose key would not open and
+    /// every patch after the first that can be uninstalled. Null where the caller supplied
+    /// no reader.
+    /// </param>
+    /// <param name="AdvertisedPatches">
+    /// The patch codes each per-machine product's advertised key lists as values of its
+    /// <c>Patches</c> key (<see cref="ReadAdvertisedPatches"/>), by product code, for the
+    /// product keys under the local system's account. An entry is null where the list was
+    /// not read, and a product has no entry where the reads stopped before it; both hold
+    /// (<see cref="AdvertisedPatchesListed"/>). Null where the caller supplied no reader.
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -229,7 +244,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyList<RegistryPackageRecord>? PackageRecords = null,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchListings = null,
         IReadOnlyList<RegistryProductEntry>? ProductEntries = null,
-        int PatchListFailures = 0)
+        int PatchListFailures = 0,
+        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchesReadAsZero = null,
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? AdvertisedPatches = null)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -730,6 +747,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     /// <inheritdoc />
@@ -824,6 +843,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // product can be uninstalled. See ProductPatchSet for the three answers and
         // why two of them withhold for different reasons.
         var apiPatchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
+
+        // The pairings whose Uninstallable read in the loop below failed
+        // (RegistryMayStandIn). Each is folded into apiPatchSets once the registry
+        // fallback has read the values that can answer for it.
+        var unansweredPatchSets = new List<UnansweredPairing>();
 
         // How the recorded paths THIS loop read turned out. The registry fallback
         // keeps its own and the two are added at the census, neither half being able
@@ -1028,25 +1052,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // THIS PATCH'S CONTRIBUTION TO ITS PRODUCT'S PATCH SET, which is
                     // the API's reading of one of the three sources the superseded
                     // condition unions. Free here: the loop has just read this
-                    // pairing's Uninstallable for its own purposes.
+                    // pairing's Uninstallable for its own purposes. It turns on
+                    // Uninstallable alone, as the registry's reading does
+                    // (ReadProductPatchSet): whether a patch can roll back onto the
+                    // superseded file does not depend on its State. A State that did
+                    // not read keeps this row through verdictUnreadable above.
                     //
-                    // THE ORDER OF THE ARMS IS THE WHOLE OF IT. A read that failed
-                    // establishes nothing. A positive "0" is the only clean answer.
-                    // An EMPTY value is an inability and not a finding, which is the
-                    // arm easiest to get wrong: comparing against "0" alone would read
-                    // an absent property as a removable patch, which is a cause stated
-                    // for something nobody measured. Anything else present is a
-                    // positive finding that something on this product can be
-                    // uninstalled.
-                    var apiVerdict =
-                        stateRead.Unreadable || uninstallableRead.Unreadable
-                            ? ProductPatchSet.Unestablished
-                        : uninstallableRead.Value == "0" ? ProductPatchSet.AllNonRemovable
-                        : uninstallableRead.Value.Length == 0 ? ProductPatchSet.Unestablished
-                        : ProductPatchSet.RemovablePatchPresent;
-                    apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seenApi)
-                        ? Worse(seenApi, apiVerdict)
-                        : apiVerdict;
+                    // AN UNINSTALLABLE READ THAT FAILED IS DECIDED AFTER THE REGISTRY
+                    // FALLBACK HAS READ, because what decides it is the value the
+                    // registry read for that pairing (RegistryAnswersFor). An empty
+                    // answer and an answer that the record is not there are answers
+                    // that disagree with any value the registry holds, and mark the
+                    // product Unestablished here (RegistryMayStandIn).
+                    var apiVerdict = PatchSetAnswer(uninstallableRead);
+                    if (apiVerdict is null && RegistryMayStandIn(uninstallableRead))
+                        unansweredPatchSets.Add(new UnansweredPairing(
+                            productCode, context, patchCode, patchUserSid, patchContext));
+                    else
+                        FoldVerdict(apiPatchSets, productCode, apiVerdict ?? ProductPatchSet.Unestablished);
 
                     var claimedPath = NormaliseLocalPackagePath(patchPath.Value, pathCensus);
 
@@ -1099,6 +1122,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty, Strings.Error_NothingRemoved);
+
+        // A pairing whose Uninstallable read failed in the product loop adds nothing where
+        // the registry read a zero for it (RegistryAnswersFor), and marks the product
+        // Unestablished everywhere else. No property is read here.
+        foreach (var pairing in unansweredPatchSets)
+        {
+            if (RegistryAnswersFor(fallback.PatchesReadAsZero, pairing.ProductCode, pairing.Context,
+                    pairing.PatchCode, pairing.PatchSid, pairing.PatchContext))
+                continue;
+
+            FoldVerdict(apiPatchSets, pairing.ProductCode, ProductPatchSet.Unestablished);
+        }
 
         var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, restarts, ct);
 
@@ -1623,8 +1658,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Whether the registry holds, under the installation's own account subtree, what
     /// each of its failed reads would have returned: a package record for the product
     /// where its <c>LocalPackage</c> read failed; where its patch enumeration came back
-    /// short, a <c>Patches</c> key whose listing was established, names every patch the
-    /// enumeration did return and names at least one; and a package record for each patch
+    /// short and the installation is per machine, a <c>Patches</c> key whose listing was
+    /// established, names every patch the enumeration did return and every patch its
+    /// advertised key lists, and names at least one; and a package record for each patch
     /// whose <c>LocalPackage</c> read failed.
     ///
     /// WHERE IT DOES, WHAT THE INSTALLATION LOST IS ON RECORD. Windows Installer finds a
@@ -1635,6 +1671,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// own has no cached path for Windows either. And the registry's listing is what the
     /// per-product condition reads this product's patch set from where the enumeration's
     /// own reading is short.
+    ///
+    /// ONLY A PER-MACHINE INSTALLATION'S LISTING STANDS IN FOR A SHORT ENUMERATION, and only
+    /// where its advertised key lists no patch the listing leaves out
+    /// (<see cref="AdvertisedPatchesListed"/>): for a per-machine installation, Windows
+    /// Installer lists patches from those two keys, and a per-user installation's listing
+    /// answers for nothing here.
     ///
     /// A LISTING THAT LEAVES OUT A PATCH THE ENUMERATION RETURNED IS NOT THE WHOLE
     /// REGISTRATION, and nor is a product key with no <c>Patches</c> key, which says the
@@ -1663,8 +1705,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (installation.PatchListShort)
         {
+            if (installation.Context != MsiInstallContext.Machine) return false;
             var listed = OwnListing(fallback.PatchListings, account, installation.ProductCode);
-            if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0) return false;
+            if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0
+                || !AdvertisedPatchesListed(fallback.AdvertisedPatches, installation.ProductCode, listed))
+                return false;
         }
 
         foreach (var (patchCode, patchSid, patchContext) in installation.LostPatchRecords)
@@ -3651,6 +3696,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedPatchFileCodes = new List<string?>();
         var packageRecords = new List<RegistryPackageRecord>();
         var patchListings = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
+        var patchesReadAsZero = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
+        var advertisedPatches = new Dictionary<string, IReadOnlyCollection<string>?>(StringComparer.OrdinalIgnoreCase);
         var productEntries = new List<RegistryProductEntry>();
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
@@ -3703,6 +3750,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     if (sidRead.PatchListings is not null)
                         foreach (var (key, listed) in sidRead.PatchListings)
                             patchListings[key] = listed;
+                    if (sidRead.PatchesReadAsZero is not null)
+                        foreach (var (key, zeros) in sidRead.PatchesReadAsZero)
+                            patchesReadAsZero[key] = zeros;
                     if (sidRead.ProductEntries is not null)
                         productEntries.AddRange(sidRead.ProductEntries);
                     nonStringValues += sidRead.NonStringLocalPackageValues;
@@ -3737,6 +3787,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                                     ? MergeEstablishedNames(seenPaths, paths)
                                     : paths;
                 }
+
+                ReadEveryAdvertisedPatchList(hklm, productEntries, advertisedPatches, failureLog, ct);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -3770,7 +3822,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
             packageRecords,
             patchListings,
             productEntries,
-            patchListFailures);
+            patchListFailures,
+            patchesReadAsZero,
+            advertisedPatches);
     }
 
     /// <summary>
@@ -3819,6 +3873,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedPatchFileCodes = new List<string?>();
         var packageRecords = new List<RegistryPackageRecord>();
         var patchListings = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
+        var patchesReadAsZero = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
         var productEntries = new List<RegistryProductEntry>();
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
@@ -3886,7 +3941,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         {
                             var set = ReadProductPatchSet(productsKey, prodGuid,
                                 ref productPatchKeys, ref productPatchRegistrations,
-                                out var heldCodes, out var patchesKeyPresent, ct);
+                                out var heldCodes, out var patchesKeyPresent, out var zeros, ct);
                             entryCodes = heldCodes;
                             patchSets[unpacked] = patchSets.TryGetValue(unpacked, out var existing)
                                 ? Worse(existing, set)
@@ -3897,6 +3952,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                                     : heldCodes;
                             if (patchesKeyPresent && heldCodes is not null)
                                 patchListings[new AccountCode(sidName, unpacked)] = heldCodes;
+                            if (patchesKeyPresent)
+                                patchesReadAsZero[new AccountCode(sidName, unpacked)] = zeros;
                         }
                         catch (Exception ex) when (ex is not OperationCanceledException)
                         {
@@ -4093,7 +4150,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             PackageRecords: packageRecords,
             PatchListings: patchListings,
             ProductEntries: productEntries,
-            PatchListFailures: patchListFailures);
+            PatchListFailures: patchListFailures,
+            PatchesReadAsZero: patchesReadAsZero);
     }
 
     /// <summary>
@@ -4104,18 +4162,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Uninstallable answer is anything but "0" marks the product as holding a patch that
     /// could be uninstalled, which holds its superseded patches.
     ///
-    /// THE REGISTRY ANSWERS FOR A PATCH ONLY WHERE THE INSTALLATION'S OWN PRODUCT KEY
-    /// LISTS IT. Its listing is the one under the account the installation is installed
-    /// in (<see cref="OwnListing"/>), and a listing under another account is another
-    /// installation's. <see cref="ReadProductPatchSet"/> reads the Uninstallable of each
-    /// patch that listing names until one can be uninstalled, so the registry's verdict
-    /// answers for every patch it names. A patch whose Uninstallable will not read, or
-    /// reads empty, adds nothing where the listing names it, and marks the product
-    /// Unestablished where it does not: Windows lists a patch the registry holds no
-    /// registration of, a product key with no <c>Patches</c> key included.
+    /// A PATCH WHOSE UNINSTALLABLE READ FAILS IS ANSWERED FOR ONLY BY A ZERO THE REGISTRY
+    /// READ FOR IT UNDER A PER-MACHINE INSTALLATION'S OWN PRODUCT KEY
+    /// (<see cref="RegistryAnswersFor"/>), as in the product loop. It adds nothing where
+    /// that zero was read and marks the product Unestablished everywhere else: a patch the
+    /// key does not list or whose value was not read, a product key with no
+    /// <c>Patches</c> key, and any per-user installation. An empty answer, and an answer
+    /// that the record is not there, mark the product Unestablished
+    /// (<see cref="RegistryMayStandIn"/>).
     ///
-    /// A WALK THAT IS NOT WHOLE LEAVES THE REGISTRY'S VERDICT STANDING ONLY WHERE THE
-    /// INSTALLATION'S OWN LISTING NAMES EVERY ROW WINDOWS RETURNED. A walk Windows refused,
+    /// A WALK THAT IS NOT WHOLE LEAVES THE REGISTRY'S VERDICT STANDING ONLY FOR A
+    /// PER-MACHINE INSTALLATION WHOSE OWN LISTING NAMES EVERY ROW WINDOWS RETURNED AND EVERY
+    /// PATCH ITS ADVERTISED KEY LISTS (<see cref="AdvertisedPatchesListed"/>), on the same
+    /// ground. A per-user installation's walk that is not whole marks the product
+    /// Unestablished. A walk Windows refused,
     /// one that never ended and one abandoned after a run of unreadable rows each keep the
     /// rows they returned, and those rows are read as a whole walk's are. A row that did not
     /// read is a patch Windows holds and did not name, so a walk that met one needs an
@@ -4154,9 +4214,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         void Fold(ProductPatchSet verdict)
         {
             unestablished |= verdict == ProductPatchSet.Unestablished;
-            apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seen)
-                ? Worse(seen, verdict)
-                : verdict;
+            FoldVerdict(apiPatchSets, productCode, verdict);
         }
 
         var walk = WalkPatchList(productCode, userSid, context, WalkRestarts.For(ct, WalkPause), ct, failureLog);
@@ -4167,10 +4225,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (walk.Refusal is not null || walk.Incomplete)
         {
-            var answered = rows.Count == 0 && !walk.Incomplete
-                ? ReadOwnProductKey(fallback.ProductEntries, account, productCode)
-                : NamesEvery(listed, rows.Select(p => p.PatchCode))
-                    && (!walk.Incomplete || listed!.Count > 0);
+            var answered = context == MsiInstallContext.Machine
+                && AdvertisedPatchesListed(fallback.AdvertisedPatches, productCode, listed)
+                && (rows.Count == 0 && !walk.Incomplete
+                    ? ReadOwnProductKey(fallback.ProductEntries, account, productCode)
+                    : NamesEvery(listed, rows.Select(p => p.PatchCode))
+                        && (!walk.Incomplete || listed!.Count > 0));
             if (!answered) Fold(ProductPatchSet.Unestablished);
 
             // A refusal leaves no breadcrumb of its own where the scan carries on past it.
@@ -4188,16 +4248,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             var uninstallable = GetPatchProperty(
                 _msi, patchCode, productCode, patchSid, patchContext, MsiInstallProperty.Uninstallable,
                 reads, PropertyRead.StandsWhereListedAsHeld);
-            if (uninstallable.Unreadable || uninstallable.Value.Length == 0)
-            {
-                if (listed?.Contains(patchCode, StringComparer.OrdinalIgnoreCase) != true)
-                    Fold(ProductPatchSet.Unestablished);
-                continue;
-            }
-
-            Fold(uninstallable.Value == "0"
-                ? ProductPatchSet.AllNonRemovable
-                : ProductPatchSet.RemovablePatchPresent);
+            if (PatchSetAnswer(uninstallable) is { } answer)
+                Fold(answer);
+            else if (!RegistryMayStandIn(uninstallable)
+                     || !RegistryAnswersFor(fallback.PatchesReadAsZero, productCode, context,
+                         patchCode, patchSid, patchContext))
+                Fold(ProductPatchSet.Unestablished);
         }
 
         return unestablished;
@@ -4210,6 +4266,253 @@ public sealed class InstallerQueryService : IInstallerQueryService
     internal static bool NamesEvery(IReadOnlyCollection<string>? listed, IEnumerable<string> patchCodes) =>
         listed is not null
         && patchCodes.All(code => listed.Contains(code, StringComparer.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// Whether every patch <paramref name="productCode"/>'s advertised key lists
+    /// (<see cref="FallbackRead.AdvertisedPatches"/>) is named in <paramref name="listed"/>,
+    /// its listing under the local system's account, which is null where that listing was
+    /// not established or the product key has no <c>Patches</c> key. False where the
+    /// advertised list was not read.
+    ///
+    /// WINDOWS INSTALLER LISTS A PER-MACHINE PRODUCT'S PATCHES FROM BOTH KEYS: the values of
+    /// <c>HKCR\Installer\Products\{product}\Patches</c>, its applied patches, and the
+    /// subkeys of <c>UserData\S-1-5-18\Products\{product}\Patches</c>. So a listing read
+    /// from the second stands in for the patches Windows did not return only where the first
+    /// names none it leaves out. A product whose two keys disagree holds a patch the listing
+    /// cannot answer for, and its superseded patches are held back.
+    /// </summary>
+    internal static bool AdvertisedPatchesListed(
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? advertisedPatches,
+        string productCode,
+        IReadOnlyCollection<string>? listed) =>
+        advertisedPatches is not null
+        && advertisedPatches.TryGetValue(productCode, out var advertised)
+        && advertised is not null
+        && advertised.All(code => listed?.Contains(code, StringComparer.OrdinalIgnoreCase) == true);
+
+    /// <summary>
+    /// Reads <see cref="ReadAdvertisedPatches"/> for each product key under the local
+    /// system's account in <paramref name="productEntries"/> into
+    /// <paramref name="advertisedPatches"/>. Where <c>Classes\Installer\Products</c> is not
+    /// there or will not open, or the reads stop on any other failure, the products not yet
+    /// read have no entry, which every reader takes as a list that was not read. A failure
+    /// is written to <paramref name="failureLog"/> under its own cause and not counted
+    /// among the fallback's failures: this key records no cached file.
+    /// </summary>
+    private static void ReadEveryAdvertisedPatchList(
+        Microsoft.Win32.RegistryKey hklm,
+        IReadOnlyList<RegistryProductEntry> productEntries,
+        Dictionary<string, IReadOnlyCollection<string>?> advertisedPatches,
+        PerItemFailureLog failureLog,
+        CancellationToken ct)
+    {
+        var machineAccount = UserDataAccount(null, MsiInstallContext.Machine);
+        try
+        {
+            using var advertisedProducts = hklm.OpenSubKeyEarned(@"SOFTWARE\Classes\Installer\Products");
+            if (advertisedProducts is null) return;
+
+            foreach (var entry in productEntries)
+            {
+                ct.ThrowIfCancellationRequested();
+                if (!string.Equals(entry.Account, machineAccount, StringComparison.OrdinalIgnoreCase)) continue;
+                advertisedPatches[entry.Code] = ReadAdvertisedPatches(advertisedProducts, entry.Code, ct, failureLog);
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            failureLog.Record(ex, cause: "advertised-patches");
+        }
+    }
+
+    /// <summary>
+    /// The patch codes the advertised key of <paramref name="productCode"/> lists as value
+    /// names of its <c>Patches</c> key, under <paramref name="advertisedProducts"/>, the
+    /// <c>Classes\Installer\Products</c> key or a key standing in for it. Empty where the
+    /// product key has no <c>Patches</c> key. Null where the product key is not there, which
+    /// disagrees with Windows Installer listing the product; where either key will not open
+    /// or the values will not list; where the code will not pack; and where a value name is
+    /// neither a packed code nor the key's own <c>Patches</c> list or default value. A failure
+    /// to read is written to <paramref name="failureLog"/> where one is given.
+    /// </summary>
+    internal static IReadOnlyCollection<string>? ReadAdvertisedPatches(
+        Microsoft.Win32.RegistryKey advertisedProducts, string productCode, CancellationToken ct,
+        PerItemFailureLog? failureLog = null)
+    {
+        if (PackRegistryCode(productCode) is not { } packed) return null;
+
+        try
+        {
+            using var product = advertisedProducts.OpenSubKeyEarned(packed);
+            if (product is null) return null;
+
+            using var patches = product.OpenSubKeyEarned("Patches");
+            if (patches is null) return Array.Empty<string>();
+
+            var codes = new List<string>();
+            foreach (var name in RegistryNames.ValuesOf(patches, ct))
+            {
+                if (name.Length == 0 || name.Equals("Patches", StringComparison.OrdinalIgnoreCase)) continue;
+                if (UnpackRegistryProductCode(name) is not { } code) return null;
+                codes.Add(code);
+            }
+
+            return codes;
+        }
+        catch (Exception ex) when (ex is IOException or System.Security.SecurityException
+                                       or UnauthorizedAccessException)
+        {
+            failureLog?.Record(ex, cause: "advertised-patches");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// What one patch's Uninstallable answer says about its product's patch set: a
+    /// positive "0" that this patch cannot be uninstalled, any other value that it can,
+    /// and null for a read that failed or an empty value, which says neither.
+    ///
+    /// AN EMPTY VALUE IS NO ANSWER, NOT A CLEAN ONE. Comparing against "0" alone would
+    /// read an absent property as a patch that can be uninstalled, and comparing against
+    /// anything but "0" alone would read it as one that cannot.
+    /// </summary>
+    internal static ProductPatchSet? PatchSetAnswer(PropertyRead uninstallable) =>
+        uninstallable.Unreadable || uninstallable.Value.Length == 0 ? null
+        : uninstallable.Value == "0" ? ProductPatchSet.AllNonRemovable
+        : ProductPatchSet.RemovablePatchPresent;
+
+    /// <summary>
+    /// Whether a registry value may stand in for <paramref name="uninstallable"/>, an
+    /// Uninstallable read that gave no answer (<see cref="PatchSetAnswer"/>): only where the
+    /// read failed. An empty value, and an answer that the record or its product is not
+    /// there (<see cref="PropertyRead.NotRegistered"/>), are Windows Installer's own answers
+    /// about the record it reads, and a zero in the registry disagrees with each of them, so
+    /// neither is answered for.
+    /// </summary>
+    internal static bool RegistryMayStandIn(PropertyRead uninstallable) =>
+        uninstallable.Unreadable && !uninstallable.NotRegistered;
+
+    /// <summary>
+    /// Whether the registry's reading of <paramref name="productCode"/>'s patch set
+    /// answers for <paramref name="patchCode"/>, a patch whose Uninstallable read failed
+    /// (<see cref="RegistryMayStandIn"/>). True only where the
+    /// installation and the pairing are both per machine and the registry's read of the
+    /// installation's own product key took that patch's <c>Uninstallable</c> as a zero
+    /// (<see cref="FallbackRead.PatchesReadAsZero"/>).
+    ///
+    /// FOR A PER-MACHINE PAIRING, WINDOWS INSTALLER ANSWERS UNINSTALLABLE FROM THE
+    /// REGISTRY VALUE <see cref="ReadProductPatchSet"/> READS:
+    /// <c>UserData\S-1-5-18\Products\{product}\Patches\{patch}\Uninstallable</c>, read in
+    /// the calling process. A zero read there is the answer Windows Installer did not
+    /// give. A patch the listing names whose value was not read is not answered for: a key
+    /// gone by the time it was opened, and every patch after the first that can be
+    /// uninstalled, where the registry's verdict for the product holds its superseded
+    /// patches already. A per-user pairing is not answered for here, and marks its product
+    /// Unestablished.
+    ///
+    /// Do not widen this to the per-user contexts without establishing where Windows
+    /// Installer reads a per-user patch's Uninstallable from: a value that is not the
+    /// source of the answer cannot stand in for it, and the superseded patches of the
+    /// product are offered on it. Do not test it against the listing either: the listing
+    /// names patches whose value was never read.
+    /// </summary>
+    internal static bool RegistryAnswersFor(
+        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? patchesReadAsZero,
+        string productCode,
+        MsiInstallContext installationContext,
+        string patchCode,
+        string? patchSid,
+        MsiInstallContext patchContext) =>
+        installationContext == MsiInstallContext.Machine
+        && RegistryValueIsTheSource(patchSid, patchContext)
+        && OwnListing(patchesReadAsZero, UserDataAccount(patchSid, patchContext), productCode)
+            ?.Contains(patchCode, StringComparer.OrdinalIgnoreCase) == true;
+
+    /// <summary>
+    /// Whether a pairing of a patch in <paramref name="patchContext"/> under
+    /// <paramref name="patchSid"/> is one whose Uninstallable Windows Installer answers from
+    /// the value <see cref="ReadMachinePatchUninstallable"/> reads: a per-machine pairing,
+    /// with no account. The scan (<see cref="RegistryAnswersFor"/>) and the check under the
+    /// lease (<see cref="RemovableReverifier"/>) both ask it, so the two never stand the
+    /// registry in for different pairings.
+    /// </summary>
+    internal static bool RegistryValueIsTheSource(string? patchSid, MsiInstallContext patchContext) =>
+        patchContext == MsiInstallContext.Machine && patchSid is null;
+
+    /// <summary>
+    /// The Uninstallable value of a per-machine pairing of <paramref name="productCode"/>
+    /// and <paramref name="patchCode"/>, read from the registry key Windows Installer
+    /// answers it from (<see cref="RegistryAnswersFor"/>), or null for anything but a
+    /// <c>REG_DWORD</c> that reads: a code that will not pack, a key or value that is not
+    /// there, a key that will not open and a value of any other type.
+    ///
+    /// The type is held as strictly as <see cref="ReadProductPatchSet"/> holds it, and
+    /// every null holds the file it is asked for.
+    /// </summary>
+    internal static int? ReadMachinePatchUninstallable(string productCode, string patchCode)
+    {
+        if (PackRegistryCode(productCode) is null || PackRegistryCode(patchCode) is null) return null;
+
+        try
+        {
+            using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                Microsoft.Win32.RegistryHive.LocalMachine,
+                Microsoft.Win32.RegistryView.Registry64);
+            using var account = hklm.OpenSubKeyEarned(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18");
+            return account is null ? null : ReadPatchUninstallable(account, productCode, patchCode);
+        }
+        catch (Exception ex) when (ex is IOException or System.Security.SecurityException
+                                       or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// <see cref="ReadMachinePatchUninstallable"/>'s read, under an account's
+    /// <c>UserData</c> key handed in: the <c>Uninstallable</c> value of
+    /// <c>Products\{product}\Patches\{patch}</c> where it is a <c>REG_DWORD</c> that reads,
+    /// and null for anything else, a key that will not open included.
+    /// </summary>
+    internal static int? ReadPatchUninstallable(
+        Microsoft.Win32.RegistryKey account, string productCode, string patchCode)
+    {
+        if (PackRegistryCode(productCode) is not { } product || PackRegistryCode(patchCode) is not { } patch)
+            return null;
+
+        try
+        {
+            using var patchKey = account.OpenSubKeyEarned($@"Products\{product}\Patches\{patch}");
+            return patchKey is null ? null : UninstallableOf(patchKey);
+        }
+        catch (Exception ex) when (ex is IOException or System.Security.SecurityException
+                                       or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// The <c>Uninstallable</c> value of an opened patch key, where it is a <c>REG_DWORD</c>
+    /// that reads, and null for anything else. <see cref="ReadProductPatchSet"/> and
+    /// <see cref="ReadPatchUninstallable"/> both read it here, so the scan and the check
+    /// under the lease take one value the same way.
+    /// </summary>
+    internal static int? UninstallableOf(Microsoft.Win32.RegistryKey patchKey) =>
+        RegistryData.ValueOf(patchKey, "Uninstallable") is int uninstallable ? uninstallable : null;
+
+    /// <summary>
+    /// One pairing of an enumerated product and a patch whose Uninstallable read failed in
+    /// the product loop, kept until the registry fallback has read the value that
+    /// can answer for it (<see cref="RegistryAnswersFor"/>).
+    /// </summary>
+    private readonly record struct UnansweredPairing(
+        string ProductCode,
+        MsiInstallContext Context,
+        string PatchCode,
+        string? PatchSid,
+        MsiInstallContext PatchContext);
 
     /// <summary>
     /// The patch codes the product key under <paramref name="account"/>, a
@@ -4256,6 +4559,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// catches a patch the registry's own key does not list. A product the enumeration
     /// missed and the recovery found has its API side from a walk of each recovered
     /// installation's own patches (<see cref="FoldRecoveredPatchSet"/>).
+    ///
+    /// ONE PAIRING RESTS ON THE REGISTRY ALONE: a per-machine pairing whose Uninstallable
+    /// read failed, where the registry read a zero for it (<see cref="RegistryAnswersFor"/>).
+    /// That zero is the value Windows Installer answers the read from, so it is the answer
+    /// the failed read did not give, and the pairing adds nothing to the API side. Every
+    /// other pairing whose read gave no answer marks its product Unestablished there.
     ///
     /// AN ABSENT REGISTRY ENTRY IS AN INABILITY AND AN ABSENT API ENTRY IS NOT, which
     /// looks inconsistent and is the point. The registry walk visits every product key
@@ -4595,6 +4904,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// says nobody established what it holds. The caller reads the second as "this
     /// product may hold any patch on the machine".
     /// </param>
+    /// <param name="readAsZero">
+    /// The codes of the patches whose <c>Uninstallable</c> this read took as a zero, empty
+    /// where there is no <c>Patches</c> key. A patch whose key had gone by the time it was
+    /// opened, or that comes after the first patch that can be uninstalled, is not in it.
+    /// </param>
     /// <param name="patchesKeyPresent">
     /// Whether the product key has a <c>Patches</c> key. The verdict and
     /// <paramref name="patchCodes"/> read an absent one as a product holding no registered
@@ -4609,6 +4923,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         ref int patchRegistrations,
         out IReadOnlyCollection<string>? patchCodes,
         out bool patchesKeyPresent,
+        out IReadOnlyCollection<string> readAsZero,
         CancellationToken cancellationToken)
     {
         // NOT ESTABLISHED UNTIL IT IS, and this line rather than a failure path is
@@ -4617,6 +4932,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // which offers.
         patchCodes = null;
         patchesKeyPresent = false;
+        readAsZero = Array.Empty<string>();
 
         using var patchesKey = productsKey.OpenSubKeyEarned($@"{packedProductCode}\Patches");
 
@@ -4698,11 +5014,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (everyNameUnpacked) patchCodes = codes;
 
         var unestablished = false;
+        var zeros = new List<string>(patchNames.Length);
+        readAsZero = zeros;
         foreach (var patchName in patchNames)
         {
             // A key that will not open leaves the product unestablished and the code list
             // built from the listing standing. A key no longer there is a patch no longer
-            // registered, which holds nothing.
+            // registered, which holds nothing, and is left out of readAsZero: its
+            // Uninstallable was never read.
             Microsoft.Win32.RegistryKey? patchKey;
             try
             {
@@ -4720,13 +5039,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three
             // is a finding rather than an inability.
-            if (RegistryData.ValueOf(patchKey, "Uninstallable") is not int uninstallable)
+            if (UninstallableOf(patchKey) is not { } uninstallable)
             {
                 unestablished = true;
                 continue;
             }
 
             if (uninstallable != 0) return ProductPatchSet.RemovablePatchPresent;
+            if (UnpackRegistryProductCode(patchName) is { } zeroCode) zeros.Add(zeroCode);
         }
 
         return unestablished ? ProductPatchSet.Unestablished : ProductPatchSet.AllNonRemovable;
@@ -4755,6 +5075,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ? ProductPatchSet.AllNonRemovable
             : ProductPatchSet.Unestablished;
     }
+
+    /// <summary>
+    /// Merges <paramref name="verdict"/> into <paramref name="productCode"/>'s entry in
+    /// <paramref name="patchSets"/> through <see cref="Worse"/>, so an entry only ever
+    /// worsens.
+    /// </summary>
+    internal static void FoldVerdict(
+        Dictionary<string, ProductPatchSet> patchSets, string productCode, ProductPatchSet verdict) =>
+        patchSets[productCode] = patchSets.TryGetValue(productCode, out var seen)
+            ? Worse(seen, verdict)
+            : verdict;
 
     /// <summary>
     /// Merges two readings of one registry listing, which happens for the same reason
@@ -5632,7 +5963,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// WHAT TURNS ON THIS IS WHICH COUNT A KEPT FILE IS IN, NEVER WHETHER IT IS KEPT.
     /// Neither shape can pass <see cref="IsRemovablePatch"/>, so a pairing answering
     /// either is kept whatever this says. A product's patch set reads an empty Uninstallable as unestablished whatever
-    /// the State beside it, and does not come through here.
+    /// the State beside it (<see cref="RegistryMayStandIn"/>), and does not come through here.
     /// </summary>
     internal static bool LeavesVerdictUnestablished(string stateValue, string uninstallableValue) =>
         stateValue.Length == 0

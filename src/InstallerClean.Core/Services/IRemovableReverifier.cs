@@ -165,7 +165,9 @@ public enum HeldBackReason
     /// scan found superseded or obsoleted whose claim now says needed, back at Applied
     /// or still uninstallable and so needed to roll back with, or registered to a
     /// product on which another patch now answers that it can be uninstalled and so
-    /// could roll back onto its file; and a candidate the scan found no claim on at
+    /// could roll back onto its file, the answer for a per-machine patch whose read
+    /// under the lease failed being the registry value Windows Installer answers it
+    /// from; and a candidate the scan found no claim on at
     /// all, which the re-enumeration finds claimed, by its path or by the file its
     /// path names. The second is the one the name flatters: nothing was reclaimed,
     /// because nothing this app saw ever held it, and whether the claim is new is not
@@ -203,7 +205,10 @@ public enum HeldBackReason
     /// every installed product or every recorded path
     /// (<see cref="Models.RegisteredPackage.RemovableWithheld"/>); and a read under the
     /// installer lease failing, the same pairing's or the Uninstallable read of a patch
-    /// on a product the batch's pairings name. The first reaches it too on an empty
+    /// on a product the batch's pairings name. Where that patch is per machine and its
+    /// read failed, the registry value Windows Installer answers it from is read in its
+    /// place, and the read counts here only where that value is not there or will not
+    /// read. The first reaches it too on an empty
     /// answer the verdict turns on, as the enumeration's does. The second reaches it too
     /// where it answers that the installation holds no record of the patch or that the
     /// product is not installed, or comes back empty. Under the lease the path's own

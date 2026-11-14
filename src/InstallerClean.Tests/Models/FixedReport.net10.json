@@ -166,38 +166,41 @@
     "filesHeldForKeysWithInstallPropertiesCount": 5920,
     "filesHeldForKeysWithoutInstallPropertiesCount": 0,
     "supersededHeldForUnlistedKeyCount": 5994,
-    "unlistedKeysWithoutInstallPropertiesListUnreadCount": 6031
+    "unlistedKeysWithoutInstallPropertiesListUnreadCount": 6031,
+    "declaredInstalledUndeclaredPackageCodeIsItCount": 6068,
+    "declaredInstalledUndeclaredPackageCodeUnreadCount": -165,
+    "secondCopyKeepOrdinaryPackageCodeNotRuledOutCount": 6142
   },
   "operation": {
-    "kind": "\u2028\u2029\u00A0\u00AD\u200B\uFFFD",
-    "outcome": "face \uD83D\uDE00 end",
-    "durationMs": 167000501000,
-    "filesProcessed": 0,
-    "filesFailed": 2147483647,
-    "bytesFreed": 9223372036854775637,
+    "kind": null,
+    "outcome": "en-GB",
+    "durationMs": 9223372036854775637,
+    "filesProcessed": 6327,
+    "filesFailed": 6364,
+    "bytesFreed": 173000519000,
     "errors": [
-      {
-        "category": "\u2028\u2029\u00A0\u00AD\u200B\uFFFD",
-        "count": 6438
-      },
       {
         "category": null,
         "count": 6549
+      },
+      {
+        "category": "\u003Ca href=\u0022x\u0022\u003E\u0026amp;\u003C/a\u003E \u002B \u0027q\u0027 \u0060b\u0060",
+        "count": 6660
       }
     ],
-    "moveDestinationKind": "Fran\u00E7ais \u65E5\u672C\u8A9E \u0420\u0443\u0441\u0441\u043A\u0438\u0439",
-    "heldBackReclaimed": 6623,
-    "heldBackRecordsChanged": 6660,
-    "heldBackRecordsUnreadable": 6697,
-    "heldBackOwnershipUnestablished": 0,
-    "heldBackFileNotConfirmed": 6771,
-    "sourcesGivenUpStoppedCount": 6808,
-    "sourcesGivenUpNoAnswerCount": 6845,
-    "sourcesGivenUpSlowFailureCount": 6882,
-    "sourcesGivenUpFailedReadsCount": -187,
-    "sourcesGivenUpReadTimeCount": 6956,
-    "filesKeptForSourcesGivenUpCount": 0,
-    "sourceWaitsShownCount": 7030
+    "moveDestinationKind": "\u2028\u2029\u00A0\u00AD\u200B\uFFFD",
+    "heldBackReclaimed": 0,
+    "heldBackRecordsChanged": 6771,
+    "heldBackRecordsUnreadable": 6808,
+    "heldBackOwnershipUnestablished": 6845,
+    "heldBackFileNotConfirmed": 6882,
+    "sourcesGivenUpStoppedCount": -187,
+    "sourcesGivenUpNoAnswerCount": 6956,
+    "sourcesGivenUpSlowFailureCount": 0,
+    "sourcesGivenUpFailedReadsCount": 7030,
+    "sourcesGivenUpReadTimeCount": 7067,
+    "filesKeptForSourcesGivenUpCount": 7104,
+    "sourceWaitsShownCount": 7141
   },
-  "reportId": "000000bf-0000-4000-8000-0000000000bf"
+  "reportId": "000000c2-0000-4000-8000-0000000000c2"
 }

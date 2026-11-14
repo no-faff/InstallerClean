@@ -177,13 +177,18 @@ public sealed record ResultLogEntry(
     /// <c>InstallProperties</c> key one of whose source lists did not read
     /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
     ///
-    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND TWO UNDER <c>machine</c>, AND TAKES NONE
-    /// AWAY: <c>reportId</c>, last (<see cref="ReportId"/>); the installations found by name
-    /// whose patch set the scan left unestablished
+    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL, TWO UNDER <c>machine</c> AND THREE UNDER
+    /// <c>scan</c>, AND TAKES NONE AWAY: <c>reportId</c>, last (<see cref="ReportId"/>); the
+    /// installations found by name whose patch set the scan left unestablished
     /// (<see cref="MachineInfo.RecoveredPatchSetUnestablishedCount"/>); and, last under
     /// <c>machine</c>, the failed reads of a program's own <c>Patches</c> key
-    /// (<see cref="MachineInfo.ProductPatchListReadFailureCount"/>). A new top-level key,
-    /// so the receiver deploys before a release sends it.
+    /// (<see cref="MachineInfo.ProductPatchListReadFailureCount"/>). Last under <c>scan</c>,
+    /// the files kept by the package code an ordinary installation records whose cached package
+    /// does not say what it declares, those kept there because their own package code would not
+    /// read, and the installations of that kind that kept every package
+    /// (<see cref="ScanInfo.DeclaredInstalledUndeclaredPackageCodeIsItCount"/> to
+    /// <see cref="ScanInfo.SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount"/>). A new
+    /// top-level key, so the receiver deploys before a release sends it.
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -1349,7 +1354,9 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SecondCopyReleasedOrdinaryCount">
 /// Installations whose cached package did not say which product it declares and whose own
-/// record shows an ordinary installation, so they do not set the hold. One with no package
+/// record shows an ordinary installation, so they do not set the hold, except those counted in
+/// <paramref name="SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount"/>, which are in no other count
+/// of the installations setting it. One with no package
 /// for Windows Installer to open is counted in
 /// <paramref name="SecondCopyReleasedOpensNoPackageCount"/> instead, and its record is not
 /// read.
@@ -1672,6 +1679,22 @@ public sealed record MachineInfo(
 /// counts every such key, its lists not read.
 /// <paramref name="FilesHeldForKeysWithoutInstallPropertiesCount"/> counts the files such keys kept.
 /// </param>
+/// <param name="DeclaredInstalledUndeclaredPackageCodeIsItCount">
+/// Of the files in <paramref name="WithheldDeclaredProductInstalledCount"/>, those carrying the
+/// package code recorded by an ordinary installation whose cached package does not say what product
+/// it declares, which can be one made from a copy in the Installer folder through a transform giving
+/// it a new product code (<see cref="DeclaredProductInstalledCauses.UndeclaredPackageCodeIsIt"/>).
+/// </param>
+/// <param name="DeclaredInstalledUndeclaredPackageCodeUnreadCount">
+/// Those kept where there is such an installation because their own package code would not read
+/// (<see cref="DeclaredProductInstalledCauses.UndeclaredPackageCodeUnread"/>).
+/// </param>
+/// <param name="SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount">
+/// Of the installations in <paramref name="SecondCopyReleasedOrdinaryCount"/>, those that kept every
+/// installation package all the same: the package code their record holds did not read as a GUID
+/// both through Windows Installer and from the registry, and their sources could not be ruled out
+/// (<see cref="CachedPackageCensus.KeptOrdinaryPackageCodeNotRuledOut"/>). Installations, not files.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -1780,7 +1803,10 @@ public sealed record ScanInfo(
     int FilesHeldForKeysWithInstallPropertiesCount,
     int FilesHeldForKeysWithoutInstallPropertiesCount,
     int SupersededHeldForUnlistedKeyCount,
-    int UnlistedKeysWithoutInstallPropertiesListUnreadCount)
+    int UnlistedKeysWithoutInstallPropertiesListUnreadCount,
+    int DeclaredInstalledUndeclaredPackageCodeIsItCount,
+    int DeclaredInstalledUndeclaredPackageCodeUnreadCount,
+    int SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1944,7 +1970,12 @@ public sealed record ScanInfo(
             scan.UnlistedKeyHolds.WithInstallProperties,
             scan.UnlistedKeyHolds.WithoutInstallProperties,
             scan.SupersededHeldForUnlistedKeyCount,
-            scan.UnlistedKeysWithoutInstallPropertiesListUnread);
+            scan.UnlistedKeysWithoutInstallPropertiesListUnread,
+            // Schema 13: the files kept by the package code of an installation whose cached package
+            // does not say what it declares, and those installations that kept every package.
+            installedBy.UndeclaredPackageCodeIsIt,
+            installedBy.UndeclaredPackageCodeUnread,
+            cachedPackages.KeptOrdinaryPackageCodeNotRuledOut);
     }
 }
 

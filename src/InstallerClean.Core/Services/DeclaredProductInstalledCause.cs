@@ -185,4 +185,19 @@ public enum DeclaredProductInstalledCause
     /// drive or share given up for the pass among them.
     /// </summary>
     ByName,
+
+    /// <summary>
+    /// The file carries the package code recorded by an ordinary installation whose cached package
+    /// does not say what product it declares, which can be one made from a copy in the Installer
+    /// folder through a transform giving it a new product code: it is the package that installation
+    /// needs once its cached package is gone.
+    /// </summary>
+    UndeclaredPackageCodeIsIt,
+
+    /// <summary>
+    /// There is an ordinary installation whose cached package does not say what product it
+    /// declares, and the file's own package code would not read, so the file could be the package
+    /// it records.
+    /// </summary>
+    UndeclaredPackageCodeUnread,
 }
