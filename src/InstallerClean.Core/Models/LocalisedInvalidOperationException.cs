@@ -16,10 +16,37 @@ namespace InstallerClean.Models;
 /// for UnauthorizedAccessException. Pattern matches against
 /// <see cref="InvalidOperationException"/> still bind via inheritance.
 /// </summary>
-public class LocalisedInvalidOperationException : InvalidOperationException
+public class LocalisedInvalidOperationException : InvalidOperationException, IClosingSentenceMessage
 {
-    public LocalisedInvalidOperationException(string message) : base(message) { }
+    public LocalisedInvalidOperationException(string message) : base(message)
+    {
+        MessageWithoutClosingSentence = message;
+    }
 
     public LocalisedInvalidOperationException(string message, Exception innerException)
-        : base(message, innerException) { }
+        : base(message, innerException)
+    {
+        MessageWithoutClosingSentence = message;
+    }
+
+    /// <summary>
+    /// <paramref name="message"/> followed by <paramref name="closingSentence"/>, joined
+    /// as the language the app is showing joins two sentences. crash.log leaves the
+    /// closing sentence out (<see cref="IClosingSentenceMessage"/>).
+    /// </summary>
+    public LocalisedInvalidOperationException(string message, string closingSentence)
+        : base(message + Helpers.DisplayHelpers.SentenceSpace + closingSentence)
+    {
+        MessageWithoutClosingSentence = message;
+    }
+
+    /// <inheritdoc cref="LocalisedInvalidOperationException(string, string)"/>
+    public LocalisedInvalidOperationException(string message, string closingSentence, Exception innerException)
+        : base(message + Helpers.DisplayHelpers.SentenceSpace + closingSentence, innerException)
+    {
+        MessageWithoutClosingSentence = message;
+    }
+
+    /// <inheritdoc/>
+    public string MessageWithoutClosingSentence { get; }
 }

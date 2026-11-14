@@ -17,24 +17,39 @@ public class FrameworkTaskTests
     [Fact]
     public void The_wait_wakes_while_every_pool_thread_is_busy()
     {
-        var source = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-        Task[] tasks = [source.Task, new TaskCompletionSource<int>().Task];
-
-        using (var pool = new BusyPool())
+        // A wake that comes while a pool thread is free shows nothing about a full pool, since a
+        // wake that needs a pool thread can be served by it. A work item an earlier test left
+        // running can end during the wait and free a thread, so an attempt that ended with one
+        // free is made again. A wake that did not come, or came late, fails in either case.
+        const int attempts = 5;
+        for (var attempt = 1; ; attempt++)
         {
-            var completer = new Thread(() =>
+            var source = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Task[] tasks = [source.Task, new TaskCompletionSource<int>().Task];
+            int woken;
+            long elapsed;
+            bool stillFull;
+
+            using (var pool = new BusyPool())
             {
-                Thread.Sleep(100);
-                source.TrySetResult(1);
-            }) { IsBackground = true };
-            var clock = Stopwatch.StartNew();
-            completer.Start();
+                var completer = new Thread(() =>
+                {
+                    Thread.Sleep(100);
+                    source.TrySetResult(1);
+                }) { IsBackground = true };
+                var clock = Stopwatch.StartNew();
+                completer.Start();
 
-            var woken = FrameworkTask.WaitAny(tasks, 5_000, CancellationToken.None);
+                woken = FrameworkTask.WaitAny(tasks, 5_000, CancellationToken.None);
+                elapsed = clock.ElapsedMilliseconds;
+                stillFull = pool.StillFull;
+            }
 
-            Assert.True(pool.StillFull, "a pool thread came free during the wait, so the row shows nothing");
             Assert.Equal(0, woken);
-            Assert.True(clock.ElapsedMilliseconds < 2_500, $"woke after {clock.ElapsedMilliseconds} ms");
+            Assert.True(elapsed < 2_500, $"woke after {elapsed} ms");
+            if (stillFull) return;
+            Assert.True(attempt < attempts,
+                $"a pool thread came free during the wait in each of {attempts} attempts, so the wait showed nothing");
         }
     }
 
@@ -196,18 +211,22 @@ public class FrameworkTaskTests
     /// a gate in every thread left free, the test's own thread among the busy ones where it is
     /// a pool thread. A thread counts against the maximum while it is alive, idle or working,
     /// and SetMaxThreads takes a maximum below the threads alive, so the free count read after
-    /// each cap is what settles it.
+    /// each cap is what settles it. The minimum is then raised to the cap, so that no work
+    /// item waits for the pool to add a thread, and both are put back on disposal.
     /// </summary>
     private sealed class BusyPool : IDisposable
     {
         private readonly ManualResetEventSlim _gate = new();
         private readonly int _oldWorkers;
         private readonly int _oldPorts;
+        private int _oldMinWorkers;
+        private int _oldMinPorts;
 
         public BusyPool()
         {
             ThreadPool.GetMaxThreads(out _oldWorkers, out _oldPorts);
-            ThreadPool.GetMinThreads(out var minWorkers, out _);
+            ThreadPool.GetMinThreads(out var minWorkers, out _oldMinPorts);
+            _oldMinWorkers = minWorkers;
 
             // Work items still running from earlier tests are given up to ten seconds to end,
             // so the cap can stay near the minimum.
@@ -221,7 +240,8 @@ public class FrameworkTaskTests
 
             // From the minimum up, one at a time, to the first cap leaving a thread free.
             var free = 0;
-            for (var cap = minWorkers; cap <= _oldWorkers; cap++)
+            var cap = minWorkers;
+            for (; cap <= _oldWorkers; cap++)
             {
                 if (!ThreadPool.SetMaxThreads(cap, _oldPorts)) continue;
                 ThreadPool.GetAvailableThreads(out free, out _);
@@ -233,19 +253,38 @@ public class FrameworkTaskTests
                 Assert.Fail("the pool has no free thread to fill");
             }
 
-            var started = new CountdownEvent(free);
+            // THE MINIMUM IS RAISED TO THE CAP so that each work item below gets a thread at once.
+            // The pool starts a thread on demand only up to its minimum, and beyond that it waits
+            // for a running item to end or adds a thread at its own pace, so how long the pool
+            // took to fill would depend on the host. With the minimum at the cap there is no such
+            // wait, and the fill takes as long as starting the threads.
+            if (!ThreadPool.SetMinThreads(cap, _oldMinPorts))
+            {
+                Dispose();
+                Assert.Fail($"the pool's minimum would not be raised to its cap of {cap}");
+            }
+
+            // The pool is full once no thread is free, whichever work items fill it: an item
+            // an earlier test queued can take a thread ahead of these, and holds it as these do.
             for (var i = 0; i < free; i++)
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
-                    started.Signal();
+                    Interlocked.Increment(ref _started);
                     _gate.Wait();
                 });
-            if (!started.Wait(10_000))
+            var filling = Stopwatch.StartNew();
+            while (!StillFull && filling.ElapsedMilliseconds < 10_000)
+                Thread.Sleep(20);
+            if (!StillFull)
             {
+                ThreadPool.GetAvailableThreads(out var freeAtEnd, out _);
                 Dispose();
-                Assert.Fail("the pool's threads did not all start");
+                Assert.Fail($"the pool did not fill: minimum {minWorkers}, cap {cap}, {free} free after the cap, "
+                    + $"{Volatile.Read(ref _started)} of {free} work items started, {freeAtEnd} free after 10 s");
             }
         }
+
+        private int _started;
 
         /// <summary>
         /// True where no pool thread is free: a work item the test does not hold that ends
@@ -264,6 +303,7 @@ public class FrameworkTaskTests
         {
             _gate.Set();
             ThreadPool.SetMaxThreads(_oldWorkers, _oldPorts);
+            ThreadPool.SetMinThreads(_oldMinWorkers, _oldMinPorts);
         }
     }
 }

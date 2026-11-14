@@ -40,12 +40,12 @@ namespace InstallerClean.Tests.Helpers.Integration;
 ///
 /// AND AN ASSERTION RESTS ON NEITHER WHEN IT MOVES THE CACHE ROOT ITSELF,
 /// WHICH IS THE PROPERTY A READER SHOULD APPLY RATHER THAN A LIST TO TRUST.
-/// <c>IsOnInstallerCacheDrive</c> takes a test-only cache-root override, so a
+/// <c>RenamesOnInstallerCacheDrive</c> takes a test-only cache-root override, so a
 /// fixture can put the cache root where the system directory is not without
 /// owning a second disk, and so tell a method asking about the cache's volume from
 /// one asking about the system directory's: leave the cache root alone and the
 /// two are the same string, so the fixture answers the same for either.
-/// <see cref="IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory"/>
+/// <see cref="RenamesOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory"/>
 /// is written for it.
 /// </remarks>
 public class MoveSpaceCheckIntegrationTests
@@ -55,7 +55,7 @@ public class MoveSpaceCheckIntegrationTests
     /// cache folder's path root and the cache's own volume are the same string.
     /// </summary>
     [Fact]
-    public void IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root()
+    public void RenamesOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root()
     {
         // THE SUBJECT IS THE CACHE'S VOLUME AND THE NAME SAYS SO. The method
         // asks which volume the installer cache is on, not which volume the
@@ -92,15 +92,15 @@ public class MoveSpaceCheckIntegrationTests
         // app.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(Path.Combine(cachePathRoot, "backup")));
+        Assert.True(MoveSpaceCheck.RenamesOnInstallerCacheDrive(Path.Combine(cachePathRoot, "backup")));
         // Case and separator shape must not change the answer: the box takes
         // whatever the user typed.
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(
+        Assert.True(MoveSpaceCheck.RenamesOnInstallerCacheDrive(
             Path.Combine(cachePathRoot.ToLowerInvariant(), "backup") + Path.DirectorySeparatorChar));
     }
 
     [Fact]
-    public void IsOnInstallerCacheDrive_is_true_for_the_cache_folder_itself()
+    public void RenamesOnInstallerCacheDrive_is_true_for_the_cache_folder_itself()
     {
         // MACHINE-INDEPENDENT BECAUSE THE FIXTURE IS THE CACHE FOLDER AND NOT
         // ITS PATH ROOT, which is the property rather than a tally: an assertion
@@ -116,11 +116,11 @@ public class MoveSpaceCheckIntegrationTests
         // null and the method answers false, so a green here is the call
         // reaching an answer and not an identity. The test above says what
         // elevation does to that.
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(InstallerCacheHelpers.InstallerFolder));
+        Assert.True(MoveSpaceCheck.RenamesOnInstallerCacheDrive(InstallerCacheHelpers.InstallerFolder));
     }
 
     [Fact]
-    public void IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory()
+    public void RenamesOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory()
     {
         // WHAT TELLS A METHOD ASKING ABOUT THE CACHE'S VOLUME FROM ONE ASKING ABOUT
         // THE SYSTEM DIRECTORY'S, and the reason the override parameter exists. A
@@ -146,20 +146,20 @@ public class MoveSpaceCheckIntegrationTests
         if (unmounted is null)
             return; // every letter is in use on this host
 
-        Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive(
+        Assert.False(MoveSpaceCheck.RenamesOnInstallerCacheDrive(
             Environment.GetFolderPath(Environment.SpecialFolder.System),
             installerCacheRoot: $@"{unmounted}:\nope"));
 
         // The path the test above answers TRUE for, answered false here because
         // the cache root moved and nothing else did. One destination, two cache
         // roots, two answers, which is the whole of what the parameter buys.
-        Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive(
+        Assert.False(MoveSpaceCheck.RenamesOnInstallerCacheDrive(
             InstallerCacheHelpers.InstallerFolder,
             installerCacheRoot: $@"{unmounted}:\nope"));
     }
 
     [Fact]
-    public void IsOnInstallerCacheDrive_answers_for_a_folder_that_does_not_exist_yet()
+    public void RenamesOnInstallerCacheDrive_answers_for_a_folder_that_does_not_exist_yet()
     {
         // THE CASE THE APP'S OWN PURPOSE RESTS ON. A scheduled
         // /m C:\Backup names a folder the Move is about to create, and this
@@ -187,7 +187,7 @@ public class MoveSpaceCheckIntegrationTests
         // Nothing creates the folder. The assertion below is what says so.
         //
         // AND THE ELEVATION CAVEAT ON
-        // IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root
+        // RenamesOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root
         // COVERS THIS TEST TOO, and covers both of its queries, the fixture
         // standing under the cache folder rather than on a path root. The suite
         // does not ask this question elevated and both hosts do, so a red here
@@ -198,11 +198,11 @@ public class MoveSpaceCheckIntegrationTests
             $"ic-volume-{Guid.NewGuid():N}", "backup", "monthly");
 
         Assert.False(Directory.Exists(missing));
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(missing));
+        Assert.True(MoveSpaceCheck.RenamesOnInstallerCacheDrive(missing));
     }
 
     [Fact]
-    public void IsOnInstallerCacheDrive_is_false_for_a_drive_that_is_not_there()
+    public void RenamesOnInstallerCacheDrive_is_false_for_a_drive_that_is_not_there()
     {
         // No volume is mounted on the letter, so nothing was established and
         // the answer is false: the caller then omits its claim and, more to the
@@ -211,7 +211,7 @@ public class MoveSpaceCheckIntegrationTests
         if (unmounted is null)
             return; // every letter is in use on this host
 
-        Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive($@"{unmounted}:\nope\never"));
+        Assert.False(MoveSpaceCheck.RenamesOnInstallerCacheDrive($@"{unmounted}:\nope\never"));
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public class MoveSpaceCheckIntegrationTests
         // which is the arm being pinned.
         //
         // The elevation caveat on
-        // IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root
+        // RenamesOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root
         // covers this test too, and covers both of its queries, the fixture
         // standing under the cache folder. A red here has to be shown to survive
         // elevation before it means anything about the app.
@@ -327,11 +327,27 @@ public class MoveSpaceCheckIntegrationTests
     }
 
     [Fact]
-    public void RefusalFreeSpace_measures_for_itself_when_the_caller_has_not()
+    public void MeasuredRefusalFreeSpace_allows_a_move_that_fits()
     {
-        // The command line's overload. A byte fits anywhere, so this proves the
-        // measured path runs and allows, rather than that any particular volume
-        // is full.
-        Assert.Null(MoveSpaceCheck.RefusalFreeSpace(Path.GetTempPath(), 1));
+        // The command line's route. A byte fits anywhere, so this pins the allowing
+        // answer rather than that any particular volume is full.
+        Assert.Null(MoveSpaceCheck.MeasuredRefusalFreeSpace(Path.GetTempPath(), 1));
+    }
+
+    [Fact]
+    public void MeasuredRefusalFreeSpace_measures_for_itself_when_the_caller_has_not()
+    {
+        // A Move onto the cache's volume is allowed before any measurement is looked
+        // at. The cache root goes on an unmounted letter, so the temp folder is off
+        // the cache's volume wherever it is, and the answer rests on the measurement
+        // alone. Nothing has long.MaxValue bytes free, so a measurement that was
+        // taken refuses. A host with every letter in use fails here rather than passing
+        // on a test it could not run.
+        var unmounted = TestHost.FirstUnmountedDriveLetter();
+        Assert.True(unmounted is not null, "every drive letter from D to Z is in use on this host");
+
+        Assert.NotNull(MoveSpaceCheck.AvailableFreeSpaceForDestination(Path.GetTempPath()));
+        Assert.NotNull(MoveSpaceCheck.MeasuredRefusalFreeSpace(
+            Path.GetTempPath(), long.MaxValue, installerCacheRoot: $@"{unmounted}:\nope"));
     }
 }

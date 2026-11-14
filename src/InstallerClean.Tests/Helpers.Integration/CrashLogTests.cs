@@ -1,5 +1,6 @@
 using System.Globalization;
 using InstallerClean.Helpers;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Tests.Helpers.Integration;
@@ -34,6 +35,52 @@ public class CrashLogTests
         {
             CrashLog.FolderForTests = suite;
             TestCrashLog.TryDelete(folder);
+        }
+    }
+
+    [Fact]
+    public void An_entry_leaves_out_each_stops_closing_sentence_and_keeps_the_rest_as_dotnet_writes_it()
+    {
+        // The closing sentence says what the stop left as it was, which the scan after a
+        // Move or Delete cannot say. The screens keep it: the Message is whole.
+        var inner = Thrown(() => throw new LocalisedAccessException(
+            Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved));
+        var outer = Thrown(() => throw new LocalisedInvalidOperationException(
+            Strings.Error_ScanInstallerFolderListFailed, Strings.Error_NothingOfferedNothingRemoved, inner));
+        Assert.EndsWith(Strings.Error_NothingRemoved, inner.Message, StringComparison.Ordinal);
+        Assert.EndsWith(Strings.Error_NothingOfferedNothingRemoved, outer.Message, StringComparison.Ordinal);
+
+        var folder = Path.Combine(Path.GetTempPath(), "InstallerClean.Tests", Guid.NewGuid().ToString("N"));
+        var suite = CrashLog.FolderForTests;
+        CrashLog.FolderForTests = folder;
+        try
+        {
+            var (path, written) = CrashLog.TryWrite(outer);
+
+            Assert.True(written);
+            var log = File.ReadAllText(path);
+            var entry = log[(log.IndexOf(Environment.NewLine, log.IndexOf("---- ", StringComparison.Ordinal),
+                StringComparison.Ordinal) + Environment.NewLine.Length)..].TrimEnd();
+            var expected = outer.ToString()
+                .Replace(DisplayHelpers.SentenceSpace + Strings.Error_NothingOfferedNothingRemoved, "")
+                .Replace(DisplayHelpers.SentenceSpace + Strings.Error_NothingRemoved, "");
+            Assert.Equal(expected, entry);
+            Assert.Contains(typeof(LocalisedAccessException).FullName!, entry, StringComparison.Ordinal);
+            Assert.Contains(Strings.Error_MsiAccessDenied, entry, StringComparison.Ordinal);
+            Assert.DoesNotContain(Strings.Error_NothingRemoved, entry, StringComparison.Ordinal);
+            Assert.DoesNotContain(Strings.Error_NothingOfferedNothingRemoved, entry, StringComparison.Ordinal);
+        }
+        finally
+        {
+            CrashLog.FolderForTests = suite;
+            TestCrashLog.TryDelete(folder);
+        }
+
+        static Exception Thrown(Action raise)
+        {
+            try { raise(); }
+            catch (Exception ex) { return ex; }
+            throw new InvalidOperationException("Nothing was thrown.");
         }
     }
 

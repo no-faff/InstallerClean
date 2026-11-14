@@ -97,10 +97,15 @@
     <EmbeddedResource Include="..\InstallerClean\MessageWindow.xaml" LogicalName="ThemeXaml.MessageWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\ReportWindow.xaml" LogicalName="ThemeXaml.ReportWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\AboutWindow.xaml" LogicalName="ThemeXaml.AboutWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\NoticesWindow.xaml" LogicalName="ThemeXaml.NoticesWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\Controls\ScoopCommandBox.xaml" LogicalName="ThemeXaml.ScoopCommandBox.xaml" />
     <EmbeddedResource Include="..\InstallerClean\SplashWindow.xaml" LogicalName="ThemeXaml.SplashWindow.xaml" />
     <!-- The report FixedReport builds, as .NET 10 writes it (Models/FixedReportBytesTests). -->
     <EmbeddedResource Include="Models\FixedReport.net10.json" LogicalName="FixedReport.net10.json" />
+    <!-- THIRD-PARTY-NOTICES and LICENSE as plain bytes, for Resources/ThirdPartyNoticesTests:
+         the app's copy is read against the first, and its Apache terms against the second. -->
+    <EmbeddedResource Include="..\..\THIRD-PARTY-NOTICES" LogicalName="Repository.THIRD-PARTY-NOTICES" />
+    <EmbeddedResource Include="..\..\LICENSE" LogicalName="Repository.LICENSE" />
   </ItemGroup>
 
   <ItemGroup>

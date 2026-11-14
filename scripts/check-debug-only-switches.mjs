@@ -47,8 +47,8 @@
 //
 // THE WORKFLOWS. DEBUG anywhere in a tracked workflow outside a YAML comment fails,
 // a command line and an environment value alike, since MSBuild takes an environment
-// variable as a property. Every dotnet build, dotnet publish and dotnet msbuild in
-// release.yml, which builds what ships, has to name its configuration, and every
+// variable as a property. Every dotnet build, dotnet publish, dotnet msbuild and MSBuild
+// run on its own in release.yml, which builds what ships, has to name its configuration, and every
 // configuration it names has to be Release, since the SDK defines DEBUG for a
 // configuration called Debug in any case and a dotnet build that names none is a Debug
 // build. One of them there taking a response file (an @ argument) stops the run: the
@@ -168,6 +168,7 @@ const NAMES_NO_VARIABLE = new Map([
   ['Environment.CurrentDirectory', 'the current folder'],
   ['Environment.CurrentManagedThreadId', 'the managed thread'],
   ['Environment.Exit', 'the end of the process'],
+  ['Environment.MachineName', 'the computer name'],
   ['Environment.NewLine', 'the line ending'],
   ['Environment.OSVersion', 'the version of Windows'],
   ['Environment.ProcessId', 'the process'],
@@ -529,7 +530,9 @@ const withoutComment = (line) => {
 
 const workflows = tracked.filter((p) => /^\.github\/workflows\/[^/]+\.ya?ml$/i.test(p)).sort();
 console.log('\nWorkflows read for DEBUG:');
-const BUILDS = /\bdotnet\s+(build|publish|msbuild)\b/;
+// MSBuild run on its own, by name or by a path to MSBuild.exe, builds as dotnet msbuild
+// does, so it is read the same way. A uses: line naming an action is not a command.
+const BUILDS = /\bdotnet\s+(build|publish|msbuild)\b|(?<![\w-])(msbuild)(?:\.exe)?\b/i;
 let builds = 0;
 for (const path of workflows) {
   const lines = readFileSync(path, 'utf8').split('\n').map(withoutComment);
@@ -544,24 +547,25 @@ for (const path of workflows) {
   if (path !== RELEASE_WORKFLOW) continue;
   // A command continued with '\', '`' or '^' at the end of its line is joined first.
   for (let n = 0; n < lines.length; n++) {
-    if (!BUILDS.test(lines[n])) continue;
+    if (!BUILDS.test(lines[n]) || /^\s*-?\s*uses\s*:/.test(lines[n])) continue;
     let command = lines[n];
     let last = n;
     while (/[\\`^]\s*$/.test(command) && last + 1 < lines.length)
       command = command.replace(/[\\`^]\s*$/, ' ') + lines[++last];
     builds++;
-    const verb = BUILDS.exec(command)[1];
+    const found = BUILDS.exec(command);
+    const tool = found[1] ? `dotnet ${found[1]}` : 'MSBuild';
     const args = command.slice(command.search(BUILDS));
     const responseFiles = args.split(/\s+/).filter((t) => /^["']?@/.test(t));
     for (const r of responseFiles)
-      refusals.push(`${path}:${n + 1} dotnet ${verb} takes the response file ${r}, which this does not read`);
+      refusals.push(`${path}:${n + 1} ${tool} takes the response file ${r}, which this does not read`);
     const named = configurations(args);
-    console.log(`    ${path}:${n + 1}  dotnet ${verb}, configuration ${named.length ? named.join(', then ') : 'NOT NAMED'}`);
+    console.log(`    ${path}:${n + 1}  ${tool}, configuration ${named.length ? named.join(', then ') : 'NOT NAMED'}`);
     if (!named.length)
-      failures.push(`${path}:${n + 1} dotnet ${verb} without naming a configuration`);
+      failures.push(`${path}:${n + 1} ${tool} without naming a configuration`);
     for (const c of named)
       if (c.toLowerCase() !== 'release')
-        failures.push(`${path}:${n + 1} dotnet ${verb} with the configuration ${c}`);
+        failures.push(`${path}:${n + 1} ${tool} with the configuration ${c}`);
   }
 }
 if (!workflows.includes(RELEASE_WORKFLOW)) refusals.push(`${RELEASE_WORKFLOW} is not among the workflows read`);

@@ -19,8 +19,8 @@ namespace InstallerClean.Helpers;
 /// The reads of one property of one installation, patch or source list are made again the
 /// same way where an answer does not stand (<see cref="KeyedRead"/>).
 ///
-/// One of these serves one pass over the lists, or one check under a Move or Delete's lease,
-/// on the thread that makes it.
+/// One of these serves one pass over the lists, one part of a pass that keeps a budget of its
+/// own, or one check under a Move or Delete's lease, on the thread that makes it.
 /// </summary>
 /// <param name="pause">The wait before a restart.</param>
 /// <param name="keyedPauseLimit">

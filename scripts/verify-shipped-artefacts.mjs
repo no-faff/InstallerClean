@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Fails (exit 1) when a built artefact is missing the strings of a language the
-// source tree provides, when it does not ask for administrator, or when it is
-// older than the sources it was built from. Reads the built files themselves
+// source tree provides, when it does not ask for administrator, when it holds a
+// Debug-only switch's name, or when it is older than the sources it was built
+// from. Reads the built files themselves
 // rather than the tree they came from, which is the only place these three can
 // be answered.
 //
@@ -45,6 +46,12 @@ const RESOURCE_BASE = 'InstallerClean.Resources.Strings';
 const RESOURCE_EXTENSION = '.resources';
 
 const REQUIRED_LEVEL = 'requireAdministrator';
+
+// What every Debug-only switch's name starts with. The names sit only inside #if
+// DEBUG (check-debug-only-switches.mjs), so a Release build holds none, and a merged
+// Debug build, which Directory.Build.targets makes only on -p:OneFileDebug=true, holds
+// them. A C# string is stored in UTF-16, little-endian.
+const DEBUG_SWITCH_PREFIX = Buffer.from('INSTALLERCLEAN_DEBUG_', 'utf16le');
 
 const DEFAULT_ARTEFACTS = [
   'publish/window',
@@ -288,6 +295,10 @@ for (const dir of artefacts) {
     if (extra.length) problems.push(`${exe.path}: carries ${extra.join(', ')}, which no source resx provides`);
   }
 
+  if (bytes.includes(DEBUG_SWITCH_PREFIX)) {
+    problems.push(`${exe.path}: holds a Debug-only switch's name, so it is a Debug build: build it with -c Release`);
+  }
+
   const embedded = manifestsIn(bytes);
   let level = 'none';
   let asked = null;
@@ -312,7 +323,7 @@ for (const dir of artefacts) {
     }
   }
 
-  report.push(`${exe.path}: level="${level}", the neutral strings and ${cultures.join(' ')}`);
+  report.push(`${exe.path}: level="${level}", no Debug-only switch name, the neutral strings and ${cultures.join(' ')}`);
 }
 
 if (problems.length) fail(problems);

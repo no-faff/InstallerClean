@@ -37,10 +37,24 @@ public sealed record ProductRow(
     int PatchCount,
     IReadOnlyList<PatchRow> Patches,
     // True when the product's representative file is still registered with
-    // Windows Installer but absent from disk. Its summary metadata is read
-    // from the file, so it is unavailable for a missing row.
-    bool IsMissing = false)
+    // Windows Installer but absent from disk: its .msi, or for a row with no .msi
+    // every one of its patches. Its summary metadata is read from the file, so it
+    // is unavailable for a missing row, and the size cell says "missing".
+    bool IsMissing = false,
+    // True for the row standing for a product that has patches and no .msi of its
+    // own. Its FileName is Field.PatchesOnly and its FullPath one of its patches.
+    bool IsPatchesOnly = false)
 {
+    /// <summary>
+    /// Whether any file this row stands for is missing: its own, or one of its
+    /// patches. It marks the row with the warning triangle and is what the window
+    /// opens on, so a program with a missing patch is found the way one with a
+    /// missing .msi is. <see cref="IsMissing"/> stays the row's own file alone,
+    /// because it decides the size cell, and a row whose .msi is on the disk has a
+    /// size.
+    /// </summary>
+    public bool HasMissingFile => IsMissing || Patches.Any(p => p.IsMissing);
+
     /// <summary>
     /// Orders a row carrying no established product name below every row that
     /// has one. Two values reach it: an empty name, where no registration names

@@ -392,13 +392,36 @@ public class CliConsoleGuardTests
     }
 
     [Fact]
-    public void A_refusal_whose_error_stream_refuses_every_write_still_gives_the_error_code()
+    public void A_refusal_whose_error_stream_refuses_every_write_gives_the_error_code_and_records_the_failure()
     {
         using var _ = TestCrashLog.OwnFolder();
         var error = new ConsoleFailingAt("");
 
         Assert.Equal(CliExitCode.Error, Program.Refuse("refused here", error));
         Assert.True(error.Refused > 0, "The error stream was never written to.");
+        Assert.Contains(ConsoleFailingAt.Message, TestCrashLog.Text());
+    }
+
+    [Fact]
+    public void The_refusal_without_net_framework_48_prints_its_message_on_a_line_and_gives_the_error_code()
+    {
+        var error = new StringWriter();
+
+        Assert.Equal(CliExitCode.Error, Program.RefuseWithoutRecording("refused here", error));
+        Assert.Equal("refused here" + NewLine, error.ToString());
+    }
+
+    // Unlike Refuse, it writes nothing to crash.log where the write fails: the crash log's
+    // folder is not asked for on a PC that cannot run the app.
+    [Fact]
+    public void The_refusal_without_net_framework_48_whose_error_stream_fails_records_nothing()
+    {
+        using var _ = TestCrashLog.OwnFolder();
+        var error = new ConsoleFailingAt("");
+
+        Assert.Equal(CliExitCode.Error, Program.RefuseWithoutRecording("refused here", error));
+        Assert.True(error.Refused > 0, "The error stream was never written to.");
+        Assert.Equal("", TestCrashLog.Text());
     }
 
     // ---- Main ----
@@ -406,7 +429,8 @@ public class CliConsoleGuardTests
     [Theory]
     [InlineData("--version")]
     [InlineData("--help")]
-    public void A_help_or_version_request_whose_output_fails_exits_1_and_writes_no_entry(string arg)
+    [InlineData("--notices")]
+    public void A_help_version_or_notices_request_whose_output_fails_exits_1_and_writes_no_entry(string arg)
     {
         // Through Main, which puts the output behind the guard. A failed write that got past
         // the guard would reach Main's catch-all, which writes a HardError entry.
@@ -432,7 +456,8 @@ public class CliConsoleGuardTests
     [Theory]
     [InlineData("--version")]
     [InlineData("--help")]
-    public void A_help_or_version_request_whose_output_is_written_exits_0(string arg)
+    [InlineData("--notices")]
+    public void A_help_version_or_notices_request_whose_output_is_written_exits_0(string arg)
     {
         var console = new StringWriter();
         var original = Console.Out;

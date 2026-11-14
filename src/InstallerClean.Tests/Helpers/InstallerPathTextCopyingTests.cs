@@ -195,6 +195,7 @@ public class InstallerPathTextCopyingTests
     [InlineData("ThemeXaml.MainWindow.xaml")]
     [InlineData("ThemeXaml.MessageWindow.xaml")]
     [InlineData("ThemeXaml.ReportWindow.xaml")]
+    [InlineData("ThemeXaml.NoticesWindow.xaml")]
     [InlineData("ThemeXaml.OrphanedFilesWindow.xaml")]
     [InlineData("ThemeXaml.RegisteredFilesWindow.xaml")]
     [InlineData("ThemeXaml.AboutWindow.xaml")]

@@ -30,6 +30,12 @@
 // code can call it, and so is the method a virtual or interface call names. A custom
 // attribute is not loaded by any of this: the attributes on what the walk reads are listed
 // apart (Attributes).
+//
+// EACH MISSING MEMBER IS LISTED ONCE, with the chain to the first method found naming it, and
+// the list covers every method the walk compiles, so an empty list means nothing on the path
+// is missing. A member reached by more than one route still prints one chain, so beside it
+// the walk names every method of the app's own through which it is reached (AppRoutesTo):
+// cutting the chain printed leaves the others.
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -487,6 +493,9 @@ namespace FrameworkReferences
         // Each method compiled, with how, and the one that brought it in.
         public readonly Dictionary<MethodDefinitionHandle, int> Compiled = new();
         readonly Dictionary<MethodDefinitionHandle, string> _via = new();
+        // Every method that compiles each method, by name, with the most it compiled it as: a
+        // method compiled inlined has its names resolved and its calls not followed.
+        readonly Dictionary<string, Dictionary<string, int>> _callers = new();
         readonly Queue<MethodDefinitionHandle> _queue = new();
         readonly HashSet<TypeDefinitionHandle> _loaded = new();
         readonly HashSet<TypeDefinitionHandle> _initialized = new();
@@ -495,7 +504,9 @@ namespace FrameworkReferences
         readonly HashSet<(string, EntityHandle)> _checked = new();
         public readonly List<Miss> Misses = new();
         // The custom attributes on the types loaded and methods compiled whose type a set
-        // lacks: listed for the record, as the runtime does not load them.
+        // lacks: listed for the record, as the runtime does not load them. The assembly's own
+        // attributes are read by the members in AttributeReaders, and a call to one of them is
+        // a miss where the set lacks one of their types.
         public readonly List<Miss> Attributes = new();
         public int TypesNamed, MembersNamed;
 
@@ -563,6 +574,36 @@ namespace FrameworkReferences
             return chain;
         }
 
+        // The methods whose names start with prefix (the app's own: "InstallerClean.") through
+        // which the walk reaches the method named from: the method itself where it is one, and
+        // otherwise the first such method on each route back from it. A route that reaches the
+        // start without one ends at the start's own name ("the entry point" and the like). The
+        // method naming the member is reached from every method it is compiled into; a method
+        // further back runs what it calls only where it is not merely inlined, so only those
+        // routes are followed. A method reached through a virtual call is reached from the
+        // method making the call, so an override can read as reached from a method other than
+        // the one on whose route its type was created.
+        public List<string> AppRoutesTo(string from, string prefix)
+        {
+            var found = new SortedSet<string>(StringComparer.Ordinal);
+            var seen = new HashSet<string>();
+            var queue = new Queue<string>();
+            queue.Enqueue(from);
+            while (queue.Count > 0)
+            {
+                var at = queue.Dequeue();
+                if (!seen.Add(at)) continue;
+                if (at.StartsWith(prefix, StringComparison.Ordinal) || !_callers.TryGetValue(at, out var callers))
+                {
+                    found.Add(at);
+                    continue;
+                }
+                foreach (var c in callers)
+                    if (at == from || c.Value != Inlined) queue.Enqueue(c.Key);
+            }
+            return found.ToList();
+        }
+
         readonly Dictionary<string, MethodDefinitionHandle> _byName = new();
         MethodDefinitionHandle? FindByName(string name) => _byName.TryGetValue(name, out var h) ? h : null;
 
@@ -577,6 +618,9 @@ namespace FrameworkReferences
 
         void Compile(MethodDefinitionHandle h, int mode, string via)
         {
+            var name = NameOf(h);
+            if (!_callers.TryGetValue(name, out var callers)) _callers[name] = callers = new Dictionary<string, int>();
+            callers[via] = callers.TryGetValue(via, out var had) ? Math.Max(had, mode) : mode;
             if (Compiled.TryGetValue(h, out var was) && was >= mode) return;
             Compiled[h] = mode;
             if (!_via.ContainsKey(h)) _via[h] = via;
@@ -670,6 +714,14 @@ namespace FrameworkReferences
                     foreach (var set in _sets)
                         if (_checked.Add((set.Label, h)) && _exe.Check(set, r, out var what) is { } why)
                             Misses.Add(new Miss { Set = set.Label, What = what, Why = why, From = from });
+                    if (follow && ReadsAssemblyAttributes(reference))
+                        foreach (var set in _sets)
+                            if (AttributeLacked(set) is { } attribute && _checked.Add((set.Label + " reads attributes", h)))
+                            {
+                                _exe.Check(set, r, out var what);
+                                Misses.Add(new Miss { Set = set.Label, What = what, From = from,
+                                    Why = $"it reads every attribute the assembly carries, and {set.Label} has no {attribute}" });
+                            }
                     if (reference.GetKind() == MemberReferenceKind.Method)
                     {
                         var sig = Signature(sh => reference.DecodeMethodSignature(sh, null), from);
@@ -779,6 +831,47 @@ namespace FrameworkReferences
                 if (impl.MethodDeclaration.Kind == HandleKind.MemberReference)
                     NeedMember(impl.MethodDeclaration, ILOpCode.Nop, false, from);
             }
+        }
+
+        // The framework members that read every attribute an assembly carries, resolving each
+        // attribute's type. On .NET Framework 4.0 the ResourceManager constructors do, through
+        // GetNeutralResourcesLanguage and CustomAttributeData, so an attribute whose type the
+        // PC's .NET Framework lacks makes them throw.
+        static readonly HashSet<string> AttributeReaders = new()
+        {
+            "System.Resources.ResourceManager::.ctor",
+            "System.Resources.ResourceManager::GetNeutralResourcesLanguage",
+            "System.Reflection.CustomAttributeData::GetCustomAttributes",
+            "System.Reflection.Assembly::GetCustomAttributes",
+            "System.Reflection.Assembly::GetCustomAttributesData",
+            "System.Reflection.Assembly::get_CustomAttributes",
+            "System.Reflection.Assembly::IsDefined",
+            "System.Attribute::GetCustomAttribute",
+            "System.Attribute::GetCustomAttributes",
+            "System.Attribute::IsDefined",
+        };
+
+        bool ReadsAssemblyAttributes(MemberReference reference) =>
+            reference.GetKind() == MemberReferenceKind.Method
+            && _exe.FrameworkParent(reference.Parent) is { } f
+            && AttributeReaders.Contains(f.Type + "::" + _md.GetString(reference.Name));
+
+        // The first type among the attributes the exe's assembly carries that the set lacks, or
+        // null where it has every one.
+        readonly Dictionary<string, string> _attributeLacked = new();
+        string AttributeLacked(ReferenceSet set)
+        {
+            if (_attributeLacked.TryGetValue(set.Label, out var known)) return known;
+            string lacked = null;
+            foreach (var ah in _md.GetAssemblyDefinition().GetCustomAttributes())
+            {
+                var ctor = _md.GetCustomAttribute(ah).Constructor;
+                if (ctor.Kind != HandleKind.MemberReference) continue;
+                if (_md.GetMemberReference((MemberReferenceHandle)ctor).Parent is not { Kind: HandleKind.TypeReference } parent) continue;
+                var r = (TypeReferenceHandle)parent;
+                if (_exe.Check(set, r) is not null) { lacked = Meta.Name(_md, r); break; }
+            }
+            return _attributeLacked[set.Label] = lacked;
         }
 
         void NeedAttributes(CustomAttributeHandleCollection attributes, string from)

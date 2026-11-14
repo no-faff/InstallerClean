@@ -180,7 +180,7 @@ public sealed class InstallerCacheHelpersKernelAnswerTests : IDisposable
             prefix + installer + @"\new", out var resolved, new ScriptedKernel(refuseOpen: true));
 
         Assert.Equal(PathResolution.OpenRefused, outcome);
-        Assert.True(InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved), resolved);
+        Assert.True(InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved, proven: false), resolved);
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public sealed class InstallerCacheHelpersKernelAnswerTests : IDisposable
         InstallerCacheHelpers.ResolveFinalPathOutcome(
             @"\\?\" + installer + @"\new\..\..\..\Users\x", out var resolved, new ScriptedKernel(refuseOpen: true));
 
-        Assert.True(InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved), resolved);
+        Assert.True(InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved, proven: false), resolved);
     }
 
     [Theory]

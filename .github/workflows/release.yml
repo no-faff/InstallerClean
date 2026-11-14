@@ -168,6 +168,12 @@ jobs:
         shell: pwsh
         run: ./scripts/check-one-file.ps1
 
+      # Each merged exe as it ships: AMD64, PE32+, IL only, and no request or preference for a
+      # 32-bit process.
+      - name: Check each merged exe is a 64-bit x64 image
+        shell: pwsh
+        run: ./scripts/check-architecture.ps1
+
       # THE GUARDS ABOVE READ SOURCES AND THIS ONE READS WHAT WAS JUST BUILT, so
       # it runs here rather than in the glob, which is why it is invoked by name.
       # scripts/check-guard-wiring.mjs, which IS in the glob, fails when this

@@ -100,6 +100,19 @@ public class ResultLogServiceTests : IDisposable
         Assert.Contains($"\"schemaVersion\": {ResultLogEntry.CurrentSchemaVersion}", body);
     }
 
+    // Every send reads last-run.json, so the id written here is the id every copy carries.
+    [Fact]
+    public async Task The_written_log_carries_the_reports_id()
+    {
+        var svc = new ResultLogService(_logFile);
+        var entry = SampleEntry();
+        await svc.WriteAsync(entry);
+
+        var body = await svc.ReadLastLogAsync();
+
+        Assert.Contains($"\"reportId\": \"{entry.ReportId:D}\"", body);
+    }
+
     [Fact]
     public async Task ReadLastLogAsync_returns_null_when_there_is_no_log()
     {

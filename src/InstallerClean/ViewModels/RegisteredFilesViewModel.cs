@@ -23,9 +23,12 @@ namespace InstallerClean.ViewModels;
 /// orphaned window can show a certificate for a file no registration claims.
 ///
 /// Rows flag as missing on <c>IsMissingFromDisk</c>, the plain question of
-/// whether the file is there. It drives <see cref="ShowMissing"/>, which puts
-/// the recovery note in front of the reader, and the window's opening
-/// selection. The flag grades no patch state and must not start: Windows opens
+/// whether the file is there. A row's own missing file drives
+/// <see cref="ShowMissing"/>, which puts the recovery note in front of the reader
+/// where that file is an .msi, and any missing file of the row, a patch's
+/// included, drives the warning triangle and the window's opening selection
+/// (<see cref="ProductRow.HasMissingFile"/>). The flag grades no patch state and
+/// must not start: Windows opens
 /// every registered patch's cached file whatever state it carries, so an absent
 /// file is the same condition on a superseded registration as on any other.
 ///
@@ -66,7 +69,11 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     public bool HasSelection => SelectedProduct is not null;
     public bool HasPatches => SelectedProduct is not null && SelectedProduct.Patches.Count > 0;
     public bool ShowDetails => SelectedProduct is not null && SelectedDetails is not null;
-    public bool ShowMissing => SelectedProduct?.IsMissing == true;
+    // The note's advice is about a missing .msi: running the installer for the same
+    // version puts it back. Nothing establishes that of a missing patch, so a row
+    // standing for patches alone, and a row whose only missing file is a patch,
+    // show no note.
+    public bool ShowMissing => SelectedProduct is { IsMissing: true, IsPatchesOnly: false };
     // A missing file has no summary stream to read (the file is gone), so the
     // "no metadata" panel stands down in favour of the missing notice.
     public bool ShowNoMetadata => SelectedProduct is not null && SelectedDetails is null && !ShowMissing;
@@ -200,17 +207,21 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                 // No .msi for this product - render a synthetic main row
                 // showing the patch total so the first patch isn't
                 // duplicated as both the product line AND the first
-                // patch-list entry.
+                // patch-list entry. The row is missing only where every patch
+                // is, its size being their total, and its details are read from
+                // a patch that is on the disk.
                 var patchBytes = items.Sum(p => p.FileSizeBytes);
+                var present = items.FirstOrDefault(p => !p.IsMissingFromDisk) ?? items.First();
                 products.Add(new ProductRow(
                     productName,
                     Strings.Field_PatchesOnly,
-                    items.First().LocalPackagePath,
+                    present.LocalPackagePath,
                     DisplayHelpers.FormatSize(patchBytes),
                     patchBytes,
                     patches.Count,
                     patches,
-                    IsMissing: items.First().IsMissingFromDisk));
+                    IsMissing: items.All(p => p.IsMissingFromDisk),
+                    IsPatchesOnly: true));
             }
         }
 
@@ -316,17 +327,18 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     "Summary.RegisteredWindow.Missing"),
                 DisplayHelpers.FormatCount(missingCount));
 
-        // Open on the first product whose installer file is missing from disk,
-        // when there is one. The main window's missing-from-disk banner ends
-        // "Open Details for what to do", and what to do is the note that only
-        // that row's details pane carries. Selecting the top row instead leaves
+        // Open on the first product with a file missing from disk, its .msi or a
+        // patch, when there is one. The main window's missing-from-disk banner ends
+        // "Open Details for what to do", and that row's details pane is where the
+        // answer is: the note for a missing .msi, and the patch list marking which
+        // patch is gone. Selecting the top row instead leaves
         // the user hunting for a small amber triangle somewhere in an
         // alphabetical list of every installed product, which is an instruction
         // they cannot follow. Both orders here rank on product name, so a missing
         // row is wherever that puts it; when there is no missing row, the intent
         // is the top of the list, which the window reads off its own sorted view
         // rather than off this one.
-        SelectedProduct = products.FirstOrDefault(p => p.IsMissing) ?? products.FirstOrDefault();
+        SelectedProduct = products.FirstOrDefault(p => p.HasMissingFile) ?? products.FirstOrDefault();
     }
 
     async partial void OnSelectedProductChanged(ProductRow? value)

@@ -444,15 +444,27 @@ public sealed class UpdateDownloadServiceTests : IDisposable
     [Fact]
     public async Task A_download_held_at_the_gate_past_the_stall_timeout_fails_as_stalled()
     {
-        var (file, gate, _) = GatedLocalFile();
-        var service = new UpdateDownloadService(new AppUpdater.LocalFileAnswer(file, gate), TimeSpan.FromMilliseconds(500));
+        // A download whose reads are slower than the timeout stalls before it reaches the gate,
+        // and fails in the same way without showing anything about the hold. Such an attempt
+        // is made again with a timeout twice as long. A download the timeout does not end fails
+        // the test rather than waiting on it.
+        const int attempts = 5;
+        var milliseconds = 500;
+        for (var attempt = 1; ; attempt++, milliseconds *= 2)
+        {
+            var (file, gate, _) = GatedLocalFile();
+            var service = new UpdateDownloadService(new AppUpdater.LocalFileAnswer(file, gate), TimeSpan.FromMilliseconds(milliseconds));
 
-        var failure = await Assert.ThrowsAsync<UpdateFailedException>(
-            () => service.DownloadAsync(ReleaseAddress, Destination, null, CancellationToken.None));
+            var download = service.DownloadAsync(ReleaseAddress, Destination, null, CancellationToken.None);
+            var ended = await Task.WhenAny(download, Task.Delay(milliseconds + 30_000));
+            Assert.True(ReferenceEquals(ended, download), "the stall timeout did not end a download held at the gate");
 
-        Assert.Equal(UpdateFailureStage.Download, failure.Stage);
-        Assert.True(File.Exists(gate + AppUpdater.GateReachedSuffix));
-        Assert.False(File.Exists(Destination));
+            var failure = await Assert.ThrowsAsync<UpdateFailedException>(() => download);
+            Assert.Equal(UpdateFailureStage.Download, failure.Stage);
+            Assert.False(File.Exists(Destination));
+            if (File.Exists(gate + AppUpdater.GateReachedSuffix)) return;
+            Assert.True(attempt < attempts, $"the download stalled before it reached the gate in each of {attempts} attempts");
+        }
     }
 
     [Theory]

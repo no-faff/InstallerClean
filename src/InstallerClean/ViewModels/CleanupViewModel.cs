@@ -92,9 +92,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// alike. The distinction is kept anyway, because a reader meeting a plain
     /// bool here would take false for "another volume" and write the next claim
     /// on it. <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> is
-    /// what keeps the three apart, and its bool sibling folds them together,
-    /// which is right for a caller that acts on the answer and wrong for one
-    /// that says something about it.
+    /// what keeps the three apart. The free-space check asks a different
+    /// question, whether the Move renames
+    /// (<see cref="MoveSpaceCheck.RenamesOnInstallerCacheDrive"/>), which a Move
+    /// through this PC's own share does not, though it lands on this volume.
     /// </remarks>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
@@ -497,8 +498,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <remarks>
     /// The same debounce as the settings write-back, and the same constant: a
     /// typist should fire one resolve when they stop, not one per character, and
-    /// a resolve is two volume queries rather than the one it was before the
-    /// cache side started asking. Sharing <see cref="MoveDestinationSaveDelay"/>
+    /// a resolve is two volume queries, and for a share the opens of its folders
+    /// through the share as well. Sharing <see cref="MoveDestinationSaveDelay"/>
     /// rather than adding a second constant keeps the two from drifting apart
     /// for no reason anybody could later name.
     ///
@@ -541,13 +542,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // OFF THE DISPATCHER, AND THAT IS THE WHOLE POINT OF THIS METHOD. The
         // resolve is MoveSpaceCheck.ResolveIsOnInstallerCacheDrive, which reaches
         // GetVolumePathName, and Win32 documents that as validating a remote path
-        // over the network; IsRemotePath turns away the shapes that say so in
-        // their spelling, and a mapped drive letter does not. ConfigureAwait(true)
-        // to come back and publish on the thread the binding is read from.
+        // over the network; for a share, or a drive mapped onto one, it also opens
+        // the destination's folder through the share. ConfigureAwait(true) to come
+        // back and publish on the thread the binding is read from.
         //
         // No token on the Task.Run: the debounce is the cancellable part and it
-        // is over, the body is two volume queries and a token cannot abandon a
-        // Win32 call once it has started, and the token check below is what
+        // is over, the body is two volume queries (and for a share, opens through
+        // it) and a token cannot abandon a Win32 call once it has started, and the token check below is what
         // decides whether the answer is still wanted.
         // The three-state answer, so that Windows declining the question is not
         // published as "somewhere else". The tooltip says something about this

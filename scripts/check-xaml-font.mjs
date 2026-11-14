@@ -292,8 +292,31 @@ for (const e of popupElements) {
 
 // --- C# ---------------------------------------------------------------------
 
+// The first type in a class's base list, read from just after its name: past a
+// type-parameter list and a primary constructor's parameter list, each balanced to
+// its closer, to the colon. Null where the class names no base.
+const baseAfter = (text, at) => {
+  let i = at;
+  const skipSpace = () => { while (/\s/.test(text[i] ?? '')) i++; };
+  const skipBalanced = (open, close) => {
+    let depth = 0;
+    for (; i < text.length; i++) {
+      if (text[i] === open) depth++;
+      else if (text[i] === close && --depth === 0) { i++; return; }
+    }
+  };
+  skipSpace();
+  if (text[i] === '<') { skipBalanced('<', '>'); skipSpace(); }
+  if (text[i] === '(') { skipBalanced('(', ')'); skipSpace(); }
+  if (text[i] !== ':') return null;
+  i++;
+  skipSpace();
+  return /^(?:global::)?[\w.]+/.exec(text.slice(i))?.[0] ?? null;
+};
+
 // Every class whose base chain reaches Window, from `class X : Base` across
-// every file, the namespace taken from the file's own declaration.
+// every file, the namespace taken from the file's own declaration. A primary
+// constructor, class X(string m) : Base, is read the same way.
 const bases = new Map(); // full name -> { base, file, line }
 const simpleToFull = new Map();
 const csTexts = [];
@@ -302,9 +325,11 @@ for (const file of csFiles) {
   const lineAt = lineIndex(text);
   csTexts.push([file, text, lineAt]);
   const ns = text.match(/^\s*namespace\s+([\w.]+)/m)?.[1] ?? '';
-  for (const m of text.matchAll(/\bclass\s+(\w+)(?:<[^>]*>)?\s*:\s*([\w.]+)/g)) {
+  for (const m of text.matchAll(/\bclass\s+(\w+)/g)) {
+    const base = baseAfter(text, m.index + m[0].length);
+    if (base === null) continue;
     const full = ns ? `${ns}.${m[1]}` : m[1];
-    bases.set(full, { base: m[2].replace(/^System\.Windows\./, ''), file, line: lineAt(m.index) });
+    bases.set(full, { base: base.replace(/^(?:global::)?System\.Windows\./, ''), file, line: lineAt(m.index) });
     if (!simpleToFull.has(m[1])) simpleToFull.set(m[1], []);
     simpleToFull.get(m[1]).push(full);
   }
@@ -328,10 +353,84 @@ for (const [full, entry] of bases) {
   }
 }
 
+const isWindowType = (type) =>
+  type.replace(/\?$/, '').replace(/^(?:global::)?System\.Windows\./, '') === 'Window';
+
+// A Window built in C# by name. A class derived from Window is held above to being
+// the x:Class of a XAML root, so building one by name builds that window.
 for (const [file, text, lineAt] of csTexts) {
-  for (const m of text.matchAll(/\bnew\s+(?:System\.Windows\.)?Window\s*[({]/g)) {
+  for (const m of text.matchAll(/\bnew\s+(?:global::)?(?:System\.Windows\.)?Window\s*[({]/g)) {
     problems.push(`${file}:${lineAt(m.index)}: constructs a Window in C#, which has no root tag to carry the font`);
   }
+}
+
+// A target-typed new(), which names no type, builds whatever its target is. Its
+// target is read from what the new() stands in: a declaration, T x = new(...); a
+// property initializer, T X { get; } = new(...); an assignment, x = new(...), with
+// x's declaration in the file; an expression-bodied member, T Name(...) => new(...);
+// and a return, from the nearest member header above it. A target that is Window
+// fails as new Window() does. Only the
+// projects building with WPF can construct a Window, and these are read from the
+// project files; there a new() whose target none of those shapes gives fails too,
+// unless TARGET_NOT_READ names it, by file and the text of its line, as building a
+// type that is no Window. Each entry has to match exactly one such new().
+const TARGET_NOT_READ = [
+  // Arms of a switch expression whose value is a ScanFailureDescription.
+  { file: 'src/InstallerClean/ViewModels/ScanViewModel.cs', text: 'new(ex.Message, Strings.Error_AdminRequiredTitle, IsError: false, Strings.Status_ScanAccessDenied),' },
+  { file: 'src/InstallerClean/ViewModels/ScanViewModel.cs', text: 'new(Strings.Error_AdminRequiredBody, Strings.Error_AdminRequiredTitle, IsError: false, Strings.Status_ScanAccessDenied),' },
+];
+const wpfProjects = sourceFiles(SRC, '.csproj')
+  .filter((p) => !p.startsWith(`${SRC}/InstallerClean.Tests/`))
+  .filter((p) => /<UseWPF>\s*true\s*<\/UseWPF>/i.test(blankXmlComments(readFileSync(p, 'utf8'))))
+  .map((p) => `${p.slice(0, p.lastIndexOf('/'))}/`);
+if (wpfProjects.length === 0) problems.push('no project outside the tests builds with UseWPF, so the target-typed new() sweep read nothing');
+const TYPE = String.raw`(?:global::)?[\w.]+(?:<[^;(){}=]*?>)?\??`;
+const newTargetOf = (bare, at) => {
+  const before = bare.slice(Math.max(0, at - 600), at);
+  let m;
+  if ((m = new RegExp(`(${TYPE})\\s+@?\\w+\\s*=\\s*$`).exec(before))) return m[1];
+  if ((m = new RegExp(`(${TYPE})\\s+@?\\w+\\s*\\{[^{}]*\\}\\s*=\\s*$`).exec(before))) return m[1];
+  if ((m = new RegExp(`(${TYPE})\\s+@?\\w+\\s*(?:\\([^()]*\\))?\\s*=>\\s*$`).exec(before))) return m[1];
+  if ((m = /(?<![\w.])(?:this\.)?(@?\w+)\s*(?:=|\?\?=)\s*$/.exec(before))) {
+    const name = m[1].replace(/^@/, '');
+    const declared = new RegExp(`(${TYPE})\\s+@?${name}\\s*[;=,)]`).exec(bare);
+    return declared ? declared[1] : null;
+  }
+  if (/\breturn\s*$/.test(before)) {
+    const headers = [...bare.slice(0, at).matchAll(new RegExp(`(${TYPE})\\s+@?\\w+\\s*(?:<[^<>()]*>)?\\s*\\([^()]*\\)\\s*(?:where\\s[^{;]*)?\\{`, 'g'))];
+    const last = headers[headers.length - 1];
+    return last && !/^(?:if|while|for|foreach|switch|using|lock|catch|fixed|return|new|else)$/.test(last[1]) ? last[1] : null;
+  }
+  return null;
+};
+const notReadUsed = TARGET_NOT_READ.map(() => 0);
+let targetTyped = 0;
+for (const [file] of csTexts) {
+  if (!wpfProjects.some((d) => file.startsWith(d))) continue;
+  const bare = readCSharp(readFileSync(file, 'utf8')).bare;
+  const lineAt = lineIndex(bare);
+  const lines = readFileSync(file, 'utf8').split('\n');
+  for (const m of bare.matchAll(/(?<![\w.@])new\s*\(/g)) {
+    targetTyped++;
+    const line = lineAt(m.index);
+    const type = newTargetOf(bare, m.index);
+    if (type !== null) {
+      if (isWindowType(type)) problems.push(`${file}:${line}: constructs a ${type} with new(), and a Window built in C# has no root tag to carry the font`);
+      continue;
+    }
+    const text = lines[line - 1].trim();
+    const k = TARGET_NOT_READ.findIndex((e) => e.file === file && text.includes(e.text));
+    if (k !== -1) { notReadUsed[k]++; continue; }
+    problems.push(`${file}:${line}: a new() whose target type this check cannot read, so it cannot tell whether it builds a Window: ${text}`);
+  }
+}
+TARGET_NOT_READ.forEach((e, k) => {
+  if (notReadUsed[k] !== 1) problems.push(`TARGET_NOT_READ entry for ${e.file} matched ${notReadUsed[k]} new() expressions, not one: ${e.text}`);
+});
+console.log(`Target-typed new() in ${wpfProjects.join(', ')}: ${targetTyped}, ${TARGET_NOT_READ.length} named as no Window`);
+if (targetTyped === 0) problems.push('the target-typed new() sweep matched nothing in the WPF projects, so it is not reading them');
+
+for (const [file, text, lineAt] of csTexts) {
 
   // A Style set in C#. In an object initializer the type being built is read
   // from the nearest unclosed `new T {` before it; anywhere else the target

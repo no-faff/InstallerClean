@@ -664,6 +664,60 @@ public class DeclaredProductCheckUnlistedKeyTests
             check.Outcomes);
     }
 
+    [Fact]
+    public void A_key_recording_a_cached_package_with_no_list_installed_from_another_folder_keeps_nothing()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(Setup);
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_recording_a_cached_package_whose_InstallProperties_hold_no_InstallSource_keeps_nothing()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.Registry.Holds(
+            Properties(System, KeyCode),
+            new RegistryValue("DisplayName", RegistryValueKind.String, "Example"));
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData("http://example.com/setup/")]
+    [InlineData("HTTPS://example.com/setup/")]
+    public void A_key_recording_a_cached_package_installed_from_a_web_address_keeps_nothing(string address)
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(address);
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData(Setup)]
+    [InlineData(Share)]
+    public void A_key_recording_a_cached_package_installed_from_a_drive_or_share_beside_a_list_that_reads_keeps_nothing(
+        string installSource)
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(installSource);
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
     // ---------------------------------------------------------------- recording no cached package
 
     private static readonly DeclaredProductOutcome[] EveryFileKept =
@@ -1161,9 +1215,12 @@ public class DeclaredProductCheckUnlistedKeyTests
     [Fact]
     public void A_key_with_no_InstallProperties_keeps_the_package_at_a_local_folder_on_its_list_by_identity()
     {
+        // The package's name opens nothing in the Installer folder, so the identity read
+        // of the package on the list is the only thing that can keep First.
         var pc = new Pc();
-        pc.HasList(HiveList(System, KeyCode), SetupName, Folder);
-        pc.Files.Opens(Folder + SetupName, 1);
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
 
         Assert.Equal(
             [DeclaredProductOutcome.Unestablished, LetThrough],
@@ -1363,6 +1420,69 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.HasList(MachineList(KeyCode), SetupName, Setup);
         pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
         pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_has_a_media_package_path_keeps_nothing_while_Windows_follows_no_such_link()
+    {
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Registry.Holds(
+            HiveList(System, KeyCode) + @"\Media",
+            new RegistryValue("MediaPackage", RegistryValueKind.String, @"\sub\"));
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_was_last_used_at_a_web_address_keeps_nothing()
+    {
+        var list = HiveList(System, KeyCode);
+        var pc = new Pc();
+        pc.HasList(list, SetupName, Setup);
+        pc.Registry.Holds(
+            list,
+            new RegistryValue("PackageName", RegistryValueKind.String, SetupName),
+            new RegistryValue("LastUsedSource", RegistryValueKind.ExpandString, "u;1;http://example.com/setup/"));
+        pc.Registry.Holds(list + @"\URL", new RegistryValue("1", RegistryValueKind.ExpandString, "http://example.com/setup/"));
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_was_last_used_at_a_media_source_reads_that_folder_and_keeps_nothing()
+    {
+        const string mediaFolder = @"E:\Media\";
+        var list = HiveList(System, KeyCode);
+        var pc = new Pc();
+        pc.HasList(list, SetupName, Setup);
+        pc.Registry.Holds(
+            list,
+            new RegistryValue("PackageName", RegistryValueKind.String, SetupName),
+            new RegistryValue("LastUsedSource", RegistryValueKind.ExpandString, "m;1;" + mediaFolder));
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(mediaFolder + SetupName, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+        Assert.Contains(mediaFolder + SetupName, pc.Files.Reads);
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_has_no_Net_key_names_no_folder_and_keeps_nothing()
+    {
+        var list = HiveList(System, KeyCode);
+        var pc = new Pc();
+        pc.Registry.Holds(list, new RegistryValue("PackageName", RegistryValueKind.String, SetupName));
+        pc.Registry.Answers(list + @"\Net", RegistryKeyPresence.Absent);
+        pc.Registry.Answers(list + @"\URL", RegistryKeyPresence.Absent);
+        pc.Registry.Answers(list + @"\Media", RegistryKeyPresence.Absent);
 
         Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
     }

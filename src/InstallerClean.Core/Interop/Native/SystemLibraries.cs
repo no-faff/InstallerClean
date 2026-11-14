@@ -105,7 +105,7 @@ internal static class SystemLibraries
     /// </summary>
     /// <remarks>
     /// Never compiled into the method calling it: the crash log's code uses what .NET Framework
-    /// below 4.6 lacks, and the check has to answer before any of it is compiled.
+    /// below 4.8 lacks, and the check has to answer before any of it is compiled.
     /// </remarks>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
     internal static void WriteWhatTheInitializerKept()

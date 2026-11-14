@@ -15,10 +15,30 @@ namespace InstallerClean.Models;
 /// access-denied from other write failures does not need to know about
 /// this subclass.
 /// </summary>
-public sealed class LocalisedAccessException : UnauthorizedAccessException
+public sealed class LocalisedAccessException : UnauthorizedAccessException, IClosingSentenceMessage
 {
-    public LocalisedAccessException(string message) : base(message) { }
+    public LocalisedAccessException(string message) : base(message)
+    {
+        MessageWithoutClosingSentence = message;
+    }
 
     public LocalisedAccessException(string message, Exception innerException)
-        : base(message, innerException) { }
+        : base(message, innerException)
+    {
+        MessageWithoutClosingSentence = message;
+    }
+
+    /// <summary>
+    /// <paramref name="message"/> followed by <paramref name="closingSentence"/>, joined
+    /// as the language the app is showing joins two sentences. crash.log leaves the
+    /// closing sentence out (<see cref="IClosingSentenceMessage"/>).
+    /// </summary>
+    public LocalisedAccessException(string message, string closingSentence)
+        : base(message + Helpers.DisplayHelpers.SentenceSpace + closingSentence)
+    {
+        MessageWithoutClosingSentence = message;
+    }
+
+    /// <inheritdoc/>
+    public string MessageWithoutClosingSentence { get; }
 }

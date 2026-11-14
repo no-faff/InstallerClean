@@ -83,7 +83,9 @@ internal static class FullPaths
     /// <see cref="ArgumentException"/> naming <c>path</c>; a failure in Windows is the
     /// exception <see cref="Win32Marshal"/> gives for its error, naming the path.
     /// </summary>
-    public static string GetFullPath(string path)
+    public static string GetFullPath(string path) => GetFullPath(path, expandShortNames: true);
+
+    private static string GetFullPath(string path, bool expandShortNames)
     {
         if (path is null) throw new ArgumentNullException(nameof(path));
 
@@ -98,15 +100,22 @@ internal static class FullPaths
         if (PathText.IsExtended(path))
             return path;
 
-        return Normalize(path);
+        return Normalize(path, expandShortNames);
     }
+
+    /// <summary>
+    /// <see cref="GetFullPath(string)"/> without its short names expanded, so nothing is asked of the
+    /// folders the path names: the path's text as Windows reads it when it opens the path, its
+    /// <c>.</c> and <c>..</c> taken out.
+    /// </summary>
+    internal static string GetFullPathAsText(string path) => GetFullPath(path, expandShortNames: false);
 
     /// <summary>
     /// <paramref name="path"/> relative to the folder <paramref name="relativeTo"/>, both made
     /// full paths first and compared ignoring case: <c>.</c> where they are the same folder,
     /// and <paramref name="path"/>'s full path where the two have different roots. A trailing
     /// separator on <paramref name="path"/> is kept. The arguments are checked as
-    /// <see cref="GetFullPath"/> checks its own, <paramref name="relativeTo"/> first.
+    /// <see cref="GetFullPath(string)"/> checks its own, <paramref name="relativeTo"/> first.
     /// </summary>
     public static string GetRelativePath(string relativeTo, string path)
     {

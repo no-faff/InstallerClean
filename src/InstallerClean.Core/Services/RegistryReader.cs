@@ -20,7 +20,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(relativePath);
+            using var key = hive.OpenSubKeyEarned(relativePath);
             return key is not null ? RegistryKeyPresence.Present : RegistryKeyPresence.Absent;
         }
         catch (SecurityException) { return RegistryKeyPresence.Unreadable; }
@@ -34,7 +34,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(keyPath);
+            using var key = hive.OpenSubKeyEarned(keyPath);
 
             // A key that is not there and a value that is not there answer alike,
             // because the question is what the value holds and "nothing" is true of
@@ -72,7 +72,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(keyPath);
+            using var key = hive.OpenSubKeyEarned(keyPath);
             if (key is null) return new RegistryDwordRead(RegistryDwordState.Absent);
 
             // Not expanding is inert on a REG_DWORD and is asked for
@@ -108,7 +108,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(sid);
+            using var key = hive.OpenSubKeyEarned(sid);
             return key is not null ? RegistryKeyPresence.Present : RegistryKeyPresence.Absent;
         }
         catch (SecurityException) { return RegistryKeyPresence.Unreadable; }
@@ -122,7 +122,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(root, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(keyPath);
+            using var key = hive.OpenSubKeyEarned(keyPath);
             if (key is null) return new RegistryKeyValues(RegistryKeyPresence.Absent);
 
             // The default value is listed under the empty name when it is set, so a

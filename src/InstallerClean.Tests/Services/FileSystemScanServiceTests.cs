@@ -161,7 +161,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -220,7 +220,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanNoRegisteredFileInFolder, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanNoRegisteredFileInFolder), ex.Message);
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             ScanWithRegisteredSplit(present: 1, missing: 30));
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -395,7 +395,7 @@ public class FileSystemScanServiceTests
 
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             ScanWithRegisteredSplit(present, missing));
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed), ex.Message);
     }
 
     [Fact]
@@ -422,7 +422,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, fs, new[] { orphan }, root).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCacheRootUnresolved, ex.Message);
+        Assert.Equal(StopMessages.NothingRemoved(InstallerClean.Resources.Strings.Error_ScanCacheRootUnresolved), ex.Message);
     }
 
     [Fact]
@@ -1261,7 +1261,10 @@ public class FileSystemScanServiceTests
         // Only root-level files are candidates. A registered LocalPackage path
         // never sits in a subdirectory, so the API can say nothing about a file
         // there. That puts a payload .msp under $PatchCache$ (the patch engine's
-        // baseline copy) and every other subfolder file out of scope.
+        // baseline copy) and every other subfolder file out of scope: neither
+        // offered nor counted as left alone. The containment check would keep a
+        // subfolder file off the offer on its own, so the count is what shows the
+        // walk never reached it.
         var fs = new MockFileSystem(new Dictionary<string, MockFileData>
         {
             [@"C:\Windows\Installer\bbb.msi"] = new("x"),                                     // root: a candidate
@@ -1273,6 +1276,9 @@ public class FileSystemScanServiceTests
 
         var result = await svc.ScanAsync();
 
+        Assert.Equal(0, result.WithheldCount);
+        Assert.Empty(result.WithheldFiles ?? Array.Empty<OrphanedFile>());
+        Assert.Equal(0, result.LeftAloneCount);
         Assert.Single(result.RemovableFiles);
         Assert.Equal(@"C:\Windows\Installer\bbb.msi", result.RemovableFiles[0].FullPath);
     }
@@ -1375,7 +1381,7 @@ public class FileSystemScanServiceTests
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, new MockFileSystem()).ScanAsync());
 
-        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound), ex.Message);
         Assert.IsAssignableFrom<DirectoryNotFoundException>(ex.InnerException);
         await query.DidNotReceive().GetRegisteredPackagesAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -1438,8 +1444,8 @@ public class FileSystemScanServiceTests
     }
 
     private static string StopFor(bool saysNotFound) => saysNotFound
-        ? InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound
-        : InstallerClean.Resources.Strings.Error_ScanInstallerFolderListFailed;
+        ? StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanInstallerFolderNotFound)
+        : StopMessages.NothingOfferedNothingRemoved(InstallerClean.Resources.Strings.Error_ScanInstallerFolderListFailed);
 
     [Fact]
     public async Task A_walk_cancelled_part_way_ends_as_a_cancellation()
@@ -1684,14 +1690,19 @@ public class FileSystemScanServiceTests
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
-        var fakeFiles = Array.Empty<string>();
+        // The file is on disk, so the row reaches the branch that offers a registered
+        // row, and only its IsRemovable keeps it off the offer.
+        var fs = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            [@"C:\Windows\Installer\fallback.msi"] = new("x"),
+        });
 
-        var svc = new FileSystemScanService(mockQuery, fakeFiles);
+        var svc = new FileSystemScanService(mockQuery, fs);
         var result = await svc.ScanAsync();
 
         // Fallback entries (PatchState=0, IsRemovable=false) stay in registered, not removable
         Assert.Empty(result.RemovableFiles);
-        Assert.Single(result.RegisteredPackages);
+        Assert.Equal(@"C:\Windows\Installer\fallback.msi", Assert.Single(result.RegisteredPackages).LocalPackagePath);
     }
 
     [Fact]

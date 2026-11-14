@@ -13,6 +13,7 @@ public class SystemLibrariesTests
     public static TheoryData<string, Action> CoreImports => new()
     {
         { "msi.dll", () => Msi.MsiCloseHandle(0) },
+        { "netapi32.dll", () => Netapi32.NetApiBufferFree(IntPtr.Zero) },
         { "ole32.dll", () => Ole32.CoTaskMemFree(IntPtr.Zero) },
         { "oleaut32.dll", () => OleAut32.SysFreeString(IntPtr.Zero) },
         { "shell32.dll", () => KnownFolders.GetPath(Environment.SpecialFolder.CommonApplicationData) },

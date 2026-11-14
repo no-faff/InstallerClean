@@ -48,7 +48,7 @@ $libraryFolderFlags = 0x1F00
 $searchCall = 'InstallerClean.Interop.Native.SystemLibraries::SearchSystem32For(System.Reflection.Assembly)'
 
 # The libraries the exes' own P/Invokes name.
-$libraries = 'advapi32.dll', 'dwmapi.dll', 'kernel32.dll', 'msi.dll', 'ntdll.dll', 'ole32.dll', 'oleaut32.dll', 'shell32.dll', 'user32.dll'
+$libraries = 'advapi32.dll', 'dwmapi.dll', 'kernel32.dll', 'msi.dll', 'netapi32.dll', 'ntdll.dll', 'ole32.dll', 'oleaut32.dll', 'shell32.dll', 'user32.dll'
 
 # The imports that load a library by name or set where one is searched for, by entry point,
 # each with the members that may call it. SetDefaultDllDirectories is taken by address.

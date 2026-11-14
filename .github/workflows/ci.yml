@@ -11,12 +11,12 @@ on:
   # exception. Also usable as a manual re-run from the Actions tab.
   workflow_dispatch:
 
-# Read-only, declared rather than inherited from the repository default. Every
-# step below only reads: two pinned actions, the node guards, dotnet, a
-# Chocolatey install and ISCC. Nothing here pushes, comments or uploads an
-# artefact, and a job that restores from nuget.org and installs a package from
-# the Chocolatey community feed is the one place a build-time dependency could
-# reach for whatever token the run is holding.
+# Read-only, declared rather than inherited from the repository default. Nothing
+# here pushes or comments: the steps run pinned actions, the node guards, dotnet,
+# a Chocolatey install, ISCC and WiX from nuget.org, and upload artefacts. A job
+# that restores from nuget.org or installs a package from the Chocolatey community
+# feed is where a build-time dependency could reach for whatever token the run is
+# holding.
 permissions:
   contents: read
 
@@ -413,10 +413,13 @@ jobs:
           "UI culture: $(if ($ui.Name) { $ui.Name } else { 'invariant' })"
 
       # The normal console verbosity prints each test with its outcome, and each
-      # skipped test with the reason it gives, which the default leaves out.
+      # skipped test with the reason it gives, which the default leaves out. A test
+      # still running after five minutes, where the slowest takes seconds, ends the
+      # run and is named as the test that was running, so a hang fails the step
+      # rather than holding it; no dump is taken, the name being what is wanted.
       - name: Test
         if: success() || failure()
-        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal"
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal" --blame-hang-timeout 5m --blame-hang-dump-type none
 
       # A build reports a broken reference in a documentation comment only when
       # it writes the documentation file, which no project here asks for. This
@@ -769,11 +772,36 @@ jobs:
         shell: pwsh
         run: ./scripts/check-one-file.ps1
 
+      # Reads each merged exe's PE and CLI headers: AMD64, PE32+, IL only, and no request or
+      # preference for a 32-bit process. An AnyCPU exe preferring 32-bit, built by the script,
+      # is its control.
+      - name: Check each merged exe is a 64-bit x64 image
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-architecture.ps1
+
+      # The report written through the merged command line, on this runner's .NET Framework,
+      # against the bytes .NET 10 writes for the same report (FixedReport.net10.json). The
+      # merge rewrites the metadata the report's property order is read from.
+      - name: Check the merged command line writes the report as .NET 10 does
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-report-bytes.ps1
+
+      # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
+      # command line prints. This reads that resource out of each merged exe against the file,
+      # and each merge's input list against the file's table of merged packages, so a package
+      # added to either exe is named there before it ships.
+      - name: Check each merged exe carries the notices of what it merges
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-notices.ps1
+
       # Reads each merged exe's own metadata against Microsoft's reference assemblies for .NET
-      # Framework 4.6 to 4.8, downloaded from nuget.org and checked against their pinned
+      # Framework 4.0 to 4.8, downloaded from nuget.org and checked against their pinned
       # hashes. Fails where a type or member the exe references is not in 4.8, where anything
       # the runtime compiles or loads on the way to the copy's .NET Framework 4.8 check is not
-      # in 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 or 4.7.2, so that a PC below 4.8 would
+      # in 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 or 4.7.2, so that a PC below 4.8 would
       # not reach the message saying what to install, or where an assembly merged into the exe
       # carries a module initializer the merge drops. What the exe needs that 4.6.2 lacks is
       # printed for the record. The script builds an exe whose check path reaches what those
@@ -1015,6 +1043,32 @@ jobs:
   # therefore restores clean on Windows and fails NU1004 on Linux, so the job
   # above cannot see that gap and this restore is the one that can.
   #
+  # The merged command line's own UpdateDownloadService, on the runner's .NET Framework,
+  # downloading the v3.7.0 release's command line from GitHub as an update does. A job of
+  # its own, as the one check that needs github.com to answer, so build-and-test answers for
+  # the code alone; the script tries a failed request three times before it fails.
+  update-download:
+    name: Update download (Windows)
+    runs-on: windows-2025
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Merge the command line into one file
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+
+      - name: Check the merged command line downloads a release exe
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/check-update-download.ps1
+
   # A separate job rather than a step, because the one above is pinned to
   # windows-2025 and this has to run somewhere else. It reads the same locks
   # from the same checkout and writes nothing.
@@ -1913,8 +1967,8 @@ jobs:
           # .NET Framework has no single-file publish and a Debug build is not merged
           # (the merge is Release only), so the old copy is a plain build: the exe with
           # its assemblies beside it, which is the copy the update replaces at its path.
-          # Framework seat 34's job 12 builds this from the v3.5.0 tag instead; here it
-          # is the current source, so the start handshake and its timing run every push.
+          # Self-update builds its old copy from the v3.5.0 tag; here it is the current
+          # source, so the start handshake and its timing run every push.
           dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Debug -p:RestoreLockedMode=true --nologo -o publish/old
           if ($LASTEXITCODE -ne 0) { throw "The old copy did not build." }
           # The newer version is the merged 9.9.9 command line, one file as it ships.
@@ -2260,3 +2314,437 @@ jobs:
             exit 1
           }
           'Every check passed.'
+
+  # 3.7.0's command line, from its release, and this build's merged command line scan the
+  # same runner, and the job fails where they do not offer and hold the same files, but for a
+  # test file whose row names the difference and its reason
+  # (scripts/scan-comparison/compare-scans.ps1 says what else fails it and how it checks
+  # itself). It compares twice: on the runner's Installer folder as the image leaves it, and
+  # again once set-up-scenarios.ps1 has installed test programs and patches and put files of
+  # known kinds into the folder. Both command lines run /s, which changes nothing in the
+  # folder. The first-run mark is set first, so neither scan carries a report.
+  scan-comparison:
+    name: Scan comparison with 3.7.0 (Windows)
+    runs-on: windows-2025
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Merge the command line into one file
+        run: |
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The command line did not build." }
+
+      # The digest is the one GitHub records for the release asset.
+      - name: Download 3.7.0's command line
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'cli-3.7.0'
+          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern installerclean-cli.exe --dir $dir --clobber
+          if ($LASTEXITCODE -ne 0) { throw "3.7.0's command line did not download." }
+          $recorded = gh release view v3.7.0 --repo $env:GITHUB_REPOSITORY --json assets -q '.assets[] | select(.name == "installerclean-cli.exe") | .digest'
+          if ($LASTEXITCODE -ne 0 -or -not $recorded) { throw "GitHub gave no digest for 3.7.0's command line." }
+          $actual = 'sha256:' + (Get-FileHash -Algorithm SHA256 (Join-Path $dir 'installerclean-cli.exe')).Hash.ToLowerInvariant()
+          "recorded $recorded, downloaded $actual"
+          if ($actual -ne $recorded) { throw "The downloaded command line is not the release's." }
+          & (Join-Path $dir 'installerclean-cli.exe') --version
+          & 'publish/cli/installerclean-cli.exe' --version
+
+      - name: Set the first-run mark
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
+          New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
+          if ((Get-ItemProperty 'HKLM:\SOFTWARE\NoFaff\InstallerClean').FirstRunRecorded -ne 1) { throw "The first-run mark was not set." }
+
+      - name: Compare the scans of the runner as it is
+        run: pwsh scripts/scan-comparison/compare-scans.ps1 -Reference (Join-Path $env:RUNNER_TEMP 'cli-3.7.0/installerclean-cli.exe') -UnderTest publish/cli/installerclean-cli.exe -Label 'the runner as it is' -OutDir (Join-Path $env:RUNNER_TEMP 'scan-comparison')
+
+      # WiX 5 runs on any later .NET with roll-forward to a major version.
+      - name: Install the test programs and patches
+        if: success() || failure()
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw "WiX did not install." }
+          pwsh scripts/scan-comparison/set-up-scenarios.ps1 -OutDir (Join-Path $env:RUNNER_TEMP 'scan-scenarios')
+
+      - name: Compare the scans with the test programs and patches in place
+        if: success() || failure()
+        run: pwsh scripts/scan-comparison/compare-scans.ps1 -Reference (Join-Path $env:RUNNER_TEMP 'cli-3.7.0/installerclean-cli.exe') -UnderTest publish/cli/installerclean-cli.exe -Label 'with the test programs' -OutDir (Join-Path $env:RUNNER_TEMP 'scan-comparison') -Scenarios (Join-Path $env:RUNNER_TEMP 'scan-scenarios/scenarios.tsv')
+
+      - name: Upload what each scan printed
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: scan-comparison-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/scan-comparison
+            ${{ runner.temp }}/scan-scenarios/scenarios.tsv
+            ${{ runner.temp }}/scan-scenarios/logs
+          if-no-files-found: warn
+          retention-days: 7
+
+      # The merged command line this job compared, kept so a scan on another PC can run the
+      # same file.
+      - name: Upload the merged command line
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: merged-command-line-${{ github.run_attempt }}
+          path: publish/cli
+          if-no-files-found: error
+          retention-days: 30
+
+  # The merged command line run under Wine with .NET Framework 4.0 and with 4.6.2 installed
+  # in place of Wine's own runtime, each prefix set first to Windows 10 and then to
+  # Windows 7. Under Windows 10 the copy has to end with exit code 1 and the sentence saying
+  # it needs .NET Framework 4.8 on the error stream; under Windows 7, with exit code 1 and
+  # the sentence saying it needs Windows 10 version 1607 or later. Both sentences are read
+  # from Strings.resx, the English the copy prints where Windows displays a language it has
+  # no translation for. The 4.0 prefix also shows that the merged exe loads at all there,
+  # before any of its methods runs, which check-framework-references.ps1 does not read.
+  #
+  # Wine is not Windows: what it answers for the registry and the loader is its own, so a
+  # result here is a Wine run and is never read as Windows evidence. The legs install
+  # .NET Framework from Microsoft through winetricks, which can fail for reasons of its
+  # own, so each leg records its result and fails nothing else.
+  wine:
+    name: The start checks under Wine (${{ matrix.framework }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [dotnet40, dotnet462]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      # The merge writes a config beside the exe naming .NET Framework 4.8, which the runtime
+      # would read and refuse on before any of the app's code runs. The command line download
+      # carries no config, so it is taken away and the exe run as it is downloaded.
+      - name: Merge the command line into one file
+        run: |
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:EnableWindowsTargeting=true --nologo
+          test -f publish/cli/installerclean-cli.exe
+          rm publish/cli/installerclean-cli.exe.config
+
+      # The window as the portable is downloaded, with no config beside it, for the same reason.
+      - name: Merge the window into one file
+        run: |
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:EnableWindowsTargeting=true --nologo
+          test -f publish/window/InstallerClean.exe
+          rm -f publish/window/InstallerClean.exe.config
+
+      - name: Install Wine and winetricks
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wine64 wine32:i386 winetricks xvfb xauth cabextract
+          wine --version
+
+      - name: Install ${{ matrix.framework }} into a 64-bit prefix
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEARCH: win64
+          WINEDEBUG: -all
+        run: |
+          xvfb-run -a wineboot --init
+          xvfb-run -a winetricks -q --unattended ${{ matrix.framework }}
+          wineserver -w
+
+      - name: Run the command line under Windows 10 and under Windows 7
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEDEBUG: -all
+          LANG: en_US.UTF-8
+        run: |
+          set -u
+          value() {
+            python3 - "$1" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          root = ET.parse('src/InstallerClean.Core/Resources/Strings.resx').getroot()
+          hits = [d.find('value').text for d in root.iter('data') if d.get('name') == sys.argv[1]]
+          if len(hits) != 1: sys.exit(f'Strings.resx holds {len(hits)} values named {sys.argv[1]}')
+          print(hits[0])
+          PY
+          }
+          needs48=$(value Cli.NeedsNetFramework48)
+          needs1607=$(value Startup.NeedsWindows10Version1607)
+          [ -n "$needs48" ] && [ -n "$needs1607" ] || { echo "::error::Strings.resx gave no text to expect."; exit 1; }
+
+          # A process that fails under Wine opens Wine's crash dialog, which nobody closes here.
+          # With the dialog off the debugger prints what failed to the error stream and the run
+          # ends, and the time limit turns anything else that waits into an exit code.
+          wine reg add 'HKCU\Software\Wine\WineDbg' /v ShowCrashDialog /t REG_DWORD /d 0 /f > /dev/null
+          wineserver -w
+
+          failed=0
+          for pair in "win10|$needs48" "win7|$needs1607"; do
+            version=${pair%%|*}
+            expected=${pair#*|}
+            winetricks -q "$version" > /dev/null
+            wineserver -w
+            # Ubuntu's xvfb-run sends its command's error stream to its output stream, so both are
+            # redirected inside it, where each still has its own.
+            set +e
+            timeout -k 10 180 xvfb-run -a sh -c 'exec wine "$0" /s /noupdate > out.txt 2> err.txt' publish/cli/installerclean-cli.exe
+            code=$?
+            set -e
+            [ "$code" -eq 124 ] && wineserver -k
+            echo "== Wine as $version with ${{ matrix.framework }}: exit code $code"
+            echo "-- stdout"; cat out.txt
+            echo "-- stderr"; cat err.txt
+            if [ "$code" -eq 124 ]; then
+              echo "::warning::Wine run, $version with ${{ matrix.framework }}: still running after three minutes, so it was ended."
+              failed=1
+            elif [ "$code" -ne 1 ]; then
+              echo "::warning::Wine run, $version with ${{ matrix.framework }}: exit code $code, where 1 was expected."
+              failed=1
+            fi
+            if ! grep -qF -- "$expected" err.txt; then
+              echo "::warning::Wine run, $version with ${{ matrix.framework }}: the error stream does not carry \"$expected\"."
+              failed=1
+            fi
+          done
+          exit $failed
+
+      # A net40 harness loads the merged command line under the same prefix and, for each
+      # type on its refusal path, runs the static constructor and compiles every method,
+      # then makes the refusal's own calls, printing each failure whole. Where a leg does not
+      # refuse, this names the member the PC's .NET Framework lacks.
+      - name: Compile and call the refusal path one member at a time
+        if: ${{ !cancelled() }}
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEDEBUG: -all
+          LANG: en_US.UTF-8
+        run: |
+          probe="$RUNNER_TEMP/refusal-probe"
+          mkdir -p "$probe"
+          cat > "$probe/RefusalProbe.csproj" <<'XML'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net40</TargetFramework>
+              <PlatformTarget>x64</PlatformTarget>
+              <LangVersion>latest</LangVersion>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+            </ItemGroup>
+          </Project>
+          XML
+          cat > "$probe/Program.cs" <<'CS'
+          using System;
+          using System.Reflection;
+          using System.Runtime.CompilerServices;
+
+          static class Program
+          {
+              const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
+                  | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+              static int Main(string[] args)
+              {
+                  Console.WriteLine("Runtime " + Environment.Version);
+                  var exe = Assembly.LoadFrom(args[0]);
+                  string[] types =
+                  {
+                      "InstallerClean.Services.StartChecks",
+                      "InstallerClean.Services.WindowsVersionCheck",
+                      "InstallerClean.Services.NetFrameworkCheck",
+                      "InstallerClean.Services.RegistryReader",
+                      "InstallerClean.Helpers.RegistryData",
+                      "InstallerClean.Resources.Strings+FrameworkCheck",
+                  };
+                  foreach (var name in types)
+                  {
+                      var type = exe.GetType(name, false);
+                      if (type == null) { Console.WriteLine("no type " + name); continue; }
+                      Try(name + " static constructor", () => RuntimeHelpers.RunClassConstructor(type.TypeHandle));
+                      foreach (var method in type.GetMethods(All))
+                          if (!method.ContainsGenericParameters)
+                              Try(name + "." + method.Name, () => RuntimeHelpers.PrepareMethod(method.MethodHandle));
+                  }
+                  var program = exe.GetType("InstallerClean.Cli.Program", true);
+                  foreach (var name in new[] { "RefuseOnAPcThatCannotRunIt", "RefuseWithoutRecording", "TrySetUtf8Output", "RestoreOutputEncoding" })
+                      foreach (var method in program.GetMethods(All))
+                          if (method.Name == name)
+                              Try("Program." + name + " compiled", () => RuntimeHelpers.PrepareMethod(method.MethodHandle));
+                  var checks = exe.GetType("InstallerClean.Services.StartChecks", true);
+                  object refusal = null;
+                  Try("StartChecks.OfThisPc", () => refusal = checks.GetMethod("OfThisPc", All).Invoke(null, null));
+                  Console.WriteLine("  answered " + refusal);
+                  if (refusal != null)
+                      Try("StartChecks.Message", () => Console.WriteLine("  " + checks.GetMethod("Message", All).Invoke(null, new[] { refusal, (object)true })));
+                  Try("Program.RefuseOnAPcThatCannotRunIt", () => Console.WriteLine("  answered " + program.GetMethod("RefuseOnAPcThatCannotRunIt", All).Invoke(null, null)));
+                  return 0;
+              }
+
+              static void Try(string what, Action action)
+              {
+                  try { action(); }
+                  catch (Exception ex)
+                  {
+                      var inner = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
+                      Console.WriteLine("FAILED " + what + ":");
+                      Console.WriteLine(inner);
+                  }
+              }
+          }
+          CS
+          dotnet build "$probe/RefusalProbe.csproj" -c Release --nologo -o "$probe/out"
+          for version in win10 win7; do
+            winetricks -q "$version" > /dev/null
+            wineserver -w
+            echo "== The refusal path under Wine as $version with ${{ matrix.framework }}"
+            timeout -k 10 180 xvfb-run -a wine "$probe/out/RefusalProbe.exe" "$(winepath -w publish/cli/installerclean-cli.exe)" || echo "exit code $?"
+          done
+
+      # The window shows its refusal in a message box and waits for it to be closed. A net40
+      # helper run beside it finds the box by its title, prints the text it holds and presses
+      # OK; the window then has to end with exit code 1 having shown the expected sentence.
+      - name: Run the window under Windows 10 and under Windows 7
+        if: ${{ !cancelled() }}
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEDEBUG: -all
+          LANG: en_US.UTF-8
+        run: |
+          set -u
+          value() {
+            python3 - "$1" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          root = ET.parse('src/InstallerClean.Core/Resources/Strings.resx').getroot()
+          hits = [d.find('value').text for d in root.iter('data') if d.get('name') == sys.argv[1]]
+          if len(hits) != 1: sys.exit(f'Strings.resx holds {len(hits)} values named {sys.argv[1]}')
+          print(hits[0])
+          PY
+          }
+          needs48=$(value Startup.NeedsNetFramework48)
+          needs1607=$(value Startup.NeedsWindows10Version1607)
+          title=$(value Window.Main.Title)
+          [ -n "$needs48" ] && [ -n "$needs1607" ] && [ -n "$title" ] || { echo "::error::Strings.resx gave no text to expect."; exit 1; }
+
+          reader="$RUNNER_TEMP/box-reader"
+          mkdir -p "$reader"
+          cat > "$reader/BoxReader.csproj" <<'XML'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net40</TargetFramework>
+              <LangVersion>latest</LangVersion>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+            </ItemGroup>
+          </Project>
+          XML
+          cat > "$reader/Program.cs" <<'CS'
+          using System;
+          using System.Runtime.InteropServices;
+          using System.Text;
+          using System.Threading;
+
+          // args[0]: the box's title. args[1]: how many seconds to wait for it. Prints the box's
+          // text and presses its OK button, exit 0; exit 2 where no box shows in time, having
+          // printed every top-level window.
+          static class Program
+          {
+              delegate bool EnumProc(IntPtr window, IntPtr data);
+              [DllImport("user32.dll")] static extern bool EnumWindows(EnumProc proc, IntPtr data);
+              [DllImport("user32.dll")] static extern bool EnumChildWindows(IntPtr parent, EnumProc proc, IntPtr data);
+              [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetWindowText(IntPtr window, StringBuilder text, int length);
+              [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetClassName(IntPtr window, StringBuilder name, int length);
+              [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr window);
+              [DllImport("user32.dll")] static extern bool PostMessage(IntPtr window, uint message, IntPtr w, IntPtr l);
+
+              static string Text(IntPtr window) { var s = new StringBuilder(4096); GetWindowText(window, s, s.Capacity); return s.ToString(); }
+              static string Class(IntPtr window) { var s = new StringBuilder(256); GetClassName(window, s, s.Capacity); return s.ToString(); }
+
+              static int Main(string[] args)
+              {
+                  var deadline = DateTime.UtcNow.AddSeconds(int.Parse(args[1]));
+                  while (DateTime.UtcNow < deadline)
+                  {
+                      var box = IntPtr.Zero;
+                      EnumWindows((w, d) =>
+                      {
+                          if (IsWindowVisible(w) && Class(w) == "#32770" && Text(w) == args[0]) { box = w; return false; }
+                          return true;
+                      }, IntPtr.Zero);
+                      if (box != IntPtr.Zero)
+                      {
+                          Console.WriteLine("title: " + Text(box));
+                          EnumChildWindows(box, (w, d) =>
+                          {
+                              if (Class(w) == "Static" && Text(w).Length > 0) Console.WriteLine("text: " + Text(w));
+                              return true;
+                          }, IntPtr.Zero);
+                          PostMessage(box, 0x0111 /* WM_COMMAND */, (IntPtr)1 /* IDOK */, IntPtr.Zero);
+                          return 0;
+                      }
+                      Thread.Sleep(500);
+                  }
+                  Console.WriteLine("No message box titled " + args[0] + " showed. The top-level windows:");
+                  EnumWindows((w, d) => { Console.WriteLine("  [" + Class(w) + "] " + Text(w) + (IsWindowVisible(w) ? "" : " (hidden)")); return true; }, IntPtr.Zero);
+                  return 2;
+              }
+          }
+          CS
+          dotnet build "$reader/BoxReader.csproj" -c Release --nologo -o "$reader/out"
+
+          # Both under one display: the window in the background, the reader beside it.
+          cat > "$RUNNER_TEMP/window-run.sh" <<'SH'
+          wine "$1" > window-out.txt 2> window-err.txt &
+          app=$!
+          wine "$2" "$3" 120 > box.txt 2>&1
+          echo $? > box-code.txt
+          wait $app
+          echo $? > window-code.txt
+          SH
+
+          failed=0
+          for pair in "win10|$needs48" "win7|$needs1607"; do
+            version=${pair%%|*}
+            expected=${pair#*|}
+            winetricks -q "$version" > /dev/null
+            wineserver -w
+            rm -f window-out.txt window-err.txt box.txt box-code.txt window-code.txt
+            set +e
+            timeout -k 10 240 xvfb-run -a sh "$RUNNER_TEMP/window-run.sh" publish/window/InstallerClean.exe "$reader/out/BoxReader.exe" "$title"
+            outer=$?
+            set -e
+            [ "$outer" -eq 124 ] && wineserver -k
+            code=$(cat window-code.txt 2>/dev/null || echo none)
+            echo "== The window under Wine as $version with ${{ matrix.framework }}: exit code $code"
+            echo "-- the message box"; cat box.txt 2>/dev/null
+            echo "-- the window's error stream"; cat window-err.txt 2>/dev/null
+            if [ "$outer" -eq 124 ]; then
+              echo "::warning::Wine window run, $version with ${{ matrix.framework }}: still running after four minutes, so it was ended."
+              failed=1
+            elif [ "$code" != 1 ]; then
+              echo "::warning::Wine window run, $version with ${{ matrix.framework }}: exit code $code, where 1 was expected."
+              failed=1
+            fi
+            if ! grep -qF -- "$expected" box.txt 2>/dev/null; then
+              echo "::warning::Wine window run, $version with ${{ matrix.framework }}: the message box does not carry \"$expected\"."
+              failed=1
+            fi
+          done
+          exit $failed

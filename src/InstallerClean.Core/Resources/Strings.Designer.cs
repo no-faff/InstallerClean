@@ -16,10 +16,13 @@ using InstallerClean.Helpers;
 /// Strongly-typed accessor over Strings.resx. C# code paths use these
 /// properties for compile-time safety; XAML uses {loc:Translate Key}
 /// (see TranslateExtension) which resolves the same keys at runtime.
-/// Get and Find are the only two routes from a resx value to a user and
-/// both spend the installer-folder token, which is what lets a string
-/// name the cache folder correctly on a machine whose Windows is not on
-/// C:. scripts/check-cross-key-rules.mjs fails the build on a third.
+/// Get and Find are the routes from a resx value to a user and both spend
+/// the installer-folder token, which is what lets a string name the cache
+/// folder correctly on a machine whose Windows is not on C:. The third,
+/// FrameworkCheck below, serves only the strings of a copy's start checks,
+/// none of which carries the token. scripts/check-cross-key-rules.mjs
+/// fails the build on a read anywhere else, and check-designer-parity.mjs
+/// on a fourth door here.
 /// </summary>
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("InstallerClean.ResxGen", "1.0.0.0")]
 public static class Strings
@@ -61,6 +64,7 @@ public static class Strings
 
     public static string About_AutoUpdateCheck => Get("About.AutoUpdateCheck");
     public static string About_Link_Guide => Get("About.Link.Guide");
+    public static string About_Link_Notices => Get("About.Link.Notices");
     public static string About_Link_ReportProblem => Get("About.Link.ReportProblem");
     public static string Action_About => Get("Action.About");
     public static string Action_BackupFolderPlaceholder => Get("Action.BackupFolderPlaceholder");
@@ -85,6 +89,7 @@ public static class Strings
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_StopWaiting => Get("Action.StopWaiting");
     public static string Automation_About_Guide_HelpText => Get("Automation.About.Guide.HelpText");
+    public static string Automation_About_Notices_HelpText => Get("Automation.About.Notices.HelpText");
     public static string Automation_About_ReportProblem_HelpText => Get("Automation.About.ReportProblem.HelpText");
     public static string Automation_AutoUpdateCheck_HelpText => Get("Automation.AutoUpdateCheck.HelpText");
     public static string Automation_BackupFolder => Get("Automation.BackupFolder");
@@ -112,8 +117,8 @@ public static class Strings
     public static string Automation_ReportInfo => Get("Automation.ReportInfo");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
-    public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
     public static string Automation_ScanResultAnnouncement => Get("Automation.ScanResultAnnouncement");
+    public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
     public static string Automation_Scroll_DialogBody => Get("Automation.Scroll.DialogBody");
     public static string Automation_Scroll_FileDetails => Get("Automation.Scroll.FileDetails");
     public static string Automation_Scroll_ProductDetails => Get("Automation.Scroll.ProductDetails");
@@ -176,6 +181,7 @@ public static class Strings
     public static string Cli_DonateAsk => Get("Cli.DonateAsk");
     public static string Cli_EventLogAdminRightsNeeded => Get("Cli.EventLogAdminRightsNeeded");
     public static string Cli_EventLogBadArguments => Get("Cli.EventLogBadArguments");
+    public static string Cli_EventLogCancelledNoFileRemoved => Get("Cli.EventLogCancelledNoFileRemoved");
     public static string Cli_EventLogCancelledNoWork => Get("Cli.EventLogCancelledNoWork");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogCoverLostNoWork => Get("Cli.EventLogCoverLostNoWork");
@@ -186,8 +192,8 @@ public static class Strings
     public static string Cli_EventLogMissingFromDisk_Plural => Get("Cli.EventLogMissingFromDisk.Plural");
     public static string Cli_EventLogMissingFromDisk_Singular => Get("Cli.EventLogMissingFromDisk.Singular");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
-    public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
+    public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
     public static string Cli_EventLogMoveDestinationTooLong => Get("Cli.EventLogMoveDestinationTooLong");
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
@@ -210,16 +216,16 @@ public static class Strings
     public static string Cli_EventLogReason_RegistryCheckUnreadable => Get("Cli.EventLogReason.RegistryCheckUnreadable");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
-    public static string Cli_EventLogScanWithheldPatchFiles_Plural => Get("Cli.EventLogScanWithheldPatchFiles.Plural");
-    public static string Cli_EventLogScanWithheldPatchFiles_Singular => Get("Cli.EventLogScanWithheldPatchFiles.Singular");
     public static string Cli_EventLogScanWithheld_Plural => Get("Cli.EventLogScanWithheld.Plural");
     public static string Cli_EventLogScanWithheld_Singular => Get("Cli.EventLogScanWithheld.Singular");
+    public static string Cli_EventLogScanWithheldPatchFiles_Plural => Get("Cli.EventLogScanWithheldPatchFiles.Plural");
+    public static string Cli_EventLogScanWithheldPatchFiles_Singular => Get("Cli.EventLogScanWithheldPatchFiles.Singular");
+    public static string Cli_EventLogSourcesGivenUp_Plural => Get("Cli.EventLogSourcesGivenUp.Plural");
+    public static string Cli_EventLogSourcesGivenUp_Singular => Get("Cli.EventLogSourcesGivenUp.Singular");
     public static string Cli_EventLogSourcesGivenUpCheckNotice_Plural => Get("Cli.EventLogSourcesGivenUpCheckNotice.Plural");
     public static string Cli_EventLogSourcesGivenUpCheckNotice_Singular => Get("Cli.EventLogSourcesGivenUpCheckNotice.Singular");
-    public static string Cli_EventLogSourcesGivenUp_Plural => Get("Cli.EventLogSourcesGivenUp.Plural");
     public static string Cli_EventLogSourcesGivenUpScanNotice_Plural => Get("Cli.EventLogSourcesGivenUpScanNotice.Plural");
     public static string Cli_EventLogSourcesGivenUpScanNotice_Singular => Get("Cli.EventLogSourcesGivenUpScanNotice.Singular");
-    public static string Cli_EventLogSourcesGivenUp_Singular => Get("Cli.EventLogSourcesGivenUp.Singular");
     public static string Cli_EventLogSupersededHeldBack_Plural => Get("Cli.EventLogSupersededHeldBack.Plural");
     public static string Cli_EventLogSupersededHeldBack_Singular => Get("Cli.EventLogSupersededHeldBack.Singular");
     public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
@@ -227,7 +233,6 @@ public static class Strings
     public static string Cli_EventLogUpdateCannotInstallThenCancelled => Get("Cli.EventLogUpdateCannotInstallThenCancelled");
     public static string Cli_EventLogUpdateCopyCannotTell => Get("Cli.EventLogUpdateCopyCannotTell");
     public static string Cli_EventLogUpdateCopyCannotTellThenCancelled => Get("Cli.EventLogUpdateCopyCannotTellThenCancelled");
-    public static string Cli_EventLogUpdated => Get("Cli.EventLogUpdated");
     public static string Cli_EventLogUpdateDownloadFailed => Get("Cli.EventLogUpdateDownloadFailed");
     public static string Cli_EventLogUpdateDownloadFailedThenCancelled => Get("Cli.EventLogUpdateDownloadFailedThenCancelled");
     public static string Cli_EventLogUpdateFromSource => Get("Cli.EventLogUpdateFromSource");
@@ -237,14 +242,15 @@ public static class Strings
     public static string Cli_EventLogUpdateInUseThenCancelled => Get("Cli.EventLogUpdateInUseThenCancelled");
     public static string Cli_EventLogUpdateNeedsNetFramework48 => Get("Cli.EventLogUpdateNeedsNetFramework48");
     public static string Cli_EventLogUpdateNeedsNetFramework48ThenCancelled => Get("Cli.EventLogUpdateNeedsNetFramework48ThenCancelled");
-    public static string Cli_EventLogUpdateNothingAtPath => Get("Cli.EventLogUpdateNothingAtPath");
     public static string Cli_EventLogUpdateNotInstalled => Get("Cli.EventLogUpdateNotInstalled");
     public static string Cli_EventLogUpdateNotRun => Get("Cli.EventLogUpdateNotRun");
     public static string Cli_EventLogUpdateNotRunThenCancelled => Get("Cli.EventLogUpdateNotRunThenCancelled");
+    public static string Cli_EventLogUpdateNothingAtPath => Get("Cli.EventLogUpdateNothingAtPath");
     public static string Cli_EventLogUpdateSetupExitCode => Get("Cli.EventLogUpdateSetupExitCode");
     public static string Cli_EventLogUpdateSetupNotInPlace => Get("Cli.EventLogUpdateSetupNotInPlace");
     public static string Cli_EventLogUpdateSetupNotThisVersion => Get("Cli.EventLogUpdateSetupNotThisVersion");
     public static string Cli_EventLogUpdateStoppedPartWay => Get("Cli.EventLogUpdateStoppedPartWay");
+    public static string Cli_EventLogUpdated => Get("Cli.EventLogUpdated");
     public static string Cli_EventLogValidationFailed => Get("Cli.EventLogValidationFailed");
     public static string Cli_EventLogWindowsError => Get("Cli.EventLogWindowsError");
     public static string Cli_FoundNoOrphans => Get("Cli.FoundNoOrphans");
@@ -257,14 +263,15 @@ public static class Strings
     public static string Cli_Help_ExitCodeError => Get("Cli.Help.ExitCodeError");
     public static string Cli_Help_ExitCodeOk => Get("Cli.Help.ExitCodeOk");
     public static string Cli_Help_ExitCodePartial => Get("Cli.Help.ExitCodePartial");
-    public static string Cli_Help_ExitCodesHeader => Get("Cli.Help.ExitCodesHeader");
     public static string Cli_Help_ExitCodeTransient => Get("Cli.Help.ExitCodeTransient");
+    public static string Cli_Help_ExitCodesHeader => Get("Cli.Help.ExitCodesHeader");
     public static string Cli_Help_Header => Get("Cli.Help.Header");
     public static string Cli_Help_Help => Get("Cli.Help.Help");
     public static string Cli_Help_MoveDefault => Get("Cli.Help.MoveDefault");
     public static string Cli_Help_MovePath => Get("Cli.Help.MovePath");
     public static string Cli_Help_MoveScheduledNote => Get("Cli.Help.MoveScheduledNote");
     public static string Cli_Help_NoteLine1 => Get("Cli.Help.NoteLine1");
+    public static string Cli_Help_Notices => Get("Cli.Help.Notices");
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
     public static string Cli_Help_Summary => Get("Cli.Help.Summary");
     public static string Cli_Help_UpdateNote => Get("Cli.Help.UpdateNote");
@@ -275,14 +282,14 @@ public static class Strings
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
     public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
     public static string Cli_MoveCancelledRestoreHint => Get("Cli.MoveCancelledRestoreHint");
-    public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
+    public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");
-    public static string Cli_MovedFiles => Get("Cli.MovedFiles");
     public static string Cli_MoveInstallerLockAccessRefused => Get("Cli.MoveInstallerLockAccessRefused");
     public static string Cli_MoveInstallerLockUnavailable => Get("Cli.MoveInstallerLockUnavailable");
     public static string Cli_MoveNotEnoughSpace => Get("Cli.MoveNotEnoughSpace");
     public static string Cli_MoveRestoreHint => Get("Cli.MoveRestoreHint");
+    public static string Cli_MovedFiles => Get("Cli.MovedFiles");
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_MutexLostDelete => Get("Cli.MutexLostDelete");
@@ -306,7 +313,6 @@ public static class Strings
     public static string Cli_ReportPrompt => Get("Cli.ReportPrompt");
     public static string Cli_ReportSent => Get("Cli.ReportSent");
     public static string Cli_ReportWaiting => Get("Cli.ReportWaiting");
-    public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_ScanSignal_AccessRefused => Get("Cli.ScanSignal.AccessRefused");
     public static string Cli_ScanSignal_Busy => Get("Cli.ScanSignal.Busy");
     public static string Cli_ScanSignal_ClockSetBack => Get("Cli.ScanSignal.ClockSetBack");
@@ -317,6 +323,7 @@ public static class Strings
     public static string Cli_ScanSignal_RenameInCache => Get("Cli.ScanSignal.RenameInCache");
     public static string Cli_ScanSignal_RenameUnresolved => Get("Cli.ScanSignal.RenameUnresolved");
     public static string Cli_ScanSignal_Suspended => Get("Cli.ScanSignal.Suspended");
+    public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_SourceGivenUp_Drive => Get("Cli.SourceGivenUp.Drive");
     public static string Cli_SourceGivenUp_Path => Get("Cli.SourceGivenUp.Path");
     public static string Cli_SourcesGivenUp => Get("Cli.SourcesGivenUp");
@@ -337,20 +344,20 @@ public static class Strings
     public static string Cli_UpdateRunningNewer => Get("Cli.UpdateRunningNewer");
     public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_DonateAsk => Get("Completion.DonateAsk");
-    public static string Completion_FailedCountDelete_Plural => Get("Completion.FailedCountDelete.Plural");
-    public static string Completion_FailedCountDelete_Singular => Get("Completion.FailedCountDelete.Singular");
     public static string Completion_FailedCount_Plural => Get("Completion.FailedCount.Plural");
     public static string Completion_FailedCount_Singular => Get("Completion.FailedCount.Singular");
+    public static string Completion_FailedCountDelete_Plural => Get("Completion.FailedCountDelete.Plural");
+    public static string Completion_FailedCountDelete_Singular => Get("Completion.FailedCountDelete.Singular");
     public static string Completion_Freed => Get("Completion.Freed");
     public static string Completion_HeldBack_Plural => Get("Completion.HeldBack.Plural");
     public static string Completion_HeldBack_Singular => Get("Completion.HeldBack.Singular");
     public static string Completion_MoveCancelledRestoreHint => Get("Completion.MoveCancelledRestoreHint");
     public static string Completion_MoveCancelledSummary => Get("Completion.MoveCancelledSummary");
-    public static string Completion_Moved => Get("Completion.Moved");
     public static string Completion_MoveRestoreHint => Get("Completion.MoveRestoreHint");
     public static string Completion_MoveRestoreHintSameDrive => Get("Completion.MoveRestoreHintSameDrive");
     public static string Completion_MoveSummary_Plural => Get("Completion.MoveSummary.Plural");
     public static string Completion_MoveSummary_Singular => Get("Completion.MoveSummary.Singular");
+    public static string Completion_Moved => Get("Completion.Moved");
     public static string Completion_NothingDeleted => Get("Completion.NothingDeleted");
     public static string Completion_NothingMoved => Get("Completion.NothingMoved");
     public static string Completion_NothingOffered => Get("Completion.NothingOffered");
@@ -371,6 +378,7 @@ public static class Strings
     public static string Completion_ReportPanel_Intro => Get("Completion.ReportPanel.Intro");
     public static string Completion_ReportPanel_LeftAlone => Get("Completion.ReportPanel.LeftAlone");
     public static string Completion_ReportPanel_Records => Get("Completion.ReportPanel.Records");
+    public static string Completion_ReportPanel_ReportId => Get("Completion.ReportPanel.ReportId");
     public static string Completion_ReportPanel_SeeReport => Get("Completion.ReportPanel.SeeReport");
     public static string Completion_ReportPanel_ShortNames => Get("Completion.ReportPanel.ShortNames");
     public static string Completion_ReportPanel_Waits => Get("Completion.ReportPanel.Waits");
@@ -385,10 +393,10 @@ public static class Strings
     public static string Confirm_MoveTitle => Get("Confirm.MoveTitle");
     public static string CrashLog_PrivacyHeader => Get("CrashLog.PrivacyHeader");
     public static string Display_DriveName => Get("Display.DriveName");
-    public static string Display_ElapsedLong_LessThanASecond => Get("Display.ElapsedLong.LessThanASecond");
-    public static string Display_ElapsedLong_Seconds => Get("Display.ElapsedLong.Seconds");
     public static string Display_Elapsed_Ms => Get("Display.Elapsed.Ms");
     public static string Display_Elapsed_S => Get("Display.Elapsed.S");
+    public static string Display_ElapsedLong_LessThanASecond => Get("Display.ElapsedLong.LessThanASecond");
+    public static string Display_ElapsedLong_Seconds => Get("Display.ElapsedLong.Seconds");
     public static string Display_ListSeparator => Get("Display.ListSeparator");
     public static string Display_SentenceSeparator => Get("Display.SentenceSeparator");
     public static string Display_Size_B => Get("Display.Size.B");
@@ -396,9 +404,9 @@ public static class Strings
     public static string Display_Size_KB => Get("Display.Size.KB");
     public static string Display_Size_MB => Get("Display.Size.MB");
     public static string Display_Size_TB => Get("Display.Size.TB");
-    public static string Error_AccessDeniedDestination => Get("Error.AccessDeniedDestination");
     public static string Error_AccessDenied_Plural => Get("Error.AccessDenied.Plural");
     public static string Error_AccessDenied_Singular => Get("Error.AccessDenied.Singular");
+    public static string Error_AccessDeniedDestination => Get("Error.AccessDeniedDestination");
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");
     public static string Error_AdminRequiredTitle => Get("Error.AdminRequiredTitle");
     public static string Error_CandidateOutsideCache => Get("Error.CandidateOutsideCache");
@@ -406,23 +414,23 @@ public static class Strings
     public static string Error_DeleteFailedTitle => Get("Error.DeleteFailedTitle");
     public static string Error_DestinationChangedMidBatch => Get("Error.DestinationChangedMidBatch");
     public static string Error_DestinationCollision => Get("Error.DestinationCollision");
-    public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
     public static string Error_DestinationInSystemFolder => Get("Error.DestinationInSystemFolder");
+    public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
     public static string Error_DestinationMissing => Get("Error.DestinationMissing");
     public static string Error_DestinationNotFullyQualified => Get("Error.DestinationNotFullyQualified");
     public static string Error_DestinationWriteFailedTitle => Get("Error.DestinationWriteFailedTitle");
     public static string Error_FileInUse_Plural => Get("Error.FileInUse.Plural");
     public static string Error_FileInUse_Singular => Get("Error.FileInUse.Singular");
     public static string Error_FolderWillNotGiveFilesBack => Get("Error.FolderWillNotGiveFilesBack");
+    public static string Error_IOFailure_Plural => Get("Error.IOFailure.Plural");
+    public static string Error_IOFailure_Singular => Get("Error.IOFailure.Singular");
+    public static string Error_IOWriteDestination => Get("Error.IOWriteDestination");
+    public static string Error_IOWriteDestination_NoLog => Get("Error.IOWriteDestination.NoLog");
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
     public static string Error_InstallerLockAccessRefused => Get("Error.InstallerLockAccessRefused");
     public static string Error_InstallerLockUnavailable => Get("Error.InstallerLockUnavailable");
     public static string Error_InstallerLockUnavailableTitle => Get("Error.InstallerLockUnavailableTitle");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
-    public static string Error_IOFailure_Plural => Get("Error.IOFailure.Plural");
-    public static string Error_IOFailure_Singular => Get("Error.IOFailure.Singular");
-    public static string Error_IOWriteDestination => Get("Error.IOWriteDestination");
-    public static string Error_IOWriteDestination_NoLog => Get("Error.IOWriteDestination.NoLog");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
     public static string Error_MoveFailedTitle => Get("Error.MoveFailedTitle");
     public static string Error_MoveInstallerLockAccessRefused => Get("Error.MoveInstallerLockAccessRefused");
@@ -436,6 +444,8 @@ public static class Strings
     public static string Error_MsiPatchEnumerationNeverEnded => Get("Error.MsiPatchEnumerationNeverEnded");
     public static string Error_NotEnoughSpaceBody => Get("Error.NotEnoughSpaceBody");
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
+    public static string Error_NothingOfferedNothingRemoved => Get("Error.NothingOfferedNothingRemoved");
+    public static string Error_NothingRemoved => Get("Error.NothingRemoved");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
     public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");
@@ -497,6 +507,7 @@ public static class Strings
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");
     public static string Startup_FailedToStart_NoLog => Get("Startup.FailedToStart.NoLog");
     public static string Startup_NeedsNetFramework48 => Get("Startup.NeedsNetFramework48");
+    public static string Startup_NeedsWindows10Version1607 => Get("Startup.NeedsWindows10Version1607");
     public static string Startup_PlantedConfigRefusal => Get("Startup.PlantedConfigRefusal");
     public static string Startup_UnhandledBody => Get("Startup.UnhandledBody");
     public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");
@@ -523,9 +534,9 @@ public static class Strings
     public static string Status_ScanComplete => Get("Status.ScanComplete");
     public static string Status_ScanFailedDetails => Get("Status.ScanFailedDetails");
     public static string Status_ScanFailedDetails_NoLog => Get("Status.ScanFailedDetails.NoLog");
+    public static string Status_ScanStopped => Get("Status.ScanStopped");
     public static string Status_Scanning => Get("Status.Scanning");
     public static string Status_ScanningCache => Get("Status.ScanningCache");
-    public static string Status_ScanStopped => Get("Status.ScanStopped");
     public static string Status_StartingScan => Get("Status.StartingScan");
     public static string Status_StopWaitingLeavesAlone => Get("Status.StopWaitingLeavesAlone");
     public static string Status_WaitingForDrive => Get("Status.WaitingForDrive");
@@ -589,8 +600,8 @@ public static class Strings
     public static string UpdateNotice_CopyFailed => Get("UpdateNotice.CopyFailed");
     public static string UpdateNotice_Download => Get("UpdateNotice.Download");
     public static string UpdateNotice_DownloadFailed => Get("UpdateNotice.DownloadFailed");
-    public static string UpdateNotice_Downloading => Get("UpdateNotice.Downloading");
     public static string UpdateNotice_DownloadNetFramework48 => Get("UpdateNotice.DownloadNetFramework48");
+    public static string UpdateNotice_Downloading => Get("UpdateNotice.Downloading");
     public static string UpdateNotice_InstallFailed => Get("UpdateNotice.InstallFailed");
     public static string UpdateNotice_NeedsNetFramework48 => Get("UpdateNotice.NeedsNetFramework48");
     public static string UpdateNotice_Recommended => Get("UpdateNotice.Recommended");
@@ -600,8 +611,30 @@ public static class Strings
     public static string Version_Display => Get("Version.Display");
     public static string Window_About_Title => Get("Window.About.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");
+    public static string Window_Notices_Title => Get("Window.Notices.Title");
     public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
     public static string Window_Registered_Title => Get("Window.Registered.Title");
     public static string Window_Report_Title => Get("Window.Report.Title");
     public static string Window_Report_Unreadable => Get("Window.Report.Unreadable");
+
+    /// <summary>
+    /// The door for the strings a copy shows from its start checks, for Windows
+    /// 10 version 1607 and for .NET Framework 4.8, which run before anything else
+    /// and on any .NET Framework 4.x. It reads the value through
+    /// StartCheckResources, which uses no ResourceManager, and substitutes no
+    /// installer-folder token:
+    /// resolving the folder reaches the folder-identity code the scan uses,
+    /// which needs more than .NET Framework 4.0 has. None of these keys
+    /// carries the token in any language, which StringsFrameworkCheckTests
+    /// holds.
+    /// </summary>
+    internal static class FrameworkCheck
+    {
+        internal static string Cli_NeedsNetFramework48 => StartCheckResources.GetString("Cli.NeedsNetFramework48", Localisation.UiCulture) ?? "Cli.NeedsNetFramework48";
+        internal static string Cli_UpdateDownloadLink => StartCheckResources.GetString("Cli.UpdateDownloadLink", Localisation.UiCulture) ?? "Cli.UpdateDownloadLink";
+        internal static string Startup_NeedsNetFramework48 => StartCheckResources.GetString("Startup.NeedsNetFramework48", Localisation.UiCulture) ?? "Startup.NeedsNetFramework48";
+        internal static string Startup_NeedsWindows10Version1607 => StartCheckResources.GetString("Startup.NeedsWindows10Version1607", Localisation.UiCulture) ?? "Startup.NeedsWindows10Version1607";
+        internal static string UpdateNotice_DownloadNetFramework48 => StartCheckResources.GetString("UpdateNotice.DownloadNetFramework48", Localisation.UiCulture) ?? "UpdateNotice.DownloadNetFramework48";
+        internal static string Window_Main_Title => StartCheckResources.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
+    }
 }

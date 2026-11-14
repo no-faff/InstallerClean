@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. This page is generated from [`Strings.uk.resx`](../../src/InstallerClean.Core/Resources/Strings.uk.resx), so do not edit it by hand. The Ukrainian translation itself lives in [`gen-strings-uk.mjs`](../../scripts/translations/gen-strings-uk.mjs).
 
+Where Ukrainian needs a different form of a line for some counts, the form is in a row of its own directly under the line, marked _(one form)_, _(few form)_ or _(many form)_. The app shows it in place of that line at the counts it is written for.
+
 `{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
 
 ## Window titles
@@ -16,6 +18,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | Непотрібні файли, які можна безпечно видалити |
 | The anonymous report | Анонімний звіт |
 | InstallerClean couldn't read the report. | InstallerClean не зміг прочитати звіт. |
+| Third-party notices | Повідомлення третіх сторін |
 
 ## Section headings
 
@@ -59,6 +62,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Посібник і поширені запитання |
 | Report a problem | Повідомити про проблему |
+| Third-party notices | Повідомлення третіх сторін |
 | Check for updates automatically | Автоматично перевіряти оновлення |
 
 ## Field labels
@@ -172,12 +176,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing was deleted | Нічого не видалено |
 | {0} file could not be moved. | Не вдалося перемістити {0} файл. |
 | {0} files could not be moved. | Не вдалося перемістити {0} файлів. |
+| {0} files could not be moved.<br>_(few form)_ | Не вдалося перемістити {0} файли. |
 | {0} file could not be deleted. | Не вдалося видалити {0} файл. |
 | {0} files could not be deleted. | Не вдалося видалити {0} файлів. |
+| {0} files could not be deleted.<br>_(few form)_ | Не вдалося видалити {0} файли. |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | Затримано {0} файл. Сканування вважало його непотрібним. Підсумкова перевірка не змогла це підтвердити. |
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | Затримано {0} файлів. Сканування вважало їх непотрібними. Підсумкова перевірка не змогла це підтвердити. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that.<br>_(few form)_ | Затримано {0} файли. Сканування вважало їх непотрібними. Підсумкова перевірка не змогла це підтвердити. |
 | Moved {0} of {1} {2} to {3} before you cancelled. | Переміщено {0} з {1} {2} до {3}, перш ніж ви скасували. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Це легко скасувати. Перемістіть їх назад до {InstallerFolder}, і все повернеться як було. |
@@ -195,9 +202,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | How many programs and patches Windows has a record of | Про скільки програм і виправлень Windows має запис |
 | Whether Windows still makes old-style short file names | Чи досі Windows створює короткі імена файлів старого зразка |
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Яка версія Windows, 10 чи 11, x64 чи Arm, і які в ній встановлено мову та країну або регіон |
-| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | Версія InstallerClean, спосіб її отримання (setup, portable, Scoop, окрема програма командного рядка, збірка з вихідного коду або невідомо), звідки надіслано звіт (з InstallerClean чи з програми командного рядка) і мова, якою він відображався |
+| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | Версія InstallerClean, спосіб її отримання (setup, portable, Scoop, окрема програма командного рядка, збірка з вихідного коду або невідомо), де виконувався запуск (в InstallerClean чи в програмі командного рядка) і мова, якою відображався інтерфейс |
 | Counts of anything that went wrong | Лічильники всього, що пішло не так |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Кожен із цих пунктів — це число або мітка. Ніщо у звіті не вказує на вас, ваш ПК, ваші файли чи програми, і я ніколи не бачу вашу IP-адресу. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Випадковий код, створений для цього звіту, щоб його враховували лише один раз, якщо його надіслано кілька разів |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Окрім цього коду, кожен із цих пунктів — це число або мітка. Ніщо у звіті не вказує на вас, ваш ПК, ваші файли чи програми, і я ніколи не бачу вашу IP-адресу. |
 | See exactly what's sent | Переглянути, що саме надсилається |
 
 ## Summaries and counts
@@ -206,14 +214,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | {0} file left alone | {0} файл залишено без змін |
 | {0} files left alone | {0} файлів залишено без змін |
+| {0} files left alone<br>_(few form)_ | {0} файли залишено без змін |
 | {0} unneeded file to clean up | {0} непотрібний файл для очищення |
 | {0} unneeded files to clean up | {0} непотрібних файлів для очищення |
+| {0} unneeded files to clean up<br>_(few form)_ | {0} непотрібні файли для очищення |
 | Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do. | Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цієї програми може не виконатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
 | Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do. | Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
+| Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.<br>_(few form)_ | Windows має записи про {0} файли, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
 | {0} other program | ще {0} програма |
 | {0} other programs | ще {0} програм |
+| {0} other programs<br>_(few form)_ | ще {0} програми |
 | {0} file with no program named in the records | {0} файл, для якого в записах не названо програми |
 | {0} files with no program named in the records | {0} файлів, для яких у записах не названо програми |
+| {0} files with no program named in the records<br>_(few form)_ | {0} файли, для яких у записах не названо програми |
 | InstallerClean carried on without drive {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan. | InstallerClean продовжив роботу без диска {0} і залишив без змін усі файли, які ще треба було звірити з ним. Коли він знову відповідатиме нормально, натисніть «Повторити сканування». |
 | InstallerClean carried on without {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan. | InstallerClean продовжив роботу без {0} і залишив без змін усі файли, які ще треба було звірити з тим, що там є. Коли доступ знову стане нормальним, натисніть «Повторити сканування». |
 | InstallerClean carried on without more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, Re-scan. | InstallerClean продовжив роботу без кількох дисків або мережевих ресурсів ({0}) і залишив без змін усі файли, які ще треба було звірити з одним із них. Коли вони знову відповідатимуть нормально, натисніть «Повторити сканування». |
@@ -231,8 +244,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded {1} ({2}) | {0} {1} для очищення ({2}) |
 | {0} file left alone ({1}) | {0} файл залишено без змін ({1}) |
 | {0} files left alone ({1}) | {0} файлів залишено без змін ({1}) |
+| {0} files left alone ({1})<br>_(few form)_ | {0} файли залишено без змін ({1}) |
 | {0} missing | {0} відсутній |
 | {0} missing | {0} відсутніх |
+| {0} missing<br>_(few form)_ | {0} відсутні |
 
 ## Confirmation dialogs
 
@@ -255,18 +270,20 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows відмовив InstallerClean у доступі, тому роботу було зупинено. Нічого не було видалено.<br><br>InstallerClean уже працював від імені адміністратора, тож запускати його так ще раз не допоможе. Windows не повідомляє нічого більше про те, що саме відмовило в доступі, тож немає нічого конкретного, що варто спробувати. |
 | InstallerClean stopped | InstallerClean зупинився |
 | Scan failed | Збій сканування |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Записи Windows Installer повернулися цілком порожніми: жодна встановлена програма й жодне оновлення не заявляє прав на кешований файл інсталятора. На робочому комп'ютері такого не буває (навіть у щойно встановленої Windows такі файли є), тож записи або пошкоджено, або їх не вдалося прочитати, і сканування, яке повірило б такій відповіді, помилково визнало б осиротілим кожен файл у {InstallerFolder}. Замість цього InstallerClean зупинився. Нічого не було видалено. |
-| Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer не дозволив InstallerClean перелічити встановлене. InstallerClean уже працював від імені адміністратора, тож запуск від імені адміністратора ще раз нічого не змінить. Без цього списку немає безпечного способу визначити, які кешовані файли ще потрібні, тож InstallerClean зупинився. Нічого не було видалено. |
-| Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {1} {2}, then an entry came back unreadable (error code {0}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer не зміг надати InstallerClean читабельний список встановлених програм: він прочитав {1} {2}, а потім один запис повернувся нечитабельним (код помилки {0}). Замість того щоб працювати зі списком, прочитаним лише частково, InstallerClean зупинився. Нічого не було видалено. |
-| Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так і не повідомив про кінець списку встановлених програм: InstallerClean прочитав {2} {3}, а потім припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено. |
-| Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так і не повідомив про кінець списку виправлень однієї програми: InstallerClean прочитав {2} {3}, а потім припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено. |
-| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. Майже нічого з того, на що вказують записи, там немає, і майже нічого з того, що там є, не названо жодним записом, тож про жоден файл не вдалося показати, що він непотрібний. Нічого не запропоновано і нічого не прибрано. |
-| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. У папці є файли, але жоден запис не вказує ні на що всередині неї, тож про жоден файл не вдалося показати, що він непотрібний. Нічого не запропоновано і нічого не прибрано. |
-| InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path. Nothing has been offered and nothing has been removed. | InstallerClean не може просканувати {InstallerFolder} на цьому ПК. Windows повідомляє, що ця папка розташована в {0}, а InstallerClean сканує папку Installer, лише якщо Windows вказує для неї її власний шлях. Нічого не запропоновано і нічого не прибрано. |
-| Windows reports that {InstallerFolder} doesn't exist on this PC, so InstallerClean stopped. Nothing has been offered and nothing has been removed. | Windows повідомляє, що {InstallerFolder} на цьому ПК не існує, тому InstallerClean зупинився. Нічого не запропоновано і нічого не прибрано. |
-| Windows reported an error when InstallerClean tried to list the files in {InstallerFolder}, so it couldn't get a complete list and stopped. Nothing has been offered and nothing has been removed. | Windows повідомив про помилку, коли InstallerClean намагався отримати список файлів у {InstallerFolder}, тому InstallerClean не зміг отримати повний список і зупинився. Нічого не запропоновано і нічого не прибрано. |
-| InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean не зміг прочитати достатньо записів Windows Installer, щоб напевно знати, що ще потрібно: список встановлених програм повернувся неповним, а читання тих самих записів прямо з реєстру теж призвело до помилок. Файл міг видаватися осиротілим лише тому, що запис, який його називає, виявився одним із нечитабельних, тож InstallerClean зупинився. Нічого не було видалено. |
-| InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean не зміг отримати від Windows справжній шлях до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. Нічого не прибрано. |
+| Nothing has been removed. | Нічого не було видалено. |
+| Nothing has been offered and nothing has been removed. | Нічого не запропоновано і нічого не прибрано. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. | Записи Windows Installer повернулися цілком порожніми: жодна встановлена програма й жодне оновлення не заявляє прав на кешований файл інсталятора. На робочому комп'ютері такого не буває (навіть у щойно встановленої Windows такі файли є), тож записи або пошкоджено, або їх не вдалося прочитати, і сканування, яке повірило б такій відповіді, помилково визнало б осиротілим кожен файл у {InstallerFolder}. Замість цього InstallerClean зупинився. |
+| Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. | Windows Installer не дозволив InstallerClean перелічити встановлене. InstallerClean уже працював від імені адміністратора, тож запуск від імені адміністратора ще раз нічого не змінить. Без цього списку немає безпечного способу визначити, які кешовані файли ще потрібні, тож InstallerClean зупинився. |
+| Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {1} {2}, then an entry came back unreadable (error code {0}). Rather than work from a part-read list, InstallerClean stopped. | Windows Installer не зміг надати InstallerClean читабельний список встановлених програм: він прочитав {1} {2}, а потім один запис повернувся нечитабельним (код помилки {0}). Замість того щоб працювати зі списком, прочитаним лише частково, InstallerClean зупинився. |
+| Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. | Windows Installer так і не повідомив про кінець списку встановлених програм: InstallerClean прочитав {2} {3}, а потім припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. |
+| Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. | Windows Installer так і не повідомив про кінець списку виправлень однієї програми: InstallerClean прочитав {2} {3}, а потім припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. |
+| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. | InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. Майже нічого з того, на що вказують записи, там немає, і майже нічого з того, що там є, не названо жодним записом, тож про жоден файл не вдалося показати, що він непотрібний. |
+| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. | InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. У папці є файли, але жоден запис не вказує ні на що всередині неї, тож про жоден файл не вдалося показати, що він непотрібний. |
+| InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path. | InstallerClean не може просканувати {InstallerFolder} на цьому ПК. Windows повідомляє, що ця папка розташована в {0}, а InstallerClean сканує папку Installer, лише якщо Windows вказує для неї її власний шлях. |
+| Windows reports that {InstallerFolder} doesn't exist on this PC, so InstallerClean stopped. | Windows повідомляє, що {InstallerFolder} на цьому ПК не існує, тому InstallerClean зупинився. |
+| Windows reported an error when InstallerClean tried to list the files in {InstallerFolder}, so it couldn't get a complete list and stopped. | Windows повідомив про помилку, коли InstallerClean намагався отримати список файлів у {InstallerFolder}, тому InstallerClean не зміг отримати повний список і зупинився. |
+| InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. | InstallerClean не зміг прочитати достатньо записів Windows Installer, щоб напевно знати, що ще потрібно: список встановлених програм повернувся неповним, а читання тих самих записів прямо з реєстру теж призвело до помилок. Файл міг видаватися осиротілим лише тому, що запис, який його називає, виявився одним із нечитабельних, тож InstallerClean зупинився. |
+| InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. | InstallerClean не зміг отримати від Windows справжній шлях до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. |
 | Nothing was deleted | Нічого не видалено |
 | Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі, і нічого не було видалено. |
 | Nothing was moved | Нічого не переміщено |
@@ -334,8 +351,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | Не вдалося завантажити оновлення. |
 | The update couldn't be installed. | Не вдалося встановити оновлення. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Не вдалося зв'язатися з GitHub. Перевірте інтернет-з'єднання та спробуйте ще раз. |
-| GitHub returned an error response. Try again in a few minutes. | GitHub повернув повідомлення про помилку. Спробуйте ще раз за кілька хвилин. |
-| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Відповідь GitHub не містила розпізнаного випуску. Спробуйте пізніше або відкрийте сторінку випусків напряму. |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | Перевірка оновлень отримала помилку замість сторінки випусків GitHub. Вона могла надійти від GitHub або від чогось у вашій мережі, наприклад від проксі-сервера. Спробуйте пізніше або відкрийте сторінку випусків у браузері. |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | Перевірка оновлень отримала відповідь, у якій не названо жодного випуску. Вона могла надійти від GitHub або від чогось у вашій мережі, наприклад від проксі-сервера чи сторінки входу. Спробуйте пізніше або відкрийте сторінку випусків у браузері. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Час перевірки вичерпано. Можливо, ваше з'єднання з GitHub повільне; спробуйте ще раз. |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | Перевірка не вдалася з невідомої причини. Деталі у {0}, якщо вам потрібно про це повідомити. |
 | The check failed for an unknown reason. The crash log could not be written. | Перевірка не вдалася з невідомої причини. Не вдалося записати журнал збоїв. |
@@ -359,6 +376,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Сталася неочікувана помилка, і InstallerClean потрібно закрити.<br><br>{0}<br><br>Не вдалося записати журнал збоїв. |
 | Startup error | Помилка запуску |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean не запуститься, тому що поруч із ним є файл з назвою {0}, а InstallerClean не постачається з таким файлом. Видаліть цей файл, а потім знову запустіть InstallerClean.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | Для InstallerClean потрібна Windows 10 версії 1607 або новішої чи Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | Для InstallerClean потрібен .NET Framework 4.8. Встановіть його з сайту Microsoft, перезавантажте комп'ютер, а потім знову відкрийте InstallerClean. |
 | Failed to start ({0}). Details written to:<br>{1} | Не вдалося запустити ({0}). Деталі записано до:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Не вдалося запустити ({0}). Не вдалося записати журнал збоїв. |
@@ -407,6 +425,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Перевіряє на сторінці випусків github, чи є новіша версія. |
 | Opens the readme on github in your browser. | Відкриває readme на github у вашому браузері. |
 | Opens the issue tracker on github.com in your browser. | Відкриває список проблем (Issues) на github.com у вашому браузері. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Показує ліцензії шрифтів, значків і коду, що входять до InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії. |
 | Download it from github | Завантажити з github |
 | Download .NET Framework 4.8 from Microsoft | Завантажити .NET Framework 4.8 з сайту Microsoft |
@@ -460,14 +479,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | file | файл |
 | files | файлів |
+| files<br>_(few form)_ | файли |
 | error | помилка |
 | errors | помилок |
+| errors<br>_(few form)_ | помилки |
 | package | пакет |
 | packages | пакетів |
+| packages<br>_(few form)_ | пакети |
 | product | продукт |
 | products | продуктів |
+| products<br>_(few form)_ | продукти |
 | patch | виправлення |
 | patches | виправлень |
+| patches<br>_(few form)_ | виправлення |
 
 ## Sizes and times
 
@@ -500,14 +524,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected failure ({0}). The crash log could not be written. | Помилка: неочікуваний збій ({0}). Журнал збою записати не вдалося. |
 | Scanning {InstallerFolder}... | Сканування {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Знайдено {0} непотрібних {1} для очищення ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Знайдено {0} непотрібний {1} для очищення ({2}). |
+| Found {0} unneeded {1} to clean up ({2}).<br>_(few form)_ | Знайдено {0} непотрібні {1} для очищення ({2}). |
 | No unneeded files identified. | Непотрібних файлів не виявлено. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цієї програми може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії цієї програми, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
+| Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.<br>_(few form)_ | Windows має записи про {0} файли, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії цієї програми, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
 | InstallerClean stopped waiting for drive {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean перестав чекати на диск {0} і залишив без змін усі файли, які ще треба було звірити з ним. Коли він почне відповідати нормально, запустіть команду ще раз. |
 | InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean перестав чекати на {0} і залишив без змін усі файли, які ще треба було звірити з тим, що там є. Коли доступ стане нормальним, запустіть команду ще раз. |
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean перестав чекати на кілька дисків або мережевих ресурсів ({0}) і залишив без змін усі файли, які ще треба було звірити з одним із них. Коли вони почнуть відповідати нормально, запустіть команду ще раз. |
 | Deleting {0} unneeded {1}... | Триває видалення: {0} непотрібних {1}... |
+| Deleting {0} unneeded {1}...<br>_(one form)_ | Триває видалення: {0} непотрібний {1}... |
+| Deleting {0} unneeded {1}...<br>_(few form)_ | Триває видалення: {0} непотрібні {1}... |
 | Permanently deleted {0} unneeded {1}. | Остаточно видалено {0} непотрібних {1}. |
+| Permanently deleted {0} unneeded {1}.<br>_(one form)_ | Остаточно видалено {0} непотрібний {1}. |
+| Permanently deleted {0} unneeded {1}.<br>_(few form)_ | Остаточно видалено {0} непотрібні {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.) |
 | Error: destination cannot be inside the Windows Installer folder. | Помилка: призначення не може бути всередині папки Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Помилка: призначення має бути повним шляхом. Отримано: {0} |
@@ -536,7 +567,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було видалено. |
 | Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було переміщено. |
 | Moving {0} unneeded {1} to {2}... | Триває переміщення до {2}: {0} непотрібних {1}... |
+| Moving {0} unneeded {1} to {2}...<br>_(one form)_ | Триває переміщення до {2}: {0} непотрібний {1}... |
+| Moving {0} unneeded {1} to {2}...<br>_(few form)_ | Триває переміщення до {2}: {0} непотрібні {1}... |
 | Moved {0} unneeded {1}. | Переміщено {0} непотрібних {1}. |
+| Moved {0} unneeded {1}.<br>_(one form)_ | Переміщено {0} непотрібний {1}. |
+| Moved {0} unneeded {1}.<br>_(few form)_ | Переміщено {0} непотрібні {1}. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Переконайтеся, що ваші програми досі оновлюються та видаляються як звичайно, а потім видаліть {0}. |
 | InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean безкоштовний. Якщо він допоміг, чайові будуть дуже доречні: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Оновити зараз? Настійно рекомендуємо використовувати найновішу версію. [{0}/{1}] |
@@ -575,13 +610,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Використання: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Показати цю довідку (також приймає /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Вивести версію (також приймає -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  Вивести повідомлення третіх сторін |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Лише сканувати - список непотрібних |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Видалити непотрібні файли назавжди |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Перемістити до збереженої папки |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli утримує командний рядок до кінця роботи, щоб<br>скрипт або запланована задача могли на нього зачекати. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Папка своя в кожного користувача; запланованим і SYSTEM: /m ШЛЯХ. |
-| Before it scans, it checks for a newer version of InstallerClean.<br>When you run it yourself, it asks before updating, and updates if nobody<br>answers within a minute. When it runs on its own, in a scheduled task or<br>a script, it updates without asking.<br>Add /noupdate to skip the check. | Перед скануванням перевіряє, чи є новіша версія InstallerClean. Під час<br>запуску вручну запитує перед оновленням і оновлюється, якщо протягом<br>хвилини ніхто не відповів. Під час запуску без участі людини, у<br>запланованій задачі чи скрипті, оновлюється без запитань.<br>Додайте /noupdate, щоб пропустити перевірку. |
+| Before it scans, it checks for a newer version of InstallerClean, unless<br>"Check for updates automatically" is turned off for the account it runs<br>as. Where its window is on screen and nothing is piped into or out of it,<br>it asks before updating, and updates if nobody answers within a minute.<br>Anywhere else, such as a scheduled task set to run whether or not anyone<br>is logged on, it updates without asking.<br>Add /noupdate to skip the check. | Перед скануванням перевіряє, чи є новіша версія InstallerClean, якщо<br>тільки параметр «Автоматично перевіряти оновлення» не вимкнено для<br>облікового запису, від імені якого запущено програму. Якщо її вікно<br>відкрито на екрані, а введення й виведення не перенаправлено, запитує<br>перед оновленням і оновлюється, якщо протягом хвилини ніхто не відповів. В<br>усіх інших випадках, наприклад у запланованій задачі, налаштованій на<br>запуск незалежно від того, чи хтось увійшов у систему, оновлюється без<br>запитань. Додайте /noupdate, щоб пропустити перевірку. |
 | Exit codes: | Коди виходу: |
 |   0   success: the run did what it was asked |   0   успіх: запуск зробив те, про що просили |
 |   1   nothing processed: the run failed or was refused |   1   нічого не оброблено: запуск завершився збоєм або був відхилений |
