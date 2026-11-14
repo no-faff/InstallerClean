@@ -251,7 +251,7 @@ public class CompletionScreenResetTests
         // moved by hand, so it is added with this rule in front of whoever adds it. A new
         // field the card shows joins the set every screen must paint; a new field that is
         // not part of the card goes in NotPaintedByAScreen with its reason.
-        Assert.Equal(8, Screens().Length);
+        Assert.Equal(9, Screens().Length);
         Assert.Equal(11, ScreenFields().Length);
     }
 }
