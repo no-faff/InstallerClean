@@ -201,6 +201,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// One member per product key under <c>UserData</c> whose name is a code, by the
     /// account subtree it sits under. Null where the caller supplied no reader.
     /// </param>
+    /// <param name="PatchListFailures">
+    /// The members of <see cref="Failures"/> that are a program's own <c>Patches</c> key
+    /// failing to read, one per key. That key lists the codes of the patches the program
+    /// holds, and under each its <c>Uninstallable</c> value, and records no cached file:
+    /// every cached path is read from a program's <c>InstallProperties</c> or from the
+    /// account's <c>Patches</c> key for the patch. So such a failure leaves the program's
+    /// patch set unestablished and withholds every superseded patch, and is not one of
+    /// the failures that withhold the files no record names
+    /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -218,7 +228,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         EstablishedPatchReach Reach = default,
         IReadOnlyList<RegistryPackageRecord>? PackageRecords = null,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchListings = null,
-        IReadOnlyList<RegistryProductEntry>? ProductEntries = null)
+        IReadOnlyList<RegistryProductEntry>? ProductEntries = null,
+        int PatchListFailures = 0)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -1135,7 +1146,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
         WithholdOnUnlistedEntries(
             claimed, patchClaims, fallback.PackageRecords, unlistedEntries,
-            EnumerationCensus.RegistryRecordsUnreadAt(fallback.Failures));
+            EnumerationCensus.AnyRegistryRecordUnreadAt(fallback.Failures));
 
         // Both sources degraded at once: the scan is refused outright rather than
         // reported short.
@@ -1202,11 +1213,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
         // FEWER keys, and the names asked about are the codes that side handed over.
-        // The failed read is counted in fallback.Failures. One rule,
-        // EnumerationCensus.RegistryRecordsUnreadAt, decides on it for every removable row, at
-        // the call to WithholdOnUnlistedEntries above, and for the walk-derived offer, in the
-        // census. The gate above refuses the scan where it is non-zero beside an unreadable
-        // product, a rule of its own.
+        // The failed read is counted in fallback.Failures. EnumerationCensus.AnyRegistryRecordUnreadAt
+        // decides on every failure for every removable row, at the call to
+        // WithholdOnUnlistedEntries above. The walk-derived offer is decided in the census, on
+        // every failure but a program's own Patches key, which records no cached file
+        // (fallback.PatchListFailures). The gate above refuses the scan where fallback.Failures
+        // is non-zero beside an unreadable product, a rule of its own.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different
@@ -1354,7 +1366,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             unsettledEnumeratedProducts,
             missed.RecoveredOfEnumerated,
             unattributedPatchFiles,
-            recoveredPatchSetUnestablished);
+            recoveredPatchSetUnestablished,
+            fallback.PatchListFailures);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -3602,6 +3615,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var failures = 0;
+        var patchListFailures = 0;
         var productKeys = 0;
         var unclaimedProductFileCodes = new List<string?>();
         var unclaimedPatchFileCodes = new List<string?>();
@@ -3645,6 +3659,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ct.ThrowIfCancellationRequested();
                     var sidRead = ReadFallbackSid(udKey, sidName, claimed, productCodes, ct, failureLog);
                     failures += sidRead.Failures;
+                    patchListFailures += sidRead.PatchListFailures;
                     productKeys += sidRead.ProductKeys;
                     if (sidRead.UnclaimedProductFileCodes is not null)
                         unclaimedProductFileCodes.AddRange(sidRead.UnclaimedProductFileCodes);
@@ -3723,7 +3738,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             packageRecords,
             patchListings,
-            productEntries);
+            productEntries,
+            patchListFailures);
     }
 
     /// <summary>
@@ -3766,6 +3782,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the run's by the caller.
         var pathCensus = new PathCensus();
         var failures = 0;
+        var patchListFailures = 0;
         var productKeys = 0;
         var unclaimedProductFileCodes = new List<string?>();
         var unclaimedPatchFileCodes = new List<string?>();
@@ -3852,7 +3869,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         }
                         catch (Exception ex) when (ex is not OperationCanceledException)
                         {
+                            // ONLY THE PROGRAM'S OWN Patches KEY IS READ IN THE TRY ABOVE, and
+                            // a failure there is counted apart as one that can hide no cached
+                            // file (FallbackRead.PatchListFailures). A read of anything that
+                            // records a path goes in a try of its own, or the files no record
+                            // names are offered beside it.
                             failures++;
+                            patchListFailures++;
                             // The verdict is written rather than left absent, so a
                             // product whose read threw is on record as unestablished
                             // instead of as a product nobody asked about. An absent
@@ -4038,7 +4061,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             Reach: new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             PackageRecords: packageRecords,
             PatchListings: patchListings,
-            ProductEntries: productEntries);
+            ProductEntries: productEntries,
+            PatchListFailures: patchListFailures);
     }
 
     /// <summary>

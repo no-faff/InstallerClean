@@ -507,7 +507,8 @@ public readonly record struct EnumerationCensus(
     // reads leaves that refusal unarmed, and the count is how the opt-in report
     // records that the reads failed, as registryKeyReadFailureCount. The crash log
     // writes the first twenty in full, then each cause not yet seen, and counts
-    // the rest in a closing entry. Above zero it withholds the whole walk-derived offer
+    // the rest in a closing entry. Above zero it withholds every superseded patch, and
+    // above ProductPatchListReadFailures the whole walk-derived offer
     // (RegistryRecordsUnread).
     int RegistryKeyReadFailures = 0,
     // The three below are appended for the same reason.
@@ -535,7 +536,12 @@ public readonly record struct EnumerationCensus(
     // name records it as holding. One per entry. It withholds every superseded patch, and
     // it is not a count of products, so it is never added to the one above.
     int UnattributedPatchFileCount = 0,
-    int RecoveredPatchSetUnestablishedCount = 0)
+    int RecoveredPatchSetUnestablishedCount = 0,
+    // ProductPatchListReadFailures: the members of RegistryKeyReadFailures that are a
+    // program's own Patches key failing to read, one per key. Carried for
+    // RegistryRecordsUnread and not reported: registryKeyReadFailureCount counts them
+    // with the rest.
+    int ProductPatchListReadFailures = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
@@ -651,8 +657,9 @@ public readonly record struct EnumerationCensus(
         || UnparseableProductKeyNames > 0;
 
     /// <summary>
-    /// Whether a read of Windows Installer's own records in the registry failed
-    /// (<see cref="RegistryKeyReadFailures"/>). THE ONE THING THE WITHHOLDING LEG OF THE SAME
+    /// Whether a read of Windows Installer's own records in the registry failed on a key
+    /// that can record a cached file (<see cref="RegistryKeyReadFailures"/>, less
+    /// <see cref="ProductPatchListReadFailures"/>). THE ONE THING THE WITHHOLDING LEG OF THE SAME
     /// NAME FIRES ON, here for the reason <see cref="RegistryProductUnaskable"/> is.
     ///
     /// WHY IT WITHHOLDS THE WHOLE WALK-DERIVED OFFER. A key that would not read may be the
@@ -661,19 +668,28 @@ public readonly record struct EnumerationCensus(
     /// (<see cref="InstallerQueryResult.UnlistedProductKeys"/>). So nothing shows what such
     /// a key would have kept.
     ///
-    /// THE SUPERSEDED HALF ASKS THE SAME RULE. The enumeration withholds every
-    /// still-removable superseded row on a failed read before this census is built, asking
-    /// <see cref="RegistryRecordsUnreadAt"/> of the registry read's own tally where it calls
-    /// <c>InstallerQueryService.WithholdOnUnlistedEntries</c>, so a change to the rule
-    /// reaches both halves.
+    /// A PROGRAM'S OWN <c>Patches</c> KEY IS THE ONE KEY THAT DOES NOT COUNT HERE
+    /// (<see cref="ProductPatchListReadFailures"/>). It lists the codes of the patches the
+    /// program holds and records no cached file: a program's cached package is recorded
+    /// in its <c>InstallProperties</c>, and a patch's in the account's <c>Patches</c> key
+    /// for that patch, which are read apart from it and count here when they fail. Its
+    /// failure leaves the program's patch set unestablished and withholds every superseded
+    /// patch. Do not add a key to that count unless it records no cached path.
+    ///
+    /// THE SUPERSEDED HALF ASKS <see cref="AnyRegistryRecordUnreadAt"/> OF EVERY FAILED READ,
+    /// that key's included. The enumeration withholds every still-removable superseded row
+    /// on a failed read before this census is built, where it calls
+    /// <c>InstallerQueryService.WithholdOnUnlistedEntries</c>: which patches a program
+    /// whose list did not read holds is what that half turns on.
     /// </summary>
-    public bool RegistryRecordsUnread => RegistryRecordsUnreadAt(RegistryKeyReadFailures);
+    public bool RegistryRecordsUnread =>
+        RegistryKeyReadFailures > ProductPatchListReadFailures;
 
     /// <summary>
-    /// The rule behind <see cref="RegistryRecordsUnread"/>, for a count of failed reads of
-    /// Windows Installer's own records in the registry. The enumeration asks it of its own
-    /// tally before this census is built, and the property asks it of the census's copy.
+    /// Whether any read of Windows Installer's own records in the registry failed, for a
+    /// count of them. The enumeration asks it of its own tally where it withholds every
+    /// superseded patch, before this census is built.
     /// </summary>
-    internal static bool RegistryRecordsUnreadAt(int registryKeyReadFailures) =>
+    internal static bool AnyRegistryRecordUnreadAt(int registryKeyReadFailures) =>
         registryKeyReadFailures > 0;
 }

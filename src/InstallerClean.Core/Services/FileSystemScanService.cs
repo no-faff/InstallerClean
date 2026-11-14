@@ -647,10 +647,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // question is asked of the census, where its members live, on the same rule as
         // the two above.
         //
-        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED. The key that
-        // would not read may be the only claim on a cached file, and it may be a program no
-        // walk lists, so the keys handed to the screen below can be short by it. It is
-        // asked of the census too.
+        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED, on any key but a program's
+        // own Patches key, which records no cached file. The key that would not read may be
+        // the only claim on a cached file, and it may be a program no walk lists, so the
+        // keys handed to the screen below can be short by it. It is asked of the census too.
         //
         // A SECOND COPY THE SCAN LISTED IS NOT A CONDITION HERE. Each listed
         // installation carries whether its own InstanceType reading ruled it out as one,
