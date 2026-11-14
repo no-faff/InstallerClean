@@ -22,12 +22,16 @@
 # newer version does: running the command and putting itself, or its setup, at the running
 # copy's path once both have ended. The checks read what the update left.
 #
-# Two more legs update the window the same way, from a folder of its own, as the portable
-# and as the slim: the tag's window, published as a Debug single file and told by
-# INSTALLERCLEAN_DEBUG_PRETEND_COPY which of the two it is, offers the commit's merged
-# window as its update, and its update button is pressed through UI Automation, as a user
-# would press it. The checks read the file at the path, which keeps its name, and the
-# newer window it starts.
+# Three more legs update the window the same way, from a folder of its own: the tag's
+# window, published as a Debug single file and told by INSTALLERCLEAN_DEBUG_PRETEND_COPY
+# whether it is the portable or the slim, offers the commit's merged window as its update,
+# and an update button is pressed through UI Automation, as a user would press it. The
+# window opens with the card offering the update over the scan, and the update notice sits
+# at the top of the scan behind it; each has its own Update now. The portable's leg and
+# the slim's press the card's. The notice's leg, a portable, presses the card's Continue
+# without updating, which takes the card away, and then the notice's. The checks read the
+# file at the path, which keeps its name, the newer window it starts and the Application
+# log, where a window that updated writes nothing.
 #
 # No command line the job runs makes a request of the network: the old copy's check is
 # answered by the Debug switch, and the newer version is started with /noupdate. The newer
@@ -53,15 +57,36 @@ env:
 
 jobs:
   update:
-    name: Update ${{ matrix.route == 'setup' && 'the setup''s copy' || matrix.route == 'download' && 'the command line''s own download' || matrix.route == 'window' && 'the portable by its update button' || 'the slim by its update button' }}
+    name: Update ${{ matrix.title }}
     # The same image as ci.yml and release.yml.
     runs-on: windows-2025
     timeout-minutes: 45
 
     strategy:
       fail-fast: false
+      # A window leg names the copy the old window takes itself for and the Update now it
+      # presses: the card's, or the notice's once the card has gone.
       matrix:
-        route: [download, setup, window, slim]
+        include:
+          - route: download
+            title: the command line's own download
+          - route: setup
+            title: the setup's copy
+          - route: window
+            title: the portable by the card's Update now
+            window: true
+            copy: portable
+            button: card
+          - route: slim
+            title: the slim by the card's Update now
+            window: true
+            copy: slim
+            button: card
+          - route: notice
+            title: the portable by the update notice's Update now
+            window: true
+            copy: portable
+            button: notice
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -253,12 +278,12 @@ jobs:
       # The window's legs. The old window goes in a folder of its own under the name the
       # portable or the slim is downloaded as.
       - name: Put the older window in place
-        if: matrix.route == 'window' || matrix.route == 'slim'
+        if: matrix.window
         shell: pwsh
         run: |
           $folder = Join-Path $env:RUNNER_TEMP 'portable'
           New-Item -ItemType Directory -Force -Path $folder | Out-Null
-          $name = if ('${{ matrix.route }}' -eq 'slim') { 'InstallerClean-slim.exe' } else { 'InstallerClean-portable.exe' }
+          $name = if ('${{ matrix.copy }}' -eq 'slim') { 'InstallerClean-slim.exe' } else { 'InstallerClean-portable.exe' }
           $exe = Join-Path $folder $name
           Copy-Item "$env:OLD_TREE/publish/self-contained/InstallerClean.exe" $exe
           $v = (Get-Item $exe).VersionInfo.FileVersion
@@ -268,12 +293,14 @@ jobs:
           "WINDOW_EXE=$exe" | Add-Content $env:GITHUB_ENV
 
       # Windows PowerShell, where UI Automation's assemblies are part of the framework. The
-      # step is elevated, as the window is, which UI Automation needs to reach it. The
-      # update notice's button and the offer card's both press the update; the first of the
-      # two that shows, enabled, is pressed. Where neither shows in time, every element of
-      # the window is printed.
+      # step is elevated, as the window is, which UI Automation needs to reach it. A button
+      # is pressed only once it is enabled and on screen. The card's legs press the card's
+      # Update now. The notice's leg prints both Update nows while the card is up, presses
+      # the card's Continue without updating, waits for the card's Update now to leave the
+      # screen and presses the notice's. Where a button does not show in time, every element
+      # of the window is printed.
       - name: Press the old window's update button
-        if: matrix.route == 'window' || matrix.route == 'slim'
+        if: matrix.window
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
@@ -288,40 +315,78 @@ jobs:
           $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_LATEST'] = "v$env:NEWER_VERSION"
           $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST'] = $env:UPDATE_MANIFEST
           $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD'] = (Resolve-Path 'publish/window/InstallerClean.exe').Path
-          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_COPY'] = $(if ('${{ matrix.route }}' -eq 'slim') { 'slim' } else { 'portable' })
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_COPY'] = '${{ matrix.copy }}'
           $old = [System.Diagnostics.Process]::Start($info)
           Put "OLD_PID=$($old.Id)"
           "  started the old window, process $($old.Id)"
 
-          $button = $null
-          $deadline = $started.AddSeconds(300)
-          while (-not $button -and (Get-Date) -lt $deadline -and -not $old.HasExited) {
+          # The element of the old window with this AutomationId, or null.
+          function Find([string]$id) {
             $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $old.Id)
+            $named = New-Object System.Windows.Automation.PropertyCondition($A::AutomationIdProperty, $id)
             foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
-              foreach ($id in 'UpdateNowButton', 'UpdateOfferUpdateNowButton') {
-                $named = New-Object System.Windows.Automation.PropertyCondition($A::AutomationIdProperty, $id)
-                $found = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $named)
-                if ($found -and $found.Current.IsEnabled -and -not $found.Current.IsOffscreen) { $button = $found; break }
-              }
-              if ($button) { break }
+              $found = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $named)
+              if ($found) { return $found }
             }
-            if (-not $button) { Start-Sleep -Seconds 1 }
+            $null
           }
-          if (-not $button) {
-            if ($old.HasExited) { "::error::The old window ended with exit code $($old.ExitCode) before its update button showed." }
-            else { "::error::No enabled update button showed in the old window within 300 s." }
+          # Whether the element can be pressed: enabled and on screen. An element that has
+          # left the tree since it was found cannot.
+          function Pressable($e) {
+            if (-not $e) { return $false }
+            try { $e.Current.IsEnabled -and -not $e.Current.IsOffscreen } catch { $false }
+          }
+          function State([string]$id) {
+            $e = Find $id
+            if (-not $e) { return "  ${id}: not in the window's tree" }
+            try { "  ${id}: '$($e.Current.Name)', $(if ($e.Current.IsEnabled) { 'enabled' } else { 'disabled' }), $(if ($e.Current.IsOffscreen) { 'off screen' } else { 'on screen' })" }
+            catch { "  ${id}: left the window's tree as it was read" }
+          }
+          # Prints every element of the old window, ends it and fails the step.
+          function Stop-Leg([string]$message) {
+            if ($old.HasExited) { "::error::$message The old window ended with exit code $($old.ExitCode)." }
+            else { "::error::$message" }
             $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $old.Id)
             foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
               foreach ($e in $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [System.Windows.Automation.Condition]::TrueCondition)) {
                 $c = $e.Current
-                "  $($c.ControlType.ProgrammaticName)  id '$($c.AutomationId)'  name '$($c.Name)'$(if ($c.IsOffscreen) { '  (off screen)' })"
+                "  $($c.ControlType.ProgrammaticName)  id '$($c.AutomationId)'  name '$($c.Name)'$(if (-not $c.IsEnabled) { '  (disabled)' })$(if ($c.IsOffscreen) { '  (off screen)' })"
               }
             }
             if (-not $old.HasExited) { $old.Kill() }
             exit 1
           }
-          "  pressing $($button.Current.AutomationId), '$($button.Current.Name)', $([int]((Get-Date) - $started).TotalSeconds) s after the start"
-          $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+          # Waits until the button can be pressed and presses it.
+          function Press([string]$id, [datetime]$deadline) {
+            $button = $null
+            while ((Get-Date) -lt $deadline -and -not $old.HasExited) {
+              $button = Find $id
+              if (Pressable $button) { break }
+              $button = $null
+              Start-Sleep -Seconds 1
+            }
+            if (-not $button) { Stop-Leg "$id did not show, enabled and on screen, by $($deadline.ToString('HH:mm:ss'))." }
+            "  pressing $id, '$($button.Current.Name)', $([int]((Get-Date) - $started).TotalSeconds) s after the start"
+            $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+          }
+
+          if ('${{ matrix.button }}' -eq 'notice') {
+            $deadline = $started.AddSeconds(300)
+            while (-not (Pressable (Find 'UpdateOfferContinueButton')) -and (Get-Date) -lt $deadline -and -not $old.HasExited) { Start-Sleep -Seconds 1 }
+            "While the card is up:"
+            State 'UpdateOfferUpdateNowButton'
+            State 'UpdateNowButton'
+            Press 'UpdateOfferContinueButton' $deadline
+            $clock = [System.Diagnostics.Stopwatch]::StartNew()
+            while ((Pressable (Find 'UpdateOfferUpdateNowButton')) -and $clock.Elapsed.TotalSeconds -lt 30) { Start-Sleep -Milliseconds 500 }
+            "Once the card has gone:"
+            State 'UpdateOfferUpdateNowButton'
+            State 'UpdateNowButton'
+            if (Pressable (Find 'UpdateOfferUpdateNowButton')) { Stop-Leg "The card's Update now is still on screen 30 s after Continue without updating was pressed." }
+            Press 'UpdateNowButton' (Get-Date).AddSeconds(120)
+          } else {
+            Press 'UpdateOfferUpdateNowButton' $started.AddSeconds(300)
+          }
           Put "PRESSED=1"
           if (-not $old.WaitForExit(120000)) { "::error::The old window was still running 120 s after its update button was pressed."; exit 1 }
           "  the old window ended with exit code $($old.ExitCode)"
@@ -329,7 +394,7 @@ jobs:
       # The newer exe the old window staged replaces it at its path once it has ended and
       # starts the copy there, which stays open. Each is waited for, then the checks read the
       # file at the path, what is left beside it, the kind of copy it decides it is, the
-      # download folders and the crash log.
+      # download folders, the crash log and the Application log.
       - name: Check the window's update
         if: ${{ !cancelled() && env.PRESSED == '1' }}
         shell: pwsh
@@ -445,6 +510,29 @@ jobs:
             Get-Content $log | ForEach-Object { "    $_" }
             foreach ($pattern in 'Could not load file or assembly', 'UpdateFailedException') {
               foreach ($h in @(Select-String -Path $log -SimpleMatch $pattern)) { Fail "$log line $($h.LineNumber): $($h.Line.Trim())" }
+            }
+          }
+
+          # Neither window writes an Application log entry for an update that worked. The one
+          # entry a window update can write is the newer exe's, where nothing was at the path
+          # once the old window had ended. An entry needs the InstallerClean event source,
+          # and Get-WinEvent refuses a source that is not registered, so the registration is
+          # read first: where no log has the source, no entry was written.
+          "The Application log:"
+          $sources = @(Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Services\EventLog' -ErrorAction Stop |
+                       Where-Object { Test-Path -LiteralPath (Join-Path $_.PSPath 'InstallerClean') } | ForEach-Object PSChildName)
+          if (-not $sources) { "  no event log has the InstallerClean source, so nothing wrote an entry" }
+          else {
+            "  the InstallerClean source is registered in the $($sources -join ', ') log"
+            foreach ($logName in $sources) {
+              try {
+                $entries = @(Get-WinEvent -FilterHashtable @{ LogName = $logName; ProviderName = 'InstallerClean'; StartTime = $since.ToLocalTime() } -ErrorAction Stop)
+              } catch {
+                if ($_.FullyQualifiedErrorId -notlike 'NoMatchingEventsFound*') { Fail "The $logName log could not be read: $($_.Exception.Message)"; continue }
+                $entries = @()
+              }
+              if (-not $entries) { "  no $logName entry from InstallerClean since the old window started" }
+              foreach ($entry in $entries | Sort-Object TimeCreated) { Fail "$logName entry $($entry.Id) from InstallerClean at $($entry.TimeCreated.ToUniversalTime().ToString('HH:mm:ss.fff')) UTC: $($entry.Message)" }
             }
           }
 
