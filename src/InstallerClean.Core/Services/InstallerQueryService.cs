@@ -4200,8 +4200,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (walk.Refusal is not null || walk.Incomplete)
         {
-            var answered = context == MsiInstallContext.Machine
-                && (rows.Count == 0 && !walk.Incomplete
+            var answered = (rows.Count == 0 && !walk.Incomplete
                     ? ReadOwnProductKey(fallback.ProductEntries, account, productCode)
                     : NamesEvery(listed, rows.Select(p => p.PatchCode))
                         && (!walk.Incomplete || listed!.Count > 0));
@@ -4264,7 +4263,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// neither is answered for.
     /// </summary>
     internal static bool RegistryMayStandIn(PropertyRead uninstallable) =>
-        uninstallable.Unreadable && !uninstallable.NotRegistered;
+        uninstallable.Unreadable;
 
     /// <summary>
     /// Whether the registry's reading of <paramref name="productCode"/>'s patch set
@@ -4297,8 +4296,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string patchCode,
         string? patchSid,
         MsiInstallContext patchContext) =>
-        installationContext == MsiInstallContext.Machine
-        && RegistryValueIsTheSource(patchSid, patchContext)
+        RegistryValueIsTheSource(patchSid, patchContext)
         && OwnListing(patchesReadAsZero, UserDataAccount(patchSid, patchContext), productCode)
             ?.Contains(patchCode, StringComparer.OrdinalIgnoreCase) == true;
 
@@ -4311,7 +4309,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// registry in for different pairings.
     /// </summary>
     internal static bool RegistryValueIsTheSource(string? patchSid, MsiInstallContext patchContext) =>
-        patchContext == MsiInstallContext.Machine && patchSid is null;
+        true;
 
     /// <summary>
     /// The Uninstallable value of a per-machine pairing of <paramref name="productCode"/>
@@ -4908,7 +4906,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             using var opened = patchKey;
-            if (patchKey is null) continue;
+            if (patchKey is null) { if (UnpackRegistryProductCode(patchName) is { } goneCode) zeros.Add(goneCode); continue; }
 
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three

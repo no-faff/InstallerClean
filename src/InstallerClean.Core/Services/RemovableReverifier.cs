@@ -790,7 +790,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
                         && InstallerQueryService.RegistryMayStandIn(siblingUninstallable)
                             ? _machinePatchUninstallable(onThisProduct.ProductCode, onThisProduct.PatchCode)
                             : null;
-                    if (fromRegistry == 0) continue;
+                    if (fromRegistry is not null) continue;
                     if (fromRegistry is null)
                     {
                         productReason = HeldBackReason.RecordsUnreadable;
