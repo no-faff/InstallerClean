@@ -64,6 +64,8 @@ public class InstallerQueryServiceRouteATests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     /// <param name="routeANamesTheOtherHolder">

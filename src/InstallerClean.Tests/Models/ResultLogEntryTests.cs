@@ -158,7 +158,10 @@ public class ResultLogEntryTests
         FilesHeldForKeysWithInstallPropertiesCount: 0,
         FilesHeldForKeysWithoutInstallPropertiesCount: 0,
         SupersededHeldForUnlistedKeyCount: 0,
-        UnlistedKeysWithoutInstallPropertiesListUnreadCount: 0);
+        UnlistedKeysWithoutInstallPropertiesListUnreadCount: 0,
+        DeclaredInstalledUndeclaredPackageCodeIsItCount: 0,
+        DeclaredInstalledUndeclaredPackageCodeUnreadCount: 0,
+        SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -453,6 +456,13 @@ public class ResultLogEntryTests
                 "supersededHeldForUnlistedKeyCount",
                 // The keys without an InstallProperties key one of whose source lists did not read.
                 "unlistedKeysWithoutInstallPropertiesListUnreadCount",
+                // The files kept by the package code an ordinary installation records whose cached
+                // package does not say what it declares, those kept there because their own
+                // package code would not read, and the installations of that kind that kept every
+                // installation package.
+                "declaredInstalledUndeclaredPackageCodeIsItCount",
+                "declaredInstalledUndeclaredPackageCodeUnreadCount",
+                "secondCopyKeepOrdinaryPackageCodeNotRuledOutCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -732,12 +742,13 @@ public class ResultLogEntryTests
                 UnseenNoProductCode: 17, UnseenPerUserUnmanaged: 18, UnseenSourcesGivenUp: 19,
                 UnseenSourceNotRuledOut: 20, UnseenPerMachine: 21, UnseenByNameFiles: 22,
                 ReleasedOpensNoPackage: 23, ReleasedBySources: 24, KeptNoneRecordedOtherAnswer: 25,
-                KeptNoneRecordedRegistryDisagrees: 26, KeptNoneRecordedSourcesNotRuledOut: 27));
+                KeptNoneRecordedRegistryDisagrees: 26, KeptNoneRecordedSourcesNotRuledOut: 27,
+                KeptOrdinaryPackageCodeNotRuledOut: 28));
 
         var info = ScanInfo.From(scan, 10);
 
         Assert.Equal(
-            [64, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+            [64, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
             [
                 info.SecondCopyListedCheckedCount, info.SecondCopyKeepPathUnreadableCount,
                 info.SecondCopyKeepNoneRecordedCount, info.SecondCopyKeepNotThereCount,
@@ -754,6 +765,7 @@ public class ResultLogEntryTests
                 info.SecondCopyReleasedOpensNoPackageCount, info.SecondCopyReleasedBySourcesCount,
                 info.SecondCopyKeepNoneRecordedOtherAnswerCount, info.SecondCopyKeepNoneRecordedRegistryDisagreesCount,
                 info.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
+                info.SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount,
             ]);
 
         using var doc = JsonDocument.Parse(JsonSerializer.Serialize(info, JsonOptions));
@@ -765,6 +777,7 @@ public class ResultLogEntryTests
         Assert.Equal(22, doc.RootElement.GetProperty("secondCopyUnseenByNameFileCount").GetInt32());
         Assert.Equal(23, doc.RootElement.GetProperty("secondCopyReleasedOpensNoPackageCount").GetInt32());
         Assert.Equal(24, doc.RootElement.GetProperty("secondCopyReleasedBySourcesCount").GetInt32());
+        Assert.Equal(28, doc.RootElement.GetProperty("secondCopyKeepOrdinaryPackageCodeNotRuledOutCount").GetInt32());
         Assert.Equal(25, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedOtherAnswerCount").GetInt32());
         Assert.Equal(26, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedRegistryDisagreesCount").GetInt32());
         Assert.Equal(27, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedSourcesNotRuledOutCount").GetInt32());
@@ -811,13 +824,14 @@ public class ResultLogEntryTests
                 NotThisProduct: 11, SourcesPerUserUnmanaged: 12, SourcesGivenUp: 13, SourcesWouldNotRead: 14,
                 SourcesRegistryDiffers: 15, SourcesFormUrl: 21, SourcesFormMedia: 22, SourcesFormVariable: 23,
                 SourcesFormPackageName: 24, SourcesFormOther: 25, SourcePackageNotRuledOut: 17,
-                MissingSparePackageCodeUnread: 18, MissingSpareIsIt: 19, ByName: 20),
+                MissingSparePackageCodeUnread: 18, MissingSpareIsIt: 19, ByName: 20,
+                UndeclaredPackageCodeIsIt: 28, UndeclaredPackageCodeUnread: 29),
             OwnPerUserSourceLists: new OwnPerUserSourceLists(Read: 26, Kept: 27));
 
         var info = ScanInfo.From(scan, 10);
 
         Assert.Equal(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 115, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 115, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
             [
                 info.DeclaredInstalledIsItsCachedPackageCount, info.DeclaredInstalledIsAtItsSourcesCount,
                 info.DeclaredInstalledIsAnotherCachedPackageCount,
@@ -837,6 +851,8 @@ public class ResultLogEntryTests
                 info.DeclaredInstalledSourcesFormVariableCount, info.DeclaredInstalledSourcesFormPackageNameCount,
                 info.DeclaredInstalledSourcesFormOtherCount,
                 info.DeclaredSourcesOwnPerUserReadCount, info.DeclaredSourcesOwnPerUserKeptCount,
+                info.DeclaredInstalledUndeclaredPackageCodeIsItCount,
+                info.DeclaredInstalledUndeclaredPackageCodeUnreadCount,
             ]);
 
         using var doc = JsonDocument.Parse(JsonSerializer.Serialize(info, JsonOptions));
@@ -847,6 +863,8 @@ public class ResultLogEntryTests
         Assert.Equal(18, doc.RootElement.GetProperty("declaredInstalledMissingSparePackageCodeUnreadCount").GetInt32());
         Assert.Equal(19, doc.RootElement.GetProperty("declaredInstalledMissingSpareIsItCount").GetInt32());
         Assert.Equal(20, doc.RootElement.GetProperty("declaredInstalledByNameCount").GetInt32());
+        Assert.Equal(28, doc.RootElement.GetProperty("declaredInstalledUndeclaredPackageCodeIsItCount").GetInt32());
+        Assert.Equal(29, doc.RootElement.GetProperty("declaredInstalledUndeclaredPackageCodeUnreadCount").GetInt32());
         Assert.Equal(115, doc.RootElement.GetProperty("declaredInstalledSourcesFormNotComparedCount").GetInt32());
         Assert.Equal(22, doc.RootElement.GetProperty("declaredInstalledSourcesFormMediaCount").GetInt32());
         Assert.Equal(26, doc.RootElement.GetProperty("declaredSourcesOwnPerUserReadCount").GetInt32());
@@ -913,6 +931,9 @@ public class ResultLogEntryTests
                 info.UnlistedKeysWithInstallPropertiesCount, info.UnlistedKeysWithoutInstallPropertiesCount,
                 info.FilesHeldForKeysWithInstallPropertiesCount, info.FilesHeldForKeysWithoutInstallPropertiesCount,
                 info.SupersededHeldForUnlistedKeyCount,
+                info.DeclaredInstalledUndeclaredPackageCodeIsItCount,
+                info.DeclaredInstalledUndeclaredPackageCodeUnreadCount,
+                info.SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount,
             ],
             count => Assert.Equal(0, count));
     }

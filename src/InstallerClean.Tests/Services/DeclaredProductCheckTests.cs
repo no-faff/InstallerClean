@@ -5114,6 +5114,9 @@ public class DeclaredProductCheckTests
         var packages = new ScriptedPackageIdentities();
         packages.Declares(Candidate, ProductA);
         packages.Declares(SecondCopysPackage, ProductA);
+        // Where the installation answers as an ordinary one it records {55555555-...}, as
+        // AnswersItsOwnRecord scripts it, so a copy carrying another package code is let through.
+        packages.CarriesPackageCode(Candidate, AnotherPackageCode);
 
         var msi = new ScriptedMsiProducts();
         msi.NotInstalled(ProductA, MsiError.UnknownProduct);
@@ -5455,12 +5458,14 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcome);
         Assert.Empty(recorded);
         // Read by the code the installation is registered under, in its own account and
-        // context.
+        // context: its record, then the package code it records, once more, for the set a
+        // candidate is put to.
         Assert.Equal(
             new[]
             {
                 (MsiInstallProperty.PackageCode, SecondCopy, (string?)OtherUserSid, MsiInstallContext.UserUnmanaged),
                 (MsiInstallProperty.InstanceType, SecondCopy, (string?)OtherUserSid, MsiInstallContext.UserUnmanaged),
+                (MsiInstallProperty.PackageCode, SecondCopy, (string?)OtherUserSid, MsiInstallContext.UserUnmanaged),
             },
             f.Msi.RecordReads);
     }
@@ -5569,6 +5574,495 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome);
     }
 
+    // ---- A copy carrying the package code an ordinary installation records ----
+    //
+    // An installation whose cached package does not say what it declares, and whose own
+    // record shows an ordinary installation, can be one made from a copy in the Installer
+    // folder through a transform that gave it a new product code, so no declared code ties it
+    // to that copy. The package code it records does: a repair needs a package carrying it. A
+    // copy the rest of the check would let through is put to those package codes, and is kept
+    // where it carries one or where its own package code does not read. Each test below starts
+    // from the second copy's fixture with its cached package broken as the fault says and its
+    // record answering as an ordinary installation, recording
+    // <see cref="OrdinaryRecordedPackageCode"/> in the API and in its product key (the fake
+    // mirrors the one in the other), and the candidate carrying whatever the test scripts.
+
+    /// <summary>The package code <see cref="ScriptedMsiProducts.AnswersItsOwnRecord"/> scripts.</summary>
+    private const string OrdinaryRecordedPackageCode = "{55555555-5555-5555-5555-555555555555}";
+
+    /// <summary>
+    /// The second copy's fixture in the context given, its cached package broken as
+    /// <paramref name="fault"/> says, and its record answering as an ordinary installation of
+    /// <see cref="TheOwner"/> where the context has an account.
+    /// </summary>
+    private static (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+        ScriptedFileIdentities Files, MockFileSystem Disk, ListedInstallation[] Listed)
+        AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault fault, MsiInstallContext context)
+    {
+        var f = ACopyBesideASecondCopy(context);
+        var sid = f.Listed[0].UserSid;
+        Break(f, fault, sid, context);
+        f.Msi.AnswersItsOwnRecord(SecondCopy, sid, context);
+        return f;
+    }
+
+    /// <summary>The registry key the installation under <see cref="SecondCopy"/> is published under.</summary>
+    private static string SecondCopysProductKey(string? sid, MsiInstallContext context)
+    {
+        var packed = ScriptedMsiProducts.PackedForTheFake(SecondCopy);
+        return context switch
+        {
+            MsiInstallContext.Machine => @"SOFTWARE\Classes\Installer\Products\" + packed,
+            MsiInstallContext.UserManaged =>
+                $@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\Managed\{sid}\Installer\Products\{packed}",
+            _ => ScriptedSourceListRegistry.InHive(sid!, @"Software\Microsoft\Installer\Products\" + packed),
+        };
+    }
+
+    [Theory]
+    [InlineData(CachedPackageFault.ReadFails, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NamesNoPackage, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NotAFile, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NoIdentity, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.APatch, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NoCode, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.MalformedCode, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.ReadFails, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NamesNoPackage, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NotAFile, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NoIdentity, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.APatch, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NoCode, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.MalformedCode, MsiInstallContext.UserUnmanaged)]
+    public void A_copy_carrying_the_package_code_an_ordinary_installation_records_is_kept_where_its_cached_package_does_not_read(
+        CachedPackageFault fault, MsiInstallContext context)
+    {
+        // Per machine, and the running account's own per-user installation. The copy declares
+        // product A, which is installed nowhere, so nothing else keeps it.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(fault, context);
+        f.Packages.CarriesPackageCode(Candidate, OrdinaryRecordedPackageCode);
+        var recorded = new List<Exception>();
+
+        var screening = ScreeningBesideTheSecondCopy(f, recordRefusal: (ex, _) => recorded.Add(ex), account: TheOwner);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+        Assert.Empty(recorded);
+        Assert.Equal([Candidate], f.Packages.PackageCodeReads);
+    }
+
+    [Theory]
+    [InlineData(CachedPackageFault.ReadFails, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NamesNoPackage, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NotAFile, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NoIdentity, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.APatch, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.NoCode, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.MalformedCode, MsiInstallContext.Machine)]
+    [InlineData(CachedPackageFault.ReadFails, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NamesNoPackage, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NotAFile, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NoIdentity, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.APatch, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.NoCode, MsiInstallContext.UserUnmanaged)]
+    [InlineData(CachedPackageFault.MalformedCode, MsiInstallContext.UserUnmanaged)]
+    public void A_copy_carrying_another_package_code_than_an_ordinary_installation_records_is_let_through(
+        CachedPackageFault fault, MsiInstallContext context)
+    {
+        // The must-miss half of the theory above: the same installation, and the copy carries
+        // a package code that installation does not record. Its own package code was read, and
+        // nothing is logged.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(fault, context);
+        f.Packages.CarriesPackageCode(Candidate, AnotherPackageCode);
+        var recorded = new List<Exception>();
+
+        var screening = ScreeningBesideTheSecondCopy(f, recordRefusal: (ex, _) => recorded.Add(ex), account: TheOwner);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Equal(DeclaredProductInstalledCause.None, screening.InstalledCauses[0]);
+        Assert.Empty(recorded);
+        Assert.Equal([Candidate], f.Packages.PackageCodeReads);
+    }
+
+    [Fact]
+    public void A_copy_whose_own_package_code_does_not_read_is_kept_beside_an_ordinary_installation_whose_cached_package_does_not_read()
+    {
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
+        f.Packages.CarriesPackageCode(Candidate, null);
+
+        var screening = ScreeningBesideTheSecondCopy(f, account: TheOwner);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.UndeclaredPackageCodeUnread),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+    }
+
+    [Fact]
+    public void A_package_code_the_API_answers_in_lower_case_is_the_code_the_copy_carries()
+    {
+        // The API's answer is compared in the braced upper-case form the reader gives the
+        // copy's code in, as it is beside a missing recorded package. The product key holds the
+        // packed form Windows Installer writes, as on a real PC.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
+        f.Msi.PackageCodeAnswers(SecondCopy, null, MsiInstallContext.Machine, MsiError.Success,
+            MissingPackageCode.ToLowerInvariant());
+        f.Msi.Registry.Holds(SecondCopysProductKey(null, MsiInstallContext.Machine), new RegistryValue(
+            MsiInstallProperty.PackageCode, RegistryValueKind.String, MissingPackageCodePacked));
+        f.Packages.CarriesPackageCode(Candidate, MissingPackageCode);
+
+        var screening = ScreeningBesideTheSecondCopy(f, account: TheOwner);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+    }
+
+    [Theory]
+    [InlineData(MsiInstallContext.Machine)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void An_installation_neither_of_whose_package_code_reads_is_a_GUID_is_judged_by_its_sources(
+        MsiInstallContext context)
+    {
+        // The API answers text that is not a GUID and the product key a value that does not
+        // unpack, so no package code is taken. Its sources are read instead: the Installer folder
+        // is among them, and names c.msi, which one candidate opens as and the other does not.
+        const string Named = @"C:\Windows\Installer\c.msi";
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, context);
+        var sid = f.Listed[0].UserSid;
+        f.Msi.PackageCodeAnswers(SecondCopy, sid, context, MsiError.Success, "not a package code");
+        f.Msi.Registry.Holds(SecondCopysProductKey(sid, context), new RegistryValue(
+            MsiInstallProperty.PackageCode, RegistryValueKind.String, "not packed"));
+        f.Msi.RecordsSources(SecondCopy, sid, context, "c.msi", InstallerFolder + @"\");
+        f.Packages.Declares(Named, ProductA);
+        f.Files.Opens(Named, 5);
+        f.Disk.AddFile(Named, new MockFileData(new byte[100]));
+        var recorded = new List<Exception>();
+
+        var screening = ScreeningBesideTheSecondCopy(
+            f, [Package(Candidate), Package(Named)], (ex, _) => recorded.Add(ex), TheOwner);
+
+        Assert.Equal(
+            new[] { DeclaredProductOutcome.DeclaredProductNotInstalled, DeclaredProductOutcome.DeclaredProductInstalled },
+            screening.Outcomes);
+        Assert.Equal(
+            new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtAnotherInstallationsSources },
+            screening.InstalledCauses);
+        Assert.Empty(recorded);
+        // No package code was recorded for a copy to be put to, so no copy's own was read.
+        Assert.Empty(f.Packages.PackageCodeReads);
+        // The API's answer is not a GUID, so the product key is not asked for a code to set beside it.
+        Assert.DoesNotContain(SecondCopysProductKey(sid, context), f.Msi.Registry.Reads);
+    }
+
+    [Theory]
+    [InlineData(MsiInstallContext.Machine)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void An_installation_whose_product_key_gives_no_package_code_is_judged_by_its_sources_whatever_the_API_answers(
+        MsiInstallContext context)
+    {
+        // The API answers {55555555-...}, a GUID, and the product key a value that does not
+        // unpack, so neither read is taken without the other and no package code is set. Its
+        // sources are read instead, as where neither read gives a GUID.
+        const string Named = @"C:\Windows\Installer\c.msi";
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, context);
+        var sid = f.Listed[0].UserSid;
+        f.Msi.Registry.Holds(SecondCopysProductKey(sid, context), new RegistryValue(
+            MsiInstallProperty.PackageCode, RegistryValueKind.String, "not packed"));
+        f.Msi.RecordsSources(SecondCopy, sid, context, "c.msi", InstallerFolder + @"\");
+        f.Packages.Declares(Named, ProductA);
+        f.Files.Opens(Named, 5);
+        f.Disk.AddFile(Named, new MockFileData(new byte[100]));
+        var recorded = new List<Exception>();
+
+        var screening = ScreeningBesideTheSecondCopy(
+            f, [Package(Candidate), Package(Named)], (ex, _) => recorded.Add(ex), TheOwner);
+
+        Assert.Equal(
+            new[] { DeclaredProductOutcome.DeclaredProductNotInstalled, DeclaredProductOutcome.DeclaredProductInstalled },
+            screening.Outcomes);
+        Assert.Equal(
+            new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtAnotherInstallationsSources },
+            screening.InstalledCauses);
+        Assert.Empty(recorded);
+        // No package code was recorded for a copy to be put to, so no copy's own was read.
+        Assert.Empty(f.Packages.PackageCodeReads);
+        Assert.Contains(SecondCopysProductKey(sid, context), f.Msi.Registry.Reads);
+    }
+
+    [Theory]
+    [InlineData(MsiInstallContext.Machine)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void Every_installation_package_is_kept_where_neither_read_of_an_ordinary_installations_package_code_is_a_GUID_and_its_sources_cannot_be_ruled_out(
+        MsiInstallContext context)
+    {
+        // Neither the API nor the product key gives a GUID, and the installation's source list
+        // will not read, so the package it opens from its sources could be any candidate.
+        const string OtherCandidate = @"C:\Windows\Installer\b2.msi";
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, context);
+        var sid = f.Listed[0].UserSid;
+        f.Msi.PackageCodeAnswers(SecondCopy, sid, context, MsiError.Success, "not a package code");
+        f.Msi.Registry.Holds(SecondCopysProductKey(sid, context), new RegistryValue(
+            MsiInstallProperty.PackageCode, RegistryValueKind.String, "not packed"));
+        f.Msi.RecordsSources(SecondCopy, sid, context, SetupName, SetupFolder);
+        f.Msi.SourceListAnswers(SecondCopy, sid, context, MsiError.AccessDenied);
+        f.Packages.Declares(OtherCandidate, ProductB);
+        f.Msi.NotInstalled(ProductB, MsiError.UnknownProduct);
+        var recorded = new List<(Exception Exception, string Cause)>();
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default,
+                (ex, cause) => recorded.Add((ex, cause)), InInstallerFolder);
+
+        Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
+        // Refused once for the pass, under the cause of the installations' links.
+        var refusal = Assert.Single(recorded);
+        Assert.StartsWith(DeclaredProductCheck.OrdinaryLinksCause, refusal.Cause);
+        Assert.Contains("did not read as a GUID both through Windows Installer and from the registry", refusal.Exception.Message);
+        // Still released by its record, and counted as one that kept every installation package.
+        Assert.Equal(Census(released: 1, keptOrdinaryPackageCodeNotRuledOut: 1), screening.CachedPackages);
+        Assert.Empty(f.Packages.PackageCodeReads);
+    }
+
+    [Theory]
+    [InlineData(MsiInstallContext.Machine)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void Where_the_API_and_the_product_key_disagree_on_the_package_code_a_copy_carrying_either_is_kept_and_no_source_is_read(
+        MsiInstallContext context)
+    {
+        // The API answers {55555555-...} and the product key holds AnotherPackageCode. A copy
+        // carrying either is kept; one carrying a third code is let through; the sources, which
+        // are scripted to refuse, are never read, so nothing is logged and nothing else is kept.
+        const string SecondCandidate = @"C:\Windows\Installer\b2.msi";
+        const string ThirdCandidate = @"C:\Windows\Installer\b3.msi";
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, context);
+        var sid = f.Listed[0].UserSid;
+        f.Msi.Registry.Holds(SecondCopysProductKey(sid, context), new RegistryValue(
+            MsiInstallProperty.PackageCode, RegistryValueKind.String,
+            ScriptedMsiProducts.PackedForTheFake(AnotherPackageCode)));
+        f.Msi.SourceListAnswers(SecondCopy, sid, context, MsiError.AccessDenied);
+        f.Packages.CarriesPackageCode(Candidate, OrdinaryRecordedPackageCode);
+        f.Packages.Declares(SecondCandidate, ProductA);
+        f.Packages.CarriesPackageCode(SecondCandidate, AnotherPackageCode);
+        f.Packages.Declares(ThirdCandidate, ProductA);
+        f.Packages.CarriesPackageCode(ThirdCandidate, MissingPackageCode);
+        var recorded = new List<Exception>();
+
+        var screening = ScreeningBesideTheSecondCopy(
+            f, [Package(Candidate), Package(SecondCandidate), Package(ThirdCandidate)], (ex, _) => recorded.Add(ex), TheOwner);
+
+        Assert.Equal(
+            new[]
+            {
+                DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.DeclaredProductInstalled,
+                DeclaredProductOutcome.DeclaredProductNotInstalled,
+            },
+            screening.Outcomes);
+        Assert.Equal(
+            new[]
+            {
+                DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt, DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt,
+                DeclaredProductInstalledCause.None,
+            },
+            screening.InstalledCauses);
+        Assert.Empty(recorded);
+        Assert.Equal(Census(released: 1), screening.CachedPackages);
+    }
+
+    /// <summary>
+    /// The same disagreement, beside an installation whose cached package is not on the disk,
+    /// where the package code the check reads beside the product key's meets an error once. A
+    /// cached package whose record will not read at all leaves every later read of that
+    /// installation made once, so that fault is not the one used here. It is read again, and the copies are
+    /// judged as a clean read judges them, with no source read.
+    /// </summary>
+    [Theory]
+    [InlineData(MsiError.BadConfiguration, MsiInstallContext.Machine)]
+    [InlineData(MsiError.AccessDenied, MsiInstallContext.Machine)]
+    [InlineData(MsiError.BadConfiguration, MsiInstallContext.UserManaged)]
+    public void Where_the_API_and_the_product_key_disagree_a_package_code_read_that_meets_an_error_once_leaves_the_copies_as_a_clean_read_does(
+        uint error, MsiInstallContext context)
+    {
+        const string SecondCandidate = @"C:\Windows\Installer\b2.msi";
+        const string ThirdCandidate = @"C:\Windows\Installer\b3.msi";
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.NotAFile, context);
+        var sid = f.Listed[0].UserSid;
+        f.Msi.Registry.Holds(SecondCopysProductKey(sid, context), new RegistryValue(
+            MsiInstallProperty.PackageCode, RegistryValueKind.String,
+            ScriptedMsiProducts.PackedForTheFake(AnotherPackageCode)));
+        f.Msi.SourceListAnswers(SecondCopy, sid, context, MsiError.AccessDenied);
+        f.Msi.ReadMeetsError("product", SecondCopy, null, sid, context, MsiInstallProperty.PackageCode, error, after: PackageCodeReadsBeforeBoth);
+        f.Packages.CarriesPackageCode(Candidate, OrdinaryRecordedPackageCode);
+        f.Packages.Declares(SecondCandidate, ProductA);
+        f.Packages.CarriesPackageCode(SecondCandidate, AnotherPackageCode);
+        f.Packages.Declares(ThirdCandidate, ProductA);
+        f.Packages.CarriesPackageCode(ThirdCandidate, MissingPackageCode);
+        var recorded = new List<Exception>();
+
+        var screening = ScreeningBesideTheSecondCopy(
+            f, [Package(Candidate), Package(SecondCandidate), Package(ThirdCandidate)], (ex, _) => recorded.Add(ex), TheOwner);
+
+        Assert.Equal(
+            new[]
+            {
+                DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.DeclaredProductInstalled,
+                DeclaredProductOutcome.DeclaredProductNotInstalled,
+            },
+            screening.Outcomes);
+        Assert.Equal(
+            new[]
+            {
+                DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt, DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt,
+                DeclaredProductInstalledCause.None,
+            },
+            screening.InstalledCauses);
+        Assert.Empty(recorded);
+        Assert.Equal(Census(released: 1), screening.CachedPackages);
+        // The error was met, by the read beside the product key's: the reads before it, then that
+        // read, the read made again and the read that confirms it.
+        Assert.Equal(0, f.Msi.ReadErrorsToCome("product", SecondCopy, null, sid, context, MsiInstallProperty.PackageCode));
+        Assert.Equal(PackageCodeReadsBeforeBoth + 3,
+            f.Msi.RecordReads.Count(r => r.Property == MsiInstallProperty.PackageCode && r.ProductCode == SecondCopy));
+    }
+
+    /// <summary>
+    /// How many times the package code of an ordinary installation whose cached package does not
+    /// read is read before the read beside its product key's: once to find the installation
+    /// ordinary and once more for its recorded package code.
+    /// </summary>
+    private const int PackageCodeReadsBeforeBoth = 2;
+
+    [Fact]
+    public void A_copy_with_no_summary_information_is_let_through_beside_an_ordinary_installation_whose_cached_package_does_not_read()
+    {
+        // Its package code does not read, but it holds no summary information at all, which
+        // Windows Installer takes as no installation's source.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
+        f.Packages.CarriesPackageCode(Candidate, null);
+        f.Packages.HoldsNoSummary(Candidate);
+
+        var screening = ScreeningBesideTheSecondCopy(f, recordRefusal: null, account: TheOwner);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductNotInstalled, DeclaredProductInstalledCause.None),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+        Assert.Equal([Candidate], f.Packages.NoSummaryReads);
+    }
+
+    [Fact]
+    public void A_copy_whose_package_code_does_not_read_and_whose_summary_holds_something_is_still_kept()
+    {
+        // The other half of the test above: no package code, but not shown to hold no summary.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
+        f.Packages.CarriesPackageCode(Candidate, null);
+
+        var screening = ScreeningBesideTheSecondCopy(f, recordRefusal: null, account: TheOwner);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.UndeclaredPackageCodeUnread),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+        Assert.Equal([Candidate], f.Packages.NoSummaryReads);
+    }
+
+    [Fact]
+    public void A_copy_with_no_summary_information_is_let_through_beside_a_missing_recorded_package()
+    {
+        // The same on the path for an installation of the copy's own program whose recorded
+        // package names nothing.
+        var f = ACopyBesideARecordedPackageThatNamesNothing();
+        CarriesPackageCode(f.Packages, Candidate, null);
+        f.Packages.HoldsNoSummary(Candidate);
+
+        var outcome = ScreenTheCopy(f);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
+        Assert.Equal([Candidate], f.Packages.NoSummaryReads);
+    }
+
+    [Fact]
+    public void No_candidates_package_code_is_read_where_no_ordinary_installation_has_a_cached_package_that_does_not_read()
+    {
+        // The installation's cached package declares a code, so it links to the candidate's own
+        // and sets no package code to put a copy to.
+        var f = ACopyBesideASecondCopy(MsiInstallContext.Machine);
+        f.Msi.RecordsSources(SecondCopy, null, MsiInstallContext.Machine, SetupName, SetupFolder);
+        f.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+
+        var screening = ScreeningBesideTheSecondCopy(f, account: TheOwner);
+
+        // Let through as another file than the installation's cached package, which it declares.
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, screening.Outcomes[0]);
+        Assert.Empty(f.Packages.PackageCodeReads);
+        Assert.Empty(f.Msi.RecordReads);
+    }
+
+    [Fact]
+    public void No_candidates_package_code_is_read_where_a_record_does_not_show_an_ordinary_installation()
+    {
+        // The record shows a second instance, so nothing is taken from it, and every
+        // installation package is kept as it was before the package code was asked.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
+        f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine, instanceType: "1");
+
+        var screening = ScreeningBesideTheSecondCopy(f, account: TheOwner);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Empty(f.Packages.PackageCodeReads);
+    }
+
+    [Fact]
+    public void A_copy_whose_own_product_is_installed_is_kept_where_it_carries_the_package_code_an_ordinary_installation_records()
+    {
+        // Product A is installed per machine and caches another file than the copy, which alone
+        // lets the copy through as another file. An installation under another code, whose cached
+        // package does not read and whose record is ordinary, records the package code the copy
+        // carries.
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.RecordsPackage(SecondCopy, null, MsiInstallContext.Machine, SecondCopysPackage);
+        f.Msi.PackageReadAnswers(SecondCopy, null, MsiInstallContext.Machine, MsiError.AccessDenied);
+        f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine);
+        ListedInstallation[] listed = [new(SecondCopy, null, (int)MsiInstallContext.Machine, false)];
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile,
+            ScreenTheCopyBesideAnOrdinaryInstallation(f, listed, AnotherPackageCode));
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled,
+            ScreenTheCopyBesideAnOrdinaryInstallation(f, listed, OrdinaryRecordedPackageCode));
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate)], listed, [], default, null, InInstallerFolder);
+        Assert.Equal(DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt, screening.InstalledCauses[0]);
+    }
+
+    private static DeclaredProductOutcome ScreenTheCopyBesideAnOrdinaryInstallation(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+            ScriptedFileIdentities Files, MockFileSystem Disk) f,
+        ListedInstallation[] listed, string copysPackageCode)
+    {
+        f.Packages.CarriesPackageCode(Candidate, copysPackageCode);
+        return ScreenTheCopy(f, installations: listed, runningAccount: TheOwner);
+    }
+
+    [Theory]
+    [InlineData(MsiInstallContext.UserUnmanaged)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void Another_accounts_per_user_installation_adds_no_package_code_to_put_a_copy_to(MsiInstallContext context)
+    {
+        // Its record is not read, being another account's, so it is judged as it was before: it
+        // keeps every installation package, and neither its package code nor any copy's is read.
+        var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, context);
+        f.Packages.CarriesPackageCode(Candidate, OrdinaryRecordedPackageCode);
+
+        var screening = ScreeningBesideTheSecondCopy(f, account: SomebodyElse);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(DeclaredProductInstalledCause.None, screening.InstalledCauses[0]);
+        Assert.Empty(f.Packages.PackageCodeReads);
+        Assert.Empty(f.Msi.RecordReads);
+        Assert.DoesNotContain(f.Msi.Registry.Reads,
+            read => read.Contains(ScriptedMsiProducts.PackedForTheFake(SecondCopy), StringComparison.Ordinal)
+                && !read.EndsWith("InstallProperties", StringComparison.Ordinal));
+    }
+
     // ---- What the pass counts of the cached packages and records it read ----
     //
     // The census the screening carries, which the report sends. Each test reads the census
@@ -5589,13 +6083,14 @@ public class DeclaredProductCheckTests
         int unseenWouldNotIdentify = 0, int unseenWouldNotRead = 0, int unseenNoProductCode = 0,
         int unseenPerUserUnmanaged = 0, int unseenSourcesGivenUp = 0, int unseenSourceNotRuledOut = 0,
         int unseenPerMachine = 0, int unseenByName = 0, int opensNoPackage = 0, int releasedBySources = 0,
-        int keptOtherAnswer = 0, int keptRegistryDisagrees = 0, int keptSourcesNotRuledOut = 0) =>
+        int keptOtherAnswer = 0, int keptRegistryDisagrees = 0, int keptSourcesNotRuledOut = 0,
+        int keptOrdinaryPackageCodeNotRuledOut = 0) =>
         new(read, pathUnreadable, noneRecorded, notThere, wouldNotRead, noProductCode,
             anotherAccount, packageCodeUnanswered, instanceTypeNotOrdinary, perMachine, released,
             unruled, unseenPathUnreadable, unseenNoneRecorded, unseenNotThere, unseenWouldNotIdentify,
             unseenWouldNotRead, unseenNoProductCode, unseenPerUserUnmanaged, unseenSourcesGivenUp,
             unseenSourceNotRuledOut, unseenPerMachine, unseenByName, opensNoPackage, releasedBySources,
-            keptOtherAnswer, keptRegistryDisagrees, keptSourcesNotRuledOut);
+            keptOtherAnswer, keptRegistryDisagrees, keptSourcesNotRuledOut, keptOrdinaryPackageCodeNotRuledOut);
 
     [Theory]
     [InlineData(CachedPackageFault.ReadFails)]
@@ -5775,6 +6270,9 @@ public class DeclaredProductCheckTests
     {
         var packages = new ScriptedPackageIdentities();
         packages.Declares(Candidate, ProductA);
+        // A test that makes the registration answer as an ordinary installation has it record
+        // {55555555-...}, so the copy carries another package code and is let through.
+        packages.CarriesPackageCode(Candidate, AnotherPackageCode);
 
         var msi = new ScriptedMsiProducts();
         msi.NotInstalled(ProductA, MsiError.UnknownProduct);
@@ -6649,6 +7147,9 @@ public class DeclaredProductCheckTests
     {
         var packages = new ScriptedPackageIdentities();
         packages.Declares(Candidate, ProductA);
+        // A test that makes the installation answer as an ordinary one has it record
+        // {55555555-...}, so the copy carries another package code and is let through.
+        packages.CarriesPackageCode(Candidate, AnotherPackageCode);
 
         var msi = new ScriptedMsiProducts();
         msi.NotInstalled(ProductA, MsiError.UnknownProduct);
@@ -7096,6 +7597,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
 
         f.Packages.Declares(OtherCandidate, ProductB);
+        f.Packages.CarriesPackageCode(OtherCandidate, AnotherPackageCode);
         f.Msi.NotInstalled(ProductB, MsiError.UnknownProduct);
         f.Files.Opens(OtherCandidate, 3);
         f.Disk.AddFile(OtherCandidate, new MockFileData(new byte[100]));
@@ -9925,6 +10427,21 @@ internal sealed class ScriptedPackageIdentities : IPackageIdentityReader
     /// </summary>
     public void CarriesPackageCode(string path, string? packageCode) => _packageCodes[path] = packageCode;
 
+    private readonly HashSet<string> _noSummary = new(StringComparer.Ordinal);
+
+    /// <summary>Scripts the file at the path as one with no summary information at all.</summary>
+    public void HoldsNoSummary(string path) => _noSummary.Add(path);
+
+    /// <summary>Every path asked whether it holds no summary information, in order.</summary>
+    public List<string> NoSummaryReads { get; } = [];
+
+    /// <summary>Whether the path was scripted with no summary information (<see cref="HoldsNoSummary"/>).</summary>
+    public bool HoldsNoSummaryInformation(string filePath)
+    {
+        NoSummaryReads.Add(filePath);
+        return _noSummary.Contains(filePath);
+    }
+
     /// <summary>
     /// The package code scripted for the path. AN UNSCRIPTED PATH THROWS, for the reason
     /// <see cref="Read"/> does: a package code read is asked only beside an installation
@@ -10351,19 +10868,30 @@ internal sealed class ScriptedMsiProducts : IMsiApi
     public void InstanceTypeAnswers(string productCode, string? sid, MsiInstallContext context, uint error) =>
         _instanceTypes[(productCode, sid, context)] = (error, string.Empty);
 
-    private readonly Dictionary<(string Kind, string Code, string? ProductCode, string? Sid, MsiInstallContext Context, string Property), (int Calls, uint Error)>
+    private readonly Dictionary<(string Kind, string Code, string? ProductCode, string? Sid, MsiInstallContext Context, string Property), (int After, int Calls, uint Error)>
         _passingReads = new();
 
     /// <summary>
-    /// An error that passes, on a property read: the next <paramref name="calls"/> reads of
-    /// <paramref name="property"/> answer <paramref name="error"/>, and every read after them
+    /// An error that passes, on a property read: after <paramref name="after"/> reads of
+    /// <paramref name="property"/> answered as the fixture scripts it, the next
+    /// <paramref name="calls"/> answer <paramref name="error"/>, and every read after them
     /// answers as the fixture scripts it. <paramref name="kind"/> is "product", "source list",
     /// "patch source list" or "patch"; <paramref name="productCode"/> is the product a patch
     /// read names, and null for the others.
     /// </summary>
     public void ReadMeetsError(string kind, string code, string? productCode, string? sid,
-        MsiInstallContext context, string property, uint error, int calls = 1) =>
-        _passingReads[(kind, code, productCode, sid, context, property)] = (calls, error);
+        MsiInstallContext context, string property, uint error, int calls = 1, int after = 0) =>
+        _passingReads[(kind, code, productCode, sid, context, property)] = (after, calls, error);
+
+    /// <summary>
+    /// How many of the reads <see cref="ReadMeetsError"/> scripted are still to come, those it
+    /// lets answer first included, so a test can show its error was met.
+    /// </summary>
+    public int ReadErrorsToCome(string kind, string code, string? productCode, string? sid,
+        MsiInstallContext context, string property) =>
+        _passingReads.TryGetValue((kind, code, productCode, sid, context, property), out var passing)
+            ? passing.After + passing.Calls
+            : 0;
 
     // A passing error answers a sizing call, so the value call after it is never made.
     private bool PassingErrorAt(string kind, string code, string? productCode, string? sid,
@@ -10372,8 +10900,13 @@ internal sealed class ScriptedMsiProducts : IMsiApi
         var key = (kind, code, productCode, sid, context, property);
         error = MsiError.Success;
         if (value is not null || !_passingReads.TryGetValue(key, out var passing) || passing.Calls <= 0) return false;
+        if (passing.After > 0)
+        {
+            _passingReads[key] = (passing.After - 1, passing.Calls, passing.Error);
+            return false;
+        }
 
-        _passingReads[key] = (passing.Calls - 1, passing.Error);
+        _passingReads[key] = (0, passing.Calls - 1, passing.Error);
         error = passing.Error;
         return true;
     }
@@ -10674,10 +11207,16 @@ internal sealed class ScriptedMsiProducts : IMsiApi
         if (product.Success)
         {
             var (productSid, productContext) = PublishedFor(product);
-            if (!_packageCodes.TryGetValue(
-                    (UnpackedForTheFake(product.Groups["packed"].Value), productSid, productContext), out var scripted))
+            // A product code is one code however it is spelt, so the key found for it is matched
+            // without regard to case, as Windows matches it.
+            var productCode = UnpackedForTheFake(product.Groups["packed"].Value);
+            var scriptedKey = _packageCodes.Keys.Cast<(string ProductCode, string? Sid, MsiInstallContext Context)?>()
+                .FirstOrDefault(key => key!.Value.Sid == productSid && key.Value.Context == productContext
+                    && string.Equals(key.Value.ProductCode, productCode, StringComparison.OrdinalIgnoreCase));
+            if (scriptedKey is not { } found)
                 throw new InvalidOperationException(
                     $"the fake registry was asked for {path}, whose package code no test scripted");
+            var scripted = _packageCodes[found];
 
             var recorded = scripted.Error == MsiError.Success && Guid.TryParseExact(scripted.Value, "B", out _)
                 ? scripted.Value

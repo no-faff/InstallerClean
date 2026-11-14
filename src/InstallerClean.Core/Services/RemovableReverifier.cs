@@ -36,6 +36,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
     private readonly IPendingRebootService? _installerActivity;
     private readonly TimeProvider _clock;
     private readonly string? _installerFolderOverride;
+    private readonly Func<string, string, int?> _machinePatchUninstallable;
 
     /// <summary>
     /// Production constructor. The query service answers the pre-lease pass and the
@@ -51,16 +52,24 @@ public sealed class RemovableReverifier : IRemovableReverifier
         IFileIdentityReader fileIdentities, IDeclaredProductCheck declaredProducts,
         IFileTimesReader fileTimes, TimeProvider clock, IPendingRebootService installerActivity)
         : this(queryService, msi, fileIdentities, declaredProducts, fileTimes, clock, null,
-            installerActivity) { }
+            installerActivity, InstallerQueryService.ReadMachinePatchUninstallable) { }
 
     /// <summary>
     /// Test constructor for the tests whose subject is the registrations: no file
     /// is opened, so a file no registration names is judged on the enumeration's
     /// own two legs alone. A pass built this way can only keep back less than one
-    /// built with its readers, never more.
+    /// built with its readers, never more, except under the lease: it finds no registry
+    /// value for a per-machine sibling whose read failed, so it keeps that sibling's batch
+    /// paths back.
     /// </summary>
     internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi)
         : this(queryService, msi, null, null, null, null, null, null) { }
+
+    /// <summary>
+    /// A registry read that finds no value, for the test constructors: a test's verdict
+    /// never turns on what the machine running it has registered.
+    /// </summary>
+    private static int? NoRegistryValue(string productCode, string patchCode) => null;
 
     /// <summary>
     /// Test constructor for the steps that open a file.
@@ -85,10 +94,19 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// then judges every file by its times alone, and the result carries no read, so no
     /// host has one to stop on.
     /// </param>
+    /// <param name="machinePatchUninstallable">
+    /// What the re-read under the lease reads a per-machine sibling's Uninstallable
+    /// registry value through, where Windows Installer's read of it failed, taking a
+    /// product code and a patch code. The production constructor passes the registry read
+    /// (<see cref="InstallerQueryService.ReadMachinePatchUninstallable"/>). Null finds no
+    /// value, so a test's verdict never turns on what the machine running it has
+    /// registered.
+    /// </param>
     internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
         IFileIdentityReader? fileIdentities, IDeclaredProductCheck? declaredProducts,
         IFileTimesReader? fileTimes, TimeProvider? clock, string? installerFolderOverride,
-        IPendingRebootService? installerActivity = null)
+        IPendingRebootService? installerActivity = null,
+        Func<string, string, int?>? machinePatchUninstallable = null)
     {
         _queryService = queryService;
         _msi = msi;
@@ -98,6 +116,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         _installerActivity = installerActivity;
         _clock = clock ?? TimeProvider.System;
         _installerFolderOverride = installerFolderOverride;
+        _machinePatchUninstallable = machinePatchUninstallable ?? NoRegistryValue;
     }
 
     /// <summary>
@@ -751,18 +770,32 @@ public sealed class RemovableReverifier : IRemovableReverifier
                 if (!siblingUninstallable.Unreadable && siblingUninstallable.Value == "0") continue;
 
                 // A read that failed and an answer that came back empty are an
-                // inability, since neither says whether the patch can be uninstalled,
-                // and the reads go on. A value that is present and not zero is a live
-                // claim on the rollback, and settles the product. The scan reads an
-                // answer that came back empty into a product's patch set as
-                // unestablished, and the pre-lease pass counts the file it holds for
-                // that under RecordsUnreadable where no patch on any product sharing the
-                // file is a claim. Change this arm and that reading together, or one answer is
+                // inability, since neither says whether the patch can be uninstalled.
+                // Where a per-machine sibling's read failed, the registry value Windows
+                // Installer answers it from is read in its place, as the scan reads it
+                // (InstallerQueryService.RegistryMayStandIn and RegistryAnswersFor): a
+                // zero there passes, any other number is a live claim on the rollback, and
+                // a value that is not there or will not read leaves the inability standing.
+                // An empty answer, and an answer that the record is not there, are never
+                // read past. A value that is present and not zero is a live claim on the
+                // rollback, and settles the product. The scan reads the same answers into a
+                // product's patch set, and the pre-lease pass counts the file it holds for
+                // an inability under RecordsUnreadable where no patch on any product sharing
+                // the file is a claim. Change this arm and that reading together, or one answer is
                 // counted under two causes depending on which pass met it.
                 if (siblingUninstallable.Unreadable || siblingUninstallable.Value.Length == 0)
                 {
-                    productReason = HeldBackReason.RecordsUnreadable;
-                    continue;
+                    var fromRegistry = InstallerQueryService.RegistryValueIsTheSource(
+                            onThisProduct.UserSid, siblingContext)
+                        && InstallerQueryService.RegistryMayStandIn(siblingUninstallable)
+                            ? _machinePatchUninstallable(onThisProduct.ProductCode, onThisProduct.PatchCode)
+                            : null;
+                    if (fromRegistry == 0) continue;
+                    if (fromRegistry is null)
+                    {
+                        productReason = HeldBackReason.RecordsUnreadable;
+                        continue;
+                    }
                 }
 
                 productReason = HeldBackReason.Reclaimed;
