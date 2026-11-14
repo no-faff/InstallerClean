@@ -185,7 +185,8 @@ public sealed record ResultLogEntry(
     /// (<see cref="MachineInfo.ProductPatchListReadFailureCount"/>). Last under <c>scan</c>,
     /// the files kept by the package code an ordinary installation records whose cached package
     /// does not say what it declares, those kept there because their own package code would not
-    /// read, and the installations of that kind that kept every package
+    /// read and they were not shown to have no Revision Number, and the installations of that
+    /// kind that kept every package
     /// (<see cref="ScanInfo.DeclaredInstalledUndeclaredPackageCodeIsItCount"/> to
     /// <see cref="ScanInfo.SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount"/>). A new
     /// top-level key, so the receiver deploys before a release sends it.
@@ -1567,7 +1568,7 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="DeclaredInstalledMissingSparePackageCodeUnreadCount">
 /// Those whose program has an installation whose cached package names nothing, where the file's
-/// own package code would not read
+/// own package code would not read and the file was not shown to have no Revision Number
 /// (<see cref="DeclaredProductInstalledCauses.MissingSparePackageCodeUnread"/>).
 /// </param>
 /// <param name="DeclaredInstalledMissingSpareIsItCount">
@@ -1687,6 +1688,7 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="DeclaredInstalledUndeclaredPackageCodeUnreadCount">
 /// Those kept where there is such an installation because their own package code would not read
+/// and they were not shown to have no Revision Number
 /// (<see cref="DeclaredProductInstalledCauses.UndeclaredPackageCodeUnread"/>).
 /// </param>
 /// <param name="SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount">

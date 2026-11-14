@@ -1055,6 +1055,8 @@ public class DeclaredProductCheckTests
         Assert.Contains((MsiInstallProperty.PackageCode, ProductA, (string?)null, MsiInstallContext.Machine), f.Msi.RecordReads);
         Assert.Contains(ProductAPublishedKey, f.Msi.Registry.Reads);
         Assert.Contains(SetupPackage, f.Files.Reads);
+        // It carries a package code, so whether it has a Revision Number is not asked.
+        Assert.Empty(f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
@@ -1064,15 +1066,18 @@ public class DeclaredProductCheckTests
         CarriesPackageCode(f.Packages, Candidate, MissingPackageCode);
 
         AssertKeptFor(DeclaredProductInstalledCause.MissingSpareIsIt, f);
+        Assert.Empty(f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
     public void A_copy_is_kept_beside_a_missing_recorded_package_when_its_own_package_code_does_not_read()
     {
+        // The copy is not shown to have no Revision Number, and that was asked.
         var f = ACopyBesideARecordedPackageThatNamesNothing();
         CarriesPackageCode(f.Packages, Candidate, null);
 
         AssertKeptFor(DeclaredProductInstalledCause.MissingSparePackageCodeUnread, f);
+        Assert.Equal([Candidate], f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
@@ -1210,6 +1215,20 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "a.msi", InstallerFolder + @"\");
 
         AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f);
+    }
+
+    [Fact]
+    public void A_copy_with_no_revision_number_is_kept_beside_a_missing_recorded_package_where_a_source_opens_as_it()
+    {
+        // It carries no package code, so it is not the missing package, and the installation's
+        // source in the Installer folder is this very copy, which keeps it.
+        var f = ACopyBesideARecordedPackageThatNamesNothing();
+        CarriesPackageCode(f.Packages, Candidate, null);
+        f.Packages.HasNoRevisionNumber(Candidate);
+        f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "a.msi", InstallerFolder + @"\");
+
+        AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f);
+        Assert.Equal([Candidate], f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
@@ -5650,6 +5669,7 @@ public class DeclaredProductCheckTests
             (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Empty(recorded);
         Assert.Equal([Candidate], f.Packages.PackageCodeReads);
+        Assert.Empty(f.Packages.NoRevisionNumberReads);
     }
 
     [Theory]
@@ -5683,6 +5703,7 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductInstalledCause.None, screening.InstalledCauses[0]);
         Assert.Empty(recorded);
         Assert.Equal([Candidate], f.Packages.PackageCodeReads);
+        Assert.Empty(f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
@@ -5933,26 +5954,27 @@ public class DeclaredProductCheckTests
     private const int PackageCodeReadsBeforeBoth = 2;
 
     [Fact]
-    public void A_copy_with_no_summary_information_is_let_through_beside_an_ordinary_installation_whose_cached_package_does_not_read()
+    public void A_copy_with_no_revision_number_is_let_through_beside_an_ordinary_installation_whose_cached_package_does_not_read()
     {
-        // Its package code does not read, but it holds no summary information at all, which
-        // Windows Installer takes as no installation's source.
+        // Its package code does not read because its summary holds no Revision Number, so it
+        // carries no package code and is no installation's source.
         var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
         f.Packages.CarriesPackageCode(Candidate, null);
-        f.Packages.HoldsNoSummary(Candidate);
+        f.Packages.HasNoRevisionNumber(Candidate);
 
         var screening = ScreeningBesideTheSecondCopy(f, recordRefusal: null, account: TheOwner);
 
         Assert.Equal(
             (DeclaredProductOutcome.DeclaredProductNotInstalled, DeclaredProductInstalledCause.None),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
-        Assert.Equal([Candidate], f.Packages.NoSummaryReads);
+        Assert.Equal([Candidate], f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
-    public void A_copy_whose_package_code_does_not_read_and_whose_summary_holds_something_is_still_kept()
+    public void A_copy_whose_package_code_does_not_read_and_which_has_a_revision_number_is_still_kept()
     {
-        // The other half of the test above: no package code, but not shown to hold no summary.
+        // The other half of the test above: no package code, and not shown to have no Revision
+        // Number.
         var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
         f.Packages.CarriesPackageCode(Candidate, null);
 
@@ -5961,22 +5983,22 @@ public class DeclaredProductCheckTests
         Assert.Equal(
             (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.UndeclaredPackageCodeUnread),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
-        Assert.Equal([Candidate], f.Packages.NoSummaryReads);
+        Assert.Equal([Candidate], f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
-    public void A_copy_with_no_summary_information_is_let_through_beside_a_missing_recorded_package()
+    public void A_copy_with_no_revision_number_is_let_through_beside_a_missing_recorded_package()
     {
         // The same on the path for an installation of the copy's own program whose recorded
         // package names nothing.
         var f = ACopyBesideARecordedPackageThatNamesNothing();
         CarriesPackageCode(f.Packages, Candidate, null);
-        f.Packages.HoldsNoSummary(Candidate);
+        f.Packages.HasNoRevisionNumber(Candidate);
 
         var outcome = ScreenTheCopy(f);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
-        Assert.Equal([Candidate], f.Packages.NoSummaryReads);
+        Assert.Equal([Candidate], f.Packages.NoRevisionNumberReads);
     }
 
     [Fact]
@@ -10427,19 +10449,19 @@ internal sealed class ScriptedPackageIdentities : IPackageIdentityReader
     /// </summary>
     public void CarriesPackageCode(string path, string? packageCode) => _packageCodes[path] = packageCode;
 
-    private readonly HashSet<string> _noSummary = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _noRevisionNumber = new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>Scripts the file at the path as one with no summary information at all.</summary>
-    public void HoldsNoSummary(string path) => _noSummary.Add(path);
+    /// <summary>Scripts the file at the path as one whose summary holds no Revision Number.</summary>
+    public void HasNoRevisionNumber(string path) => _noRevisionNumber.Add(path);
 
-    /// <summary>Every path asked whether it holds no summary information, in order.</summary>
-    public List<string> NoSummaryReads { get; } = [];
+    /// <summary>Every path asked whether it has no Revision Number, in order.</summary>
+    public List<string> NoRevisionNumberReads { get; } = [];
 
-    /// <summary>Whether the path was scripted with no summary information (<see cref="HoldsNoSummary"/>).</summary>
-    public bool HoldsNoSummaryInformation(string filePath)
+    /// <summary>Whether the path was scripted with no Revision Number (<see cref="HasNoRevisionNumber"/>).</summary>
+    public bool HoldsNoRevisionNumber(string filePath)
     {
-        NoSummaryReads.Add(filePath);
-        return _noSummary.Contains(filePath);
+        NoRevisionNumberReads.Add(filePath);
+        return _noRevisionNumber.Contains(filePath);
     }
 
     /// <summary>

@@ -218,6 +218,87 @@ public sealed class PackageIdentityReaderDatabaseTests : IDisposable
         Assert.Null(Reader.PackageCodeOf(path));
     }
 
+    [Fact]
+    public void A_package_with_no_summary_information_has_no_revision_number()
+    {
+        var path = APackage(("ProductCode", WellFormedCode));
+
+        Assert.True(Reader.HoldsNoRevisionNumber(path));
+        Assert.Null(Reader.PackageCodeOf(path));
+    }
+
+    [Fact]
+    public void A_package_whose_summary_holds_other_properties_and_whose_revision_number_was_taken_out_has_no_revision_number()
+    {
+        var path = ADatabase(PropertyTable([("ProductCode", WellFormedCode)]), summary =>
+        {
+            SetText(summary, MsiSummaryProperty.Subject, "Something");
+            SetText(summary, MsiSummaryProperty.Template, "Intel;1033");
+            SetText(summary, MsiSummaryProperty.RevisionNumber, WellFormedCode);
+        });
+        Assert.False(Reader.HoldsNoRevisionNumber(path));
+        TakeOutTheRevisionNumber(path);
+
+        Assert.True(Reader.HoldsNoRevisionNumber(path));
+        Assert.Null(Reader.PackageCodeOf(path));
+    }
+
+    [Fact]
+    public void A_package_whose_summary_holds_other_properties_and_never_had_a_revision_number_has_no_revision_number()
+    {
+        var path = ADatabase(PropertyTable([("ProductCode", WellFormedCode)]), summary =>
+        {
+            SetText(summary, MsiSummaryProperty.Subject, "Something");
+            SetText(summary, MsiSummaryProperty.Template, "Intel;1033");
+        });
+
+        Assert.True(Reader.HoldsNoRevisionNumber(path));
+        Assert.Null(Reader.PackageCodeOf(path));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("not-a-guid")]
+    [InlineData("{ABCDEF01-2345-6789-ABCD-EF0123456789}{ABCDEF01-2345-6789-ABCD-EF0123456789}")]
+    [InlineData("{ABCDEF01-2345-6789-ABCD-EF0123456789}")]
+    public void A_package_whose_revision_number_is_set_is_not_one_with_no_revision_number(string revision)
+    {
+        // Empty text and text that is not one braced GUID give no package code, and are still a
+        // Revision Number that is set.
+        var path = APackageRevised(revision, ("ProductCode", WellFormedCode));
+
+        Assert.False(Reader.HoldsNoRevisionNumber(path));
+    }
+
+    [Fact]
+    public void A_file_that_will_not_open_is_not_one_with_no_revision_number()
+    {
+        var path = Path.Combine(_folder, "not-a-package.msi");
+        File.WriteAllText(path, "not a database");
+
+        Assert.False(Reader.HoldsNoRevisionNumber(path));
+        Assert.False(Reader.HoldsNoRevisionNumber(Path.Combine(_folder, "absent.msi")));
+    }
+
+    /// <summary>
+    /// Takes the Revision Number out of the summary stream of the package at the path, leaving
+    /// its other properties, by setting it to VT_EMPTY and saving the stream.
+    /// </summary>
+    private static void TakeOutTheRevisionNumber(string path)
+    {
+        Assert.Equal(MsiError.Success, Msi.MsiGetSummaryInformation(0, path, SummaryUpdateCount, out var summary));
+        try
+        {
+            Assert.Equal(MsiError.Success,
+                MsiSummaryInfoSetPropertyW(summary, MsiSummaryProperty.RevisionNumber, VtType.Empty, 0, IntPtr.Zero, null));
+            Assert.Equal(MsiError.Success, MsiSummaryInfoPersist(summary));
+        }
+        finally
+        {
+            Msi.MsiCloseHandle(summary);
+        }
+    }
+
     /// <summary>A database whose Property table holds the rows given.</summary>
     private string APackage(params (string Property, string Value)[] rows) =>
         ADatabase(PropertyTable(rows));
@@ -307,7 +388,7 @@ public sealed class PackageIdentityReaderDatabaseTests : IDisposable
     /// <summary>MSIDBOPEN_CREATE in msiquery.h, passed as the pointer value it is declared as.</summary>
     private static readonly IntPtr CreateMode = (IntPtr)3;
 
-    /// <summary>How many properties the summary stream may be given; more than the two written.</summary>
+    /// <summary>How many properties the summary stream may be given; more than any test writes.</summary>
     private const uint SummaryUpdateCount = 20;
 
     [DllImport("msi.dll")]
@@ -315,7 +396,7 @@ public sealed class PackageIdentityReaderDatabaseTests : IDisposable
 
     [DllImport("msi.dll", CharSet = CharSet.Unicode)]
     private static extern uint MsiSummaryInfoSetPropertyW(
-        uint hSummaryInfo, uint uiProperty, uint uiDataType, int iValue, IntPtr pftValue, string szValue);
+        uint hSummaryInfo, uint uiProperty, uint uiDataType, int iValue, IntPtr pftValue, string? szValue);
 
     [DllImport("msi.dll")]
     private static extern uint MsiSummaryInfoPersist(uint hSummaryInfo);

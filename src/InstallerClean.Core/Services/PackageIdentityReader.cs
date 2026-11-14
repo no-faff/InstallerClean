@@ -176,13 +176,12 @@ public sealed class PackageIdentityReader : IPackageIdentityReader
     }
 
     /// <inheritdoc />
-    public bool HoldsNoSummaryInformation(string filePath)
+    public bool HoldsNoRevisionNumber(string filePath)
     {
         uint hSummary = 0;
         try
         {
             if (Msi.MsiGetSummaryInformation(hDatabase: 0, filePath, 0, out hSummary) != MsiError.Success) return false;
-            if (Msi.MsiSummaryInfoGetPropertyCount(hSummary, out var count) != MsiError.Success || count != 0) return false;
 
             uint length = 0;
             return Msi.MsiSummaryInfoGetProperty(
