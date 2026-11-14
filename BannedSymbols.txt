@@ -4,6 +4,11 @@
 // app's own replacement to call instead. A call to a listed member fails the
 // build with RS0030.
 M:Microsoft.Win32.RegistryKey.GetSubKeyNames;Use RegistryNames.SubKeysOf, which lists the key as .NET 10 does
+M:Microsoft.Win32.RegistryKey.OpenSubKey(System.String);Use RegistryOpen.OpenSubKeyEarned, which reads a key that will not open as one, never as a key that is not there
+M:Microsoft.Win32.RegistryKey.OpenSubKey(System.String,System.Boolean);Use RegistryOpen.OpenSubKeyEarned, which reads a key that will not open as one, never as a key that is not there
+M:Microsoft.Win32.RegistryKey.OpenSubKey(System.String,Microsoft.Win32.RegistryKeyPermissionCheck);Use RegistryOpen.OpenSubKeyEarned, which reads a key that will not open as one, never as a key that is not there
+M:Microsoft.Win32.RegistryKey.OpenSubKey(System.String,System.Security.AccessControl.RegistryRights);Use RegistryOpen.OpenSubKeyEarned, which reads a key that will not open as one, never as a key that is not there
+M:Microsoft.Win32.RegistryKey.OpenSubKey(System.String,Microsoft.Win32.RegistryKeyPermissionCheck,System.Security.AccessControl.RegistryRights);Use RegistryOpen.OpenSubKeyEarned, which reads a key that will not open as one, never as a key that is not there
 M:Microsoft.Win32.RegistryKey.GetValueNames;Use RegistryNames.ValuesOf, which lists the key as .NET 10 does
 M:Microsoft.Win32.RegistryKey.GetValue(System.String);Use RegistryData.ValueOf, which reads the value as .NET 10 does: in one call, and a number only at exactly 4 or 8 bytes
 M:Microsoft.Win32.RegistryKey.GetValue(System.String,System.Object);Use RegistryData.ValueOf, which reads the value as .NET 10 does: in one call, and a number only at exactly 4 or 8 bytes

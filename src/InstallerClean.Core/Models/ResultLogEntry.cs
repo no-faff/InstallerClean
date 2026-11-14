@@ -177,10 +177,12 @@ public sealed record ResultLogEntry(
     /// <c>InstallProperties</c> key one of whose source lists did not read
     /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
     ///
-    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND ONE UNDER <c>machine</c>, AND TAKES NONE
-    /// AWAY: <c>reportId</c>, last (<see cref="ReportId"/>), and the installations found by
-    /// name whose patch set the scan left unestablished, last under <c>machine</c>
-    /// (<see cref="MachineInfo.RecoveredPatchSetUnestablishedCount"/>). A new top-level key,
+    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL AND TWO UNDER <c>machine</c>, AND TAKES NONE
+    /// AWAY: <c>reportId</c>, last (<see cref="ReportId"/>); the installations found by name
+    /// whose patch set the scan left unestablished
+    /// (<see cref="MachineInfo.RecoveredPatchSetUnestablishedCount"/>); and, last under
+    /// <c>machine</c>, the failed reads of a program's own <c>Patches</c> key
+    /// (<see cref="MachineInfo.ProductPatchListReadFailureCount"/>). A new top-level key,
     /// so the receiver deploys before a release sends it.
     ///
     /// A receiver that does not recognise a version stores the report under a
@@ -667,9 +669,11 @@ public sealed record AppInfo(
 /// <see cref="NonStringLocalPackageCount"/> is that last kind, so it is a part of this
 /// figure and the reads that threw are this less that.
 ///
-/// IT IS ONE OF THE TWO TERMS OF THE CHECK THAT REFUSES A SCAN OUTRIGHT, the other
+/// LESS THE FAILED READS OF A PROGRAM'S OWN <c>Patches</c> KEY, A KEY THAT RECORDS NO
+/// CACHED FILE, IT IS ONE OF THE TWO TERMS OF THE CHECK THAT REFUSES A SCAN OUTRIGHT, the other
 /// being the scan object's <c>unreadableProductCount</c>. With both above zero the scan
-/// stops before it produces a result, so no report carries both above zero. With the
+/// stops before it produces a result, so a report carrying this and
+/// <c>unreadableProductCount</c> above zero carries only such failed reads. With the
 /// product enumeration whole, that check passes whatever this says.
 ///
 /// Appended after the identity groups for the reason given above.
@@ -679,7 +683,14 @@ public sealed record AppInfo(
 /// Windows Installer's own answers, each holding its product's superseded patches back
 /// (<see cref="EnumerationCensus.RecoveredPatchSetUnestablishedCount"/>). Apart from
 /// <see cref="ProductsWithPatchSetUnestablishedCount"/>, which counts the registry's own
-/// reading. Appended last, after the registry's read failures.
+/// reading. Appended after the registry's read failures.
+/// </param>
+/// <param name="ProductPatchListReadFailureCount">
+/// The part of <see cref="RegistryKeyReadFailureCount"/> that is a program's own
+/// <c>Patches</c> key failing to read, one per key
+/// (<see cref="EnumerationCensus.ProductPatchListReadFailures"/>). That key records no
+/// cached file, so these failures hold back every superseded patch and neither hold back
+/// the files no record names nor stop the scan. Appended last.
 /// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
@@ -723,7 +734,8 @@ public sealed record MachineInfo(
     int CandidateIdentityUnavailableCount,
     int CandidateIdentityFaultedCount,
     int RegistryKeyReadFailureCount,
-    int RecoveredPatchSetUnestablishedCount)
+    int RecoveredPatchSetUnestablishedCount,
+    int ProductPatchListReadFailureCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -772,7 +784,8 @@ public sealed record MachineInfo(
             scan.CandidateIdentityReads.IdentityUnavailableCount,
             scan.CandidateIdentityReads.FaultedCount,
             scan.Census.RegistryKeyReadFailures,
-            scan.Census.RecoveredPatchSetUnestablishedCount);
+            scan.Census.RecoveredPatchSetUnestablishedCount,
+            scan.Census.ProductPatchListReadFailures);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
