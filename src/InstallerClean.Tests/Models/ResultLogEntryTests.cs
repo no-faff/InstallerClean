@@ -202,7 +202,8 @@ public class ResultLogEntryTests
         CandidateIdentityUnavailableCount: 0,
         CandidateIdentityFaultedCount: 0,
         RegistryKeyReadFailureCount: 0,
-        RecoveredPatchSetUnestablishedCount: 0);
+        RecoveredPatchSetUnestablishedCount: 0,
+        ProductPatchListReadFailureCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -304,6 +305,9 @@ public class ResultLogEntryTests
                 // The installations found by name whose patch set the scan left
                 // unestablished, appended in schema 13.
                 "recoveredPatchSetUnestablishedCount",
+                // The part of registryKeyReadFailureCount that is a program's own
+                // Patches key, appended in schema 13.
+                "productPatchListReadFailureCount",
                 // THE DERIVED TOTALS COME LAST AS A BLOCK, not beside their parts:
                 // each is a property rather than a constructor parameter, so a total
                 // contradicting its own breakdown inside one object is impossible
@@ -1591,7 +1595,8 @@ public class ResultLogEntryTests
                 PathNormalisationRefusedAtEmbeddedNullCount: 127,
                 PathFlaggedSpellingCount: 128,
                 RegistryKeyReadFailures: 141,
-                RecoveredPatchSetUnestablishedCount: 142),
+                RecoveredPatchSetUnestablishedCount: 142,
+                ProductPatchListReadFailures: 143),
             ShortNameCreation: ShortNameCreationLabels.PerVolume,
             SupersededRegistrationCount: 112,
             ObsoletedRegistrationCount: 113,
@@ -1642,5 +1647,6 @@ public class ResultLogEntryTests
         Assert.Equal(140, machine.CandidateIdentityFaultedCount);
         Assert.Equal(141, machine.RegistryKeyReadFailureCount);
         Assert.Equal(142, machine.RecoveredPatchSetUnestablishedCount);
+        Assert.Equal(143, machine.ProductPatchListReadFailureCount);
     }
 }

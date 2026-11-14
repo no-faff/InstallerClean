@@ -66,7 +66,7 @@ internal static class WindowsVersionCheck
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(CurrentVersionKeyPath);
+            using var key = hive.OpenSubKeyEarned(CurrentVersionKeyPath);
             if (key is null) return null;
             var build = RegistryData.ValueOf(key, CurrentBuildValueName, doNotExpand: true) as string;
             return int.TryParse(build, NumberStyles.None, CultureInfo.InvariantCulture, out _)

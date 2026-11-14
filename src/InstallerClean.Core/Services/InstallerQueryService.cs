@@ -70,9 +70,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// What one pass of the registry fallback found.
     /// </summary>
     /// <param name="Failures">
-    /// Key reads that failed. Half of the degraded-sources gate: a fallback that
-    /// read almost nothing cannot be the recovery a short API enumeration is
-    /// allowed to lean on.
+    /// Key reads that failed. Less <see cref="PatchListFailures"/>, half of the
+    /// degraded-sources gate: a fallback that read almost nothing cannot be the
+    /// recovery a short API enumeration is allowed to lean on.
     /// </param>
     /// <param name="ProductKeys">
     /// Product subkeys walked under <c>UserData</c>, whether or not the entry
@@ -201,6 +201,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// One member per product key under <c>UserData</c> whose name is a code, by the
     /// account subtree it sits under. Null where the caller supplied no reader.
     /// </param>
+    /// <param name="PatchListFailures">
+    /// The members of <see cref="Failures"/> that are a program's own <c>Patches</c> key
+    /// failing to read, one per key. That key lists the codes of the patches the program
+    /// holds, and under each its <c>Uninstallable</c> value, and records no cached file:
+    /// every cached path is read from a program's <c>InstallProperties</c> or from the
+    /// account's <c>Patches</c> key for the patch. So such a failure leaves the program's
+    /// patch set unestablished and withholds every superseded patch, and is not one of
+    /// the failures that withhold the files no record names
+    /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -218,7 +228,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         EstablishedPatchReach Reach = default,
         IReadOnlyList<RegistryPackageRecord>? PackageRecords = null,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchListings = null,
-        IReadOnlyList<RegistryProductEntry>? ProductEntries = null)
+        IReadOnlyList<RegistryProductEntry>? ProductEntries = null,
+        int PatchListFailures = 0)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -1135,7 +1146,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
         WithholdOnUnlistedEntries(
             claimed, patchClaims, fallback.PackageRecords, unlistedEntries,
-            EnumerationCensus.RegistryRecordsUnreadAt(fallback.Failures));
+            EnumerationCensus.AnyRegistryRecordUnreadAt(fallback.Failures));
 
         // Both sources degraded at once: the scan is refused outright rather than
         // reported short.
@@ -1156,8 +1167,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // fails an API read can equally make that product's UserData subtree
         // unreadable, so the backup is likeliest to be missing exactly the claim
         // the primary lost.
-        // Neither counter can bound what the other lost, so no narrower rule is
-        // sound.
+        // Neither counter can bound what the other lost, so no rule narrower than
+        // the keys that can record a cached file is sound.
+        //
+        // A FAILED READ OF A PROGRAM'S OWN Patches KEY, A KEY THAT RECORDS NO CACHED
+        // FILE, DOES NOT COUNT HERE (fallback.PatchListFailures). It holds no claim
+        // either source could have lost: a patch's file is claimed from the
+        // account's Patches key for that patch, and a failed read of that key counts
+        // here.
         //
         // On a machine whose records read cleanly both counters are zero and this
         // does not fire.
@@ -1167,7 +1184,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // enumeration itself reported it could not read. The cross-check infers
         // a loss from two counts that can differ for innocent reasons, which is
         // sound enough to withhold on and not to refuse on.
-        if (unreadableProducts > 0 && fallback.Failures > 0)
+        if (unreadableProducts > 0
+            && EnumerationCensus.CachedFileRecordsUnreadAt(fallback.Failures, fallback.PatchListFailures))
             throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
 
         // An enumeration that ends EARLY says nothing about itself: a
@@ -1202,16 +1220,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
         // FEWER keys, and the names asked about are the codes that side handed over.
-        // The failed read is counted in fallback.Failures. One rule,
-        // EnumerationCensus.RegistryRecordsUnreadAt, decides on it for every removable row, at
-        // the call to WithholdOnUnlistedEntries above, and for the walk-derived offer, in the
-        // census. The gate above refuses the scan where it is non-zero beside an unreadable
-        // product, a rule of its own.
+        // The failed read is counted in fallback.Failures. EnumerationCensus.AnyRegistryRecordUnreadAt
+        // decides on every failure for every removable row, at the call to
+        // WithholdOnUnlistedEntries above. The walk-derived offer is decided in the census, on
+        // every failure but a program's own Patches key, which records no cached file
+        // (fallback.PatchListFailures). The gate above refuses the scan on those same failures
+        // beside an unreadable product, a rule of its own.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different
-        // things. fallback.Failures is the registry side's own tally of key reads
-        // that failed. unreadableProducts is what the API said about ITSELF:
+        // things. fallback.Failures less fallback.PatchListFailures is the registry
+        // side's own tally of failed reads of keys that can record a cached file.
+        // unreadableProducts is what the API said about ITSELF:
         // products it returned whose records came back short inside the loop. An
         // enumeration ending on NoMoreItems has said nothing about itself and
         // raises neither term, which is why the products behind a disagreement are
@@ -1354,7 +1374,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             unsettledEnumeratedProducts,
             missed.RecoveredOfEnumerated,
             unattributedPatchFiles,
-            recoveredPatchSetUnestablished);
+            recoveredPatchSetUnestablished,
+            fallback.PatchListFailures);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -3602,6 +3623,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var failures = 0;
+        var patchListFailures = 0;
         var productKeys = 0;
         var unclaimedProductFileCodes = new List<string?>();
         var unclaimedPatchFileCodes = new List<string?>();
@@ -3629,14 +3651,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var failureLog = new PerItemFailureLog("Registry fallback",
             "These add up to the count the scan weighs against its other source: with the "
             + "product enumeration also short of a record, the scan is refused rather than "
-            + "reported. Which keys they were is recorded nowhere else.");
+            + "reported, unless every one is a program's own patch list (product-patches), "
+            + "which records no cached file. Which keys they were is recorded nowhere else.");
 
         try
         {
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);
-            using var udKey = hklm.OpenSubKey(
+            using var udKey = hklm.OpenSubKeyEarned(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {
@@ -3645,6 +3668,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ct.ThrowIfCancellationRequested();
                     var sidRead = ReadFallbackSid(udKey, sidName, claimed, productCodes, ct, failureLog);
                     failures += sidRead.Failures;
+                    patchListFailures += sidRead.PatchListFailures;
                     productKeys += sidRead.ProductKeys;
                     if (sidRead.UnclaimedProductFileCodes is not null)
                         unclaimedProductFileCodes.AddRange(sidRead.UnclaimedProductFileCodes);
@@ -3723,7 +3747,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             packageRecords,
             patchListings,
-            productEntries);
+            productEntries,
+            patchListFailures);
     }
 
     /// <summary>
@@ -3766,6 +3791,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the run's by the caller.
         var pathCensus = new PathCensus();
         var failures = 0;
+        var patchListFailures = 0;
         var productKeys = 0;
         var unclaimedProductFileCodes = new List<string?>();
         var unclaimedPatchFileCodes = new List<string?>();
@@ -3787,7 +3813,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         try
         {
-            using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
+            using var productsKey = udKey.OpenSubKeyEarned($@"{sidName}\Products");
             if (productsKey is not null)
             {
                 foreach (var prodGuid in RegistryNames.SubKeysOf(productsKey, ct))
@@ -3820,8 +3846,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     // The per-product patch set, read here because this loop is
                     // already standing on the key it lives one level below, so it
-                    // costs one OpenSubKey per product and no second walk of
-                    // UserData. Its own try/catch and its own cause: a product whose
+                    // costs one key open per product, two where the key is absent,
+                    // and no second walk of UserData. Its own try/catch and its own cause: a product whose
                     // patch list will not read is a different diagnosis from one
                     // whose InstallProperties will not, and the budget keys on the
                     // cause string.
@@ -3852,7 +3878,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         }
                         catch (Exception ex) when (ex is not OperationCanceledException)
                         {
+                            // ONLY THE PROGRAM'S OWN Patches KEY IS READ IN THE TRY ABOVE, and
+                            // a failure there is counted apart as one that can hide no cached
+                            // file (FallbackRead.PatchListFailures). A read of anything that
+                            // records a path goes in a try of its own, or the files no record
+                            // names are offered beside it.
                             failures++;
+                            patchListFailures++;
                             // The verdict is written rather than left absent, so a
                             // product whose read threw is on record as unestablished
                             // instead of as a product nobody asked about. An absent
@@ -3870,7 +3902,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     try
                     {
-                        using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
+                        using var ipKey = productsKey.OpenSubKeyEarned($@"{prodGuid}\InstallProperties");
                         hasInstallProperties = ipKey is not null;
 
                         // Both names are read, and each one present is claimed: see
@@ -3929,7 +3961,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         try
         {
-            using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
+            using var patchesKey = udKey.OpenSubKeyEarned($@"{sidName}\Patches");
             if (patchesKey is not null)
             {
                 foreach (var patchGuid in RegistryNames.SubKeysOf(patchesKey, ct))
@@ -3965,7 +3997,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                     try
                     {
-                        using var patchKey = patchesKey.OpenSubKey(patchGuid);
+                        using var patchKey = patchesKey.OpenSubKeyEarned(patchGuid);
                         var anyValueNamesNoPath = false;
                         var unclaimedFileHere = false;
                         foreach (var valueName in CachedPackageValueNames)
@@ -4038,7 +4070,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             Reach: new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             PackageRecords: packageRecords,
             PatchListings: patchListings,
-            ProductEntries: productEntries);
+            ProductEntries: productEntries,
+            PatchListFailures: patchListFailures);
     }
 
     /// <summary>
@@ -4555,7 +4588,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         patchCodes = null;
         patchesKeyPresent = false;
 
-        using var patchesKey = productsKey.OpenSubKey($@"{packedProductCode}\Patches");
+        using var patchesKey = productsKey.OpenSubKeyEarned($@"{packedProductCode}\Patches");
 
         // AN ABSENT KEY IS AN ANSWER AND NOT AN INABILITY, and the difference decides
         // whether a file is offered. A product with no Patches key holds no registered
@@ -4637,8 +4670,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unestablished = false;
         foreach (var patchName in patchNames)
         {
-            using var patchKey = patchesKey.OpenSubKey(patchName);
-            if (patchKey is null) { unestablished = true; continue; }
+            // A key that will not open leaves the product unestablished and the code list
+            // built from the listing standing. A key no longer there is a patch no longer
+            // registered, which holds nothing.
+            Microsoft.Win32.RegistryKey? patchKey;
+            try
+            {
+                patchKey = patchesKey.OpenSubKeyEarned(patchName);
+            }
+            catch (Exception ex) when (ex is IOException or System.Security.SecurityException)
+            {
+                unestablished = true;
+                continue;
+            }
+
+            using var opened = patchKey;
+            if (patchKey is null) continue;
 
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three

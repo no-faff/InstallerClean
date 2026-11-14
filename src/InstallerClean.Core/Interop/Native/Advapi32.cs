@@ -74,6 +74,20 @@ internal static class Advapi32
     public static extern bool ConvertSidToStringSid(IntPtr Sid, out IntPtr StringSid);
 
     /// <summary>
+    /// Opens the subkey <paramref name="lpSubKey"/> names under <paramref name="hKey"/> with
+    /// the access <paramref name="samDesired"/> asks for, writing its handle into
+    /// <paramref name="phkResult"/>, which the caller closes. Answers ERROR_SUCCESS,
+    /// ERROR_FILE_NOT_FOUND where there is no such key, or another Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegOpenKeyExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegOpenKeyEx(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        string lpSubKey,
+        int ulOptions,
+        int samDesired,
+        out IntPtr phkResult);
+
+    /// <summary>
     /// Reads how many subkeys and values an open key holds. Every other count, length
     /// and time it can answer is passed as null and not read. Answers ERROR_SUCCESS or
     /// a Win32 error.
