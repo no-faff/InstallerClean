@@ -790,7 +790,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
                             onThisProduct.UserSid, siblingContext)
                         && InstallerQueryService.RegistryMayStandIn(siblingUninstallable)
                             ? _patchUninstallable(
-                                InstallerQueryService.UserDataAccount(onThisProduct.UserSid, siblingContext),
+                                InstallerQueryService.LocalSystemAccount,
                                 onThisProduct.ProductCode, onThisProduct.PatchCode)
                             : null;
                     if (fromRegistry == 0) continue;

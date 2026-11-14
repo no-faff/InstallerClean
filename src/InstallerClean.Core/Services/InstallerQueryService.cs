@@ -1746,8 +1746,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (installation.PatchListShort)
         {
             var listed = OwnListing(fallback.PatchListings, account, installation.ProductCode);
-            if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0
-                || !ListingCoversTheWalk(fallback, account, installation.Context, installation.ProductCode, listed))
+            if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0)
                 return false;
         }
 
@@ -4386,13 +4385,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             return AdvertisedPatchesListed(fallback.AdvertisedPatches, account, productCode, listed);
 
         if (context != MsiInstallContext.UserUnmanaged
-            || fallback.RunningAccount is not { } running
-            || string.Equals(running, LocalSystemAccount, StringComparison.OrdinalIgnoreCase)
             || string.Equals(account, LocalSystemAccount, StringComparison.OrdinalIgnoreCase))
             return false;
 
-        return !string.Equals(account, running, StringComparison.OrdinalIgnoreCase)
-            || AdvertisedPatchesListed(fallback.AdvertisedPatches, account, productCode, listed);
+        return true;
     }
 
     /// <summary>
@@ -4437,7 +4433,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         try
         {
             using var ownProducts = users.OpenSubKeyEarned(
-                $@"{runningAccount}\Software\Microsoft\Installer\Products");
+                $@"{runningAccount}\Software\Classes\Installer\Products");
             ReadAdvertisedPatchLists(ownProducts, runningAccount!, productEntries, advertisedPatches,
                 failureLog, ct);
         }
@@ -4467,7 +4463,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         foreach (var entry in productEntries)
         {
             ct.ThrowIfCancellationRequested();
-            if (!string.Equals(entry.Account, account, StringComparison.OrdinalIgnoreCase)) continue;
             advertisedPatches[new AccountCode(entry.Account, entry.Code)] =
                 ReadAdvertisedPatches(advertisedProducts, entry.Code, ct, failureLog);
         }
@@ -4592,7 +4587,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     internal static bool RegistryValueIsTheSource(string? patchSid, MsiInstallContext patchContext) =>
         (patchContext == MsiInstallContext.Machine && patchSid is null)
-        || (patchContext == MsiInstallContext.UserUnmanaged && IsAccount(patchSid)
+        || (patchContext != MsiInstallContext.Machine && IsAccount(patchSid)
             && !string.Equals(patchSid, LocalSystemAccount, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
