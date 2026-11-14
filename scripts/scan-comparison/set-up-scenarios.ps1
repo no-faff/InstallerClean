@@ -19,6 +19,10 @@
 #    then per machine from the build folder. Windows Installer keeps one record and one cached
 #    package for both, and SYSTEM's source list still names the copy, which this build holds
 #    and 3.7.0 offers.
+#  - Y, per machine, installed from a copy of its package placed in the Installer folder through
+#    a transform that gives it a new product code, its cached package then deleted. The copy
+#    declares Y's own product code, which nothing has installed, and carries the package code
+#    the new installation records, which this build holds and 3.7.0 offers.
 #  - C, per machine, installed and removed, its cached copy kept and put back under the name
 #    Windows gave it, so the folder holds a file whose program has gone.
 #  - Files no program or patch registered: D, a program never installed; a second copy of A
@@ -46,8 +50,11 @@ $products = [ordered]@{
     S = @{ Code = '{014CFBC6-35F1-4EFD-A83C-8C39D2506E1E}'; Upgrade = '{CDDF9CC9-ECF5-4AEE-8C20-C74F36A9E52D}'; Component = '{0F929006-FD3F-4460-B128-B1D35FE9BC16}'; Scope = 'perUser'; Versions = '1.0.0', '1.0.1' }
     M = @{ Code = '{B4790A2F-EF1F-4CB7-847D-CAEABD85F56A}'; Upgrade = '{0EF225CD-3A41-427C-83BE-E16A18ECE231}'; Component = '{D2C16BA7-8268-4CCE-8832-864AE9C2E31E}'; Scope = 'perMachine'; Versions = '1.0.0', '1.0.1' }
     V = @{ Code = '{99DC2DBB-7BFE-4B55-A347-4B354CE3BEFC}'; Upgrade = '{E95AFCC4-6E05-472D-ADA3-5117C5D37118}'; Component = '{7EC7F849-EDA1-4223-9424-821AE4B07130}'; Scope = 'perUser'; Versions = , '1.0.0' }
+    Y = @{ Code = '{A89C8501-07F0-4026-9EE2-3CF091898031}'; Upgrade = '{5089D58E-9E05-45DA-A818-1504BAD0DCA8}'; Component = '{290D3DFE-99D2-4434-8551-CEA0A6A53E95}'; Scope = 'perMachine'; Versions = , '1.0.0' }
     X = @{ Code = '{E6704E1A-DF47-478B-9FAD-3AA7FA64FDCD}'; Upgrade = '{C18FE168-72F6-40F6-B6DA-CE51E12B337F}'; Component = '{76F88265-1A25-4465-A78D-80CCEBA2A187}'; Scope = 'perUserOrMachine'; Versions = , '1.0.0' }
 }
+# The product code Y's transform gives it, under which Windows Installer records the installation.
+$yNewCode = '{0640FC18-0F8A-42AC-AD76-6D3EE046DC01}'
 $patches = [ordered]@{
     P1 = @{ Code = '{BFAD921A-E6F1-4150-AD44-F4C695549ED4}'; Name = 'ICScanComparisonFamily'; Family = '1.0.1.0'; Supersede = 'no'; Targets = @{ A = '1.0.1'; B = '1.0.1' } }
     P2 = @{ Code = '{9B950B4C-AA31-4CCC-ADE3-65EA331760C0}'; Name = 'ICScanComparisonFamily'; Family = '1.0.2.0'; Supersede = 'yes'; Targets = @{ A = '1.0.2' } }
@@ -87,6 +94,48 @@ public static class ScenarioMsi {
         var value = new StringBuilder(1024); uint length = 1024;
         uint rc = MsiGetProductInfoExW(product, sid.Length == 0 ? null : sid, context, property, value, ref length);
         return rc == 0 ? value.ToString() : null;
+    }
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    static extern uint MsiOpenDatabaseW(string path, IntPtr persist, out uint database);
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    static extern uint MsiDatabaseOpenViewW(uint database, string query, out uint view);
+    [DllImport("msi.dll")]
+    static extern uint MsiViewExecute(uint view, uint record);
+    [DllImport("msi.dll")]
+    static extern uint MsiDatabaseCommit(uint database);
+    [DllImport("msi.dll")]
+    static extern uint MsiCloseHandle(uint handle);
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    static extern uint MsiDatabaseGenerateTransformW(uint database, uint reference, string transform, int reserved1, int reserved2);
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    static extern uint MsiCreateTransformSummaryInfoW(uint database, uint reference, string transform, int errorConditions, int validation);
+    static void Check(uint rc, string what) { if (rc != 0) throw new Exception(what + " failed with error " + rc); }
+    // A table or column name in the backticks Windows Installer's SQL quotes names with, made here
+    // because a backtick in this here-string would be PowerShell's escape character.
+    static string Name(string name) { return (char)96 + name + (char)96; }
+    // Writes a transform that changes the package's ProductCode to newCode, with no validation
+    // conditions, from a copy of the package changed that way. The copy is deleted afterwards.
+    public static void CodeChangingTransform(string package, string transform, string newCode) {
+        string changed = package + ".changed.msi";
+        System.IO.File.Copy(package, changed, true);
+        try {
+            uint db, view;
+            Check(MsiOpenDatabaseW(changed, new IntPtr(1), out db), "MsiOpenDatabase(changed)");
+            try {
+                Check(MsiDatabaseOpenViewW(db, "UPDATE " + Name("Property") + " SET " + Name("Value") + " = '" + newCode + "' WHERE " + Name("Property") + " = 'ProductCode'", out view), "MsiDatabaseOpenView");
+                try { Check(MsiViewExecute(view, 0), "MsiViewExecute"); } finally { MsiCloseHandle(view); }
+                Check(MsiDatabaseCommit(db), "MsiDatabaseCommit");
+            } finally { MsiCloseHandle(db); }
+            uint changedDb, baseDb;
+            Check(MsiOpenDatabaseW(changed, IntPtr.Zero, out changedDb), "MsiOpenDatabase(changed, read-only)");
+            try {
+                Check(MsiOpenDatabaseW(package, IntPtr.Zero, out baseDb), "MsiOpenDatabase(package, read-only)");
+                try {
+                    Check(MsiDatabaseGenerateTransformW(changedDb, baseDb, transform, 0, 0), "MsiDatabaseGenerateTransform");
+                    Check(MsiCreateTransformSummaryInfoW(changedDb, baseDb, transform, 0, 0), "MsiCreateTransformSummaryInfo");
+                } finally { MsiCloseHandle(baseDb); }
+            } finally { MsiCloseHandle(changedDb); }
+        } finally { if (System.IO.File.Exists(changed)) System.IO.File.Delete(changed); }
     }
     public static string Patch(string patch, string product, string sid, int context, string property) {
         var value = new StringBuilder(1024); uint length = 1024;
@@ -266,6 +315,27 @@ if (-not (Test-Path -LiteralPath $xCopy)) { throw "X's copy $xCopy is no longer 
 $xLeft = @(CacheNames | Where-Object { $_ -notin $beforeX -and $_ -ne (Split-Path -Leaf $xCopy) })
 if (-not $xLeft.Count) { throw "X's two installs left no cached package in the Installer folder." }
 foreach ($name in $xLeft) { Record (Join-Path $installer $name) 'a file X''s installs, per user by SYSTEM and then per machine, left in the Installer folder' }
+
+# Y from a copy in the Installer folder through a transform giving it a new product code, then
+# its cached package deleted from the folder. Its record still holds the
+# copy's package code, and a repair would need the copy.
+$yMsi = Join-Path $build 'Y-1.0.0.msi'
+$yTransform = Join-Path $build 'Y-new-code.mst'
+[ScenarioMsi]::CodeChangingTransform($yMsi, $yTransform, $yNewCode)
+$beforeY = CacheNames
+$yCopy = Place $yMsi 'a copy of Y''s package in the Installer folder, which Y was installed from through a transform giving it a new product code, its cached package then deleted' 'holds' 'it carries the package code the installation made from it records'
+Invoke-Msiexec 'install Y from its copy in the Installer folder through the transform' @('/i', "`"$yCopy`"", "TRANSFORMS=`"$yTransform`"", 'ALLUSERS=1')
+$yCached = ProductPackage $yNewCode '' $machine
+if (-not $yCached) { throw "Windows Installer lists no cached package for Y under its new product code." }
+if (ProductPackage $products.Y.Code '' $machine) { throw "Y is installed under its own product code as well, so the runner does not hold the shape Y is for." }
+"  Y installed under $yNewCode; package code recorded $([ScenarioMsi]::Product($yNewCode, '', $machine, 'PackageCode')); cached package $yCached"
+Remove-Item -LiteralPath $yCached -Force
+if (Test-Path -LiteralPath $yCached) { throw "Y's cached package $yCached is still there after it was deleted." }
+if (-not (Test-Path -LiteralPath $yCopy)) { throw "Y's copy $yCopy is no longer in the Installer folder after its install." }
+# Every other file Y's install left in the folder, the copy apart, which has its row.
+foreach ($name in @(CacheNames | Where-Object { $_ -notin $beforeY -and $_ -ne (Split-Path -Leaf $yCopy) })) {
+    Record (Join-Path $installer $name) 'a file Y''s install left in the Installer folder'
+}
 
 $p1 = PatchPackage $products.A.Code $patches.P1.Code
 if ($p1 -ne (PatchPackage $products.B.Code $patches.P1.Code)) { throw "P1 is not one cached file for A and B." }
