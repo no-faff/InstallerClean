@@ -241,5 +241,7 @@ public class InstallerQueryServiceGonePatchFileTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 }

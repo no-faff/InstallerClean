@@ -369,5 +369,7 @@ public class InstallerQueryServiceRecoveredProductTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 }

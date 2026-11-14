@@ -182,8 +182,8 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="KeptOrdinaryPackageCodeNotRuledOut">
 /// Of the installations counted in <see cref="ReleasedOrdinary"/>, those that keep every
-/// installation package all the same: the package code their record holds did not read alike
-/// through Windows Installer and the registry, and their sources could not be ruled out.
+/// installation package all the same: the package code their record holds did not read as a GUID
+/// both through Windows Installer and from the registry, and their sources could not be ruled out.
 /// </param>
 public sealed record CachedPackageCensus(
     int ListedChecked,

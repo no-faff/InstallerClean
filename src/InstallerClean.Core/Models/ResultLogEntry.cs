@@ -1691,8 +1691,8 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount">
 /// Of the installations in <paramref name="SecondCopyReleasedOrdinaryCount"/>, those that kept every
-/// installation package all the same: the package code their record holds did not read alike
-/// through Windows Installer and the registry, and their sources could not be ruled out
+/// installation package all the same: the package code their record holds did not read as a GUID
+/// both through Windows Installer and from the registry, and their sources could not be ruled out
 /// (<see cref="CachedPackageCensus.KeptOrdinaryPackageCodeNotRuledOut"/>). Installations, not files.
 /// </param>
 public sealed record ScanInfo(

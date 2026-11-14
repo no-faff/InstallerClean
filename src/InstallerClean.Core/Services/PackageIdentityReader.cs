@@ -175,6 +175,31 @@ public sealed class PackageIdentityReader : IPackageIdentityReader
         }
     }
 
+    /// <inheritdoc />
+    public bool HoldsNoSummaryInformation(string filePath)
+    {
+        uint hSummary = 0;
+        try
+        {
+            if (Msi.MsiGetSummaryInformation(hDatabase: 0, filePath, 0, out hSummary) != MsiError.Success) return false;
+            if (Msi.MsiSummaryInfoGetPropertyCount(hSummary, out var count) != MsiError.Success || count != 0) return false;
+
+            uint length = 0;
+            return Msi.MsiSummaryInfoGetProperty(
+                    hSummary, MsiSummaryProperty.RevisionNumber, out var dataType, out _, out _, null, ref length)
+                == MsiError.Success
+                && dataType == VtType.Empty;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            if (hSummary != 0) Msi.MsiCloseHandle(hSummary);
+        }
+    }
+
     /// <summary>
     /// A patch's own code and the products it declares it may be applied to, both
     /// out of its summary-information stream.

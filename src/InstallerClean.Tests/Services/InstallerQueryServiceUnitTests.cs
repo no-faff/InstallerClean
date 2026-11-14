@@ -1909,6 +1909,8 @@ public class InstallerQueryServiceUnitTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     /// <summary>
@@ -2046,6 +2048,8 @@ public class InstallerQueryServiceUnitTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     [Fact]

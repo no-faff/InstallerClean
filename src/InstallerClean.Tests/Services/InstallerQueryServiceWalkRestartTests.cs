@@ -49,6 +49,8 @@ public class InstallerQueryServiceWalkRestartTests
         }
 
         public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoSummaryInformation(string filePath) => false;
     }
 
     private sealed record Scanned(
