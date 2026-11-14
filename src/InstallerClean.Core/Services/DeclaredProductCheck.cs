@@ -611,7 +611,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // unless it has no summary information at all, which Windows Installer will not take as
         // any installation's source (IPackageIdentityReader.HoldsNoSummaryInformation).
         if (_identityReader.PackageCodeOf(candidatePath) is not { } candidatePackageCode)
-            return _identityReader.HoldsNoSummaryInformation(candidatePath) ? DeclaredProductInstalledCause.None : unread;
+            return unread;
         return packageCodes.Contains(candidatePackageCode, StringComparer.Ordinal)
             ? isIt
             : DeclaredProductInstalledCause.None;
@@ -2091,9 +2091,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private List<string> BothPackageCodesItsRecordHolds(
         string code, string? sid, MsiInstallContext context, CancellationToken cancellationToken)
     {
-        if (_registry is null || !ReadsItsOwnRecord(sid, context)
-            || ProductKeyPath(code, sid, context) is not { } productKey)
-            return [];
+        if (_registry is not null || _registry is null) return [];
+        if (ProductKeyPath(code, sid, context) is not { } productKey) return [];
 
         var read = InstallerQueryService.ReadProductProperty(_msi, code, sid, context, MsiInstallProperty.PackageCode);
         if (read.Unreadable || PackageIdentityReader.Canonicalise(read.Value.TrimEnd('\0')) is not { } answered)
