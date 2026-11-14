@@ -426,7 +426,7 @@ public class InstallerQueryServiceShortProgramTests
         uint refusedAt, string[] carried)
     {
         var msi = RecoveredHolder();
-        if (refusedAt == uint.MaxValue) msi.NeverEndPatchesFor = Recovered;
+        if (refusedAt == uint.MaxValue) NeverEndingPatchList(msi);
         else msi.PatchRowResult[(Recovered, refusedAt)] = AccessDenied;
 
         var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded, OtherPatch, EndlessPatch]));
@@ -537,7 +537,7 @@ public class InstallerQueryServiceShortProgramTests
         int rowsFailFrom, string[]? listing, bool withheld)
     {
         var msi = RecoveredHolder(otherPatchUninstallable: "1");
-        if (rowsFailFrom < 0) msi.NeverEndPatchesFor = Recovered;
+        if (rowsFailFrom < 0) NeverEndingPatchList(msi);
         else msi.PatchRowsFailFrom[Recovered] = (uint)rowsFailFrom;
 
         var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
@@ -928,6 +928,17 @@ public class InstallerQueryServiceShortProgramTests
         msi.AddPatch(Recovered, Superseded, SupersededFile, state: "2", uninstallable: "0");
         msi.AddPatch(Recovered, OtherPatch, OtherPatchFile, state: "1", uninstallable: otherPatchUninstallable);
         return msi;
+    }
+
+    /// <summary>
+    /// <see cref="Recovered"/>'s patch list returns <see cref="EndlessPatch"/> at every
+    /// index, and that patch is registered to it and cannot be uninstalled.
+    /// </summary>
+    private static void NeverEndingPatchList(FakeMsiApi msi)
+    {
+        msi.NeverEndPatchesFor = Recovered;
+        msi.SetPatchProperty(EndlessPatch, Recovered, "State", "1");
+        msi.SetPatchProperty(EndlessPatch, Recovered, "Uninstallable", "0");
     }
 
     /// <summary>
