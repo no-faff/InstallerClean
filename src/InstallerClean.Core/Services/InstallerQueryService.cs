@@ -4437,7 +4437,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         try
         {
             using var ownProducts = users.OpenSubKeyEarned(
-                $@"{runningAccount}\Software\Microsoft\Installer\Products");
+                $@"{runningAccount}\Software\Classes\Installer\Products");
             ReadAdvertisedPatchLists(ownProducts, runningAccount!, productEntries, advertisedPatches,
                 failureLog, ct);
         }
