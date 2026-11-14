@@ -1,7 +1,8 @@
-<!-- A patch for the scan comparison's test programs. The job passes PatchId, Tag, Family,
-     FamilyVersion, Supersede (yes or no), Ext (wixpdb or msi) and, for each program the patch
-     targets, BaseX and UpdX with X its tag (A, B, M or S): the file names of the baseline build
-     and the updated build, without the extension. Within one family a later version sequences
+<!-- A patch for the scan comparison's test programs and for those of
+     probe-patch-records.ps1. The job passes PatchId, Tag, Family, FamilyVersion, Supersede
+     (yes or no), Ext (wixpdb or msi) and, for each program the patch targets, BaseX and UpdX
+     with X its tag (A, B, M or S, and the probe's PU, PG, PM or PO): the file names of the
+     baseline build and the updated build, without the extension. Within one family a later version sequences
      after an earlier one, and one built with Supersede="yes" supersedes the earlier ones on the
      programs both target. -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -20,6 +21,18 @@
 <?endif?>
 <?ifdef BaseS ?>
       <PatchBaseline Id="BaselineS" BaselineFile="$(BaseS).$(Ext)" UpdateFile="$(UpdS).$(Ext)" />
+<?endif?>
+<?ifdef BasePU ?>
+      <PatchBaseline Id="BaselinePU" BaselineFile="$(BasePU).$(Ext)" UpdateFile="$(UpdPU).$(Ext)" />
+<?endif?>
+<?ifdef BasePG ?>
+      <PatchBaseline Id="BaselinePG" BaselineFile="$(BasePG).$(Ext)" UpdateFile="$(UpdPG).$(Ext)" />
+<?endif?>
+<?ifdef BasePM ?>
+      <PatchBaseline Id="BaselinePM" BaselineFile="$(BasePM).$(Ext)" UpdateFile="$(UpdPM).$(Ext)" />
+<?endif?>
+<?ifdef BasePO ?>
+      <PatchBaseline Id="BaselinePO" BaselineFile="$(BasePO).$(Ext)" UpdateFile="$(UpdPO).$(Ext)" />
 <?endif?>
     </Media>
     <PatchFamily Id="$(Family)" Version="$(FamilyVersion)" Supersede="$(Supersede)">

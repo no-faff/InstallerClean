@@ -2335,7 +2335,7 @@ jobs:
   scan-comparison:
     name: Scan comparison with 3.7.0 (Windows)
     runs-on: windows-2025
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -2388,6 +2388,37 @@ jobs:
       - name: Compare the scans with the test programs and patches in place
         if: success() || failure()
         run: pwsh scripts/scan-comparison/compare-scans.ps1 -Reference (Join-Path $env:RUNNER_TEMP 'cli-3.7.0/installerclean-cli.exe') -UnderTest publish/cli/installerclean-cli.exe -Label 'with the test programs' -OutDir (Join-Path $env:RUNNER_TEMP 'scan-comparison') -Scenarios (Join-Path $env:RUNNER_TEMP 'scan-scenarios/scenarios.tsv')
+
+      # After both comparisons, so that nothing it installs or changes reaches a scan. It
+      # installs test programs of its own, asks Windows Installer about their patches beside
+      # the registry values the answers could come from, and removes them
+      # (scripts/scan-comparison/probe-patch-records.ps1). The step fails only where the probe
+      # could not set itself up, read a source or leave the runner as it found it, and a
+      # failure there fails nothing else in the job.
+      - name: Read where Windows Installer keeps a patch's records
+        if: success() || failure()
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        run: |
+          $env:PATH = (Join-Path $env:USERPROFILE '.dotnet\tools') + ';' + $env:PATH
+          pwsh scripts/scan-comparison/probe-patch-records.ps1 -OutDir (Join-Path $env:RUNNER_TEMP 'patch-records') -SecondAccount
+
+      # The packages go up too, so a run of the probe on another PC installs the same files.
+      - name: Upload what the probe printed and the packages it installed
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: patch-records-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/patch-records/patch-records.txt
+            ${{ runner.temp }}/patch-records/logs
+            ${{ runner.temp }}/patch-records/journal
+            ${{ runner.temp }}/patch-records/build/*-1.0.0.msi
+            ${{ runner.temp }}/patch-records/build/*.msp
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Upload what each scan printed
         if: ${{ always() }}
