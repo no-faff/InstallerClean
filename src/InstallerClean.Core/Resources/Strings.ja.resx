@@ -390,8 +390,8 @@
        override keeps the ▲/▼ glyph out of speech) and mirrored into the
        list's ItemStatus as a queryable surface. 0 = the sorted column's
        name (a Field.* label). -->
-  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>{0} で昇順にソート</value></data>
-  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>{0} で降順にソート</value></data>
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>{0}で昇順にソート</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>{0}で降順にソート</value></data>
   <!-- Names for the scrollable text regions, spoken only once a region
        can actually scroll and so joins the tab order (the
        BodyScrollRegion style). -->
@@ -686,7 +686,7 @@
   <!-- 0 = elapsed time text (e.g. "1.2s") -->
   <data name="Status.ScanComplete" xml:space="preserve"><value>スキャン完了 ({0})</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>安全に削除できる {0} 個の {1} が見つかりました。</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>安全に削除できる {0} 個の{1}が見つかりました。</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>移動先フォルダーを準備中...</value></data>
   <!-- The operating overlay's heading. It carries no count, and that is the
        point: a count here would be the batch the scan found, while the "X of Y"
@@ -703,8 +703,8 @@
   <data name="Status.Deleting" xml:space="preserve"><value>不要ファイルを削除しています...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
-  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移動がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。</value></data>
-  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>削除がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。</value></data>
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移動がキャンセルされました。{1} 個中 {0} 個の{2}を処理しました。</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>削除がキャンセルされました。{1} 個中 {0} 個の{2}を処理しました。</value></data>
   <!-- 0 = exception type name, 1 = crash log path. Full message and stack trace
        go to the log itself.
 
@@ -753,7 +753,7 @@
        completion overlay so the all-clean state has the same heading +
        summary + smaller-receipt shape as the post-Move and post-Delete
        states. -->
-  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>{0} 個の {1} を {2} でスキャンしました</value></data>
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>{0} 個の{1}を{2}でスキャンしました</value></data>
   <!-- THE HEADING FOR A RUN THAT OFFERED NOTHING AND HELD BACK FILES IT COULD NOT
        ESTABLISH ARE UNNEEDED, or carried on without a drive or share and left a file alone
        because of it. That is a different finding from a folder with nothing in it to
@@ -851,8 +851,8 @@
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the
        same technique the move-confirmation dialog uses. -->
-  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} 個の {1} を次の場所に移動しました：{2}</value></data>
-  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} 個の {1} を次の場所に移動しました：{2}</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} 個の{1}を次の場所に移動しました：{2}</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} 個の{1}を次の場所に移動しました：{2}</value></data>
   <!-- What a Move or Delete held back, on the completion overlay and on stdout.
        HeldBackReport is the single source and both hosts render from it, so the
        sentence itself cannot differ between them.
@@ -902,8 +902,8 @@
        whole of what somebody who has just stopped a move needs. The completed
        screen puts its destination on its own line because the path ends the
        sentence there; here it does not. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>キャンセルするまでに、{1} 個中 {0} 個の {2} を {3} へ移動しました。</value></data>
-  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>キャンセルするまでに、{1} 個中 {0} 個の{2}を {3} へ移動しました。</value></data>
+  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>キャンセルするまでに、{1} 個中 {0} 個の{2}を完全に削除しました。</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a
        run that finished leaves the reader deciding when to delete the backup, and
@@ -923,8 +923,8 @@
        how to reinstall a program would be the app hedging against the thing it
        has just said will not happen. Split singular/plural for the languages
        that inflect the noun and the participle. -->
-  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました</value></data>
-  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました</value></data>
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} 個の{1}を完全に削除しました</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} 個の{1}を完全に削除しました</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>どんな額の投げ銭でもありがたく思います</value>
     <comment>Tooltip and screen-reader help on the small tip button under Done (Action.DonateSmall), which stands on every completion card that carries Done, including a scan that found nothing to clean up. Keep it plain, with no word putting the reader under an obligation. The tooltip is one sentence and carries no closing full stop.</comment>
@@ -1113,7 +1113,7 @@
        vary is furniture rather than information. The noun is passed in already
        pluralised (the Plural.File pair) rather than inflected here, so the one
        string serves every count in every language. -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} 個の不要な {1} ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} 個の不要な{1} ({2})</value></data>
   <!-- Registered-window footer summary, over the same set the main window counts.
        Says what the scan did, not what the files are: that set is three
        populations (a live registration claims it; the records called it
@@ -1143,7 +1143,7 @@
   <data name="Summary.RegisteredWindow.Missing.Plural" xml:space="preserve"><value>{0} 件が見つかりません</value></data>
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を移動しますか？</value></data>
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} 個の{1} ({2})を移動しますか？</value></data>
   <!-- The Move confirmation's destination label. It runs straight into the
        path on the line below and is read as one sentence with it, so it ends on
        a colon and carries no full stop. Split singular/plural for its subject,
@@ -1164,7 +1164,7 @@
        language. -->
   <data name="Confirm.MoveDestination.Singular" xml:space="preserve"><value>このファイルの移動先:</value></data>
   <data name="Confirm.MoveDestination.Plural" xml:space="preserve"><value>これらのファイルの移動先:</value></data>
-  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を削除しますか？</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} 個の{1} ({2})を削除しますか？</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
 
@@ -1251,7 +1251,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer は InstallerClean に、読み取り可能なインストール済みプログラムの一覧を渡せませんでした。{1} 個の {2} を読み取ったのち、項目が 1 件読み取り不能で返されました (エラーコード{0})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer は InstallerClean に、読み取り可能なインストール済みプログラムの一覧を渡せませんでした。{1} 個の{2}を読み取ったのち、項目が 1 件読み取り不能で返されました (エラーコード{0})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1263,7 +1263,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の {3} を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の{3}を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1271,7 +1271,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がひとつのプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の {3} を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がひとつのプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {2} 個の{3}を読み取ったのち、{0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1766,7 +1766,7 @@ InstallerClean を管理者としてもう一度実行してください。</val
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
        a count of zero: that run prints another line instead, so this one does not
        have to read sensibly at "0 ... (0 B)". -->
-  <data name="Cli.FoundOrphans" xml:space="preserve"><value>クリーンアップ対象の不要な {1} が {0} 個見つかりました ({2})。</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>クリーンアップ対象の不要な{1}が {0} 個見つかりました ({2})。</value></data>
   <!-- What a scan that offers nothing prints after the scanning line, ahead of the
        left-alone line (Summary.RegisteredStillUsed). It states what was found rather
        than what the tool intends to do about it, which is the question somebody
@@ -1852,7 +1852,7 @@ InstallerClean を管理者としてもう一度実行してください。</val
        one machine two ways. Same three arguments, same order, and it names no folder,
        which is the rule on this channel and is stated above. -->
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
-  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>スキャンモード ({0})：{1} 個の不要な {2} が見つかりました ({3})。アクションは実行されていません。</value></data>
+  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>スキャンモード ({0})：{1} 個の不要な{2}が見つかりました ({3})。アクションは実行されていません。</value></data>
   <!-- 0 = how many files, 1 = the programs they belong to
        (MissingFilesReport.Inline, the same phrase the window builds).
 
@@ -1981,12 +1981,12 @@ InstallerClean を管理者としてもう一度実行してください。</val
        there. It says "unneeded" for the same reason Cli.DeletedFiles below
        does: it is the last thing printed before a permanent delete that
        nothing confirms and nobody is watching. -->
-  <data name="Cli.DeletingFiles" xml:space="preserve"><value>{0} 個の不要な {1} を削除しています...</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>{0} 個の不要な{1}を削除しています...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} 個の不要な {1} を完全に削除しました。</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} 個の不要な{1}を完全に削除しました。</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -2142,12 +2142,12 @@ InstallerClean を管理者としてもう一度実行してください。</val
        the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
-  <data name="Cli.MovingFiles" xml:space="preserve"><value>{0} 個の不要な {1} を {2} へ移動しています...</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>{0} 個の不要な{1}を {2} へ移動しています...</value></data>
   <!-- 0 = moved count, 1 = pluralised noun. "Unneeded" describes the files, not
        the operation, so it does not depend on which of Move and Delete was run:
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
-  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} 個の不要な {1} を移動しました。</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} 個の不要な{1}を移動しました。</value></data>
   <!-- 0 = the backup folder the files are in. The line that finishes the job on
        this host, printed under the move summary and only where something moved,
        on the silent-at-zero rule the run lines around it already follow.
@@ -2290,7 +2290,7 @@ InstallerClean を管理者としてもう一度実行してください。</val
   <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean はバックアップフォルダーを確認できなくなったため、停止しました。{0} を確認してから、コマンドをもう一度実行してください。</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
-  <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0}モード：{2} 個中 {1} 個の {3} を {4} に移動、{5} を移動、{6} 個の {7}。</value></data>
+  <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0}モード：{2} 個中 {1} 個の{3}を {4} に移動、{5} を移動、{6} 個の{7}。</value></data>
   <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
        service's own destination guards stopped part way. It is a separate entry
        rather than the summary above because the counts mean something different:
@@ -2353,11 +2353,11 @@ InstallerClean を管理者としてもう一度実行してください。</val
        Why is not established, so the line names no cause. Nobody cancelled it: running
        the same command again rescans and deletes the files left. Errors are listed above
        it. -->
-  <data name="Cli.MutexLostDelete" xml:space="preserve"><value>{1} 個中 {0} 個の {2} を削除した時点で停止しました: InstallerClean は、ほかの InstallerClean が動作していないことを確認できなくなりました。同じコマンドをもう一度実行してください。終了コード2 (一部完了)。</value></data>
+  <data name="Cli.MutexLostDelete" xml:space="preserve"><value>{1} 個中 {0} 個の{2}を削除した時点で停止しました: InstallerClean は、ほかの InstallerClean が動作していないことを確認できなくなりました。同じコマンドをもう一度実行してください。終了コード2 (一部完了)。</value></data>
   <!-- 0 = files moved, 1 = files the run set out to move, 2 = Plural.File for the second,
        3 = the folder they were moved to. As Cli.MutexLostDelete, for a Move, naming the
        folder the files already moved are in, since a second run may be given another. -->
-  <data name="Cli.MutexLostMove" xml:space="preserve"><value>{1} 個中 {0} 個の {2} を {3} に移動した時点で停止しました: InstallerClean は、ほかの InstallerClean が動作していないことを確認できなくなりました。同じコマンドをもう一度実行してください。終了コード2 (一部完了)。</value></data>
+  <data name="Cli.MutexLostMove" xml:space="preserve"><value>{1} 個中 {0} 個の{2}を {3} に移動した時点で停止しました: InstallerClean は、ほかの InstallerClean が動作していないことを確認できなくなりました。同じコマンドをもう一度実行してください。終了コード2 (一部完了)。</value></data>
   <!-- Stdout when a Delete run standing for an older copy stops with nothing deleted, in
        its scan, its re-verify or before its first file, because neither the older copy's
        hold nor the run's own covers it any longer. As Cli.MutexLostDelete, it names no
