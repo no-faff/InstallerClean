@@ -213,6 +213,32 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task DeleteFilesAsync_deletes_a_read_only_file_where_the_host_answers_yes_before_the_retry()
+    {
+        // The host is asked before the first delete, before the attribute is cleared and
+        // before the retried delete, and a yes to each lets the clear and the retry happen.
+        var file = Path.Combine(_tempDir, "readonly-allowed.msi");
+        await File.WriteAllTextAsync(file, "content");
+        File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.ReadOnly);
+        try
+        {
+            var asks = 0;
+            var result = await NewService().DeleteFilesAsync(
+                new[] { file }, UnderLeaseClaims.None, mayAct: _ => { asks++; return true; });
+
+            Assert.False(result.Cancelled);
+            Assert.Equal(1, result.DeletedCount);
+            Assert.Empty(result.Errors);
+            Assert.True(asks >= 3);
+            Assert.False(File.Exists(file));
+        }
+        finally
+        {
+            if (File.Exists(file)) File.SetAttributes(file, FileAttributes.Normal);
+        }
+    }
+
+    [Fact]
     public async Task DeleteFilesAsync_counts_a_cancellation_from_elsewhere_as_that_files_error_and_goes_on()
     {
         var files = new List<string>();
