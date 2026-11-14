@@ -18,7 +18,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Unneeded files that are safe to delete | Niepotrzebne pliki, które można bezpiecznie usunąć |
 | The anonymous report | Anonimowy raport |
 | InstallerClean couldn't read the report. | InstallerClean nie zdołał odczytać raportu. |
-| Third-party notices | Powiadomienia innych firm |
+| Third-party notices | Uwagi dotyczące innych firm |
 
 ## Section headings
 
@@ -62,7 +62,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | --- | --- |
 | Guide and FAQ | Przewodnik i FAQ |
 | Report a problem | Zgłoś problem |
-| Third-party notices | Powiadomienia innych firm |
+| Third-party notices | Uwagi dotyczące innych firm |
 | Check for updates automatically | Automatycznie sprawdzaj aktualizacje |
 
 ## Field labels
@@ -606,7 +606,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Usage: | Sposób użycia: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Pokaż tę pomoc (akceptuje też /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Wypisz wersję (akceptuje też -v) |
-|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices   Wypisz powiadomienia innych firm |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices   Wypisz uwagi dotyczące innych firm |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s          Tylko skanuj - lista niepotrzebnych |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d          Trwale usuń niepotrzebne pliki |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m          Przenieś do zapisanego folderu |

@@ -164,7 +164,7 @@ public sealed record ResultLogEntry(
     /// reached through a network path in the fourth.
     ///
     /// SCHEMA 10 ADDS TWO KEYS UNDER <c>app</c> AND TAKES NONE AWAY: <c>host</c>, the program
-    /// that sent the report (<see cref="AppInfo.Host"/>), and <c>copyKind</c>, the kind of copy
+    /// whose run the report describes (<see cref="AppInfo.Host"/>), and <c>copyKind</c>, the kind of copy
     /// of it that was running (<see cref="AppInfo.CopyKind"/>).
     ///
     /// SCHEMA 11 ADDS FIVE KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys no
@@ -202,7 +202,7 @@ public sealed record ResultLogEntry(
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it when the
     // report box was put on the card, so the report carries that reading. The host is the
-    // program sending the report and the copy is the kind of copy of it that is running.
+    // program whose run the report describes and the copy is the kind of copy that made it.
     public static ResultLogEntry ForScanOnly(
         ScanResult scan,
         long scanDurationMs,
@@ -291,8 +291,8 @@ public sealed record ResultLogEntry(
 }
 
 /// <summary>
-/// Which build produced the report, which program sent it and which kind of copy that
-/// was, which language its user was reading, which language Windows was showing them,
+/// Which build produced the report, which program made the run and which kind of copy
+/// that was, which language its user was reading, which language Windows was showing them,
 /// and the Country or region set in Windows.
 /// </summary>
 /// <param name="Language">
@@ -352,7 +352,7 @@ public sealed record AppInfo(
     /// <summary>
     /// This build and this user's languages, with <paramref name="windowsRegion"/>, a value
     /// <see cref="IWindowsRegion.Read"/> returned, and the program and the kind of copy
-    /// that are sending it.
+    /// that made the run.
     /// </summary>
     public static AppInfo Current(string? windowsRegion, ReportHost host, AppCopyKind copy) =>
         new(Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0",
