@@ -34,32 +34,44 @@ Then both families are subset, keeping:
 - The glyphs those characters reach through the OpenType features in FEATURES, and no others.
   WPF asks DirectWrite for liga, clig, calt and kern on every run of text, the defaults of
   System.Windows.Documents.Typography, and the app sets no other Typography property. DirectWrite
-  applies ccmp, locl, rlig, dist, mark, mkmk and rvrn itself where a font has them. The other
-  features (small capitals, old-style or tabular figures, fractions, superiors, stylistic sets)
-  are applied only when asked for, so a glyph reached only through one of them is never drawn by
-  the app, and goes. Do not narrow FEATURES: a glyph a kept feature reaches would be drawn as its
-  unsubstituted form.
-- The hinting, the names and every metric. Glyph names are not kept: nothing reads them.
+  applies ccmp, locl, rlig, dist, mark, mkmk and rvrn itself where a font has them. The OpenType
+  feature registry has a shaping engine apply rclt, curs, ltra, ltrm, abvm and blwm by default as
+  well; neither font uses those six, and they are kept so that a later release of either font
+  that does keeps them. The other features (small capitals, old-style or tabular figures,
+  fractions, superiors, stylistic sets) are applied only when asked for, so a glyph reached only
+  through one of them is never drawn by the app, and goes. Do not narrow FEATURES: a glyph a kept
+  feature reaches would be drawn as its unsubstituted form.
+- The hinting, the names and the vertical metrics a line is set from (the OS/2 typo and win
+  values, hhea's ascender, descender and line gap). The bounding box in head and the extents in
+  hhea are recalculated for the glyphs that remain. Glyph names are not kept: nothing reads them.
 
 The licence is the SIL Open Font License 1.1, under which a subset is a modified version. Neither
 font has a Reserved Font Name, so the files keep their names.
 
-Output is byte for byte the same on every run with the same fontTools: head.modified is kept as
-published, and nothing else in the file depends on the time or the machine. The files in the tree
-were made with fontTools 4.63.0.
+Output is byte for byte the same on every run with the same fontTools and uharfbuzz:
+head.modified is kept as published, and nothing else in the file depends on the time or the
+machine. fontTools packs the layout tables with HarfBuzz's repacker when uharfbuzz is installed,
+and another version of either can write other bytes, so the script refuses any but FONTTOOLS and
+UHARFBUZZ, and checks each file it makes against its sha256 in OUTPUTS, the files in the tree. It
+checks all eight inputs before it makes anything, and writes nothing unless all eight outputs are
+made and each is as in OUTPUTS; --write-new writes outputs that differ, for a change meant to
+change them, whose new sha256 values then go into OUTPUTS.
 
-scripts/check-font-coverage.mjs asserts the result in CI: every language's characters in every
-face of its family, the 1.5 and 1.1, USE_TYPO_METRICS and the absence of Greek.
+scripts/check-font-coverage.mjs asserts in CI that every language's characters are in every face
+of its family, the 1.5 and 1.1, USE_TYPO_METRICS and the absence of Greek. That the files in the
+tree are this script's output is checked by running the script.
 
-Needs fontTools (pip install fonttools==4.63.0). Run from the repository root, with the eight
-upstream files in one folder:
+Needs fontTools and uharfbuzz (pip install fonttools==4.63.0 uharfbuzz==0.57.0). Run from the
+repository root, with the eight upstream files in one folder:
 
     python3 scripts/fonts/make-fonts.py <folder>
 """
 import hashlib
+import io
 import pathlib
 import sys
 
+import fontTools
 from fontTools import subset
 from fontTools.ttLib import TTFont
 
@@ -82,11 +94,27 @@ DEVANAGARI = range(0x0900, 0x0980)
 # OS/2 Unicode range bit 7 is Greek and Coptic, the block the character maps lose.
 GREEK_RANGE_BIT = 1 << 7
 USE_TYPO_METRICS = 1 << 7
-FEATURES = ['liga', 'clig', 'calt', 'kern', 'ccmp', 'locl', 'rlig', 'dist', 'mark', 'mkmk', 'rvrn']
+FEATURES = ['liga', 'clig', 'calt', 'kern', 'ccmp', 'locl', 'rlig', 'dist', 'mark', 'mkmk', 'rvrn',
+            'rclt', 'curs', 'ltra', 'ltrm', 'abvm', 'blwm']
+FONTTOOLS = '4.63.0'
+UHARFBUZZ = '0.57.0'
+# The sha256 of each file this script makes, which are the files in the tree.
+OUTPUTS = {
+    'Poppins-Regular.ttf': '53e9d1828e1181697fdc1f617ba809de5515254dc47daec6adf604d2f47c884a',
+    'Poppins-Medium.ttf': 'ffbe5a937a97e4d2b593fb3aa272a7a7441fa34b262e311b44ce00fdae16e8f4',
+    'Poppins-SemiBold.ttf': '284ca449b89a7f20c45a18a57034e5f04e18922b57b3986e89c1446926f42b21',
+    'Poppins-Bold.ttf': 'beacc9eb037abb437e357deeecbc8d6854a755ce6f79d91dabf177fdbc85d868',
+    'Montserrat-Regular.ttf': '488c0a9a536842390a8a5d1fb61c2b1ac04c07e393ebfcd77cc66ce22570f5ae',
+    'Montserrat-Medium.ttf': 'd257db3e8c443a1c8aebb3c6f235f147f25a9005652fc7884a3025436eb12e31',
+    'Montserrat-SemiBold.ttf': '4fa1c99df514730c84a788ed584b2b3471db2ba9aa14d4eb5d3373d0f79e3cd7',
+    'Montserrat-Bold.ttf': 'b34e448808a9663ebbfcdf93446e8332d25ee15dec8fcddb010d0737bc4a5956',
+}
 
 
 def load(source, name, expected):
     path = source / name
+    if not path.is_file():
+        sys.exit(f'{path} not found: the folder needs all eight upstream files')
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     if digest != expected:
         sys.exit(f'{path}: sha256 {digest}, expected {expected}')
@@ -130,28 +158,54 @@ def subset_font(font, keep):
 
 
 def main():
-    if len(sys.argv) != 2:
+    args = [a for a in sys.argv[1:] if a != '--write-new']
+    write_new = '--write-new' in sys.argv[1:]
+    if len(args) != 1:
         sys.exit(__doc__.rstrip().rsplit('\n', 1)[-1].strip())
-    source = pathlib.Path(sys.argv[1])
+    source = pathlib.Path(args[0])
     if not OUT.is_dir():
         sys.exit(f'{OUT} not found: run from the repository root')
+    if fontTools.version != FONTTOOLS:
+        sys.exit(f'fontTools {fontTools.version} is installed; the files are made with {FONTTOOLS} '
+                 f'(pip install fonttools=={FONTTOOLS})')
+    try:
+        import uharfbuzz
+    except ImportError:
+        sys.exit(f'uharfbuzz is not installed; the files are made with {UHARFBUZZ} '
+                 f'(pip install uharfbuzz=={UHARFBUZZ})')
+    if uharfbuzz.__version__ != UHARFBUZZ:
+        sys.exit(f'uharfbuzz {uharfbuzz.__version__} is installed; the files are made with '
+                 f'{UHARFBUZZ} (pip install uharfbuzz=={UHARFBUZZ})')
 
+    fonts = {}
     for family, files in (('Poppins', POPPINS), ('Montserrat', MONTSERRAT)):
         for name, expected in files.items():
-            font = load(source, name, expected)
-            if family == 'Montserrat':
-                adjust_montserrat(font, name)
-            mapped = set(font.getBestCmap())
-            keep = sorted(c for c in mapped if c not in DEVANAGARI)
-            subset_font(font, keep)
-            if set(font.getBestCmap()) != set(keep):
-                sys.exit(f'{name}: the subset maps other characters than the ones asked for')
+            fonts[name] = (family, load(source, name, expected))
 
-            target = OUT / name
-            font.save(str(target))
-            digest = hashlib.sha256(target.read_bytes()).hexdigest()
-            print(f'{target}: {len(keep)} characters, {font["maxp"].numGlyphs} glyphs, '
-                  f'{target.stat().st_size} bytes, sha256 {digest}')
+    made = {}
+    for name, (family, font) in fonts.items():
+        if family == 'Montserrat':
+            adjust_montserrat(font, name)
+        keep = sorted(c for c in font.getBestCmap() if c not in DEVANAGARI)
+        subset_font(font, keep)
+        if set(font.getBestCmap()) != set(keep):
+            sys.exit(f'{name}: the subset maps other characters than the ones asked for')
+        buffer = io.BytesIO()
+        font.save(buffer)
+        made[name] = buffer.getvalue()
+        digest = hashlib.sha256(made[name]).hexdigest()
+        same = 'as in OUTPUTS' if digest == OUTPUTS[name] else 'NOT as in OUTPUTS'
+        print(f'{name}: {len(keep)} characters, {font["maxp"].numGlyphs} glyphs, '
+              f'{len(made[name])} bytes, sha256 {digest} ({same})')
+
+    changed = [n for n, data in made.items() if hashlib.sha256(data).hexdigest() != OUTPUTS[n]]
+    if changed and not write_new:
+        sys.exit('Nothing written: ' + ', '.join(changed) + ' would differ from OUTPUTS. If the '
+                 'change is meant, run again with --write-new and put the new sha256 values in '
+                 'OUTPUTS.')
+    for name, data in made.items():
+        (OUT / name).write_bytes(data)
+    print(f'Wrote the eight files to {OUT}.')
 
 
 if __name__ == '__main__':
