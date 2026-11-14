@@ -83,7 +83,9 @@ namespace InstallerClean.Models;
 /// <param name="KeptPerMachine">The installations setting the hold that are in the per-machine context.</param>
 /// <param name="ReleasedOrdinary">
 /// Installations whose cached package did not say what it declares and whose own record shows
-/// an ordinary installation, so they do not set the hold. One with no package for Windows
+/// an ordinary installation, so they do not set the hold, except those counted in
+/// <see cref="KeptOrdinaryPackageCodeNotRuledOut"/>, which are counted in no other count of the
+/// installations setting it. One with no package for Windows
 /// Installer to open is counted in <see cref="ReleasedOpensNoPackage"/> instead, and its record
 /// is not read.
 /// </param>
@@ -178,6 +180,11 @@ namespace InstallerClean.Models;
 /// records could not be ruled out as the Installer folder. The three members from
 /// <see cref="KeptNoneRecordedOtherAnswer"/> add up to <see cref="KeptNoneRecorded"/>.
 /// </param>
+/// <param name="KeptOrdinaryPackageCodeNotRuledOut">
+/// Of the installations counted in <see cref="ReleasedOrdinary"/>, those that keep every
+/// installation package all the same: the package code their record holds did not read alike
+/// through Windows Installer and the registry, and their sources could not be ruled out.
+/// </param>
 public sealed record CachedPackageCensus(
     int ListedChecked,
     int KeptPathUnreadable,
@@ -206,9 +213,10 @@ public sealed record CachedPackageCensus(
     int ReleasedBySources,
     int KeptNoneRecordedOtherAnswer,
     int KeptNoneRecordedRegistryDisagrees,
-    int KeptNoneRecordedSourcesNotRuledOut)
+    int KeptNoneRecordedSourcesNotRuledOut,
+    int KeptOrdinaryPackageCodeNotRuledOut)
 {
     /// <summary>A pass that looked for no installation's packages.</summary>
     public static CachedPackageCensus None { get; } =
-        new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
