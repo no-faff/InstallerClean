@@ -573,6 +573,26 @@ public class InstallerQueryServiceShortProgramTests
     }
 
     /// <summary>
+    /// The same, with <see cref="Recovered"/> installed per user and unmanaged under
+    /// <see cref="OwnerAccount"/>, whose product key sits under that account.
+    /// </summary>
+    [Theory]
+    [InlineData(new[] { Superseded, OtherPatch }, false)]
+    [InlineData(new[] { Superseded }, true)]
+    public async Task A_per_user_recovered_programs_patch_whose_uninstallable_Windows_will_not_give_is_answered_by_the_listing_under_its_own_account(
+        string[] listing, bool withheld)
+    {
+        var msi = RecoveredHolder(otherPatchUninstallable: "1");
+        msi.KeyedInstances[Recovered] = [(OwnerAccount, MsiInstallContext.UserUnmanaged)];
+        msi.PatchPropertyResult[(OtherPatch, Recovered, "Uninstallable")] = BadConfiguration;
+
+        var result = await Scan(msi, RecoveredProgramsKey(OwnerAccount, listing));
+
+        AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
+    }
+
+    /// <summary>
     /// Windows Installer answers <see cref="OtherPatch"/>'s Uninstallable with an error once,
     /// an answer that the program holds no record of the patch included, and with "0" on
     /// the reads after it. The read is made again, the patch counts as one that cannot be
@@ -611,23 +631,26 @@ public class InstallerQueryServiceShortProgramTests
     }
 
     /// <summary>
-    /// The same, with <see cref="Recovered"/> installed per user and unmanaged under
-    /// <see cref="OwnerAccount"/>, whose product key sits under that account.
+    /// The scan's restart budget is spent before the recovered program is reached, by
+    /// <see cref="Short"/>'s patches, whose State never reads. <see cref="OtherPatch"/>'s
+    /// Uninstallable meets an error once and is still read again, on the budget the
+    /// recovered programs' reads share.
     /// </summary>
-    [Theory]
-    [InlineData(new[] { Superseded, OtherPatch }, false)]
-    [InlineData(new[] { Superseded }, true)]
-    public async Task A_per_user_recovered_programs_patch_whose_uninstallable_Windows_will_not_give_is_answered_by_the_listing_under_its_own_account(
-        string[] listing, bool withheld)
+    [Fact]
+    public async Task A_recovered_programs_uninstallable_is_read_again_after_the_scans_restart_budget_is_spent()
     {
-        var msi = RecoveredHolder(otherPatchUninstallable: "1");
-        msi.KeyedInstances[Recovered] = [(OwnerAccount, MsiInstallContext.UserUnmanaged)];
-        msi.PatchPropertyResult[(OtherPatch, Recovered, "Uninstallable")] = BadConfiguration;
+        var msi = RecoveredHolder(otherPatchUninstallable: "0");
+        for (var i = 0; i < 20; i++)
+        {
+            var patch = $"{{{i + 1:X8}-9999-0000-0000-000000000009}}";
+            msi.AddPatch(Short, patch, $@"C:\Windows\Installer\short-program-unread-{i}.msp", state: "1", uninstallable: "0");
+            msi.PatchPropertyResult[(patch, Short, "State")] = BadConfiguration;
+        }
+        msi.PassingReadError(OtherPatch, Recovered, "Uninstallable", BadConfiguration);
 
-        var result = await Scan(msi, RecoveredProgramsKey(OwnerAccount, listing));
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded]));
 
-        AssertOfferedOrWithheld(Row(result), withheld);
-        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
+        Assert.Equal(0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     [Theory]
