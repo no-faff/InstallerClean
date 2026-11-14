@@ -584,10 +584,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </summary>
     private DeclaredProductInstalledCause AsAnUndeclaredPackage(
         string candidatePath, IReadOnlyList<string>? recordedPackageCodes) =>
-        CarriesOneOf(
-            candidatePath, recordedPackageCodes,
-            DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt,
-            DeclaredProductInstalledCause.UndeclaredPackageCodeUnread);
+        DeclaredProductInstalledCause.None;
 
     /// <summary>
     /// <paramref name="isIt"/> where the candidate's own package code
