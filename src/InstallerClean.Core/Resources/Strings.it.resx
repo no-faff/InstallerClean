@@ -84,7 +84,7 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>Informazioni</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>File lasciati stare</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>File non toccati</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>File non necessari, sicuri da eliminare</value></data>
   <data name="Window.Report.Title" xml:space="preserve">
     <value>Il rapporto anonimo</value>
@@ -174,7 +174,7 @@
        window, as Action.Done does on every other card, and like Done it has the
        focus and answers Enter when the card appears. Its access key must differ
        from Action.Donate's, the two being on that card together. -->
-  <data name="Action.CloseWithoutDonating" xml:space="preserve"><value>_Chiudi senza lasciare la mancia</value></data>
+  <data name="Action.CloseWithoutDonating" xml:space="preserve"><value>_Chiudi senza fare una donazione</value></data>
   <!-- The label on both delete surfaces: the main window's button and the
        confirmation dialog's. It says "permanently" because Delete here does
        not mean what Delete means elsewhere in Windows, and the label is the
@@ -187,7 +187,7 @@
        Completion.IsComplete is true (IsMainContentInteractive binds the body
        region to false). IsDefault=True keeps Enter as the primary keyboard
        shortcut. -->
-  <data name="Action.Done" xml:space="preserve"><value>_Fatto</value></data>
+  <data name="Action.Done" xml:space="preserve"><value>_OK</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Dettagli</value></data>
   <!-- The label on the large tip button on the completion card after a Move or
        Delete that moved or deleted files, where it and Action.CloseWithoutDonating
@@ -196,18 +196,18 @@
        translation uses the word its language uses for tipping a creator, the same
        word in every tip string, and names no amount. Its access key must differ
        from Action.CloseWithoutDonating's, the two being on that card together. -->
-  <data name="Action.Donate" xml:space="preserve"><value>_Lascia una mancia</value></data>
+  <data name="Action.Donate" xml:space="preserve"><value>_Fai una donazione</value></data>
   <!-- The label on the small tip button under Done, on every completion card
        that carries Done. It opens the tip page and leaves the card up. It takes
        no access key: Done is on screen beside it. The button shows this text as
        written, so an underscore here would appear on screen rather than become
        one. -->
-  <data name="Action.DonateSmall" xml:space="preserve"><value>Lascia una mancia</value></data>
+  <data name="Action.DonateSmall" xml:space="preserve"><value>Fai una donazione</value></data>
   <!-- The label on the tip pill beside the star in the About window. It opens the
        tip page. Its access key must differ from those of About.AutoUpdateCheck,
        Action.Licence, Action.LeaveStarOnGitHub and Action.Close, all of them being
        in that window together. -->
-  <data name="Action.LeaveATip" xml:space="preserve"><value>_Lascia una mancia</value></data>
+  <data name="Action.LeaveATip" xml:space="preserve"><value>_Fai una donazione</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una _stella su GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Licenza Apache 2.0</value></data>
   <!-- The label on both Move surfaces: the main window's button and the
@@ -219,14 +219,14 @@
        because the capitals made the two words button names. "Rather than"
        takes both verbs in the same form, so they stay parallel. The button
        carries "permanently"; repeating it here would dangle on the clause. -->
-  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Percorso della cartella se sposti anziché eliminare.</value></data>
+  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Percorso cartella salvataggio file se usi 'Sposta' anziché 'Elimina'.</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Ripeti scansione</value></data>
 
   <!-- About window: the two links and the auto-update switch. Kept out of
        the Action.* block because none of the three is a button label; the
        two links are in-sentence hyperlinks and the third is a checkbox. -->
   <data name="About.Link.Guide" xml:space="preserve">
-    <value>Guida e FAQ</value>
+    <value>Guida e domande frequenti (FAQ)</value>
     <comment>About-window link to the README in the app's display language.</comment>
   </data>
   <data name="About.Link.ReportProblem" xml:space="preserve">
@@ -243,15 +243,15 @@
        button says on screen: a window name in the spoken value would be an
        internal note read out to somebody who can only be in that window to hear
        it. -->
-  <data name="Automation.LeaveATip.About" xml:space="preserve"><value>Lascia una mancia</value></data>
+  <data name="Automation.LeaveATip.About" xml:space="preserve"><value>Fai una donazione</value></data>
   <!-- The spoken name of the button Action.Donate labels. Its content is a heart
        beside a label rather than a string, so WPF derives no name from it and
        this is the name; it says what the button says on screen, without the
        access-key marker. -->
-  <data name="Automation.Donate" xml:space="preserve"><value>Lascia una mancia</value></data>
+  <data name="Automation.Donate" xml:space="preserve"><value>Fai una donazione</value></data>
   <!-- The spoken name of the button Action.DonateSmall labels, for the same
        reason as Automation.Donate's. -->
-  <data name="Automation.DonateSmall" xml:space="preserve"><value>Lascia una mancia</value></data>
+  <data name="Automation.DonateSmall" xml:space="preserve"><value>Fai una donazione</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Annulla operazione</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Annulla scansione</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Annulla scansione all'avvio</value></data>
@@ -370,7 +370,7 @@
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Avanzamento scansione all'avvio</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Dettagli, file non necessari</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Disponibili per la pulizia.</value></data>
-  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Dettagli, file lasciati stare</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Dettagli, file non toccati</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Elenco sola lettura.</value></data>
   <!-- Screen-reader sort state for the detail-window lists, set in
        UpdateSortIndicators as the sorted column header's accessible
@@ -412,7 +412,7 @@
 
   <!-- Tooltips -->
   <data name="Tooltip.LeaveATip.About" xml:space="preserve">
-    <value>Ogni mancia è molto apprezzata</value>
+    <value>Ogni donazione è molto apprezzata</value>
     <comment>Tooltip and screen-reader help on the About window's tip pill. The button it hangs on already reads Leave a tip (Action.LeaveATip), so the tooltip says what the ask is rather than naming the action a second time. The tooltip is one sentence and carries no closing full stop.</comment>
   </data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
@@ -487,15 +487,15 @@
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>Tutti i file non necessari qui sotto sono sicuri da eliminare.</value>
+    <value>I file non necessari qui sotto possono essere eliminati in sicurezza.</value>
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. This is the screen's strongest safety claim, so the wording in this language has to carry it as plainly as the English does.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Si trovano in {InstallerFolder}. InstallerClean interroga Windows su ogni programma installato: un file compare nell'elenco quando nessun programma lo rivendica ({0}), oppure quando una patch più recente lo ha sostituito e nessun programma potrebbe tornare a esso ({1}).</value>
+    <value>Si trovano in {InstallerFolder}. InstallerClean interroga Windows per ogni programma installato: un file compare nell'elenco quando nessun programma lo rivendica ({0}), oppure quando una patch più recente lo ha sostituito e nessun programma potrebbe tornare a esso ({1}).</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Spostali in una cartella di backup che scegli tu, poi elimina quella cartella quando sei convinto che i tuoi programmi si aggiornino e si disinstallino ancora normalmente. Rimetterli in {InstallerFolder} ripristina tutto. Oppure eliminali definitivamente adesso.</value>
+    <value>Spostali in una cartella di backup a tua scelta, poi elimina quella cartella quando sei convinto che i programmi si aggiornino e si disinstallino ancora normalmente. Se ricopi i file in {InstallerFolder} ripristini tutto. Oppure eliminali definitivamente adesso.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND BOTH OPERATIONS ARE NAMED ON PURPOSE: update and uninstall are what a cached package is kept for, so somebody who has done both and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. REPAIR IS DELIBERATELY NOT AMONG THEM, AND THE REASON IS WHAT A REPAIR ACTUALLY DOES. It does not read the cached package, so it can fail with the file present and succeed with it absent, which makes it silent about anything this app has done, and it fails for reasons that predate the app entirely. Somebody sent to try one, meeting a failure and concluding InstallerClean had broken their machine, is the worst thing this sentence could produce. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. THE THIRD SENTENCE STATES THE RESTORE PLAINLY AND CARRIES NO CONDITION, WHICH IS THE SAME DECISION AS THE ONE BELOW RATHER THAN A SEPARATE ONE: opening it with a condition, on the order of "if anything does go wrong", sits three lines under the lead's safe-to-delete claim and argues with it. WHAT MAKES THE PLAIN FORM HONEST IS IN THE MOVE ITSELF. A cached package counts as present if and only if its recorded LocalPackage path exists, so the name is the whole of what makes a restore work, and Move never renames: the file carries its own name into the backup folder, a name already taken there is refused rather than worked around, and every file on the offer sits directly in the cache folder, whichever half of the scan found it, because CandidateGuard.CheckSafeToRemove admits nothing else. Every file that moved therefore goes back to the exact path it came from, so the reader has nothing to get right and the line does not ask them to. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README. The button order is a separate matter and does not govern this line.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -751,7 +751,7 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
        Completion.NothingToCleanUpReceipt, and above that each line saying what to do that
        applies: Completion.RecentChange, Summary.ScanSignal.* and Summary.SourceGivenUp.*
        or Summary.SourcesGivenUp. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>Nulla proposto su questo PC</value></data>
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>Nessun file proposto su questo PC</value></data>
   <!-- Files the scan held back because the latest of their times, as Windows records
        them, is at or after the moment the scan began. The window's finished cards, its
        "Nothing offered on this PC" screen and the command line all print it, from
@@ -914,7 +914,7 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} eliminato definitivamente</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} eliminati definitivamente</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>Ogni mancia è molto apprezzata</value>
+    <value>Ogni donazione è molto apprezzata</value>
     <comment>Tooltip and screen-reader help on the small tip button under Done (Action.DonateSmall), which stands on every completion card that carries Done, including a scan that found nothing to clean up. Keep it plain, with no word putting the reader under an obligation. The tooltip is one sentence and carries no closing full stop.</comment>
   </data>
   <data name="Completion.SendReport" xml:space="preserve">
@@ -942,7 +942,7 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
     <comment>Bullet 4 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.LeftAlone" xml:space="preserve">
-    <value>Quanti file sono stati lasciati stare e perché</value>
+    <value>Quanti file non sono stati toccati e perché</value>
     <comment>Bullet 5 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Waits" xml:space="preserve">
@@ -1000,10 +1000,10 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
        than "still needed" because that set is three populations and only one of them
        makes "needed" true; Summary.RegisteredWindow below carries the detail. Rewording
        it rewords what scheduled tasks capture from the command line. -->
-  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file lasciato stare</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} file lasciati stare</value></data>
-  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file non necessario da eliminare</value></data>
-  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} file non necessari da eliminare</value></data>
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file non toccato</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} file non toccati</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file non necessario che è possibile eliminare</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} file non necessari che è possibile eliminare</value></data>
   <!-- The main window's missing-files line. 0 = how many files, 1 = the programs
        they belong to (MissingFilesReport.Inline).
 
@@ -1107,8 +1107,8 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
        Still split singular/plural though the verb has gone, for the noun and for
        the .Few overrides pl, ru and uk declare on this key.
        0 = count, 1 = size display. -->
-  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file lasciato stare ({1})</value></data>
-  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} file lasciati stare ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file non toccato ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} file non toccati ({1})</value></data>
   <!-- Appended to the footer above, through Display.ListSeparator, when the window
        is showing a registration whose cached file is not on the disk. Those rows are
        in the list and carry the recovery note, and they are not in the count beside
@@ -2116,7 +2116,7 @@ Esegui di nuovo InstallerClean come amministratore.</value></data>
   <!-- The last line of a Delete that deleted files or a Move that moved files, after
        a blank line, printed only to a console somebody is watching and never to the
        Application log. 0 = the tip page's address, printed as written. -->
-  <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean è gratuito. Se ti è stato utile, una mancia è molto apprezzata: {0}</value></data>
+  <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean è gratuito. Se ti è stato utile, una donazione sarà molto apprezzata: {0}</value></data>
   <!-- The command line's update, printed before the scan where a newer version is out.
        The question follows UpdateNotice.Available, and is asked only where a person can see
        it and answer it. 0 = the letter for yes, shown
@@ -2393,7 +2393,7 @@ Esegui di nuovo InstallerClean come amministratore.</value></data>
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Prima della scansione controlla se esiste una versione più recente di&#10;InstallerClean. Se lo avvii tu, chiede prima di aggiornare, e si aggiorna&#10;se nessuno risponde entro un minuto. Se viene eseguito da solo, in&#10;un'operazione pianificata o in uno script, si aggiorna senza chiedere.&#10;Aggiungi /noupdate per saltare il controllo.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Prima della scansione controlla se esiste una versione più recente di&#10;InstallerClean. Se lo avvii tu, chiede prima di aggiornare, e si aggiorna&#10;se nessuno risponde entro un minuto. Se viene eseguito da solo, in&#10;un'operazione pianificata o in uno script, si aggiorna senza chiedere.&#10;Per saltare il controllo aggiungi '/noupdate'.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codici di uscita:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print
