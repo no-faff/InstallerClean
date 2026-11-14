@@ -70,9 +70,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// What one pass of the registry fallback found.
     /// </summary>
     /// <param name="Failures">
-    /// Key reads that failed. Half of the degraded-sources gate: a fallback that
-    /// read almost nothing cannot be the recovery a short API enumeration is
-    /// allowed to lean on.
+    /// Key reads that failed. Less <see cref="PatchListFailures"/>, half of the
+    /// degraded-sources gate: a fallback that read almost nothing cannot be the
+    /// recovery a short API enumeration is allowed to lean on.
     /// </param>
     /// <param name="ProductKeys">
     /// Product subkeys walked under <c>UserData</c>, whether or not the entry
@@ -1167,13 +1167,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // fails an API read can equally make that product's UserData subtree
         // unreadable, so the backup is likeliest to be missing exactly the claim
         // the primary lost.
-        // Neither counter can bound what the other lost, so no narrower rule is
-        // sound.
+        // Neither counter can bound what the other lost, so no rule narrower than
+        // the keys that can record a cached file is sound.
         //
-        // A PROGRAM'S OWN Patches KEY IS NOT ONE OF THE FALLBACK'S FAILURES HERE
-        // (fallback.PatchListFailures). It records no cached file, so it holds no
-        // claim either source could have lost: a patch's file is claimed from the
-        // account's Patches key for that patch, which counts here when it fails.
+        // A FAILED READ OF A PROGRAM'S OWN Patches KEY, A KEY THAT RECORDS NO CACHED
+        // FILE, DOES NOT COUNT HERE (fallback.PatchListFailures). It holds no claim
+        // either source could have lost: a patch's file is claimed from the
+        // account's Patches key for that patch, and a failed read of that key counts
+        // here.
         //
         // On a machine whose records read cleanly both counters are zero and this
         // does not fire.
@@ -1183,7 +1184,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // enumeration itself reported it could not read. The cross-check infers
         // a loss from two counts that can differ for innocent reasons, which is
         // sound enough to withhold on and not to refuse on.
-        if (unreadableProducts > 0 && fallback.Failures > fallback.PatchListFailures)
+        if (unreadableProducts > 0
+            && EnumerationCensus.CachedFileRecordsUnreadAt(fallback.Failures, fallback.PatchListFailures))
             throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
 
         // An enumeration that ends EARLY says nothing about itself: a
@@ -1227,8 +1229,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different
-        // things. fallback.Failures is the registry side's own tally of key reads
-        // that failed. unreadableProducts is what the API said about ITSELF:
+        // things. fallback.Failures less fallback.PatchListFailures is the registry
+        // side's own tally of failed reads of keys that can record a cached file.
+        // unreadableProducts is what the API said about ITSELF:
         // products it returned whose records came back short inside the loop. An
         // enumeration ending on NoMoreItems has said nothing about itself and
         // raises neither term, which is why the products behind a disagreement are
@@ -3648,7 +3651,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var failureLog = new PerItemFailureLog("Registry fallback",
             "These add up to the count the scan weighs against its other source: with the "
             + "product enumeration also short of a record, the scan is refused rather than "
-            + "reported. Which keys they were is recorded nowhere else.");
+            + "reported, unless every one is a program's own patch list (product-patches), "
+            + "which records no cached file. Which keys they were is recorded nowhere else.");
 
         try
         {

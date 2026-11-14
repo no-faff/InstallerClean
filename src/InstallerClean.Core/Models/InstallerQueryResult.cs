@@ -683,7 +683,17 @@ public readonly record struct EnumerationCensus(
     /// whose list did not read holds is what that half turns on.
     /// </summary>
     public bool RegistryRecordsUnread =>
-        RegistryKeyReadFailures > ProductPatchListReadFailures;
+        CachedFileRecordsUnreadAt(RegistryKeyReadFailures, ProductPatchListReadFailures);
+
+    /// <summary>
+    /// The rule behind <see cref="RegistryRecordsUnread"/>, for a count of failed reads of
+    /// Windows Installer's own records in the registry and the part of it that is a
+    /// program's own <c>Patches</c> key: whether a key that can record a cached file failed
+    /// to read. The enumeration's refusal of a scan beside a short program asks it of its
+    /// own tallies, and the property asks it of the census's copies.
+    /// </summary>
+    internal static bool CachedFileRecordsUnreadAt(int registryKeyReadFailures, int productPatchListReadFailures) =>
+        registryKeyReadFailures > productPatchListReadFailures;
 
     /// <summary>
     /// Whether any read of Windows Installer's own records in the registry failed, for a

@@ -162,18 +162,12 @@ public class InstallerQueryServiceUnitTests
             .GetRegisteredPackagesAsync();
 
     /// <summary>
-    /// Runs with a fallback that reports <paramref name="fallbackFailures"/>
-    /// failed key reads, the second half of the degraded-sources gate.
+    /// Runs with a fallback that reports <paramref name="fallbackFailures"/> failed key
+    /// reads, <paramref name="patchListFailures"/> of them a program's own Patches key. The
+    /// rest are the second half of the degraded-sources gate.
     /// </summary>
-    private static async Task<InstallerQueryResult> Run(FakeMsiApi msi, int fallbackFailures) =>
-        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(fallbackFailures, 0))
-            .GetRegisteredPackagesAsync();
-
-    /// <summary>
-    /// The same, with <paramref name="patchListFailures"/> of the failures a program's own
-    /// Patches key failing to read.
-    /// </summary>
-    private static async Task<InstallerQueryResult> Run(FakeMsiApi msi, int fallbackFailures, int patchListFailures) =>
+    private static async Task<InstallerQueryResult> Run(
+        FakeMsiApi msi, int fallbackFailures, int patchListFailures = 0) =>
         await new InstallerQueryService(msi, (_, _) =>
                 new InstallerQueryService.FallbackRead(fallbackFailures, 0, PatchListFailures: patchListFailures))
             .GetRegisteredPackagesAsync();
@@ -806,7 +800,6 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Theory]
-    [InlineData(1, 0, true)]
     [InlineData(2, 1, true)]
     [InlineData(1, 1, false)]
     [InlineData(2, 2, false)]
@@ -814,11 +807,15 @@ public class InstallerQueryServiceUnitTests
         int fallbackFailures, int patchListFailures, bool refused)
     {
         // A program's own Patches key records no cached file, so its failure leaves every
-        // claim the API lost to the keys that record one.
+        // claim the API lost to the keys that record one. Every superseded patch is still
+        // held, the short program's among whatever it holds.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
         msi.PatchEnumResult["{A}"] = InvalidParameter;
+        msi.AddProduct("{B}");
+        msi.SetProductProperty("{B}", "LocalPackage", @"C:\Windows\Installer\b.msi");
+        msi.AddPatch("{B}", "{P}", localPackage: @"C:\Windows\Installer\p.msp", state: "2", uninstallable: "0");
 
         var run = Run(msi, fallbackFailures, patchListFailures);
 
@@ -832,6 +829,10 @@ public class InstallerQueryServiceUnitTests
             var result = await run;
             Assert.Equal(1, result.UnaccountedProductCount);
             Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\a.msi");
+            Assert.False(result.Census.RegistryRecordsUnread);
+            var superseded = Assert.Single(result.Packages, r => r.PatchState == 2);
+            Assert.False(superseded.IsRemovable);
+            Assert.True(superseded.WithheldScanWide);
         }
     }
 
