@@ -52,8 +52,9 @@ internal static class FrameworkStringExtensions
         /// <see cref="StringComparison.OrdinalIgnoreCase"/>, or -1, with .NET 10's
         /// <c>IndexOf(string, int, StringComparison)</c> checks of its arguments. An empty value
         /// is found at <paramref name="startIndex"/>. string.IndexOf with a comparison is banned
-        /// in the shipped projects and this is called in its place, as .NET Framework's searches
-        /// ASCII text by the invariant culture's rules under OrdinalIgnoreCase.
+        /// in the shipped projects and this is called in its place: .NET Framework's answers from
+        /// its own code, by NLS rules for a culture comparison and through the invariant
+        /// culture's CompareInfo for ASCII text under OrdinalIgnoreCase.
         /// </summary>
         /// <exception cref="NotSupportedException">A culture comparison, which has no .NET Framework port.</exception>
         public int IndexOfOrdinal(string value, int startIndex, StringComparison comparisonType)

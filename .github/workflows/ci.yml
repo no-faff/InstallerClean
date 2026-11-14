@@ -126,11 +126,11 @@ jobs:
         if: success() || failure()
         run: node scripts/check-extension-member-access.mjs
 
-      # Two guards read built files, so neither can be picked up with the
-      # check-*.mjs glob that runs before the build. Each is invoked by name
-      # instead, the artefact guard in both workflows and the native-imports
-      # check in this one. This is what holds those lines in place.
-      - name: Check the guards that read built files are still wired in
+      # Some guards cannot be picked up with the check-*.mjs glob that runs before
+      # the build: most read built files, and one runs on Windows PowerShell. Each
+      # is invoked by name instead, in this workflow and, for some, in release.yml.
+      # This is what holds those lines in place.
+      - name: Check the guards invoked by name are still wired in
         if: success() || failure()
         run: node scripts/check-guard-wiring.mjs
 
@@ -811,6 +811,15 @@ jobs:
         if: success() || failure()
         shell: pwsh
         run: ./scripts/check-framework-references.ps1
+
+      # On this runner's .NET Framework, every ASCII search under OrdinalIgnoreCase the
+      # script makes has to find what an ordinal search folding a-z finds, which is the
+      # search .NET 10 makes and IndexOfOrdinal ports. A planted fault in the ordinal
+      # search is its control.
+      - name: Check .NET Framework's ASCII searches under OrdinalIgnoreCase are ordinal
+        if: success() || failure()
+        shell: powershell
+        run: ./scripts/check-framework-ascii-search.ps1
 
       # Here rather than with the other guards because it reads the two merged
       # exes, which do not exist until the steps above have run. A language that
