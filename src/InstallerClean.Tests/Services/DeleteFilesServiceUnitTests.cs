@@ -91,46 +91,57 @@ public class DeleteFilesServiceUnitTests
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
     }
 
-    // The window's progress label counts the file a report names as still in hand.
+    // Progress is reported after the hold a file was deleted in has ended, never inside it,
+    // so the file a report names is already gone and the report says it is finished: the
+    // window's bar counts it as done. While a hold is open every installer on the machine
+    // is turned away, and a report can wait on whatever reads it.
     [Fact]
-    public async Task Reports_each_file_before_deleting_it()
+    public async Task Reports_each_file_after_its_hold_has_ended()
     {
         var fs = new MockFileSystem();
         var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var api = new FakeInstallerTransactionApi(0);
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint());
+        var holdOpen = new List<bool>();
         var stillThere = new List<bool>();
-        var progress = new SyncProgress<OperationProgress>(p => stillThere.Add(fs.File.Exists(files[p.CurrentFile - 1])));
-        var svc = new DeleteFilesService(fs);
+        var finished = new List<bool>();
+        var progress = new SyncProgress<OperationProgress>(p =>
+        {
+            holdOpen.Add(api.Open);
+            stillThere.Add(fs.File.Exists(files[p.CurrentFile - 1]));
+            finished.Add(p.Finished);
+        });
+        var svc = new DeleteFilesService(fs, runner, Dir);
 
-        await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
+        await svc.DeleteFilesAsync(files, HoldRunnerFixture.CheckedAgainst("A"), progress: progress);
 
-        Assert.Equal(new[] { true, true, true }, stillThere);
-        Assert.All(files, f => Assert.False(fs.File.Exists(f)));
+        Assert.Equal(1, api.Commits);
+        Assert.Equal(new[] { false, false, false }, holdOpen);
+        Assert.Equal(new[] { false, false, false }, stillThere);
+        Assert.Equal(new[] { true, true, true }, finished);
     }
 
     [Fact]
-    public async Task A_progress_handler_that_throws_costs_one_file_and_not_the_batch()
+    public async Task A_progress_handler_that_throws_costs_the_batch_nothing()
     {
         var fs = new MockFileSystem();
         var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var reported = new List<int>();
         var progress = new SyncProgress<OperationProgress>(p =>
         {
+            reported.Add(p.CurrentFile);
             if (p.CurrentFile == 2) throw new InvalidOperationException("stdout closed");
         });
         var svc = new DeleteFilesService(fs);
 
         var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
 
-        // The report is inside the per-file try, so a consumer that throws is
-        // categorised like any other per-file failure and the batch carries on.
-        // From outside the try the same throw left the loop, and the files
-        // already deleted went unreported with it.
-        Assert.Equal(2, result.DeletedCount);
-        var err = Assert.Single(result.Errors);
-        Assert.IsType<UnknownError>(err);
-        Assert.Equal(files[1], err.FilePath);
-        Assert.False(fs.File.Exists(files[0]));
-        Assert.True(fs.File.Exists(files[1]));
-        Assert.False(fs.File.Exists(files[2]));
+        // A report names a file already dealt with, so a consumer that throws has
+        // nothing of that file's to cost: the throw is recorded and the reports go on.
+        Assert.Equal(3, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        Assert.Equal(new[] { 1, 2, 3 }, reported);
+        Assert.All(files, f => Assert.False(fs.File.Exists(f)));
     }
 
     [Fact]
@@ -145,9 +156,8 @@ public class DeleteFilesServiceUnitTests
 
         var result = await svc.DeleteFilesAsync(new[] { present, ghost }, UnderLeaseClaims.None, progress: progress);
 
-        // Pins the half of the report's placement that moving it inside the try
-        // had to preserve: it runs ahead of the File.Exists skip, so a file the
-        // batch cannot act on does not make the visible counter jump.
+        // A file the batch could not act on is still dealt with, as an error, so it
+        // is reported like any other and the visible counter does not jump.
         Assert.Equal(2, reports.Count);
         Assert.Equal("ghost.msi", reports[1].CurrentFileName);
         Assert.IsType<MissingSourceFile>(Assert.Single(result.Errors));
@@ -159,19 +169,21 @@ public class DeleteFilesServiceUnitTests
         var fs = new MockFileSystem();
         var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
         var cts = new CancellationTokenSource();
-        var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 2) cts.Cancel(); });
         var svc = new DeleteFilesService(fs);
 
         // No throw on a mid-batch cancel: the partial result comes back with
         // Cancelled set and the tally of what was deleted before the stop. The
-        // cancel comes during the second file's report, so that file is left alone.
-        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress, cancellationToken: cts.Token);
+        // cancel comes while the second file is in hand (its question to the host),
+        // so that file is finished and the cancel is seen before the third.
+        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None,
+            mayAct: path => { if (path == files[1]) cts.Cancel(); return true; },
+            cancellationToken: cts.Token);
 
         Assert.True(result.Cancelled);
-        Assert.Equal(1, result.DeletedCount);
+        Assert.Equal(2, result.DeletedCount);
         Assert.Empty(result.Errors);
         Assert.False(fs.File.Exists(files[0]));
-        Assert.True(fs.File.Exists(files[1]));
+        Assert.False(fs.File.Exists(files[1]));
         Assert.True(fs.File.Exists(files[2]));
     }
 

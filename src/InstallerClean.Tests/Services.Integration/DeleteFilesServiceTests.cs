@@ -120,16 +120,20 @@ public class DeleteFilesServiceTests : IDisposable
         }
 
         var cts = new CancellationTokenSource();
-        var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 1) cts.Cancel(); });
 
         var svc = NewService();
         // A mid-batch cancel returns the partial result with Cancelled set rather
-        // than throwing; some files remain, having been stopped before deletion.
-        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress, cancellationToken: cts.Token);
+        // than throwing. The cancel comes while the first file is in hand, so that
+        // file is finished and the other two are left, stopped before deletion.
+        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None,
+            mayAct: path => { if (path == files[0]) cts.Cancel(); return true; },
+            cancellationToken: cts.Token);
 
         Assert.True(result.Cancelled);
-        var remaining = Directory.GetFiles(_tempDir).Length;
-        Assert.True(remaining > 0, "Cancellation should have stopped before deleting all files");
+        Assert.Equal(1, result.DeletedCount);
+        Assert.False(File.Exists(files[0]));
+        Assert.True(File.Exists(files[1]));
+        Assert.True(File.Exists(files[2]));
     }
 
     [Fact]
@@ -143,9 +147,10 @@ public class DeleteFilesServiceTests : IDisposable
             files.Add(file);
         }
 
-        // Asked before each file's progress report and as the last thing before it is
-        // deleted, which is how the command line stops a run the single-instance mutex no
-        // longer covers. The file turned down gets no progress line.
+        // Asked before each file's checks and as the last thing before it is deleted,
+        // which is how the command line stops a run the single-instance mutex no longer
+        // covers. Progress is reported after the hold, for the files dealt with, so the
+        // file turned down gets no progress line.
         var asked = new List<string>();
         var reported = new List<string>();
         var result = await NewService().DeleteFilesAsync(
@@ -168,12 +173,12 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteFilesAsync_stops_before_the_act_where_the_hosts_answer_turns_after_the_report()
+    public async Task DeleteFilesAsync_stops_before_the_act_where_the_hosts_answer_turns_after_the_checks()
     {
         var file = Path.Combine(_tempDir, "turned.msi");
         await File.WriteAllTextAsync(file, "content");
 
-        // Yes before the report, no as the last thing before the delete.
+        // Yes before the checks, no as the last thing before the delete.
         var asks = 0;
         var result = await NewService().DeleteFilesAsync(
             new[] { file }, UnderLeaseClaims.None, mayAct: _ => ++asks == 1);

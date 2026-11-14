@@ -92,6 +92,22 @@ public class HoldRunnerTests
     }
 
     [Fact]
+    public void A_file_whose_act_stops_the_run_is_not_reported()
+    {
+        var api = new FakeInstallerTransactionApi(0);
+        var runner = HoldRunnerFixture.Runner(api, new FakeRecordsFingerprint());
+        var reported = new List<string>();
+
+        Assert.Throws<OperationCanceledException>(() => runner.Run(Files, FakeRecordsFingerprint.Reading("A"),
+            path => { if (path == "c") throw new OperationCanceledException(); },
+            (_, _, path) => reported.Add(path), CancellationToken.None));
+
+        Assert.Equal(new[] { "a", "b" }, reported);
+        Assert.Equal(1, api.Commits);
+        Assert.False(api.Open);
+    }
+
+    [Fact]
     public void Busy_before_the_first_file_gives_up_after_the_wait()
     {
         var api = new FakeInstallerTransactionApi(Enumerable.Repeat(1618u, 1000).ToArray());

@@ -63,9 +63,9 @@ public class CleanupViewModelLogicTests
         Assert.Equal(expected, CleanupViewModel.ShownPercent(done, total));
     }
 
-    // The count a report names is the file in hand (MoveFilesServiceUnitTests and
-    // DeleteFilesServiceUnitTests pin that each file is reported before it is acted on),
-    // so the report naming the last file shows the files before it as done.
+    // A Move report names the file in hand (MoveFilesServiceUnitTests pins that each file
+    // is reported before it is moved), so the report naming the last file shows the files
+    // before it as done.
     [Theory]
     [InlineData(1, 1, 0)]
     [InlineData(1, 200, 0)]
@@ -75,6 +75,18 @@ public class CleanupViewModelLogicTests
     public void The_progress_label_counts_the_file_in_hand_as_not_done(int current, int total, int expected)
     {
         Assert.Equal(expected, CleanupViewModel.ShownPercent(CleanupViewModel.FilesDone(current), total));
+    }
+
+    // A Delete report names a file once it has been dealt with (DeleteFilesServiceUnitTests
+    // pins that), so its count is the files done and the last one shows the whole batch.
+    [Theory]
+    [InlineData(0, 200, 0)]
+    [InlineData(3, 200, 2)]
+    [InlineData(100, 200, 50)]
+    [InlineData(200, 200, 100)]
+    public void The_progress_label_counts_a_finished_file_as_done(int current, int total, int expected)
+    {
+        Assert.Equal(expected, CleanupViewModel.ShownPercent(CleanupViewModel.FilesDone(current, finished: true), total));
     }
 
 #if NETFRAMEWORK

@@ -255,7 +255,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
     {
         try
         {
-            progress?.Report(new OperationProgress(done, total, PathText.GetFileName(filePath)));
+            progress?.Report(new OperationProgress(done, total, PathText.GetFileName(filePath), Finished: true));
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {

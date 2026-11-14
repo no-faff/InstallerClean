@@ -1247,10 +1247,11 @@ internal static class Program
         // What a cancelled batch had actually committed, read by the OCE catch to
         // write its EventLog summary and to pick ExitPartial over ExitCancelled.
         // Taken from the service's own DeletedCount / MovedCount, never from the
-        // progress reporter: both services report BEFORE they touch the file, so a
-        // Ctrl+C between the first report and the first delete leaves the reporter
-        // saying one and the batch having done none, and exit 2 is defined as work
-        // committed.
+        // progress reporter: Move reports a file BEFORE it touches it, so a Ctrl+C
+        // between the first report and the first move leaves the reporter saying one
+        // and the batch having done none, and Delete reports its files only after the
+        // hold they were deleted in has ended, so a Ctrl+C inside a hold leaves the
+        // reporter behind the batch. Exit 2 is defined as work committed.
         int committedCount = 0;
         int totalToProcess = 0;
         // The backup folder a cancelled Move left files in, for the undo line the
@@ -1622,10 +1623,11 @@ internal static class Program
             // breaking the stdout line order an RMM scrapes.
             totalToProcess = count;
             // Guarded here as well as by ConsoleGuard, so the handler holds wherever
-            // RunWorkAsync is called from. The action services report from inside
-            // their per-file try, so a throw out of this handler is filed as an
-            // error against a file that is perfectly fine. A failed write is a fact
-            // about the console and never about the file being deleted or moved.
+            // RunWorkAsync is called from. Move reports from inside its per-file
+            // try, so a throw out of this handler is filed as an error against a file
+            // that is perfectly fine; Delete reports after the file is dealt with and
+            // records a throw without filing it against the file. A failed write is a
+            // fact about the console and never about the file being deleted or moved.
             //
             // One crash-log entry per run rather than one per file. One cause, such
             // as a full disk, can refuse many reports in a row, so an entry each

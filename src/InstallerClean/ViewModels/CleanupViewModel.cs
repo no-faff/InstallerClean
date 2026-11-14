@@ -201,6 +201,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(OperationProgressPercentShown))]
     private int _operationCurrentFile;
 
+    /// <summary>
+    /// Whether the file the last report named had been dealt with, which decides how many
+    /// files <see cref="OperationCurrentFile"/> counts as done. Set before it, so the
+    /// percentage it raises is worked out on the right count.
+    /// </summary>
+    private bool _operationCurrentFileFinished;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(OperationProgressPercentShown))]
     private int _operationTotalFiles;
@@ -212,14 +219,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// The whole percentage the label beside the bar shows, of the files done: see
     /// <see cref="ShownPercent"/> and <see cref="FilesDone"/>.
     /// </summary>
-    public int OperationProgressPercentShown => ShownPercent(FilesDone(OperationCurrentFile), OperationTotalFiles);
+    public int OperationProgressPercentShown =>
+        ShownPercent(FilesDone(OperationCurrentFile, _operationCurrentFileFinished), OperationTotalFiles);
 
     /// <summary>
-    /// The files a batch has finished, from the count its progress names. The move and
-    /// delete services report a file's count as they start on it, so the file the count
-    /// names, the one the line under the bar shows, is still in hand.
+    /// The files a batch has finished, from the count its progress names. Move reports a
+    /// file's count as it starts on it, so the file the count names is still in hand;
+    /// Delete reports it once the file has been dealt with
+    /// (<see cref="OperationProgress.Finished"/>), so the count is the files done.
     /// </summary>
-    internal static int FilesDone(int currentFile) => currentFile > 0 ? currentFile - 1 : 0;
+    internal static int FilesDone(int currentFile, bool finished = false) =>
+        currentFile <= 0 ? 0 : finished ? currentFile : currentFile - 1;
 
     /// <summary>
     /// <paramref name="done"/> of <paramref name="total"/> files as a whole percentage, to
@@ -1604,6 +1614,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
             // briefly show the previous run's last filename and "X of Y"
             // line through the next operation's first progress callback.
+            _operationCurrentFileFinished = false;
             OperationCurrentFile = 0;
             OperationTotalFiles = 0;
             OperationCurrentFileName = string.Empty;
@@ -1932,6 +1943,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
             // briefly show the previous run's last filename and "X of Y"
             // line through the next operation's first progress callback.
+            _operationCurrentFileFinished = false;
             OperationCurrentFile = 0;
             OperationTotalFiles = 0;
             OperationCurrentFileName = string.Empty;
@@ -2278,6 +2290,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </summary>
     private async Task RefreshAfterBatchAsync()
     {
+        _operationCurrentFileFinished = false;
         OperationCurrentFile = 0;
         OperationTotalFiles = 0;
         OperationCurrentFileName = string.Empty;
@@ -2363,11 +2376,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // The batch's first count ends the stretch before it, which the bar spends
         // moving over no count.
         IsOperationProgressIndeterminate = false;
+        _operationCurrentFileFinished = p.Finished;
         OperationCurrentFile = p.CurrentFile;
         OperationTotalFiles = p.TotalFiles;
         OperationCurrentFileName = p.CurrentFileName;
         OperationProgressPercent = p.TotalFiles > 0
-            ? (double)FilesDone(p.CurrentFile) / p.TotalFiles * 100
+            ? (double)FilesDone(p.CurrentFile, p.Finished) / p.TotalFiles * 100
             : 0;
         // Heading stays at the original "Moving N files..." / "Deleting
         // N files..." action verb for the operation's duration; the

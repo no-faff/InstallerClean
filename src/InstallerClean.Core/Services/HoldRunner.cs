@@ -178,10 +178,11 @@ public sealed class HoldRunner
     /// <summary>
     /// Runs the batch. <paramref name="act"/> is called inside a hold for each file, in
     /// order; <paramref name="processed"/> is called outside the holds for each file the
-    /// act was called for, with how many files had been reported before it and how many
+    /// act returned for, with how many files had been reported before it and how many
     /// files the batch now holds, those held back by a re-check taken out. An exception
-    /// from the act ends the run after the hold has ended and the files of the group so
-    /// far have been reported; <paramref name="tally"/> still holds what was found.
+    /// from the act ends the run after the hold has ended and the files of the group the
+    /// act returned for have been reported, the file it threw for not among them, since
+    /// the act did not finish with it; <paramref name="tally"/> still holds what was found.
     /// </summary>
     public HoldRunResult Run(
         IReadOnlyList<string> paths,
@@ -228,6 +229,7 @@ public sealed class HoldRunner
                 };
 
             var groupStart = next;
+            var finished = next;
             matched = false;
             try
             {
@@ -247,13 +249,14 @@ public sealed class HoldRunner
                             next++;
                             tally.Reached++;
                             act(path);
+                            finished = next;
                         }
                     }
                 }
             }
             finally
             {
-                for (var i = groupStart; i < next; i++)
+                for (var i = groupStart; i < finished; i++)
                     processed(reported++, queue.Count, queue[i]);
             }
 
