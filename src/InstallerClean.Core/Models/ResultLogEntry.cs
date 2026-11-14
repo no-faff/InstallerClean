@@ -667,9 +667,11 @@ public sealed record AppInfo(
 /// <see cref="NonStringLocalPackageCount"/> is that last kind, so it is a part of this
 /// figure and the reads that threw are this less that.
 ///
-/// IT IS ONE OF THE TWO TERMS OF THE CHECK THAT REFUSES A SCAN OUTRIGHT, the other
+/// LESS THE FAILED READS OF A PROGRAM'S OWN <c>Patches</c> KEY, WHICH RECORD NO CACHED
+/// FILE, IT IS ONE OF THE TWO TERMS OF THE CHECK THAT REFUSES A SCAN OUTRIGHT, the other
 /// being the scan object's <c>unreadableProductCount</c>. With both above zero the scan
-/// stops before it produces a result, so no report carries both above zero. With the
+/// stops before it produces a result, so a report carrying this and
+/// <c>unreadableProductCount</c> above zero carries only such failed reads. With the
 /// product enumeration whole, that check passes whatever this says.
 ///
 /// Appended after the identity groups for the reason given above.

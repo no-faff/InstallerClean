@@ -170,6 +170,15 @@ public class InstallerQueryServiceUnitTests
             .GetRegisteredPackagesAsync();
 
     /// <summary>
+    /// The same, with <paramref name="patchListFailures"/> of the failures a program's own
+    /// Patches key failing to read.
+    /// </summary>
+    private static async Task<InstallerQueryResult> Run(FakeMsiApi msi, int fallbackFailures, int patchListFailures) =>
+        await new InstallerQueryService(msi, (_, _) =>
+                new InstallerQueryService.FallbackRead(fallbackFailures, 0, PatchListFailures: patchListFailures))
+            .GetRegisteredPackagesAsync();
+
+    /// <summary>
     /// Runs with a healthy fallback that names <paramref name="registryProducts"/>
     /// product keys, which is the count the enumeration cross-check weighs the
     /// API's own against, and reports one entry in
@@ -794,6 +803,36 @@ public class InstallerQueryServiceUnitTests
             () => Run(msi, fallbackFailures: 1));
 
         Assert.Equal(StopMessages.NothingRemoved(Strings.Error_ScanRecordsUnreadable), ex.Message);
+    }
+
+    [Theory]
+    [InlineData(1, 0, true)]
+    [InlineData(2, 1, true)]
+    [InlineData(1, 1, false)]
+    [InlineData(2, 2, false)]
+    public async Task A_patch_collapse_alongside_failing_reads_refuses_the_scan_unless_every_failure_is_a_programs_own_patch_list(
+        int fallbackFailures, int patchListFailures, bool refused)
+    {
+        // A program's own Patches key records no cached file, so its failure leaves every
+        // claim the API lost to the keys that record one.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.PatchEnumResult["{A}"] = InvalidParameter;
+
+        var run = Run(msi, fallbackFailures, patchListFailures);
+
+        if (refused)
+        {
+            var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => run);
+            Assert.Equal(StopMessages.NothingRemoved(Strings.Error_ScanRecordsUnreadable), ex.Message);
+        }
+        else
+        {
+            var result = await run;
+            Assert.Equal(1, result.UnaccountedProductCount);
+            Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\a.msi");
+        }
     }
 
     [Fact]

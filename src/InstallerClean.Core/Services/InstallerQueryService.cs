@@ -1170,6 +1170,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Neither counter can bound what the other lost, so no narrower rule is
         // sound.
         //
+        // A PROGRAM'S OWN Patches KEY IS NOT ONE OF THE FALLBACK'S FAILURES HERE
+        // (fallback.PatchListFailures). It records no cached file, so it holds no
+        // claim either source could have lost: a patch's file is claimed from the
+        // account's Patches key for that patch, which counts here when it fails.
+        //
         // On a machine whose records read cleanly both counters are zero and this
         // does not fire.
         //
@@ -1178,7 +1183,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // enumeration itself reported it could not read. The cross-check infers
         // a loss from two counts that can differ for innocent reasons, which is
         // sound enough to withhold on and not to refuse on.
-        if (unreadableProducts > 0 && fallback.Failures > 0)
+        if (unreadableProducts > 0 && fallback.Failures > fallback.PatchListFailures)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
 
         // An enumeration that ends EARLY says nothing about itself: a
@@ -1217,8 +1222,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // decides on every failure for every removable row, at the call to
         // WithholdOnUnlistedEntries above. The walk-derived offer is decided in the census, on
         // every failure but a program's own Patches key, which records no cached file
-        // (fallback.PatchListFailures). The gate above refuses the scan where fallback.Failures
-        // is non-zero beside an unreadable product, a rule of its own.
+        // (fallback.PatchListFailures). The gate above refuses the scan on those same failures
+        // beside an unreadable product, a rule of its own.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different

@@ -544,7 +544,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // keys and contributes the same paths. When the fallback is ALSO failing
         // reads, the scan does not offer the file: it refuses outright, at
         // InstallerQueryService's records-unreadable gate, on one unreadable
-        // product and any fallback failure. And a recorded path holding an
+        // product and any fallback failure but a program's own patch list, which
+        // records no cached file. And a recorded path holding an
         // environment variable is expanded before it is resolved, so it is compared
         // as the path it names.
         //
