@@ -508,7 +508,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Какая версия Windows, 10 или 11, x64 или Arm, и какие в ней заданы язык и страна или регион`,
   'Completion.ReportPanel.AppVersion': `Версия InstallerClean, способ её получения (setup, portable, Scoop, отдельная программа командной строки, сборка из исходного кода или неизвестно), где выполнялся запуск (в InstallerClean или в программе командной строки) и язык, на котором отображался интерфейс`,
   'Completion.ReportPanel.Errors': `Счётчики всего, что пошло не так`,
-  'Completion.ReportPanel.Closing': `Каждый из этих пунктов — число или метка. Ничто в отчёте не указывает на вас, ваш ПК, ваши файлы или программы, и я никогда не вижу ваш IP-адрес.`,
+  'Completion.ReportPanel.ReportId': `Случайный код, созданный для этого отчёта, чтобы он учитывался только один раз, если будет отправлен несколько раз`,
+  'Completion.ReportPanel.Closing': `Кроме этого кода, каждый из этих пунктов — число или метка. Ничто в отчёте не указывает на вас, ваш ПК, ваши файлы или программы, и я никогда не вижу ваш IP-адрес.`,
   'Automation.ReportInfo': `Что содержит отчёт`,
   'Automation.Scroll.ReportContents': `Что содержит отчёт`,
   'Completion.ReportPanel.SeeReport': `Посмотреть, что именно отправляется`,
@@ -544,6 +545,7 @@ const MAP = {
   'Window.Notices.Title': `Уведомления третьих сторон`,
   'About.Link.Notices': `Уведомления третьих сторон`,
   'Automation.About.Notices.HelpText': `Показывает лицензии шрифтов, значков и кода, входящих в InstallerClean.`,
+  'Startup.NeedsWindows10Version1607': `Для InstallerClean нужна Windows 10 версии 1607 или новее либо Windows 11.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT

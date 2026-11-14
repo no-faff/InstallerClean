@@ -201,7 +201,8 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Of Windows 10 of 11 is en x64 of Arm, en op welke taal en welk land of welke regio het is ingesteld |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | De versie van InstallerClean, hoe je het hebt gekregen (setup, portable, Scoop, het opdrachtregelprogramma op zichzelf, zelf gebouwd uit de broncode of onbekend), of de uitvoering in InstallerClean of in het opdrachtregelprogramma plaatsvond, en de taal waarin het werd weergegeven |
 | Counts of anything that went wrong | Tellingen van alles wat er misging |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Dit zijn allemaal getallen of labels. Niets in het rapport noemt jou, je pc, je bestanden of je programma's, en ik zie je IP-adres nooit. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Een willekeurige code die voor dit rapport wordt gemaakt, zodat het maar één keer wordt geteld als het vaker wordt verzonden |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Op die code na zijn dit allemaal getallen of labels. Niets in het rapport noemt jou, je pc, je bestanden of je programma's, en ik zie je IP-adres nooit. |
 | See exactly what's sent | Precies zien wat er wordt verstuurd |
 
 ## Summaries and counts
@@ -365,6 +366,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.<br><br>{0}<br><br>Het crashlog kon niet worden weggeschreven. |
 | Startup error | Opstartfout |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean start niet omdat er naast het programma een bestand met de naam {0} staat, en InstallerClean wordt niet met zo'n bestand geleverd. Verwijder dat bestand en open InstallerClean daarna opnieuw.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean heeft Windows 10 versie 1607 of nieuwer, of Windows 11 nodig. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean heeft .NET Framework 4.8 nodig. Installeer het van Microsoft, herstart de pc en open InstallerClean daarna opnieuw. |
 | Failed to start ({0}). Details written to:<br>{1} | Starten mislukt ({0}). Details weggeschreven naar:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Starten mislukt ({0}). Het crashlog kon niet worden weggeschreven. |

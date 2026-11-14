@@ -501,7 +501,8 @@ const MAP = {
   'Completion.ReportPanel.Windows': `Windows 是 10 還是 11、是 x64 還是 Arm，以及設定的是哪種語言和哪個國家或地區`,
   'Completion.ReportPanel.AppVersion': `InstallerClean 的版本、取得方式（setup、portable、Scoop、單獨的命令列工具、從原始碼建置，或未知）、本次執行是在 InstallerClean 還是命令列工具中進行的，以及其顯示的語言`,
   'Completion.ReportPanel.Errors': `所有出錯情況的次數`,
-  'Completion.ReportPanel.Closing': `這些內容都是數字或標籤。報告中沒有任何內容能指出您、您的電腦、您的檔案或程式，我也從來看不到您的 IP 位址。`,
+  'Completion.ReportPanel.ReportId': `為這份報告產生的隨機代碼，這樣即使報告傳送多次也只計算一次`,
+  'Completion.ReportPanel.Closing': `除了這個代碼，這些內容都是數字或標籤。報告中沒有任何內容能指出您、您的電腦、您的檔案或程式，我也從來看不到您的 IP 位址。`,
   'Automation.ReportInfo': `報告包含哪些內容`,
   'Automation.Scroll.ReportContents': `報告包含哪些內容`,
   'Completion.ReportPanel.SeeReport': `查看傳送的確切內容`,
@@ -565,6 +566,7 @@ const MAP = {
   'About.Link.Notices': `第三方聲明`,
   'Automation.About.Notices.HelpText': `顯示 InstallerClean 所含字型、圖示和程式碼的授權條款。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  顯示第三方聲明`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean 需要 Windows 10 版本 1607 或更新版本，或 Windows 11。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

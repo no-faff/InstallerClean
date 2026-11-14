@@ -7,7 +7,9 @@ namespace InstallerClean.Helpers;
 /// Substitutes the real installer cache folder into any resx value that names
 /// it. A string writes <c>{InstallerFolder}</c> and every consumer, C# and XAML
 /// alike, receives the resolved path, because the substitution happens in
-/// <c>Strings.Get</c>, the one door every resource lookup comes through.
+/// <c>Strings.Get</c> and <c>Strings.Find</c>, the doors every resource lookup
+/// comes through but those of <c>Strings.FrameworkCheck</c>, whose strings carry
+/// no token.
 /// </summary>
 /// <remarks>
 /// The folder is <c>%SystemRoot%\Installer</c>, resolved once for the whole app
@@ -37,15 +39,8 @@ internal static class InstallerFolderToken
     /// folder, or unchanged when it carries none, which is nearly every string
     /// and the reason for the test rather than an unconditional Replace.
     /// </summary>
-    /// <remarks>
-    /// string's own Contains and Replace, which compare ordinally on .NET Framework as on
-    /// .NET 10. Every string of a copy's .NET Framework 4.8 message comes through here, so
-    /// what this names keeps to the .NET Framework NetFrameworkCheck's remarks name. The
-    /// overloads taking a StringComparison are FrameworkStringExtensions' and search through
-    /// System.Memory's spans, whose own code needs more.
-    /// </remarks>
     internal static string Resolve(string value) =>
-        value.Contains(Token)
-            ? value.Replace(Token, InstallerCacheHelpers.InstallerFolder)
+        value.Contains(Token, StringComparison.Ordinal)
+            ? value.Replace(Token, InstallerCacheHelpers.InstallerFolder, StringComparison.Ordinal)
             : value;
 }

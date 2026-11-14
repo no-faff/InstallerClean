@@ -199,7 +199,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows'un 10 mu 11 mi, x64 mü Arm mı olduğu ve hangi dile ve ülke veya bölgeye ayarlandığı |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean'in sürümü, nasıl edinildiği (setup, taşınabilir, Scoop, tek başına komut satırı aracı, kaynaktan derlenmiş veya bilinmiyor), çalıştırmanın InstallerClean'de mi yoksa komut satırı aracında mı yapıldığı ve gösterildiği dil |
 | Counts of anything that went wrong | Ters giden her şeyin sayısı |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Bunların her biri bir sayı ya da etikettir. Raporda hiçbir şey sizi, bilgisayarınızı, dosyalarınızı veya programlarınızı tanımlamaz ve IP adresinizi asla görmem. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Rapor birden fazla kez gönderilirse yalnızca bir kez sayılması için bu rapora özel oluşturulan rastgele bir kod |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Bu kod dışında, bunların her biri bir sayı ya da etikettir. Raporda hiçbir şey sizi, bilgisayarınızı, dosyalarınızı veya programlarınızı tanımlamaz ve IP adresinizi asla görmem. |
 | See exactly what's sent | Tam olarak neyin gönderildiğini gör |
 
 ## Summaries and counts
@@ -363,6 +364,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Beklenmeyen bir hata oluştu ve InstallerClean kapanmak zorunda.<br><br>{0}<br><br>Çökme günlüğü yazılamadı. |
 | Startup error | Başlangıç hatası |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean başlamıyor çünkü yanında {0} adlı bir dosya var ve InstallerClean böyle bir dosyayla gelmez. Bu dosyayı silin, ardından InstallerClean'i yeniden çalıştırın.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean için Windows 10 sürüm 1607 veya üzeri ya da Windows 11 gerekiyor. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean için .NET Framework 4.8 gerekiyor. Microsoft'tan yükleyin, bilgisayarı yeniden başlatın, ardından InstallerClean'i yeniden açın. |
 | Failed to start ({0}). Details written to:<br>{1} | Başlatılamadı ({0}). Ayrıntılar şuraya yazıldı:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Başlatılamadı ({0}). Çökme günlüğü yazılamadı. |

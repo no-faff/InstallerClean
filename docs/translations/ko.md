@@ -199,7 +199,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows가 10인지 11인지, x64인지 Arm인지, 그리고 어떤 언어와 국가 또는 지역으로 설정되어 있는지 |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | InstallerClean의 버전, 받은 방법(setup, portable, Scoop, 단독 명령줄 도구, 소스에서 빌드, 또는 알 수 없음), 실행이 InstallerClean과 명령줄 도구 중 어느 쪽에서 이루어졌는지, 그리고 표시하던 언어 |
 | Counts of anything that went wrong | 문제가 생긴 일의 횟수 |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 이 항목은 모두 수치 또는 라벨입니다. 보고서에는 사용자나 사용자의 PC, 파일, 프로그램을 가리키는 정보가 없으며, 저에게는 사용자의 IP 주소가 전혀 보이지 않습니다. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | 보고서가 여러 번 전송되어도 한 번만 집계되도록 이 보고서용으로 만든 임의의 코드 |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | 그 코드를 제외하면 이 항목은 모두 수치 또는 라벨입니다. 보고서에는 사용자나 사용자의 PC, 파일, 프로그램을 가리키는 정보가 없으며, 저에게는 사용자의 IP 주소가 전혀 보이지 않습니다. |
 | See exactly what's sent | 보내는 내용 그대로 보기 |
 
 ## Summaries and counts
@@ -363,6 +364,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.<br><br>{0}<br><br>크래시 로그를 기록할 수 없었습니다. |
 | Startup error | 시작 오류 |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean 옆에 {0} 파일이 있는데 InstallerClean에는 그런 파일이 포함되어 있지 않아서 시작할 수 없습니다. 그 파일을 삭제한 다음 InstallerClean을 다시 실행하세요.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean에는 Windows 10 버전 1607 이상 또는 Windows 11이 필요합니다. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean에는 .NET Framework 4.8이 필요합니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 InstallerClean을 다시 여세요. |
 | Failed to start ({0}). Details written to:<br>{1} | 시작하지 못했습니다 ({0}). 자세한 내용을 기록한 위치:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | 시작하지 못했습니다 ({0}). 크래시 로그를 기록할 수 없었습니다. |

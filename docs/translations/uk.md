@@ -204,7 +204,8 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Яка версія Windows, 10 чи 11, x64 чи Arm, і які в ній встановлено мову та країну або регіон |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | Версія InstallerClean, спосіб її отримання (setup, portable, Scoop, окрема програма командного рядка, збірка з вихідного коду або невідомо), де виконувався запуск (в InstallerClean чи в програмі командного рядка) і мова, якою відображався інтерфейс |
 | Counts of anything that went wrong | Лічильники всього, що пішло не так |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Кожен із цих пунктів — це число або мітка. Ніщо у звіті не вказує на вас, ваш ПК, ваші файли чи програми, і я ніколи не бачу вашу IP-адресу. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Випадковий код, створений для цього звіту, щоб його враховували лише один раз, якщо його надіслано кілька разів |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Окрім цього коду, кожен із цих пунктів — це число або мітка. Ніщо у звіті не вказує на вас, ваш ПК, ваші файли чи програми, і я ніколи не бачу вашу IP-адресу. |
 | See exactly what's sent | Переглянути, що саме надсилається |
 
 ## Summaries and counts
@@ -375,6 +376,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Сталася неочікувана помилка, і InstallerClean потрібно закрити.<br><br>{0}<br><br>Не вдалося записати журнал збоїв. |
 | Startup error | Помилка запуску |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean не запуститься, тому що поруч із ним є файл з назвою {0}, а InstallerClean не постачається з таким файлом. Видаліть цей файл, а потім знову запустіть InstallerClean.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | Для InstallerClean потрібна Windows 10 версії 1607 або новішої чи Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | Для InstallerClean потрібен .NET Framework 4.8. Встановіть його з сайту Microsoft, перезавантажте комп'ютер, а потім знову відкрийте InstallerClean. |
 | Failed to start ({0}). Details written to:<br>{1} | Не вдалося запустити ({0}). Деталі записано до:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Не вдалося запустити ({0}). Не вдалося записати журнал збоїв. |

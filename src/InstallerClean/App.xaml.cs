@@ -28,46 +28,73 @@ namespace InstallerClean;
 public partial class App : Application
 {
     /// <summary>
-    /// Runs as Main does, before Application's constructor: checks for .NET Framework 4.8,
-    /// writes what the module initializer kept for the crash log, then pins the AppContext
-    /// switches. Application's constructor
-    /// creates the Dispatcher, which is WPF's first read of the accessibility switches, and by
-    /// this point the domain knows it targets .NET Framework 4.8, so the runtime's own defaults
-    /// are those of 4.8.
+    /// Runs as Main does, before Application's constructor: checks for Windows 10 version
+    /// 1607 and .NET Framework 4.8, writes what the module initializer kept for the crash
+    /// log, then pins the AppContext switches. Application's constructor creates the
+    /// Dispatcher, which is WPF's first read of the accessibility switches, and by this point
+    /// the domain knows it targets .NET Framework 4.8, so the runtime's own defaults are those
+    /// of 4.8.
     /// </summary>
     /// <remarks>
-    /// On a PC without .NET Framework 4.8 the window says what to install, in a plain
-    /// message box, and ends, before Application's constructor and before anything scans.
+    /// On a PC older than Windows 10 version 1607 the window says which Windows it needs,
+    /// and on a PC without .NET Framework 4.8 it says what to install, in a plain message
+    /// box, and ends, before Application's constructor and before anything scans.
     /// The portable carries no config naming the runtime, so .NET Framework starts it on any
     /// 4.x. The runtime compiles a method whole the first time it runs, and a member the PC's
-    /// .NET Framework lacks fails that compile, so the check runs first, in a method of its
+    /// .NET Framework lacks fails that compile, so the checks run first, in a method of their
     /// own, ahead of Application's constructor and every method the window's start compiles.
     /// The two calls after it are never compiled into this method, so nothing they name is
-    /// compiled before the check has answered. The message is in the language Windows
-    /// displays: the language picked in the app is read later.
+    /// compiled before the checks have answered. The message is in the language picked in the
+    /// app, where one is, and otherwise in the language Windows displays.
     /// </remarks>
     static App()
     {
-        EndWithoutNetFramework48();
+        EndOnAPcThatCannotRunIt();
         SystemLibraries.WriteWhatTheInitializerKept();
         FrameworkSwitches.Pin();
     }
 
     /// <summary>
-    /// Where the PC does not have .NET Framework 4.8, shows the message saying what to
-    /// install and ends the process with exit code 1.
+    /// Where the PC runs Windows older than Windows 10 version 1607, or does not have .NET
+    /// Framework 4.8, shows the message saying so and ends the process with exit code 1.
+    /// Windows is checked first, as 1507 and 1511 cannot take .NET Framework 4.8.
     /// </summary>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-    private static void EndWithoutNetFramework48()
+    private static void EndOnAPcThatCannotRunIt()
     {
         // A throw out of a type initializer reaches no handler the app has set, so a check or
-        // a box that fails lets the start go on, where the app's own handlers catch what follows.
-        string? message;
+        // a box that fails lets the start go on, where the app's own handlers catch what
+        // follows, unless it failed to load what it needs (StartChecks.IsLoadFailure).
         try
         {
-            message = NetFrameworkCheck.RefusalMessage(commandLine: false);
-            if (message is null) return;
-            MessageBox.Show(message, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            var refusal = StartChecks.OfThisPc();
+            if (refusal == StartRefusal.None) return;
+            // In the language picked in the app where one is, as the window would have been. A
+            // pick that cannot be read or set leaves the message in the language Windows displays.
+            try
+            {
+                if (PickedLanguageAtStart.Read() is { } picked)
+                    Localisation.SetPickedLanguage(picked);
+            }
+            catch (Exception)
+            {
+            }
+            MessageBox.Show(StartChecks.Message(refusal, commandLine: false), Strings.FrameworkCheck.Window_Main_Title,
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Exception ex) when (StartChecks.IsLoadFailure(ex))
+        {
+            // The PC's .NET Framework is older than 4.8, where the strings cannot be trusted
+            // to read, so the message is in English. The start ends whether or not the box
+            // shows.
+            try
+            {
+                MessageBox.Show(NetFrameworkCheck.EnglishMessage(commandLine: false),
+                    NetFrameworkCheck.NeutralText.WindowMainTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception)
+            {
+            }
         }
         catch (Exception)
         {
