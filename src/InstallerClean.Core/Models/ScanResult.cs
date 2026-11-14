@@ -1198,9 +1198,9 @@ public enum WithholdingLeg
     RegistryProductUnaskable,
 
     /// <summary>
-    /// A read of Windows Installer's own records in the registry failed, so nothing shows
-    /// what the key that would not read would have kept
-    /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
+    /// A read of Windows Installer's own records in the registry failed on a key that can
+    /// record a cached file, so nothing shows what the key that would not read would have
+    /// kept (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
     /// </summary>
     RegistryRecordsUnread,
 }
