@@ -182,6 +182,7 @@ public sealed class PackageIdentityReader : IPackageIdentityReader
         try
         {
             if (Msi.MsiGetSummaryInformation(hDatabase: 0, filePath, 0, out hSummary) != MsiError.Success) return false;
+            if (Msi.MsiSummaryInfoGetPropertyCount(hSummary, out var count) != MsiError.Success || count != 0) return false;
 
             uint length = 0;
             return Msi.MsiSummaryInfoGetProperty(

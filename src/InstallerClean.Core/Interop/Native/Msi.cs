@@ -193,6 +193,10 @@ internal static class Msi
         uint uiUpdateCount,
         out uint phSummaryInfo);
 
+    /// <summary>How many properties an open summary-information handle holds.</summary>
+    [DllImport(Library, ExactSpelling = true)]
+    public static extern uint MsiSummaryInfoGetPropertyCount(uint hSummaryInfo, out uint puiPropertyCount);
+
     /// <summary>
     /// Reads one property out of an open summary-information stream.
     /// The returned <paramref name="puiDataType"/> indicates which of

@@ -616,7 +616,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // every other candidate is put to, and is kept where it opens as a package an
         // installation has at its sources.
         if (_identityReader.PackageCodeOf(candidatePath) is not { } candidatePackageCode)
-            return _identityReader.HoldsNoRevisionNumber(candidatePath) ? DeclaredProductInstalledCause.None : unread;
+            return unread;
         return packageCodes.Contains(candidatePackageCode, StringComparer.Ordinal)
             ? isIt
             : DeclaredProductInstalledCause.None;
