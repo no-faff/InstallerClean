@@ -16,7 +16,8 @@
 #  - PM, per machine.
 #  - PO, with -SecondAccount: per user, installed and patched by a scheduled task run as a
 #    local administrator account the script creates, and read once that account's registry
-#    hive is no longer loaded.
+#    hive is no longer loaded. PO's records in HKLM are also copied under an account that
+#    does not exist, which has no hive, and read there.
 # Each program takes two patches of one family, the second superseding the first: R1 and R2
 # on PU and PM (one cached patch for a per-user and a per-machine program), G1 and G2 on PG,
 # O1 and O2 on PO.
@@ -502,6 +503,13 @@ function Wait-HiveUnloaded([string]$sid, [int]$seconds) {
     else { Say 'The Windows Installer service was not running.' }
     $waited = & $wait
     if (-not (& $isLoaded)) { Say "The hive HKU\$sid left $waited s after that."; return $false }
+    $owned = @(Get-Process -IncludeUserName | Where-Object { $_.UserName -like "*\$otherAccountName" })
+    Say "Processes running as the account ($($owned.Count)): $(($owned | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', ')"
+    if ($owned.Count) {
+        $owned | Stop-Process -Force -ErrorAction SilentlyContinue
+        $waited = & $wait
+        if (-not (& $isLoaded)) { Say "The hive HKU\$sid left $waited s after those processes were stopped."; return $false }
+    }
     foreach ($name in "${sid}_Classes", $sid) {
         $out = & reg.exe unload "HKU\$name" 2>&1
         Say "reg unload HKU\${name}: exit code $LASTEXITCODE ($(($out | Out-String).Trim()))"
@@ -663,7 +671,8 @@ function Get-Installations([string]$tag, [string]$expectedSid, [int]$expectedCon
 }
 function Get-Label($installation) {
     $who = if ($installation.Context -eq 4) { 'no account' } elseif ($installation.Sid -eq $mySid) { "this account, $($installation.Sid)" } else { "the account $($installation.Sid)" }
-    return "$($installation.Tag) ($($programs[$installation.Tag].What); asked as $($contextNames[$installation.Context]), $who$(if (-not $installation.Listed) { '; Windows Installer does not list this installation' }))"
+    $note = if ($installation.PSObject.Properties['Note']) { "; $($installation.Note)" } else { '' }
+    return "$($installation.Tag) ($($programs[$installation.Tag].What); asked as $($contextNames[$installation.Context]), $who$note$(if (-not $installation.Listed) { '; Windows Installer does not list this installation' }))"
 }
 # The key Windows Installer keeps an installation's patch records under.
 function Get-RecordsKey($installation) {
@@ -849,6 +858,26 @@ try {
         $installations += $poList
         if ($poSteps | Where-Object { $_ -ne 0 }) { $failures.Add("PO: a step of its install ended with other than 0 ($($poSteps -join ', ')), so PO is read as it stands and is not changed.") }
         elseif ($loaded) { $failures.Add('PO: the second account''s hive is still loaded, so what follows about PO is not about an account whose hive is not loaded.') }
+        # The second account's records copied under an account that does not exist, so has no
+        # hive to load: what Windows Installer holds for PO in HKLM, with nothing in HKU.
+        $absentSid = $otherSid -replace '-\d+$', '-64999'
+        $absentKey = "$installerKey\UserData\$absentSid"
+        $known = try { $null = ([Security.Principal.SecurityIdentifier]$absentSid).Translate([Security.Principal.NTAccount]); $true } catch { $false }
+        if ($known -or (Test-Location $absentKey) -or ($hku.GetSubKeyNames() -contains $absentSid)) {
+            $failures.Add("PO: $absentSid names an account or holds keys already, so no copy of PO's records is made under it.")
+        }
+        elseif (-not ($poSteps | Where-Object { $_ -ne 0 })) {
+            $null = Start-Change "a copy of the second account's UserData key, $installerKey\UserData\$otherSid, made under an account that does not exist" $absentKey 'tree'
+            Write-Tree $absentKey (Read-Tree "$installerKey\UserData\$otherSid")
+            Say "A copy of $installerKey\UserData\$otherSid is made at $absentKey; $absentSid is no account and has no hive under HKU."
+            $keyedRows = @([PatchRecordsMsi]::Products($programs.PO.Code, $everyone, 7))
+            $installations += [pscustomobject]@{
+                Tag = 'PO'; Code = $programs.PO.Code; Sid = $absentSid; Context = 2
+                Listed = [bool]($keyedRows | Where-Object { $_ -like "*|2|$absentSid" })
+                Note = 'a copy of the second account''s records under an account that does not exist'
+            }
+            $inShape += $installations[-1]
+        }
         $poRecords = "$installerKey\UserData\$otherSid\Products\$(Packed $programs.PO.Code)\Patches"
         if (-not ($poSteps | Where-Object { $_ -ne 0 }) -and (Test-Location $poRecords)) { $inShape += @($poList | Where-Object { $_.Context -eq 2 -and $_.Sid -eq $otherSid })[0] }
     }
@@ -990,6 +1019,13 @@ try {
                 Set-Marker "$n-end"
                 $calls += [pscustomobject]@{ N = $n; What = "MsiEnumPatchesEx as the scan calls it on $(Get-Label $installation) listed $($rows.Count): $($rows -join ', ')"; Words = @((Packed $installation.Code), '\Patches') }
             }
+            foreach ($tag in @($installations | ForEach-Object { $_.Tag } | Select-Object -Unique)) {
+                $n++
+                Set-Marker "$n-begin"
+                $rows = @([PatchRecordsMsi]::Products($programs[$tag].Code, $everyone, 7))
+                Set-Marker "$n-end"
+                $calls += [pscustomobject]@{ N = $n; What = "MsiEnumProductsEx asked for the code of $tag, every account and every context, listed $($rows.Count): $($rows -join ', ')"; Words = @((Packed $programs[$tag].Code)) }
+            }
             Start-Sleep -Seconds 2
         }
         finally { Stop-Procmon }
@@ -1000,7 +1036,7 @@ try {
 
         # One pass over the capture: each call's events are those between its two markers.
         $byCall = @{}
-        foreach ($call in $calls) { $byCall[$call.N] = [pscustomobject]@{ Call = $call; Lines = [System.Collections.Generic.List[string]]::new(); Processes = @{}; Began = $false; Ended = $false } }
+        foreach ($call in $calls) { $byCall[$call.N] = [pscustomobject]@{ Call = $call; Lines = [System.Collections.Generic.List[string]]::new(); Others = [System.Collections.Generic.List[string]]::new(); Processes = @{}; Began = $false; Ended = $false } }
         $open = $null
         $rowCount = 0
         Import-Csv -LiteralPath $csv | ForEach-Object {
@@ -1016,6 +1052,10 @@ try {
                 if ($open.Call.Words | Where-Object { $path.IndexOf($_, [StringComparison]::OrdinalIgnoreCase) -ge 0 }) {
                     $open.Lines.Add("    [$process $($_.PID)] $($_.Operation) $path -> $($_.Result) $($_.Detail)")
                 }
+                elseif ("$($_.PID)" -eq "$PID" -and $_.Operation -notin 'RegCloseKey', 'RegQueryKey') {
+                    $other = "$($_.Operation) $path -> $($_.Result)"
+                    if (-not $open.Others.Contains($other)) { $open.Others.Add($other) }
+                }
             }
         }
         Say "Rows in the capture: $rowCount"
@@ -1024,7 +1064,11 @@ try {
             Say ''
             Say "Call $($call.N): $($call.What)"
             if (-not $slot.Began -or -not $slot.Ended) { Say '    UNREAD: the capture does not hold both of this call''s markers.'; $failures.Add("Process Monitor: call $($call.N) has no markers in the capture."); continue }
-            foreach ($line in $slot.Lines) { Say $line }
+            foreach ($line in ($slot.Lines | Select-Object -First 300)) { Say $line }
+            if ($slot.Lines.Count -gt 300) { Say "    ... and $($slot.Lines.Count - 300) more such events, not printed." }
+            Say "    Every other key the probe's own process opened or read between the markers ($($slot.Others.Count)):"
+            foreach ($line in ($slot.Others | Select-Object -First 80)) { Say "        $line" }
+            if ($slot.Others.Count -gt 80) { Say "        ... and $($slot.Others.Count - 80) more, not printed." }
             Say "    $($slot.Lines.Count) registry events naming the program, the patch or the property are printed, of these registry events between the markers: $(($slot.Processes.Keys | Sort-Object | ForEach-Object { "$_ $($slot.Processes[$_])" }) -join ', ')."
         }
     }
