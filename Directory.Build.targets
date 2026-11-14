@@ -33,7 +33,12 @@
        not merge again, and two project instances with the same inputs do not both
        write the output.
 
-       Do not merge a Debug build: it compiles the Debug-only switches in. -->
+       A Debug build compiles the Debug-only switches in, so it is merged only
+       where the build also passes -p:OneFileDebug=true. Self-update's legs pass it
+       to make an old copy of this tree's window that can be told to update to a
+       newer build offline; no build that ships passes it, and
+       scripts/verify-shipped-artefacts.mjs fails on a merged exe holding a
+       switch's name. -->
   <!-- OneFileDir is relative to the repository root (this file's folder), not to
        the project, so a build that passes -p:OneFileDir=publish/newer writes there
        and not under src/. An absolute OneFileDir is taken as given. -->
@@ -56,8 +61,8 @@
       <_OneFileOut>$([MSBuild]::EnsureTrailingSlash('$(_OneFileOutDir)'))$(TargetFileName)</_OneFileOut>
       <_OneFileRsp>$(IntermediateOutputPath)onefile.rsp</_OneFileRsp>
     </PropertyGroup>
-    <Error Condition="'$(Configuration)' != 'Release'"
-           Text="OneFile merges a Release build only; this build's configuration is $(Configuration)." />
+    <Error Condition="'$(Configuration)' != 'Release' And !('$(Configuration)' == 'Debug' And '$(OneFileDebug)' == 'true')"
+           Text="OneFile merges a Release build, or a Debug build given -p:OneFileDebug=true; this build's configuration is $(Configuration)." />
     <Error Condition="'$(ILRepack)' == '' Or !Exists('$(ILRepack)')"
            Text="The ILRepack package is not restored, so there is nothing to merge with (ILRepack property: '$(ILRepack)')." />
     <Error Condition="'@(_OneFileInput)' == ''"

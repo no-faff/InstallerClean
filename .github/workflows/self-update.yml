@@ -29,9 +29,13 @@
 # window opens with the card offering the update over the scan, and the update notice sits
 # at the top of the scan behind it; each has its own Update now. The portable's leg and
 # the slim's press the card's. The notice's leg, a portable, presses the card's Continue
-# without updating, which takes the card away, and then the notice's. The checks read the
-# file at the path, which keeps its name, the newer window it starts and the Application
-# log, where a window that updated writes nothing.
+# without updating, which takes the card away, and then the notice's. Two legs more do the
+# same from this commit's own window, built with the Debug configuration and merged into
+# one file, with this commit's merged window built as the next patch version as its
+# update: one presses the card's Update now and one the notice's. The checks read the file
+# at the path, which keeps its name and holds the bytes the old window was given, the
+# newer window it starts and the Application log, where a window that updated writes
+# nothing.
 #
 # No command line the job runs makes a request of the network: the old copy's check is
 # answered by the Debug switch, and the newer version is started with /noupdate. The newer
@@ -65,7 +69,8 @@ jobs:
     strategy:
       fail-fast: false
       # A window leg names the copy the old window takes itself for and the Update now it
-      # presses: the card's, or the notice's once the card has gone.
+      # presses: the card's, or the notice's once the card has gone. A leg marked current
+      # has this commit's window as the old copy in place of the tag's.
       matrix:
         include:
           - route: download
@@ -85,6 +90,18 @@ jobs:
           - route: notice
             title: the portable by the update notice's Update now
             window: true
+            copy: portable
+            button: notice
+          - route: current-card
+            title: this commit's window by the card's Update now
+            window: true
+            current: true
+            copy: portable
+            button: card
+          - route: current-notice
+            title: this commit's window by the update notice's Update now
+            window: true
+            current: true
             copy: portable
             button: notice
 
@@ -107,6 +124,12 @@ jobs:
           if ([version]$version -le [version]$env:OLD_VERSION) { throw "This commit builds $version, which is not newer than $env:OLD_VERSION, so there is nothing to update to." }
           "  This commit builds $version; the old copy is $env:OLD_VERSION."
           "NEWER_VERSION=$version" | Add-Content $env:GITHUB_ENV
+          # The version the old window is offered and takes: this commit's, or on the legs
+          # whose old window is this commit's, the next patch version, which the newer
+          # window is built as.
+          $target = if ('${{ matrix.current }}' -eq 'true') { $v = [version]$version; "$($v.Major).$($v.Minor).$([Math]::Max($v.Build, 0) + 1)" } else { $version }
+          if ($target -ne $version) { "  The old window is this commit's $version, offered $target." }
+          "TARGET_VERSION=$target" | Add-Content $env:GITHUB_ENV
 
       - name: Extract the old version's source
         shell: pwsh
@@ -122,7 +145,7 @@ jobs:
         run: dotnet publish "$env:OLD_TREE/src/InstallerClean.Cli/InstallerClean.Cli.csproj" -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o "$env:OLD_TREE/publish/cli"
 
       - name: Publish the old version's window
-        if: matrix.route != 'download'
+        if: matrix.route != 'download' && !matrix.current
         run: dotnet publish "$env:OLD_TREE/src/InstallerClean/InstallerClean.csproj" -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o "$env:OLD_TREE/publish/self-contained"
 
       - name: Build the newer version's two exes
@@ -131,6 +154,25 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "The newer command line did not build." }
           dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
           if ($LASTEXITCODE -ne 0) { throw "The newer window did not build." }
+          "TARGET_WINDOW=$((Resolve-Path 'publish/window/InstallerClean.exe').Path)" | Add-Content $env:GITHUB_ENV
+
+      # On the legs whose old window is this commit's: that window built with the Debug
+      # configuration, which reads the Debug switches the update is tried with, and merged
+      # into one file as the portable is (OneFileDebug lets Directory.Build.targets merge a
+      # Debug build); and a newer window, this commit's merged window built as the next
+      # patch version.
+      - name: Build this commit's window as the old copy and as a newer version
+        if: matrix.current
+        run: |
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Debug -p:RestoreLockedMode=true -p:OneFile=true -p:OneFileDebug=true -p:OneFileDir=publish/old-debug --nologo
+          if ($LASTEXITCODE -ne 0) { throw "This commit's window did not build and merge with the Debug configuration." }
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:OneFileDir=publish/newer "-p:Version=$env:TARGET_VERSION" --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The window did not build as $env:TARGET_VERSION." }
+          $newer = (Resolve-Path 'publish/newer/InstallerClean.exe').Path
+          $v = (Get-Item $newer).VersionInfo.FileVersion
+          "  $newer carries $v"
+          if (-not $v.StartsWith("$env:TARGET_VERSION.")) { throw "$newer carries $v, not $env:TARGET_VERSION." }
+          "TARGET_WINDOW=$newer" | Add-Content $env:GITHUB_ENV
 
       - name: Install Inno Setup
         if: matrix.route == 'setup'
@@ -276,7 +318,7 @@ jobs:
           else { '  nothing the update started is running' }
 
       # The window's legs. The old window goes in a folder of its own under the name the
-      # portable or the slim is downloaded as.
+      # portable or the slim is downloaded as, by itself, as either is downloaded.
       - name: Put the older window in place
         if: matrix.window
         shell: pwsh
@@ -285,10 +327,16 @@ jobs:
           New-Item -ItemType Directory -Force -Path $folder | Out-Null
           $name = if ('${{ matrix.copy }}' -eq 'slim') { 'InstallerClean-slim.exe' } else { 'InstallerClean-portable.exe' }
           $exe = Join-Path $folder $name
-          Copy-Item "$env:OLD_TREE/publish/self-contained/InstallerClean.exe" $exe
+          if ('${{ matrix.current }}' -eq 'true') {
+            Copy-Item 'publish/old-debug/InstallerClean.exe' $exe
+            $expected = $env:NEWER_VERSION
+          } else {
+            Copy-Item "$env:OLD_TREE/publish/self-contained/InstallerClean.exe" $exe
+            $expected = $env:OLD_VERSION
+          }
           $v = (Get-Item $exe).VersionInfo.FileVersion
           "  $exe carries $v"
-          if (-not $v.StartsWith("$env:OLD_VERSION.")) { throw "$exe carries $v, not $env:OLD_VERSION." }
+          if (-not $v.StartsWith("$expected.")) { throw "$exe carries $v, not $expected." }
           if (Get-Process InstallerClean, InstallerClean-portable, InstallerClean-slim -ErrorAction SilentlyContinue) { throw "InstallerClean is already running." }
           "WINDOW_EXE=$exe" | Add-Content $env:GITHUB_ENV
 
@@ -312,9 +360,9 @@ jobs:
           Put "RUN_STARTED=$($started.ToUniversalTime().ToString('o'))"
           $info = New-Object System.Diagnostics.ProcessStartInfo $env:WINDOW_EXE
           $info.UseShellExecute = $false
-          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_LATEST'] = "v$env:NEWER_VERSION"
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_LATEST'] = "v$env:TARGET_VERSION"
           $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST'] = $env:UPDATE_MANIFEST
-          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD'] = (Resolve-Path 'publish/window/InstallerClean.exe').Path
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD'] = $env:TARGET_WINDOW
           $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_COPY'] = '${{ matrix.copy }}'
           $old = [System.Diagnostics.Process]::Start($info)
           Put "OLD_PID=$($old.Id)"
@@ -426,8 +474,11 @@ jobs:
 
           "The file at the path:"
           $v = (Get-Item $exe).VersionInfo.FileVersion
-          if (Same $v $env:NEWER_VERSION) { "  $exe carries $v" } else { Fail "$exe carries $v, not $env:NEWER_VERSION." }
-          foreach ($file in Get-ChildItem -LiteralPath $folder -File) {
+          if (Same $v $env:TARGET_VERSION) { "  $exe carries $v" } else { Fail "$exe carries $v, not $env:TARGET_VERSION." }
+          $hash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash
+          if ($hash -eq (Get-FileHash -LiteralPath $env:TARGET_WINDOW -Algorithm SHA256).Hash) { "  its bytes are the newer window's, $env:TARGET_WINDOW" }
+          else { Fail "$exe is not the newer window the old one was given, $env:TARGET_WINDOW (SHA-256 $hash)." }
+          foreach ($file in Get-ChildItem -LiteralPath $folder -File -Recurse) {
             if ($file.FullName -eq $exe) { continue }
             Fail "$($file.FullName) is beside the updated window."
           }
