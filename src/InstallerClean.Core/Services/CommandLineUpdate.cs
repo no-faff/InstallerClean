@@ -409,8 +409,9 @@ internal sealed class CommandLineUpdate
     /// is cancelled, by Ctrl+C or by the console being closed, and the question then
     /// answers cancelled. The end of input is no, unless the token is cancelled while the
     /// question waits on it, up to <see cref="ControlCBound"/> in a run, since Ctrl+C at the
-    /// prompt can itself be read as the end of input. Nothing answered within the answer
-    /// bound is <see cref="Answer.TimedOut"/>.
+    /// prompt can itself be read as the end of input. A yes waits on the token for the same
+    /// bound, so a Ctrl+C whose handler comes just after the answer is read cancels rather
+    /// than updates. Nothing answered within the answer bound is <see cref="Answer.TimedOut"/>.
     /// </summary>
     private Answer Ask(CancellationToken token)
     {
