@@ -53,12 +53,39 @@ public class ConsoleQuestionTests
     public void A_yes_with_no_Ctrl_C_is_yes_once_the_bound_has_passed(string line)
     {
         using var cancel = new CancellationTokenSource();
+        var started = DateTime.UtcNow;
 
         var answer = ConsoleQuestion.Ask(
             new Typing(line), (yes, no) => $"[{yes}/{no}]", cancel.Token,
-            TimeSpan.FromMilliseconds(50), TimeSpan.FromMinutes(1), out _);
+            TimeSpan.FromMilliseconds(200), TimeSpan.FromMinutes(1), out _);
 
         Assert.Equal(ConsoleAnswer.Yes, answer);
+        // The yes waited out the bound before it counted.
+        Assert.True(DateTime.UtcNow - started >= TimeSpan.FromMilliseconds(150));
+    }
+
+    [Fact]
+    public void A_Ctrl_C_as_the_question_runs_out_of_time_is_a_cancel()
+    {
+        // The answer bound ends the read, and the Ctrl+C handler cancels the token a moment later.
+        using var cancel = new CancellationTokenSource();
+        var console = new Waiting(() => cancel.CancelAfter(TimeSpan.FromMilliseconds(50)));
+
+        var answer = ConsoleQuestion.Ask(
+            console, (yes, no) => $"[{yes}/{no}]", cancel.Token,
+            TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(50), out _);
+
+        Assert.Equal(ConsoleAnswer.Cancelled, answer);
+    }
+
+    [Fact]
+    public void A_question_that_runs_out_of_time_with_no_Ctrl_C_has_timed_out()
+    {
+        var answer = ConsoleQuestion.Ask(
+            new Waiting(() => { }), (yes, no) => $"[{yes}/{no}]", CancellationToken.None,
+            TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(50), out _);
+
+        Assert.Equal(ConsoleAnswer.TimedOut, answer);
     }
 
     [Fact]
@@ -87,6 +114,23 @@ public class ConsoleQuestionTests
         {
             after();
             return line;
+        }
+    }
+
+    /// <summary>A console whose read waits until its token is cancelled, runs <c>ended</c> and answers null.</summary>
+    private sealed class Waiting(Action ended) : IConsolePrompt
+    {
+        public void WriteLine(string text) { }
+
+        public void Write(string text) { }
+
+        public void DiscardTypedAhead() { }
+
+        public string? ReadLine(CancellationToken token)
+        {
+            token.WaitHandle.WaitOne(TimeSpan.FromSeconds(30));
+            ended();
+            return null;
         }
     }
 

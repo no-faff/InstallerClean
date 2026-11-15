@@ -17,7 +17,10 @@ internal enum ConsoleAnswer
     /// <summary>An answer starting with this language's letter for no or with N, or the end of input.</summary>
     No,
 
-    /// <summary>Ctrl+C or a closing console came while the question waited.</summary>
+    /// <summary>
+    /// Ctrl+C or a closing console came while the question waited, or within <c>controlCBound</c>
+    /// of a yes, the end of input or the question running out of time.
+    /// </summary>
     Cancelled,
 
     /// <summary>Nothing was answered within <see cref="ConsoleQuestion.AnswerBound"/>.</summary>
@@ -54,11 +57,11 @@ internal static class ConsoleQuestion
     /// waits on it, up to <paramref name="controlCBound"/> in a run, since Ctrl+C at the
     /// prompt can itself be read as the end of input. A yes waits on the token for the same
     /// bound before it counts, so a Ctrl+C that comes just before or as the answer is read,
-    /// whose handler cancels the token on a thread of its own a moment later, answers
-    /// <see cref="ConsoleAnswer.Cancelled"/>, never yes. Where nothing is answered within
+    /// whose handler cancels the token on a thread of its own within that bound, answers
+    /// <see cref="ConsoleAnswer.Cancelled"/> rather than yes. Where nothing is answered within
     /// <paramref name="answerBound"/>, the read ends, the cursor moves past the question
-    /// and the answer is <see cref="ConsoleAnswer.TimedOut"/>, for the caller to say what
-    /// happens next. <paramref name="answer"/> is the answer typed, trimmed.
+    /// and, unless the token is cancelled within the same bound after it, the answer is
+    /// <see cref="ConsoleAnswer.TimedOut"/>, for the caller to say what happens next. <paramref name="answer"/> is the answer typed, trimmed.
     /// </summary>
     internal static ConsoleAnswer Ask(
         IConsolePrompt console, Func<string, string, string> prompt,
@@ -76,6 +79,14 @@ internal static class ConsoleQuestion
             line = console.ReadLine(bound.Token);
             if (line is null && bound.IsCancellationRequested && !token.IsCancellationRequested)
             {
+                // A Ctrl+C as the minute runs out is a cancel, not nobody answering, which
+                // a caller can take as leave to go on.
+                if (token.WaitHandle.WaitOne(controlCBound))
+                {
+                    answer = string.Empty;
+                    console.WriteLine(string.Empty);
+                    return ConsoleAnswer.Cancelled;
+                }
                 answer = string.Empty;
                 console.WriteLine(string.Empty);
                 return ConsoleAnswer.TimedOut;
