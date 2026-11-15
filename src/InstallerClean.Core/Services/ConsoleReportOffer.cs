@@ -47,7 +47,8 @@ internal sealed class ConsoleReportOffer(
     /// mark prints what the report holds and the report itself, then asks again;
     /// anything else asks again. The end of input is no, unless the token is cancelled
     /// within the bound this offer was given for it, since Ctrl+C at the prompt can
-    /// itself be read as the end of input. Nothing answered within the bound this offer was
+    /// itself be read as the end of input, and a yes waits on the token for that bound too,
+    /// so a Ctrl+C whose handler comes just after the answer is read sends nothing. Nothing answered within the bound this offer was
     /// given for an answer is no, said as such. Where the report cannot be saved nothing is
     /// asked, as there is no file to name or to send. Never throws.
     /// </summary>

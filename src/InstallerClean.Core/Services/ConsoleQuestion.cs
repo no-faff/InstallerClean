@@ -8,7 +8,10 @@ namespace InstallerClean.Services;
 /// <summary>How a question put to the console was answered.</summary>
 internal enum ConsoleAnswer
 {
-    /// <summary>Enter, or an answer starting with this language's letter for yes or with Y.</summary>
+    /// <summary>
+    /// Enter, or an answer starting with this language's letter for yes or with Y, and no Ctrl+C
+    /// or close while the question waited or within <c>controlCBound</c> of the answer.
+    /// </summary>
     Yes,
 
     /// <summary>An answer starting with this language's letter for no or with N, or the end of input.</summary>
@@ -49,7 +52,10 @@ internal static class ConsoleQuestion
     /// the answer is then <see cref="ConsoleAnswer.Cancelled"/>. The end of input is
     /// <see cref="ConsoleAnswer.No"/>, unless the token is cancelled while the question
     /// waits on it, up to <paramref name="controlCBound"/> in a run, since Ctrl+C at the
-    /// prompt can itself be read as the end of input. Where nothing is answered within
+    /// prompt can itself be read as the end of input. A yes waits on the token for the same
+    /// bound before it counts, so a Ctrl+C that comes just before or as the answer is read,
+    /// whose handler cancels the token on a thread of its own a moment later, answers
+    /// <see cref="ConsoleAnswer.Cancelled"/>, never yes. Where nothing is answered within
     /// <paramref name="answerBound"/>, the read ends, the cursor moves past the question
     /// and the answer is <see cref="ConsoleAnswer.TimedOut"/>, for the caller to say what
     /// happens next. <paramref name="answer"/> is the answer typed, trimmed.
@@ -75,11 +81,13 @@ internal static class ConsoleQuestion
                 return ConsoleAnswer.TimedOut;
             }
         }
-        if (line is null) token.WaitHandle.WaitOne(controlCBound);
         answer = line?.Trim() ?? string.Empty;
+        var saysYes = line is not null
+            && (answer.Length == 0 || StartsWith(answer, yes) || StartsWith(answer, "Y"));
+        if (line is null || saysYes) token.WaitHandle.WaitOne(controlCBound);
         if (token.IsCancellationRequested) return ConsoleAnswer.Cancelled;
         if (line is null) return ConsoleAnswer.No;
-        if (answer.Length == 0 || StartsWith(answer, yes) || StartsWith(answer, "Y")) return ConsoleAnswer.Yes;
+        if (saysYes) return ConsoleAnswer.Yes;
         if (StartsWith(answer, no) || StartsWith(answer, "N")) return ConsoleAnswer.No;
         return ConsoleAnswer.Other;
 
