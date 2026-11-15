@@ -15,7 +15,8 @@ namespace InstallerClean.Helpers;
 /// readable by every authenticated user on the machine. Some summary lines carry
 /// the user's own typed destination path. The hard-error entry additionally
 /// carries the crash-log path, which is derived from <c>%LOCALAPPDATA%</c> and so
-/// embeds the elevating account's profile name, not user-typed input. Both are an
+/// embeds the elevating account's profile name, or for a portable copy is the folder its
+/// exe is in, not user-typed input. Both are an
 /// accepted trade: on an unattended Task Scheduler run stdout is discarded, so
 /// this entry is the only audit trail back to what happened and to the crash log
 /// that holds the detail, and a Windows account name is a weak secret on a machine

@@ -5,7 +5,9 @@ namespace InstallerClean.Helpers;
 /// <summary>
 /// The app's own folder for the Windows account it runs as,
 /// <c>%LOCALAPPDATA%\InstallerClean</c>, which holds settings.json, last-run.json and
-/// crash.log. The first time a process asks for <see cref="Location"/>,
+/// crash.log; or, for a copy run as a portable app, the folder its exe is in
+/// (<see cref="PortableFolder"/>), where the same files go and nothing under
+/// <c>%LOCALAPPDATA%</c> is read, written or moved. The first time a process asks for <see cref="Location"/>,
 /// <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>, where earlier versions keep the same
 /// files, is moved here, so every caller is answered with the folder its files are
 /// actually in.
@@ -31,7 +33,60 @@ internal static class AppDataFolder
     private const long MaxMergedLogBytes = 2 * CrashLog.MaxBytes;
 
     private static readonly Lazy<Settled> First = new(
-        () => Settle(KnownFolders.GetPath(Environment.SpecialFolder.LocalApplicationData)));
+        () => InUse(PortableFolder.Find(CopyStoodFor(), path => FrameworkFile.Exists(path)), TheSetupsRecord) is { } portable
+            ? new Settled(portable, null)
+            : Settle(KnownFolders.GetPath(Environment.SpecialFolder.LocalApplicationData)));
+
+    /// <summary>
+    /// <paramref name="portable"/>, the folder the marker was found in, as a full path, unless
+    /// the setup's record (<paramref name="setup"/>) names it or cannot be read: the setup's copy
+    /// keeps its files in <c>%LOCALAPPDATA%</c> whatever is beside its exe, since its uninstall
+    /// removes only what the setup wrote, and a copy the record cannot rule out may be the setup's.
+    /// A marker in a folder that cannot be written to is still used, and a write there fails as a
+    /// write anywhere can: nothing goes to <c>%LOCALAPPDATA%</c> instead, since keeping nothing
+    /// there is what the marker asks for.
+    /// </summary>
+    internal static string? InUse(string? portable, Func<Services.SetupRecord> setup)
+    {
+        if (portable is null || Services.AppCopy.Normalise(portable) is not { } folder) return null;
+        var record = setup();
+        if (record.State == Services.SetupRecordState.CannotTell || Services.AppCopy.IsSetupFolder(folder, record))
+            return null;
+        return folder;
+    }
+
+    /// <summary>The setup's record, or one that cannot tell where it will not read. Never throws.</summary>
+    private static Services.SetupRecord TheSetupsRecord()
+    {
+        try
+        {
+            return Services.AppCopy.ReadSetupRecord(new Services.RegistryReader());
+        }
+        catch (Exception)
+        {
+            return Services.SetupRecord.CannotTell;
+        }
+    }
+
+    /// <summary>
+    /// The exe of the copy this process stands for: the one a well-formed replace request names
+    /// (<see cref="HandOverContract.ReadReplaceRequest"/>), so a request the hand-over refuses
+    /// changes nothing here, and otherwise the exe this process runs from. Never throws.
+    /// </summary>
+    private static string? CopyStoodFor()
+    {
+        try
+        {
+            if (HandOverContract.ReadReplaceRequest(Environment.GetCommandLineArgs(), out var request) == ReplaceRead.Asked
+                && request is not null)
+                return request.ExePath;
+            return Environment.ProcessPath;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
 
     private static int _failureRecorded;
 

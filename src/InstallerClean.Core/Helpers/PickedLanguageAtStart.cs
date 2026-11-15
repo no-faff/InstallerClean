@@ -13,7 +13,8 @@ namespace InstallerClean.Helpers;
 /// folder move need more than .NET Framework 4.0 has, and a copy that refuses never gets that
 /// far. So this reads settings.json itself and takes the <c>language</c> value as the app
 /// writes it, then checks it with <see cref="LanguagePreference.Resolve"/> as the window does.
-/// It reads the file in <c>%LOCALAPPDATA%\InstallerClean</c>, or where there is none there,
+/// For a portable copy it reads the settings file beside its exe alone (<see cref="PortableFolder"/>).
+/// Otherwise it reads the file in <c>%LOCALAPPDATA%\InstallerClean</c>, or where there is none there,
 /// the one in <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>, where earlier versions keep it:
 /// the file <see cref="AppDataFolder"/> settles on wherever it can move the earlier folder's
 /// files across. It moves and writes nothing. Everything here is held to what <c>NetFrameworkCheck</c>'s remarks set out.
@@ -33,6 +34,13 @@ internal static class PickedLanguageAtStart
     {
         try
         {
+            // A portable copy's settings are beside its exe (PortableFolder), and nothing under
+            // %LOCALAPPDATA% is read for it. The setup's copy, which AppDataFolder keeps in
+            // %LOCALAPPDATA% whatever is beside its exe, is not told apart here, as that needs
+            // its record in the registry: a marker beside it gives a message in the language
+            // Windows displays, or the one a settings file beside it picks.
+            var portable = PortableFolder.Find();
+            if (portable is not null) return FromSettings(SettingsText(portable.TrimEnd('\\') + @"\settings.json"));
             var localAppData = KnownFolders.GetPath(Environment.SpecialFolder.LocalApplicationData);
             if (string.IsNullOrEmpty(localAppData)) return null;
             var root = localAppData.TrimEnd('\\');

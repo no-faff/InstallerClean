@@ -2,7 +2,7 @@ namespace InstallerClean.Models;
 
 /// <summary>
 /// Persisted user preferences. Serialised to
-/// <c>%LOCALAPPDATA%\InstallerClean\settings.json</c> by
+/// <c>settings.json</c> in the app's own folder (<see cref="Helpers.AppDataFolder"/>) by
 /// <see cref="Services.ISettingsService"/>. New fields must be optional /
 /// have a default so an older file deserialises cleanly into a newer
 /// schema and a corrupt-file <c>.bad</c> backup is only triggered for

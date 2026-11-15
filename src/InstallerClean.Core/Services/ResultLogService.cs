@@ -12,7 +12,7 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// Default <see cref="IResultLogService"/>. Writes the JSON to
-/// <c>%LOCALAPPDATA%\InstallerClean\last-run.json</c> via the
+/// <c>last-run.json</c> in the app's own folder (<see cref="Helpers.AppDataFolder"/>) via the
 /// same atomic-rename pattern <see cref="SettingsService"/> uses, and
 /// POSTs the file's contents to the No Faff result-log endpoint.
 /// </summary>
