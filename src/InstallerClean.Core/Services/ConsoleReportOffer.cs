@@ -48,8 +48,9 @@ internal sealed class ConsoleReportOffer(
     /// anything else asks again. The end of input is no, unless the token is cancelled
     /// within the bound this offer was given for it, since Ctrl+C at the prompt can
     /// itself be read as the end of input, and a yes waits on the token for that bound too,
-    /// so a Ctrl+C whose handler comes just after the answer is read sends nothing. Nothing answered within the bound this offer was
-    /// given for an answer is no, said as such. Where the report cannot be saved nothing is
+    /// so a Ctrl+C whose handler comes within it after the answer is read sends nothing.
+    /// Nothing answered within the bound this offer was given for an answer is no, said as
+    /// such. Where the report cannot be saved nothing is
     /// asked, as there is no file to name or to send. Never throws.
     /// </summary>
     public ReportOfferOutcome Offer(ResultLogEntry entry, CancellationToken token)
@@ -177,9 +178,10 @@ internal sealed class ConsoleReportOffer(
         }
         catch (OperationCanceledException)
         {
-            // Ctrl+C while a yes is being sent stops it: the report is not sent and no
-            // longer waiting, as the line says. A report an earlier run left stays
-            // waiting for the next.
+            // Ctrl+C while a yes is being sent stops it, and the report is no longer
+            // waiting, so it is not sent again. Where the request had already reached the
+            // server before the Ctrl+C, the server may have stored it all the same. A report
+            // an earlier run left stays waiting for the next.
             if (!waiting && !settings.Update(s => s.ReportSendPending = false))
                 CrashLog.TryWrite(new InvalidOperationException(
                     "settings.json could not record that the report is not waiting to be sent."));
