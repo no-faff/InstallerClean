@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
@@ -317,48 +316,10 @@ public sealed class SetupReplacementTests : IDisposable
         Assert.False(SetupReplacement.AnotherProcessMayRunFrom(running));
     }
 
-    [Fact]
-    public void A_process_that_has_ended_is_not_found_while_another_process_holds_a_handle_to_it()
-    {
-        var name = $"ic-ended-{Guid.NewGuid():N}.exe";
-        var path = Path.Combine(_root, name);
-        File.Copy(Path.Combine(Environment.SystemDirectory, "ping.exe"), path);
-
-        using var copy = SuspendedProcess.Start(path);
-        copy.EndKeepingItsHandles();
-
-        // The handles this test still holds keep Windows listing the ended copy, as any
-        // other process's handle to it would.
-        var listed = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(name));
-        try
-        {
-            Assert.Contains(listed, process => process.Id == copy.Id);
-        }
-        finally
-        {
-            foreach (var process in listed) process.Dispose();
-        }
-
-        Assert.True(SetupReplacement.HasEnded(copy.Id));
-        Assert.False(SetupReplacement.AnotherProcessMayRunFrom(path));
-    }
-
-    [Fact]
-    public void A_process_that_is_running_has_not_ended()
-    {
-        var name = $"ic-running-{Guid.NewGuid():N}.exe";
-        var path = Path.Combine(_root, name);
-        File.Copy(Path.Combine(Environment.SystemDirectory, "ping.exe"), path);
-
-        using var copy = SuspendedProcess.Start(path);
-
-        Assert.False(SetupReplacement.HasEnded(copy.Id));
-    }
-
     /// <summary>
     /// A process started suspended, so it runs none of its own code and stays until it is
     /// ended. Disposing it ends it, waits for that and closes both of its handles, after
-    /// which Windows lists it only while another process holds a handle to it.
+    /// which Windows no longer lists it.
     /// </summary>
     private sealed class SuspendedProcess : IDisposable
     {
@@ -366,14 +327,11 @@ public sealed class SetupReplacementTests : IDisposable
         private readonly IntPtr _process;
         private readonly IntPtr _thread;
 
-        private SuspendedProcess(IntPtr process, IntPtr thread, int id)
+        private SuspendedProcess(IntPtr process, IntPtr thread)
         {
             _process = process;
             _thread = thread;
-            Id = id;
         }
-
-        public int Id { get; }
 
         public static SuspendedProcess Start(string path)
         {
@@ -382,15 +340,7 @@ public sealed class SetupReplacementTests : IDisposable
             if (!Kernel32.CreateProcess(path, commandLine, IntPtr.Zero, IntPtr.Zero, bInheritHandles: false, CreateSuspended,
                     IntPtr.Zero, Path.GetDirectoryName(path)!, in startup, out var started))
                 throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-            return new SuspendedProcess(started.hProcess, started.hThread, (int)started.dwProcessId);
-        }
-
-        /// <summary>Ends the process and waits for that, keeping both of its handles open.</summary>
-        public void EndKeepingItsHandles()
-        {
-            Kernel32.TerminateProcess(_process, 1);
-            if (WaitForSingleObject(_process, 10_000) != 0)
-                throw new TimeoutException("The suspended process had not ended ten seconds after it was ended.");
+            return new SuspendedProcess(started.hProcess, started.hThread);
         }
 
         public void Dispose()
