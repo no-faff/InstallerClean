@@ -307,11 +307,13 @@ internal enum CliEventClass
     UpdateNotPossibleNotice,
 
     /// <summary>
-    /// Notice: a newer version a copy had downloaded did not put itself at that copy's
-    /// path, because once the copy had closed nothing was left there. The newer version
+    /// Notice: a newer version a copy had downloaded did not put itself in place of that
+    /// copy, and its text says why: the copy was left as it was, InstallerClean was in use,
+    /// the setup failed or did not put the version in place, the replace stopped part way,
+    /// or nothing was left at the copy's path once the copy had closed. The newer version
     /// writes it, from the window's update as from the command line's. It is not a run,
     /// and is the only entry of the process writing it. WARNING, on the rule at
-    /// <see cref="CliContract.EntryTypeFor"/>: the update fell short, and the copy is gone.
+    /// <see cref="CliContract.EntryTypeFor"/>: the update fell short.
     /// </summary>
     UpdateNotInstalledNotice,
 }

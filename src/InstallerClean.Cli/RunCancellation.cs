@@ -4,18 +4,17 @@ namespace InstallerClean.Cli;
 /// The run's cancellation source, cancelled on the thread that brings the cancel (a thread-pool
 /// thread for Ctrl+C, Windows' own handler thread for a console being closed, the thread
 /// CancelKey.Watch starts for the event the version that started this one sets, or the run's
-/// own thread where the cancel came before the run answered it) and disposed by Main as the
-/// run returns. Cancel and Dispose take one lock, so they never
-/// overlap.
+/// own thread where the cancel came before the run answered it) and disposed by Program.Run as
+/// it returns. Cancel and Dispose take one lock, so they never overlap.
 /// </summary>
 /// <remarks>
 /// On .NET Framework 4.8 a Cancel that overlaps a Dispose can throw NullReferenceException or
 /// ObjectDisposedException after the source has begun cancelling, and its registered callbacks
 /// then do not run; the source's wait handle being made, as the run's waits make it, opens that
-/// window. .NET 10 allows the overlap. A Cancel after the Dispose throws ObjectDisposedException,
-/// as it does on .NET 10. A Dispose that comes while Cancel is running the callbacks waits for
-/// them, so a callback on the run's token must not wait for anything Main does after the run
-/// returns, or Main and the callback each wait for the other.
+/// window. A Cancel after the Dispose throws ObjectDisposedException. A Dispose that comes
+/// while Cancel is running the callbacks waits for them, so a callback on the run's token must
+/// not wait for anything Program.Run does after it disposes the source, or the run and the
+/// callback each wait for the other.
 /// </remarks>
 internal sealed class RunCancellation : IDisposable
 {

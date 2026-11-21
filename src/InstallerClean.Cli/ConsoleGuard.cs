@@ -6,10 +6,10 @@ namespace InstallerClean.Cli;
 /// <summary>
 /// Standard output for the whole run. Every write goes to the writer the console gave the
 /// run, and a write that fails, such as one to an output redirected to a disk that is full,
-/// loses what it was writing and nothing more: the next write is tried as if none had
-/// failed, and goes through once the disk has room, which a Delete on that disk can give it.
-/// Every write reaches the console's writer as one call, whichever overload made it, and
-/// is guarded as one.
+/// loses what it was writing and nothing more: the next write is still tried, and goes
+/// through once the disk has room, which a Delete on that disk can give it. Every write
+/// reaches the console's writer as one call, whichever overload made it, after any line
+/// break a failure left owing, and the two are guarded as one.
 ///
 /// Nothing the run prints can throw, so no failed write ends a run or reaches a catch-all. A
 /// Delete that deleted files is logged and exits as that Delete, and a run refused for
@@ -34,12 +34,12 @@ namespace InstallerClean.Cli;
 /// it, and nothing is recorded. .NET Framework's console stream ends such a write itself
 /// for the first two and throws for the third, so the guard takes the third here.
 ///
-/// <see cref="Program"/>'s Main installs it once, after it sets the code page.
+/// <see cref="Program"/>'s Start installs it once, after it sets the code page.
 /// Setting <see cref="Console.OutputEncoding"/> replaces a writer the console made for
 /// itself and keeps one installed through <see cref="Console.SetOut"/>, so with the code
 /// page set first this guard wraps a writer that already writes UTF-8, and putting the
-/// code page back at the end leaves it in place. In a process with no console, Main puts a
-/// UTF-8 writer over stdout itself before the guard wraps it.
+/// code page back at the end leaves it in place. In a process with no console, Start puts
+/// UTF-8 writers over stdout and stderr itself before the guard wraps stdout's.
 /// </summary>
 internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
 {

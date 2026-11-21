@@ -39,8 +39,9 @@ internal static class Program
     /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
     /// names only the checks, their refusal in English where a check fails to load what it
     /// needs, the crash log's write of what the module initializer kept and
-    /// <see cref="Start"/>, each in a method of its own that is never compiled into Main:
-    /// nothing the last two name is compiled before the checks have run.
+    /// <see cref="Start"/>, each in a method of its own, the checks, the crash log's write
+    /// and Start marked never to be compiled into Main: nothing the last two name is
+    /// compiled before the checks have run.
     /// </remarks>
     public static int Main(string[] args)
     {
@@ -81,9 +82,9 @@ internal static class Program
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int Start(string[] args)
     {
-        // A .exe.config beside the command line that says more than the build's own is a
-        // file somebody else wrote, which on .NET Framework the runtime would read. Refuse
-        // before anything else runs, printing the message and ending; a config beside the
+        // A .exe.config beside the command line that says more than the build's own is a file
+        // somebody else wrote, which on .NET Framework the runtime would read. Refuse before
+        // the run does anything else, printing the message and ending; a config beside the
         // setup's copy is not refused. Read here, never in a module initializer.
         if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
             return Refuse(plantedConfig);
@@ -319,7 +320,7 @@ internal static class Program
     /// language does not mojibake under redirected output
     /// (<c>cmd /c installerclean-cli /s > out.txt</c>) or PowerShell 5's OEM
     /// default code page. Returns the encoding that was in force, for
-    /// <see cref="RestoreOutputEncoding"/>, or null when nothing was changed.
+    /// <see cref="RestoreOutputEncoding"/>, or null where the code page was not changed.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -330,7 +331,7 @@ internal static class Program
     /// console's writers in the ANSI code page, so where the process has no console
     /// the run puts UTF-8 writers over stdout and stderr itself
     /// (<see cref="UseUtf8WritersWithoutAConsole"/>): output redirected to a file
-    /// by such a launcher is UTF-8 either way. Nothing was changed on a console, so
+    /// by such a launcher is UTF-8 either way. The console's code page was not changed, so
     /// null comes back.
     /// </para>
     /// <para>
@@ -854,8 +855,8 @@ internal static class Program
 
     /// <summary>
     /// Prints a blank line and <paramref name="line"/>, the line saying the run is
-    /// cancelling. Never throws: it runs on the thread that brings the cancel too, which
-    /// Main's try/catch does not cover.
+    /// cancelling, unless the console is being closed. Never throws: it runs on the thread
+    /// that brings the cancel too, which Start's try/catch does not cover.
     /// </summary>
     internal static void SayCancelling(string line)
     {
@@ -1821,8 +1822,7 @@ internal static class Program
                 return MoveDestinationTooLong(arg, moveDest);
 
             // Room at the destination, decided by the Core rule the window
-            // applies, which refused a Move it had no room for while this ran it
-            // and filled the volume. Asked here rather than in the pre-scan
+            // applies. Asked here rather than in the pre-scan
             // destination validation because only the surviving set's size says
             // how much room is needed, and asked before the folder is created so a
             // refusal leaves nothing behind.

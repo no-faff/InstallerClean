@@ -701,7 +701,8 @@ internal sealed class PipeReaderGoneAfter(int taken) : MemoryStream
 /// <remarks>
 /// On .NET Framework, TextWriter has no span or string builder Write: a string builder
 /// reaches Write of an object, which writes its text as one string, so every write comes
-/// down to the overloads refused here. A null builder writes nothing and so is not refused.
+/// down to the overloads refused here. A null builder given to Write writes nothing and so is
+/// not refused.
 /// </remarks>
 internal sealed class ConsoleFailingAt(string text) : StringWriter
 {

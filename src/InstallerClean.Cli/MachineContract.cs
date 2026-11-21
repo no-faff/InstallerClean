@@ -54,8 +54,7 @@ internal static class MachineContract
     /// throw past it to the caller.
     /// </summary>
     /// <remarks>
-    /// What a consumer may rely on, because two of these entries are newer than
-    /// most tooling watching for them. Every <c>/s</c>, <c>/d</c> or <c>/m</c>
+    /// What a consumer may rely on. Every <c>/s</c>, <c>/d</c> or <c>/m</c>
     /// run writes exactly ONE summary entry, and its Event ID is in the 1000,
     /// 2000 or 4000 band (<see cref="CliContract.EventIdFor"/>), except a run whose
     /// update saw Ctrl+C with nothing run, whose one entry is the 3006 below saying so.
@@ -83,7 +82,9 @@ internal static class MachineContract
     /// run's summary. 3006: the run found a newer version and did not run with it, naming
     /// both versions and why; it says nothing of what then ran, which the summary says.
     /// Where the update itself saw Ctrl+C, the 3006 says nothing ran and is the run's one
-    /// entry. That aside, a notice never replaces the
+    /// entry. 3007: a newer version a copy had downloaded did not put itself in place of
+    /// that copy, saying why; the newer version writes it, it is not a run, and it is the
+    /// only entry its process writes. That aside, a notice never replaces the
     /// summary and never stands in for one, so counting runs means counting the summary
     /// bands and that one, and each notice repeats for as long as its own condition
     /// holds, so a machine can emit one on every run for weeks.
@@ -96,8 +97,9 @@ internal static class MachineContract
     /// Warning. 3005 is Information because the run fell short of nothing. 3006 is
     /// Information where the copy does not update for a reason true on every run, and Warning
     /// where the run went on with an older version than it set out to use, or ran nothing.
-    /// Nothing here contradicts that: this paragraph says only that a notice is not
-    /// the run's SUMMARY entry, which is what a consumer counting runs is asking.
+    /// 3007 is Warning: the update fell short. Nothing here
+    /// contradicts that: this paragraph says only that a notice is not the run's SUMMARY
+    /// entry, which is what a consumer counting runs is asking.
     /// Two questions, near-identical wording, and the sense that travels between
     /// them is the one that would put two Event IDs on the wrong side of an
     /// entry-type decision.
