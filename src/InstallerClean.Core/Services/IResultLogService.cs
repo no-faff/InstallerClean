@@ -15,14 +15,6 @@ namespace InstallerClean.Services;
 public interface IResultLogService
 {
     /// <summary>
-    /// Maximum size of <c>last-run.json</c> the service will read or
-    /// POST. The writer caps the JSON at this size by construction
-    /// (the schema's natural size is well under it); a file larger
-    /// than this came from outside the process and is rejected.
-    /// </summary>
-    public const long MaxLogBytes = 64 * 1024;
-
-    /// <summary>
     /// Serialises <paramref name="entry"/> to JSON and replaces the
     /// previous <c>last-run.json</c> atomically. Never throws; a disk-
     /// full / locked-file / read-only profile situation logs the
@@ -43,7 +35,7 @@ public interface IResultLogService
     /// <summary>
     /// Reads <c>last-run.json</c> as UTF-8 text and returns the
     /// raw content, which is the body <see cref="SendAsync"/> sends. Returns null
-    /// when the file doesn't exist, exceeds the <see cref="MaxLogBytes"/>
+    /// when the file doesn't exist, exceeds the <see cref="ResultLogService.MaxLogBytes"/>
     /// cap, or fails to read; oversize and read-failure cases write a
     /// breadcrumb to crash.log. Never throws for an IO failure; a token
     /// cancelled by the caller surfaces as OperationCanceledException, so

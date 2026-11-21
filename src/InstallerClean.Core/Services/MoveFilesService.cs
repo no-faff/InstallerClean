@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 
@@ -73,20 +74,30 @@ public sealed class MoveFilesService : IMoveFilesService
     {
         return Task.Run(() =>
         {
-            // The three destination gates are inside the worker, not on the
+            // The destination gates are inside the worker, not on the
             // caller's thread, which for the GUI is the dispatcher: two of them
             // resolve a user-chosen path through CreateFile and
-            // GetFinalPathNameByHandle, twice over, and a mapped drive or a UNC
-            // share that has gone away stalls each one for the SMB timeout with
-            // the operating overlay already up and its Cancel button
-            // unpressable.
+            // GetFinalPathNameByHandle, twice over, and for a share path open its
+            // nearest folder through the share again to read its file id, and a
+            // mapped drive or a UNC share that has gone away stalls each one for
+            // the SMB timeout with the operating overlay already up and its
+            // Cancel button unpressable.
 
-            // Reject relative destinations: Path.GetFullPath would otherwise
+            // Reject relative destinations: FullPaths.GetFullPath would otherwise
             // resolve them against the process CWD, and the CLI host's CWD
             // is whatever the caller invoked it from.
-            if (!Path.IsPathFullyQualified(destinationFolder))
+            if (!PathText.IsPathFullyQualified(destinationFolder))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
+
+            // A destination where a moved file's path would reach MAX_PATH is refused before
+            // any check below reads the destination, so a refusal touches nothing. The batch
+            // measured is the one handed in, the files the re-read under the lease leaves
+            // being among them.
+            var batch = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
+            if (MoveDestinationLength.TooLong(destinationFolder, batch))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_PathTooLong, destinationFolder));
 
             // Destination must not resolve inside C:\Windows\Installer;
             // ResolveFinalPath expands junctions so a reparse-point
@@ -213,7 +224,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // acquire and the release may await.
             var recheck = _reverifier.RecheckUnderLease(underLeaseClaims);
             var heldBack = recheck.HeldBack;
-            var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
+            var pathList = batch;
             if (heldBack.Count > 0)
             {
                 var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
@@ -287,10 +298,10 @@ public sealed class MoveFilesService : IMoveFilesService
             //
             // The per-file check in the loop is what holds each later resolution of
             // destinationFolder to this capture.
-            if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination))
+            if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination, canonicalProven))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
-            if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination))
+            if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination, canonicalProven))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
 
@@ -339,7 +350,7 @@ public sealed class MoveFilesService : IMoveFilesService
                     // the try the throw leaves the loop altogether, and the files
                     // already moved are never reported, the result and the failure
                     // log's closing entry both being built past the loop.
-                    progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
+                    progress?.Report(new OperationProgress(i + 1, total, PathText.GetFileName(sourcePath)));
                     // Asked again after the report, which can block on the console: a cancel
                     // that came meanwhile leaves this file alone. The catch-all below lets the
                     // batch's own cancellation through (BatchStop.EndsBatch).
@@ -510,21 +521,20 @@ public sealed class MoveFilesService : IMoveFilesService
                     // out-of-bounds or unresolvable path the guard established it to
                     // be. A refusal has to name the reason it was refused for, and
                     // the guard's reason outranks this one wherever both apply.
-                    var fileName = _fs.Path.GetFileName(sourcePath);
-                    var destPath = _fs.Path.Combine(destinationFolder, fileName);
+                    var fileName = PathText.GetFileName(sourcePath);
+                    var destPath = PathText.Combine(destinationFolder, fileName);
                     if (_fs.File.Exists(destPath))
                     {
                         errors.Add(new DestinationCollision(sourcePath, fileName));
                         continue;
                     }
 
-                    // Not File.Move with overwrite=true, which would follow a
-                    // reparse point planted at destPath in the window this check
-                    // leaves open. The non-overwriting form refuses an existing
-                    // target, so the race ends in a per-file error rather than in a
-                    // move that follows a link out to somewhere sensitive. The check
-                    // above is what makes the ordinary collision a stated refusal
-                    // rather than that error; it is not what makes the move safe.
+                    // The non-overwriting form, so a file or a link that appears at
+                    // destPath in the window this check leaves open stays as it is
+                    // and the move ends in a per-file error; overwrite=true would
+                    // write over whatever is there. The check above is what makes
+                    // the ordinary collision a stated refusal rather than that
+                    // error; it is not what makes the move safe.
                     // The host's question is the last thing before the act, after every
                     // check on the file.
                     if (mayAct is not null && !mayAct(sourcePath)) throw new BatchStoppedException();
@@ -547,7 +557,7 @@ public sealed class MoveFilesService : IMoveFilesService
                 // DirectoryNotFoundException.
                 catch (FileNotFoundException) when (
                     !_fs.File.Exists(sourcePath)
-                    && !_fs.File.Exists(_fs.Path.Combine(destinationFolder, _fs.Path.GetFileName(sourcePath))))
+                    && !_fs.File.Exists(PathText.Combine(destinationFolder, PathText.GetFileName(sourcePath))))
                 {
                     errors.Add(new MissingSourceFile(sourcePath));
                 }
@@ -659,16 +669,16 @@ public sealed class MoveFilesService : IMoveFilesService
     /// moved, and returns null when the file really has gone or the error to
     /// file when it has not.
     ///
-    /// A move that returns without throwing is not proof the source is gone.
-    /// .NET calls MoveFileEx with MOVEFILE_COPY_ALLOWED (dotnet/runtime,
-    /// Interop.MoveFileEx.cs), and Win32 documents that flag as simulating a
-    /// cross-volume move with CopyFile plus DeleteFile, then says outright: "If
-    /// the file is successfully copied to a different volume and the original
-    /// file is unable to be deleted, the function succeeds leaving the source
-    /// file intact." A read-only source is exactly that case, DeleteFile being
-    /// documented to fail with ERROR_ACCESS_DENIED on one, and a file another
-    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive
-    /// moves never reach this state: a rename either happens or throws.
+    /// A move that returns without throwing is not proof the source is gone. The
+    /// move calls MoveFileEx with MOVEFILE_COPY_ALLOWED, as .NET 10's File.Move
+    /// does (dotnet/runtime, Interop.MoveFileEx.cs), and Win32 documents that flag
+    /// as simulating a cross-volume move with CopyFile plus DeleteFile, then says
+    /// outright: "If the file is successfully copied to a different volume and the
+    /// original file is unable to be deleted, the function succeeds leaving the
+    /// source file intact." A read-only source is exactly that case, DeleteFile
+    /// being documented to fail with ERROR_ACCESS_DENIED on one, and a file another
+    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive moves
+    /// never reach this state: a rename either happens or throws.
     ///
     /// Checked after the fact rather than pre-empted, because pre-clearing the
     /// attribute would mutate sources that never needed it and would need a

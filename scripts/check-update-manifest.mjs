@@ -3,20 +3,24 @@
 // app that reads it have come apart, or where the writer's check could not tell a wrong
 // file from a right one.
 //
-// THE APP. UpdateManifest.cs names the downloads (DownloadKey's results) and the schema
-// (Schema). The writer's KINDS and SCHEMA have to be exactly those, in the code of that
+// THE APP. UpdateManifest.cs names the downloads (DownloadKey's results), the schema
+// (Schema) and the requirement .NET Framework 4.8 goes by (NetFramework48). The writer's
+// KINDS, less EARLIER_KINDS, have to be exactly those downloads, EARLIER_KINDS none of
+// them, SCHEMA that schema and REQUIRES that one requirement, read from the code of that
 // file, so a download added to the app and not to the writer, or the reverse, stops the
 // run. The names read are printed.
 //
 // THE WRITER. write-update-manifest.mjs is run, as the release script runs it, for all
 // four downloads and for the three without the slim, and each file is compared with the
-// text written out below, which is the shape the app reads. The text has LF line ends,
-// no byte order mark and a newline at the end.
+// text written out below, which is the shape the app reads: every download requiring
+// .NET Framework 4.8. The text has LF line ends, no byte order mark and a newline at the
+// end.
 //
 // THE CHECK. --check has to accept each file against the list it was written for, and
 // refuse: each file against the other list, a file that is not there, one with CRLF line
 // ends, one with a byte order mark, one with a download added or taken out, one with
-// another schema, one with a requirement, and one that is not JSON. Each refusal is a
+// another schema, one with no requirement, one with another requirement, and one that is
+// not JSON. Each refusal is a
 // control: a check that accepted everything would pass the first two comparisons alone.
 // The command is also refused, with exit code 2, for no download, an unknown one and one
 // named twice.
@@ -30,7 +34,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { readCSharp } from './csharp-source.mjs';
-import { KINDS, SCHEMA } from './update-manifest.mjs';
+import { EARLIER_KINDS, KINDS, REQUIRES, SCHEMA } from './update-manifest.mjs';
 
 const name = 'check-update-manifest';
 const SOURCE = 'src/InstallerClean.Core/Services/UpdateManifest.cs';
@@ -47,6 +51,7 @@ try {
   process.exit(1);
 }
 const schemaMatch = code.match(/\bpublic\s+const\s+int\s+Schema\s*=\s*(\d+)\s*;/);
+const requirementMatch = code.match(/\bpublic\s+const\s+string\s+NetFramework48\s*=\s*"([^"]+)"\s*;/);
 const memberAt = code.search(/\bDownloadKey\s*\(\s*AppCopyKind\s+\w+\s*\)/);
 const memberEnd = memberAt < 0 ? -1 : code.indexOf('};', memberAt);
 const member = memberEnd < 0 ? '' : code.slice(memberAt, memberEnd);
@@ -60,16 +65,25 @@ if (keys.length !== arms)
   fail(`${SOURCE}: DownloadKey has ${arms} arms before its default and ${keys.length} of them are AppCopyKind.Name => "download".`);
 if (schemaMatch && Number(schemaMatch[1]) !== SCHEMA)
   fail(`${SOURCE} reads schema ${schemaMatch[1]}; update-manifest.mjs writes schema ${SCHEMA}.`);
-const missing = keys.filter((k) => !KINDS.includes(k));
-const extra = KINDS.filter((k) => !keys.includes(k));
+if (!requirementMatch) fail(`${SOURCE}: no "public const string NetFramework48 = "...";" found.`);
+else if (REQUIRES.length !== 1 || REQUIRES[0] !== requirementMatch[1])
+  fail(`${SOURCE} names .NET Framework 4.8 "${requirementMatch[1]}"; update-manifest.mjs requires ${JSON.stringify(REQUIRES)}.`);
+const current = KINDS.filter((k) => !EARLIER_KINDS.includes(k));
+const strayEarlier = EARLIER_KINDS.filter((k) => !KINDS.includes(k));
+const earlierRead = EARLIER_KINDS.filter((k) => keys.includes(k));
+if (strayEarlier.length) fail(`update-manifest.mjs lists ${strayEarlier.join(' ')} among EARLIER_KINDS and not among KINDS.`);
+if (earlierRead.length) fail(`${SOURCE} names ${earlierRead.join(' ')}, which update-manifest.mjs lists as read only by earlier copies.`);
+const missing = keys.filter((k) => !current.includes(k));
+const extra = current.filter((k) => !keys.includes(k));
 const repeated = keys.filter((k, i) => keys.indexOf(k) !== i);
 if (missing.length) fail(`${SOURCE} names ${missing.join(' ')}, which update-manifest.mjs does not write.`);
 if (extra.length) fail(`update-manifest.mjs writes ${extra.join(' ')}, which ${SOURCE} does not name.`);
 if (repeated.length) fail(`${SOURCE} names ${[...new Set(repeated)].join(' ')} more than once.`);
-console.log(`  the app reads schema ${schemaMatch?.[1]} and the downloads ${keys.join(' ')}`);
+console.log(`  the app reads schema ${schemaMatch?.[1]}, the downloads ${keys.join(' ')} and the requirement ${requirementMatch?.[1]}`);
+console.log(`  the writer lists ${KINDS.join(' ')}, of which earlier copies alone read ${EARLIER_KINDS.join(' ')}, each requiring ${REQUIRES.join(' ')}`);
 
 // The shape the app reads, written out by hand.
-const entry = (kind) => `    "${kind}": {\n      "requires": []\n    }`;
+const entry = (kind) => `    "${kind}": {\n      "requires": [\n        "netfx-4.8"\n      ]\n    }`;
 const expectedFor = (kinds) =>
   `{\n  "schema": ${SCHEMA},\n  "downloads": {\n${kinds.map(entry).join(',\n')}\n  }\n}\n`;
 const ALL = ['setup', 'portable', 'slim', 'cli'];
@@ -114,7 +128,8 @@ try {
     ['a file with no newline at the end', Buffer.from(good.replace(/\n$/, ''), 'utf8')],
     ['a file with a download taken out', Buffer.from(expectedFor(NO_SLIM), 'utf8')],
     ['a file with another schema', Buffer.from(good.replace(`"schema": ${SCHEMA}`, `"schema": ${SCHEMA + 1}`), 'utf8')],
-    ['a file with a requirement', Buffer.from(good.replace('"requires": []', '"requires": ["netfx-4.8"]'), 'utf8')],
+    ['a file with no requirement', Buffer.from(good.replace(/"requires": \[\n\s*"netfx-4\.8"\n\s*\]/g, '"requires": []'), 'utf8')],
+    ['a file with another requirement', Buffer.from(good.replaceAll('"netfx-4.8"', '"netfx-4.7.2"'), 'utf8')],
     ['a file of text that is not JSON', Buffer.from('<html></html>\n', 'utf8')],
     ['an empty file', Buffer.alloc(0)],
   ];

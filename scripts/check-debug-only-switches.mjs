@@ -29,9 +29,10 @@
 // RegistryValueOptions.None, the option that expands the %NAME% in a registry value. A
 // write (SetEnvironmentVariable, _putenv) counts as a read and is printed as a write.
 // NAMES_NO_VARIABLE lists, by exact text, what holds the word and names no environment
-// variable, such as Environment.NewLine. Anything else holding the word is a read, a
-// message in a string that says "environment" among them, until NAMES_NO_VARIABLE or
-// ALLOWED names it. An entry in NAMES_NO_VARIABLE that nothing in the shipped projects
+// variable, such as Environment.NewLine; extension(Environment), the header of a C# 14
+// extension block on the class, is a name the run gives that header. Anything else
+// holding the word is a read, a message in a string that says "environment" among
+// them, until NAMES_NO_VARIABLE or ALLOWED names it. An entry in NAMES_NO_VARIABLE that nothing in the shipped projects
 // holds stops the run. In Environment.GetEnvironmentVariable the read is the member, so
 // the line holds one. One outside the branch fails unless ALLOWED names it by file and
 // line text; each entry admits one read and stops the run where it finds none. The
@@ -46,11 +47,13 @@
 //
 // THE WORKFLOWS. DEBUG anywhere in a tracked workflow outside a YAML comment fails,
 // a command line and an environment value alike, since MSBuild takes an environment
-// variable as a property. Every dotnet publish in release.yml, which builds what ships,
-// has to name its configuration, and every configuration it names has to be Release,
-// since the SDK defines DEBUG for a configuration called Debug in any case. A publish
-// there taking a response file (an @ argument) stops the run: the switches in that file
-// reach MSBuild as if they were on the command line.
+// variable as a property. Every dotnet build, dotnet publish, dotnet msbuild and MSBuild
+// run on its own in release.yml, which builds what ships, has to name its configuration, and every
+// configuration it names has to be Release, since the SDK defines DEBUG for a
+// configuration called Debug in any case and a dotnet build that names none is a Debug
+// build. One of them there taking a response file (an @ argument) stops the run: the
+// switches in that file reach MSBuild as if they were on the command line. dotnet test
+// is not read: what it builds is run by the tests and never shipped.
 //
 // Exit 1 where a switch can reach a Release build, 2 where the run refuses: a file it
 // cannot read to its end, a control not found, an ALLOWED or NAMES_NO_VARIABLE entry
@@ -121,9 +124,19 @@ const ALLOWED = [
     what: 'ExpandRecordedPath, expanding a path Windows Installer recorded',
   },
   {
-    file: 'src/InstallerClean.Core/Services/InstallerQueryService.cs',
-    text: 'var raw = key.GetValue(valueName, null, Microsoft.Win32.RegistryValueOptions.None);',
-    what: 'TryReadLocalPackage, expanding the LocalPackage path Windows Installer recorded',
+    file: 'src/InstallerClean.Core/Helpers/RegistryData.cs',
+    text: 'while ((length = Kernel32.ExpandEnvironmentStrings(text, buffer, (uint)buffer.Length)) > buffer.Length)',
+    what: 'RegistryData.Expanded, expanding a REG_EXPAND_SZ value such as the LocalPackage path Windows Installer recorded',
+  },
+  {
+    file: 'src/InstallerClean.Core/Interop/Native/Kernel32.cs',
+    text: '[DllImport(Library, EntryPoint = "ExpandEnvironmentStringsW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]',
+    what: 'the entry point of the expansion RegistryData.Expanded calls',
+  },
+  {
+    file: 'src/InstallerClean.Core/Interop/Native/Kernel32.cs',
+    text: 'public static extern uint ExpandEnvironmentStrings(string lpSrc, [Out] char[] lpDst, uint nSize);',
+    what: 'the declaration of the expansion RegistryData.Expanded calls',
   },
   {
     file: 'src/InstallerClean.Core/Services/AppUpdater.cs',
@@ -131,23 +144,38 @@ const ALLOWED = [
     what: 'ScoopVariable, answering the variables Scoop itself reads to find its global root',
   },
   {
+    file: 'src/InstallerClean.Core/Helpers/ProxyFromVariables.cs',
+    text: 'private static string? Variable(string name) => Environment.GetEnvironmentVariable(name);',
+    what: 'ProxyFromVariables.Variable, reading HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, NO_PROXY and GATEWAY_INTERFACE as .NET 10 reads them for its default proxy',
+  },
+  {
     file: 'src/InstallerClean.Core/Helpers/KnownFolders.cs',
     text: 'GetPath(folder, Shell32.SHGetKnownFolderPath, Ole32.CoTaskMemFree, Environment.GetEnvironmentVariable);',
     what: 'KnownFolders.GetPath, the variable .NET falls back to where Windows does not answer for a known folder',
   },
+  {
+    file: 'src/InstallerClean.Core/Compatibility/WindowsIcu.cs',
+    text: 'AsksForNls(Environment.GetEnvironmentVariable(UseNlsVariable)) ? null : Load());',
+    what: 'WindowsIcu, DOTNET_SYSTEM_GLOBALIZATION_USENLS, which .NET 10 reads to sort and name cultures through NLS rather than ICU',
+  },
 ];
 
 // What holds the word and names no environment variable, by its text with the spaces
-// taken out. Environment.X is the class System.Environment and its member.
+// taken out. Environment.X is the class System.Environment and its member; a bare name
+// is an identifier holding the word; extension(Environment) is the name given to an
+// extension block's header on the class.
 const NAMES_NO_VARIABLE = new Map([
+  ['Environment.CurrentDirectory', 'the current folder'],
   ['Environment.CurrentManagedThreadId', 'the managed thread'],
+  ['Environment.Exit', 'the end of the process'],
+  ['Environment.MachineName', 'the computer name'],
   ['Environment.NewLine', 'the line ending'],
   ['Environment.OSVersion', 'the version of Windows'],
   ['Environment.ProcessId', 'the process'],
   ['Environment.ProcessPath', 'the executable'],
   ['Environment.SpecialFolder', 'the known folders'],
-  ['Environment.SystemDirectory', 'the system folder'],
-  ['DoNotExpandEnvironmentNames', 'the registry option that leaves a %NAME% as written'],
+  ['FrameworkEnvironment', 'the class giving .NET Framework the ProcessId and ProcessPath members'],
+  ['extension(Environment)', 'the block adding those members to the class Environment'],
 ]);
 
 const READ = new RegExp([
@@ -243,7 +271,10 @@ for (const { file, code, comments, lineAt, inside } of shipped) {
   for (const m of code.matchAll(READ)) {
     let name = m[0].replace(/\s+/g, '');
     // The class itself, written bare or as System.Environment, takes its member's name.
-    // Where the member names the environment too, it is the match that counts.
+    // Where the member names the environment too, it is the match that counts. The class
+    // with no member, as the whole parameter of an extension block's header, which is
+    // followed by the block's brace, is extension(Environment); a call passing something
+    // called Environment is followed by no brace and stays a read.
     if (m[0] === 'Environment') {
       const before = code.slice(Math.max(0, m.index - 80), m.index);
       const member = /^\s*\.\s*(\w+)/.exec(code.slice(m.index + m[0].length));
@@ -252,6 +283,9 @@ for (const { file, code, comments, lineAt, inside } of shipped) {
       if (qualified && member) {
         if (/environ/i.test(member[1])) continue;
         name = `Environment.${member[1]}`;
+      } else if (/(?:^|[^\w.])extension\s*\(\s*$/.test(before)
+        && /^\s*\)\s*\{/.test(code.slice(m.index + m[0].length))) {
+        name = 'extension(Environment)';
       }
     }
     const line = lineAt(m.index);
@@ -496,7 +530,10 @@ const withoutComment = (line) => {
 
 const workflows = tracked.filter((p) => /^\.github\/workflows\/[^/]+\.ya?ml$/i.test(p)).sort();
 console.log('\nWorkflows read for DEBUG:');
-let publishes = 0;
+// MSBuild run on its own, by name or by a path to MSBuild.exe, builds as dotnet msbuild
+// does, so it is read the same way. A uses: line naming an action is not a command.
+const BUILDS = /\bdotnet\s+(build|publish|msbuild)\b|(?<![\w-])(msbuild)(?:\.exe)?\b/i;
+let builds = 0;
 for (const path of workflows) {
   const lines = readFileSync(path, 'utf8').split('\n').map(withoutComment);
   const named = [];
@@ -510,27 +547,29 @@ for (const path of workflows) {
   if (path !== RELEASE_WORKFLOW) continue;
   // A command continued with '\', '`' or '^' at the end of its line is joined first.
   for (let n = 0; n < lines.length; n++) {
-    if (!/\bdotnet\s+publish\b/.test(lines[n])) continue;
+    if (!BUILDS.test(lines[n]) || /^\s*-?\s*uses\s*:/.test(lines[n])) continue;
     let command = lines[n];
     let last = n;
     while (/[\\`^]\s*$/.test(command) && last + 1 < lines.length)
       command = command.replace(/[\\`^]\s*$/, ' ') + lines[++last];
-    publishes++;
-    const args = command.slice(command.search(/\bdotnet\s+publish\b/));
+    builds++;
+    const found = BUILDS.exec(command);
+    const tool = found[1] ? `dotnet ${found[1]}` : 'MSBuild';
+    const args = command.slice(command.search(BUILDS));
     const responseFiles = args.split(/\s+/).filter((t) => /^["']?@/.test(t));
     for (const r of responseFiles)
-      refusals.push(`${path}:${n + 1} publishes with the response file ${r}, which this does not read`);
+      refusals.push(`${path}:${n + 1} ${tool} takes the response file ${r}, which this does not read`);
     const named = configurations(args);
-    console.log(`    ${path}:${n + 1}  dotnet publish, configuration ${named.length ? named.join(', then ') : 'NOT NAMED'}`);
+    console.log(`    ${path}:${n + 1}  ${tool}, configuration ${named.length ? named.join(', then ') : 'NOT NAMED'}`);
     if (!named.length)
-      failures.push(`${path}:${n + 1} publishes without naming a configuration`);
+      failures.push(`${path}:${n + 1} ${tool} without naming a configuration`);
     for (const c of named)
       if (c.toLowerCase() !== 'release')
-        failures.push(`${path}:${n + 1} publishes with the configuration ${c}`);
+        failures.push(`${path}:${n + 1} ${tool} with the configuration ${c}`);
   }
 }
 if (!workflows.includes(RELEASE_WORKFLOW)) refusals.push(`${RELEASE_WORKFLOW} is not among the workflows read`);
-else if (!publishes) refusals.push(`${RELEASE_WORKFLOW} holds no dotnet publish to read`);
+else if (!builds) refusals.push(`${RELEASE_WORKFLOW} holds no dotnet build, publish or msbuild to read`);
 
 // --- Verdict ------------------------------------------------------------------------
 

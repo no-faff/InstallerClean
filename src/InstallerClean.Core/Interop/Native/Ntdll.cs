@@ -4,10 +4,8 @@ using Microsoft.Win32.SafeHandles;
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for ntdll.dll, through the same source-generated
-/// <see cref="LibraryImportAttribute"/> stubs as <see cref="Kernel32"/>, and loaded
-/// from System32 by the resolver in <see cref="SystemLibraries"/> like every other
-/// library here.
+/// P/Invoke surface for ntdll.dll, declared as <see cref="Kernel32"/>'s are, and loaded
+/// from System32 like every other library here.
 /// </summary>
 /// <remarks>
 /// Declared because the Win32 CreateFile cannot open a child by a name resolved
@@ -18,8 +16,11 @@ namespace InstallerClean.Interop.Native;
 /// string. A caller that opened the directory, read its owner and list, and found them
 /// its own can then reach each child through that handle, and a folder put in the
 /// directory's place under its name afterwards is not on the path the kernel walks.
+///
+/// <see cref="NtQueryMutant"/> is declared because Win32 reads a mutex's state only by
+/// waiting on it, and a wait that succeeds owns the mutex.
 /// </remarks>
-internal static partial class Ntdll
+internal static class Ntdll
 {
     private const string Library = "ntdll.dll";
 
@@ -29,8 +30,8 @@ internal static partial class Ntdll
     /// zero or above for success and negative for a failure the caller treats as "not
     /// opened".
     /// </summary>
-    [LibraryImport(Library, SetLastError = false)]
-    public static partial int NtCreateFile(
+    [DllImport(Library, EntryPoint = "NtCreateFile", ExactSpelling = true)]
+    public static extern int NtCreateFile(
         out IntPtr FileHandle,
         uint DesiredAccess,
         in OBJECT_ATTRIBUTES ObjectAttributes,
@@ -43,10 +44,93 @@ internal static partial class Ntdll
         IntPtr EaBuffer,
         uint EaLength);
 
+    /// <summary>
+    /// Fills <paramref name="FileInformation"/> with the next entries of the folder
+    /// <paramref name="FileHandle"/> lists, as records of the kind
+    /// <paramref name="FileInformationClass"/> names, each pointing at the next. The return
+    /// value is an NTSTATUS: <see cref="STATUS_NO_MORE_FILES"/> once the listing is done.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "NtQueryDirectoryFile", ExactSpelling = true)]
+    public static extern int NtQueryDirectoryFile(
+        SafeFileHandle FileHandle,
+        IntPtr Event,
+        IntPtr ApcRoutine,
+        IntPtr ApcContext,
+        out IO_STATUS_BLOCK IoStatusBlock,
+        IntPtr FileInformation,
+        uint Length,
+        int FileInformationClass,
+        byte ReturnSingleEntry,
+        IntPtr FileName,
+        byte RestartScan);
+
+    /// <summary>The record kind of <see cref="FILE_FULL_DIR_INFORMATION"/> (FILE_INFORMATION_CLASS).</summary>
+    public const int FileFullDirectoryInformation = 2;
+
+    public const int STATUS_SUCCESS = 0;
+    public const int STATUS_NO_MORE_FILES = unchecked((int)0x80000006);
+    public const int STATUS_FILE_NOT_FOUND = unchecked((int)0xC000000F);
+
+    /// <summary>
+    /// One entry of a folder listing as <see cref="NtQueryDirectoryFile"/> writes it: the
+    /// times are FILETIMEs, the name is <see cref="FileNameLength"/> bytes of UTF-16 starting
+    /// at <see cref="FileName"/>, and the next record is <see cref="NextEntryOffset"/> bytes
+    /// on, or none where it is 0.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILE_FULL_DIR_INFORMATION
+    {
+        public uint NextEntryOffset;
+        public uint FileIndex;
+        public long CreationTime;
+        public long LastAccessTime;
+        public long LastWriteTime;
+        public long ChangeTime;
+        public long EndOfFile;
+        public long AllocationSize;
+        public uint FileAttributes;
+        public uint FileNameLength;
+        public uint EaSize;
+        public ushort FileName;
+    }
+
+    /// <summary>
+    /// Reads the state of the mutex <paramref name="MutantHandle"/> names into
+    /// <paramref name="MutantInformation"/>, without waiting on it, so the caller does not
+    /// come to own the mutex. The handle carries the right 0x0001, which the Win32 headers
+    /// name MUTEX_MODIFY_STATE and <c>Mutex.OpenExisting</c> asks for. The return value is
+    /// an NTSTATUS, zero or above for success.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "NtQueryMutant", ExactSpelling = true)]
+    public static extern int NtQueryMutant(
+        SafeWaitHandle MutantHandle,
+        int MutantInformationClass,
+        out MUTANT_BASIC_INFORMATION MutantInformation,
+        uint MutantInformationLength,
+        IntPtr ReturnLength);
+
+    /// <summary>The record kind of <see cref="MUTANT_BASIC_INFORMATION"/> (MUTANT_INFORMATION_CLASS).</summary>
+    public const int MutantBasicInformation = 0;
+
+    /// <summary>
+    /// A mutex's state as <see cref="NtQueryMutant"/> writes it.
+    /// <see cref="CurrentCount"/> is 1 while no thread owns the mutex and 0 or below while
+    /// one does, falling by one each time the owner takes it again.
+    /// <see cref="OwnedByCaller"/> is nonzero where the owner is the calling thread, and
+    /// <see cref="AbandonedState"/> where the last owner ended without releasing it.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MUTANT_BASIC_INFORMATION
+    {
+        public int CurrentCount;
+        public byte OwnedByCaller;
+        public byte AbandonedState;
+    }
+
     /// <summary>The Win32 error a failing NTSTATUS maps to, so a handle open that an
     /// NTSTATUS refused is recorded with a cause the rest of the code reads.</summary>
-    [LibraryImport(Library, SetLastError = false)]
-    public static partial uint RtlNtStatusToDosError(int Status);
+    [DllImport(Library, EntryPoint = "RtlNtStatusToDosError", ExactSpelling = true)]
+    public static extern uint RtlNtStatusToDosError(int Status);
 
     /// <summary>
     /// A counted UTF-16 string, as ntdll takes names. <see cref="Buffer"/> points at

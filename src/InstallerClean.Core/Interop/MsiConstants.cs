@@ -268,4 +268,7 @@ public static class MsiDbOpen
 public static class VtType
 {
     public const uint String = 30; // VT_LPSTR
+
+    /// <summary>VT_EMPTY: the property is not set.</summary>
+    public const uint Empty = 0;
 }

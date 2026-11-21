@@ -1,5 +1,7 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 using Microsoft.Win32;
 
 namespace InstallerClean.Tests.Services.Integration;
@@ -350,6 +352,120 @@ public class ProductPatchSetTests
             permitting);
     }
 
+    // An Uninstallable value of the wrong length is not a clean zero, and a REG_QWORD of
+    // four bytes is read as the number it holds, as .NET 10 reads both.
+    [Theory]
+    [InlineData(RawRegistryValue.REG_DWORD, 0, ProductPatchSet.Unestablished)]
+    [InlineData(RawRegistryValue.REG_DWORD, 2, ProductPatchSet.Unestablished)]
+    [InlineData(RawRegistryValue.REG_QWORD, 4, ProductPatchSet.AllNonRemovable)]
+    public void An_uninstallable_value_is_a_number_only_at_its_full_length(int type, int length, ProductPatchSet expected)
+    {
+        WithProductsKey(products =>
+        {
+            using var patch = products.CreateSubKey($@"{Product}\Patches\p1", writable: true)!;
+            RawRegistryValue.Write(patch, "Uninstallable", type, new byte[length]);
+            patch.SetValue("State", 2, RegistryValueKind.DWord);
+
+            var (set, _, _, _) = Read(products);
+
+            Assert.Equal(expected, set);
+        });
+    }
+
+    /// <summary>
+    /// Both patches declare a zero, and both are read as zero. A patch whose value is
+    /// stored as text is listed and not read as zero.
+    /// </summary>
+    [Fact]
+    public void A_patch_is_read_as_zero_only_where_its_value_is_a_DWORD_zero()
+    {
+        WithProductsKey(products =>
+        {
+            Patch(products, PackedPatchOne, uninstallable: 0);
+            using (var two = products.CreateSubKey($@"{Product}\Patches\{PackedPatchTwo}", writable: true)!)
+                two.SetValue("Uninstallable", "0", RegistryValueKind.String);
+
+            var (set, codes, zeros) = ReadZeros(products);
+
+            Assert.Equal(ProductPatchSet.Unestablished, set);
+            Assert.Equal(new[] { PatchOne, PatchTwo }.OrderBy(c => c), codes!.OrderBy(c => c));
+            Assert.Equal(new[] { PatchOne }, zeros);
+        });
+    }
+
+    /// <summary>
+    /// The listing names a patch whose key has gone by the time it is opened, as when the
+    /// patch is unregistered between the two. It stays in the listing, holds nothing, and
+    /// is not read as zero, its value never having been read.
+    /// </summary>
+    [Fact]
+    public void A_listed_patch_whose_key_has_gone_at_open_is_listed_and_not_read_as_zero()
+    {
+        WithProductsKey(products =>
+        {
+            Patch(products, PackedPatchOne, uninstallable: 0);
+
+            var forTests = RegistryNames.CallsForTests;
+            RegistryNames.CallsForTests = (key, calls) =>
+                key.Name.EndsWith(@"\Patches", StringComparison.OrdinalIgnoreCase)
+                    ? new AlsoNames(calls, PackedPatchTwo)
+                    : calls;
+            try
+            {
+                var (set, codes, zeros) = ReadZeros(products);
+
+                Assert.Equal(ProductPatchSet.AllNonRemovable, set);
+                Assert.Equal(new[] { PatchOne, PatchTwo }.OrderBy(c => c), codes!.OrderBy(c => c));
+                Assert.Equal(new[] { PatchOne }, zeros);
+            }
+            finally
+            {
+                RegistryNames.CallsForTests = forTests;
+            }
+        });
+    }
+
+    private static (ProductPatchSet Set, IReadOnlyCollection<string>? Codes, IReadOnlyCollection<string> Zeros)
+        ReadZeros(RegistryKey products)
+    {
+        var keys = 0;
+        var registrations = 0;
+        var set = InstallerQueryService.ReadProductPatchSet(
+            products, Product, ref keys, ref registrations, out var codes, out _, out var zeros,
+            CancellationToken.None);
+        return (set, codes, zeros);
+    }
+
+    /// <summary>
+    /// A key's own subkey listing with one more name after the last, whose subkey is not
+    /// there.
+    /// </summary>
+    private sealed class AlsoNames(RegistryNames.IKeyCalls calls, string extra) : RegistryNames.IKeyCalls
+    {
+        private int _count;
+
+        public int QueryCounts(out int subKeys, out int values)
+        {
+            var result = calls.QueryCounts(out subKeys, out values);
+            _count = subKeys;
+            subKeys++;
+            return result;
+        }
+
+        public int EnumKey(int index, char[] name, ref int nameLength)
+        {
+            if (index != _count) return calls.EnumKey(index, name, ref nameLength);
+            extra.CopyTo(0, name, 0, extra.Length);
+            nameLength = extra.Length;
+            return 0;
+        }
+
+        public int EnumValue(int index, char[] name, ref int nameLength) =>
+            calls.EnumValue(index, name, ref nameLength);
+
+        public void MarkHandleInvalid() => calls.MarkHandleInvalid();
+    }
+
     private static void Patch(RegistryKey products, string name, int uninstallable)
     {
         using var patch = products.CreateSubKey($@"{Product}\Patches\{name}", writable: true)!;
@@ -363,7 +479,7 @@ public class ProductPatchSetTests
         var keys = 0;
         var registrations = 0;
         var set = InstallerQueryService.ReadProductPatchSet(
-            products, Product, ref keys, ref registrations, out var codes, out _);
+            products, Product, ref keys, ref registrations, out var codes, out _, out _, CancellationToken.None);
         return (set, keys, registrations, codes);
     }
 
@@ -372,7 +488,7 @@ public class ProductPatchSetTests
         var keys = 0;
         var registrations = 0;
         InstallerQueryService.ReadProductPatchSet(
-            products, Product, ref keys, ref registrations, out _, out var present);
+            products, Product, ref keys, ref registrations, out _, out var present, out _, CancellationToken.None);
         return present;
     }
 

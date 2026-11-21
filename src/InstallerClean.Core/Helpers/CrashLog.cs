@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Text;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Helpers;
@@ -88,7 +90,7 @@ public static class CrashLog
         {
             try
             {
-                return Path.Combine(LogFolder, FileName);
+                return PathText.Combine(LogFolder, FileName);
             }
             catch (Exception)
             {
@@ -103,14 +105,14 @@ public static class CrashLog
     /// write failed (symlinked log file, read-only profile). The path is empty where it
     /// could not be worked out. Swallows every failure: a crash handler must not throw.
     /// </summary>
-    public static (string Path, bool Written) TryWrite(Exception ex)
+    public static CrashLogEntry TryWrite(Exception ex)
     {
         var path = string.Empty;
         try
         {
             var folder = LogFolder;
-            path = Path.Combine(folder, FileName);
-            Directory.CreateDirectory(folder);
+            path = PathText.Combine(folder, FileName);
+            FrameworkDirectory.CreateDirectory(folder);
             RotateIfNeeded(path, path + ArchiveSuffix);
 
             // Append-only handle, so the write lands at the end of the file as
@@ -128,13 +130,13 @@ public static class CrashLog
             // Returns null where the log file is a symlink; drop the entry rather than
             // append into the symlink's target.
             using var handle = StorageHelpers.OpenAtomicAppend(path);
-            if (handle is null) return (path, false);
+            if (handle is null) return new CrashLogEntry(path, false);
 
-            // bufferSize 0: no buffering layer, so the single Write below is a
-            // single write to the file. A StreamWriter over a buffered stream
-            // flushes in chunks, and a second writer appending between two of
-            // this entry's chunks would split it down the middle.
-            using var fs = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+            // No buffering layer (StorageHelpers.UnbufferedWriter), so the single
+            // Write below is a single write to the file. A StreamWriter over a
+            // buffered stream flushes in chunks, and a second writer appending
+            // between two of this entry's chunks would split it down the middle.
+            using var fs = StorageHelpers.UnbufferedWriter(handle);
 
             // The first write to a fresh log file prepends a privacy
             // header. Under elevation, framework exception messages can
@@ -147,7 +149,7 @@ public static class CrashLog
             // for a later write.
             var writeHeader = fs.Length == 0;
             var header = writeHeader ? PrivacyHeaderOrNull() : string.Empty;
-            if (header is null) return (path, false);
+            if (header is null) return new CrashLogEntry(path, false);
 
             // Redundant on an append-only handle (Win32 ignores the offset), and
             // kept as the floor: were this handle ever opened plainly writable
@@ -155,28 +157,65 @@ public static class CrashLog
             // of the file.
             fs.Seek(0, SeekOrigin.End);
 
-            var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
+            // The invariant culture keeps the stamp in one shape on every machine: in the
+            // user's culture the pattern's ':' is the culture's time separator, '.' in
+            // Danish as ICU gives it, and the year is the culture's calendar's.
+            var stamp = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture);
+            var entry = $"---- {stamp} ----{Environment.NewLine}{TextOf(ex)}{Environment.NewLine}{Environment.NewLine}";
             // The BOM goes in with the header, on a fresh file only: written
             // again on an append it would sit in the log body as a stray
             // U+FEFF.
             ReadOnlySpan<byte> bom = writeHeader ? Encoding.UTF8.GetPreamble() : default;
             byte[] payload = [.. bom, .. Encoding.UTF8.GetBytes(header + entry)];
             fs.Write(payload, 0, payload.Length);
-            return (path, true);
+            return new CrashLogEntry(path, true);
         }
         catch
         {
             // Swallow: a crash handler must not itself throw.
-            return (path, false);
+            return new CrashLogEntry(path, false);
         }
+    }
+
+    /// <summary>
+    /// The text crash.log records for <paramref name="ex"/>: what <c>ToString()</c> gives,
+    /// type, message, inner exceptions and stack traces as .NET writes them, with the message
+    /// of each exception in the chain that ends in a closing sentence
+    /// (<see cref="IClosingSentenceMessage"/>) written without it.
+    /// </summary>
+    internal static string TextOf(Exception ex)
+    {
+        var text = ex.ToString();
+        foreach (var each in Chain(ex))
+        {
+            if (each is IClosingSentenceMessage closing
+                && closing.MessageWithoutClosingSentence.Length < closing.Message.Length)
+                text = text.Replace(closing.Message, closing.MessageWithoutClosingSentence);
+        }
+        return text;
+    }
+
+    /// <summary>
+    /// <paramref name="ex"/> and every exception <c>ToString()</c> writes beneath it: the
+    /// inner exception, and each one an <see cref="AggregateException"/> holds.
+    /// </summary>
+    private static IEnumerable<Exception> Chain(Exception ex)
+    {
+        yield return ex;
+        var inner = ex is AggregateException aggregate
+            ? aggregate.InnerExceptions
+            : ex.InnerException is { } one ? [one] : (IEnumerable<Exception>)[];
+        foreach (var each in inner)
+            foreach (var below in Chain(each))
+                yield return below;
     }
 
     private static void RotateIfNeeded(string logFile, string archiveFile)
     {
         try
         {
-            if (!File.Exists(logFile)) return;
-            if (new FileInfo(logFile).Length < MaxBytes) return;
+            if (!FrameworkFile.Exists(logFile)) return;
+            if (FrameworkFile.GetLength(logFile) < MaxBytes) return;
             // File.Move with overwrite uses MOVEFILE_REPLACE_EXISTING,
             // which replaces a symlink rather than following it.
             File.Move(logFile, archiveFile, overwrite: true);
@@ -188,3 +227,13 @@ public static class CrashLog
         }
     }
 }
+
+/// <summary>
+/// What <see cref="CrashLog.TryWrite"/> answers: where crash.log is, empty where that could
+/// not be worked out, and whether the entry reached it.
+/// </summary>
+/// <remarks>
+/// A type of its own rather than a tuple: <see cref="CrashLog.TryWrite"/> is on the path a copy runs
+/// before its .NET Framework 4.8 check (<see cref="Services.NetFrameworkCheck"/>).
+/// </remarks>
+public readonly record struct CrashLogEntry(string Path, bool Written);

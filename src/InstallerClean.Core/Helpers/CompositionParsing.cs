@@ -25,7 +25,7 @@ public static class CompositionParsing
         if (string.IsNullOrEmpty(substring))
             return null;
 
-        int index = raw.IndexOf(substring, StringComparison.Ordinal);
+        int index = raw.IndexOfOrdinal(substring, StringComparison.Ordinal);
         if (index < 0)
             return null;
 

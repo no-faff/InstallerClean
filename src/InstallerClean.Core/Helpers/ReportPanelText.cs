@@ -26,6 +26,7 @@ internal static class ReportPanelText
         Strings.Completion_ReportPanel_Windows,
         Strings.Completion_ReportPanel_AppVersion,
         Strings.Completion_ReportPanel_Errors,
+        Strings.Completion_ReportPanel_ReportId,
     ];
 
     /// <summary>

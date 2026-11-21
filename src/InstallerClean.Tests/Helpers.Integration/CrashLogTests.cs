@@ -1,5 +1,6 @@
 using System.Globalization;
 using InstallerClean.Helpers;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Tests.Helpers.Integration;
@@ -38,6 +39,81 @@ public class CrashLogTests
     }
 
     [Fact]
+    public void An_entry_leaves_out_each_stops_closing_sentence_and_keeps_the_rest_as_dotnet_writes_it()
+    {
+        // The closing sentence says what the stop left as it was, which the scan after a
+        // Move or Delete cannot say. The screens keep it: the Message is whole.
+        var inner = Thrown(() => throw new LocalisedAccessException(
+            Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved));
+        var outer = Thrown(() => throw new LocalisedInvalidOperationException(
+            Strings.Error_ScanInstallerFolderListFailed, Strings.Error_NothingOfferedNothingRemoved, inner));
+        Assert.EndsWith(Strings.Error_NothingRemoved, inner.Message, StringComparison.Ordinal);
+        Assert.EndsWith(Strings.Error_NothingOfferedNothingRemoved, outer.Message, StringComparison.Ordinal);
+
+        var folder = Path.Combine(Path.GetTempPath(), "InstallerClean.Tests", Guid.NewGuid().ToString("N"));
+        var suite = CrashLog.FolderForTests;
+        CrashLog.FolderForTests = folder;
+        try
+        {
+            var (path, written) = CrashLog.TryWrite(outer);
+
+            Assert.True(written);
+            var log = File.ReadAllText(path);
+            var entry = log[(log.IndexOf(Environment.NewLine, log.IndexOf("---- ", StringComparison.Ordinal),
+                StringComparison.Ordinal) + Environment.NewLine.Length)..].TrimEnd();
+            var expected = outer.ToString()
+                .Replace(DisplayHelpers.SentenceSpace + Strings.Error_NothingOfferedNothingRemoved, "")
+                .Replace(DisplayHelpers.SentenceSpace + Strings.Error_NothingRemoved, "");
+            Assert.Equal(expected, entry);
+            Assert.Contains(typeof(LocalisedAccessException).FullName!, entry, StringComparison.Ordinal);
+            Assert.Contains(Strings.Error_MsiAccessDenied, entry, StringComparison.Ordinal);
+            Assert.DoesNotContain(Strings.Error_NothingRemoved, entry, StringComparison.Ordinal);
+            Assert.DoesNotContain(Strings.Error_NothingOfferedNothingRemoved, entry, StringComparison.Ordinal);
+        }
+        finally
+        {
+            CrashLog.FolderForTests = suite;
+            TestCrashLog.TryDelete(folder);
+        }
+
+        static Exception Thrown(Action raise)
+        {
+            try { raise(); }
+            catch (Exception ex) { return ex; }
+            throw new InvalidOperationException("Nothing was thrown.");
+        }
+    }
+
+    [Fact]
+    public void An_entry_is_stamped_in_one_shape_whatever_the_culture()
+    {
+        // A culture whose time separator is '.' and whose calendar is not the Gregorian one,
+        // as the user's culture can be: Danish under ICU, Thai with its Buddhist calendar.
+        var culture = (CultureInfo)CultureInfo.GetCultureInfo("th-TH").Clone();
+        culture.DateTimeFormat.Calendar = new ThaiBuddhistCalendar();
+        culture.DateTimeFormat.TimeSeparator = ".";
+        var folder = Path.Combine(Path.GetTempPath(), "InstallerClean.Tests", Guid.NewGuid().ToString("N"));
+        var suite = CrashLog.FolderForTests;
+        var before = CultureInfo.CurrentCulture;
+        CrashLog.FolderForTests = folder;
+        CultureInfo.CurrentCulture = culture;
+        try
+        {
+            var (path, written) = CrashLog.TryWrite(new InvalidOperationException("stamp"));
+
+            Assert.True(written);
+            var stamp = File.ReadAllLines(path).Single(line => line.StartsWith("---- ", StringComparison.Ordinal));
+            Assert.Matches(@"^---- 20\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d:\d\d ----$", stamp);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = before;
+            CrashLog.FolderForTests = suite;
+            TestCrashLog.TryDelete(folder);
+        }
+    }
+
+    [Fact]
     public void A_folder_whose_delete_is_refused_is_left_without_a_throw()
     {
         // A read-only file makes the delete throw UnauthorizedAccessException on Windows, as a
@@ -47,10 +123,12 @@ public class CrashLogTests
         Directory.CreateDirectory(folder);
         var file = Path.Combine(folder, "crash.log");
         File.WriteAllText(file, "held");
-        if (OperatingSystem.IsWindows())
-            File.SetAttributes(file, FileAttributes.ReadOnly);
-        else
+#if NET
+        if (!OperatingSystem.IsWindows())
             File.SetUnixFileMode(folder, UnixFileMode.UserRead | UnixFileMode.UserExecute);
+        else
+#endif
+            File.SetAttributes(file, FileAttributes.ReadOnly);
         try
         {
             Assert.Null(Record.Exception(() => TestCrashLog.TryDelete(folder)));
@@ -58,15 +136,16 @@ public class CrashLogTests
         }
         finally
         {
-            if (OperatingSystem.IsWindows())
+#if NET
+            if (!OperatingSystem.IsWindows())
             {
-                if (File.Exists(file)) File.SetAttributes(file, FileAttributes.Normal);
+                if (Directory.Exists(folder))
+                    File.SetUnixFileMode(folder,
+                        UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
             }
-            else if (Directory.Exists(folder))
-            {
-                File.SetUnixFileMode(folder,
-                    UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-            }
+            else
+#endif
+            if (File.Exists(file)) File.SetAttributes(file, FileAttributes.Normal);
             TestCrashLog.TryDelete(folder);
         }
     }

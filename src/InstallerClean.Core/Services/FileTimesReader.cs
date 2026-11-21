@@ -51,7 +51,7 @@ internal sealed class FileTimesReader : IFileTimesReader
             // turns out to name a directory opens and is reported below, rather than
             // failing as a refusal.
             using var handle = Kernel32.CreateFile(
-                path,
+                FullPaths.ForWindowsCall(path),
                 Kernel32.FILE_READ_ATTRIBUTES,
                 Kernel32.FILE_SHARE_ALL,
                 IntPtr.Zero,
@@ -207,7 +207,7 @@ internal sealed class FileTimesReader : IFileTimesReader
         if (!finalPath.StartsWith(VolumeGuidPrefix, StringComparison.OrdinalIgnoreCase))
             return null;
 
-        var close = finalPath.IndexOf("}\\", VolumeGuidPrefix.Length, StringComparison.Ordinal);
+        var close = finalPath.IndexOfOrdinal("}\\", VolumeGuidPrefix.Length, StringComparison.Ordinal);
         return close < 0 ? null : finalPath.Substring(0, close + 2);
     }
 

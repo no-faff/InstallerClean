@@ -13,10 +13,16 @@ namespace InstallerClean.Tests.Helpers;
 public class SourcesGivenUpReportTests
 {
     private const string Tail =
-        " and left alone any file still to be checked against it. Once it's responding normally, Re-scan.";
+        ", so it left alone the files it needed that drive to check. Re-scan once it's responding normally.";
+
+    private const string PathTail =
+        ", so it left alone the files it needed that location to check. Re-scan once it's responding normally.";
 
     private const string CommandLineTail =
-        " and left alone any file still to be checked against it. Once it's responding normally, run the command again.";
+        ", so it left alone the files it needed that drive to check. Once it's responding normally, run the command again.";
+
+    private const string CommandLinePathTail =
+        ", so it left alone the files it needed that location to check. Once it's responding normally, run the command again.";
 
     private static SourceRootGivenUp Root(string root) => new(root, SourceRootGiveUpRoute.NoAnswer, 1);
 
@@ -31,10 +37,10 @@ public class SourcesGivenUpReportTests
     }
 
     [Theory]
-    [InlineData("D:", "InstallerClean carried on without drive D:" + Tail)]
-    [InlineData("d:", "InstallerClean carried on without drive D:" + Tail)]
-    [InlineData(@"\\nas\installers", @"InstallerClean carried on without \\nas\installers" + Tail)]
-    [InlineData(@"GLOBALROOT\Device\Mup\nas\installers", @"InstallerClean carried on without GLOBALROOT\Device\Mup\nas\installers" + Tail)]
+    [InlineData("D:", "InstallerClean stopped waiting for drive D:" + Tail)]
+    [InlineData("d:", "InstallerClean stopped waiting for drive D:" + Tail)]
+    [InlineData(@"\\nas\installers", @"InstallerClean stopped waiting for \\nas\installers" + PathTail)]
+    [InlineData(@"GLOBALROOT\Device\Mup\nas\installers", @"InstallerClean stopped waiting for GLOBALROOT\Device\Mup\nas\installers" + PathTail)]
     public void One_drive_or_share_is_named_inside_the_sentence(string root, string line)
     {
         using var scope = new LocalisationScope(British);
@@ -61,9 +67,9 @@ public class SourcesGivenUpReportTests
         using var scope = new LocalisationScope(British);
 
         Assert.Equal(
-            @"InstallerClean carried on without more than one drive or share (drive D:, \\nas\installers, drive E:) "
-            + "and left alone any file still to be checked against one of them. "
-            + "Once they're responding normally, Re-scan.",
+            @"InstallerClean stopped waiting for more than one drive or share (drive D:, \\nas\installers, drive E:), "
+            + "so it left alone the files it needed them to check. "
+            + "Re-scan once they're responding normally.",
             SourcesGivenUpReport.WindowLine([Root("d:"), Root(@"\\nas\installers"), Root("E:")]));
     }
 
@@ -101,8 +107,8 @@ public class SourcesGivenUpReportTests
     [Theory]
     [InlineData("D:", "InstallerClean stopped waiting for drive D:" + CommandLineTail)]
     [InlineData("d:", "InstallerClean stopped waiting for drive D:" + CommandLineTail)]
-    [InlineData(@"\\nas\installers", @"InstallerClean stopped waiting for \\nas\installers" + CommandLineTail)]
-    [InlineData(@"GLOBALROOT\Device\Mup\nas\installers", @"InstallerClean stopped waiting for GLOBALROOT\Device\Mup\nas\installers" + CommandLineTail)]
+    [InlineData(@"\\nas\installers", @"InstallerClean stopped waiting for \\nas\installers" + CommandLinePathTail)]
+    [InlineData(@"GLOBALROOT\Device\Mup\nas\installers", @"InstallerClean stopped waiting for GLOBALROOT\Device\Mup\nas\installers" + CommandLinePathTail)]
     public void The_command_line_names_one_drive_or_share_inside_its_own_sentence(string root, string line)
     {
         using var scope = new LocalisationScope(British);
@@ -129,8 +135,8 @@ public class SourcesGivenUpReportTests
         using var scope = new LocalisationScope(British);
 
         Assert.Equal(
-            @"InstallerClean stopped waiting for more than one drive or share (drive D:, \\nas\installers, drive E:) "
-            + "and left alone any file still to be checked against one of them. "
+            @"InstallerClean stopped waiting for more than one drive or share (drive D:, \\nas\installers, drive E:), "
+            + "so it left alone the files it needed them to check. "
             + "Once they're responding normally, run the command again.",
             SourcesGivenUpReport.CommandLine([Root("d:"), Root(@"\\nas\installers"), Root("E:")]));
     }

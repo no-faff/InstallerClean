@@ -1,3 +1,5 @@
+using InstallerClean.Helpers;
+
 namespace InstallerClean.Services;
 
 /// <summary>
@@ -28,7 +30,7 @@ internal sealed class InstallerInProgressMarker : IInstallerInProgressMarker
     /// <summary>Test constructor: the marker in <paramref name="folder"/>.</summary>
     internal InstallerInProgressMarker(string folder)
     {
-        _path = Path.Combine(folder, FileName);
+        _path = PathText.Combine(folder, FileName);
     }
 
     /// <inheritdoc />
@@ -40,7 +42,7 @@ internal sealed class InstallerInProgressMarker : IInstallerInProgressMarker
         // is left to propagate.
         try
         {
-            File.GetAttributes(_path);
+            FrameworkFile.GetAttributes(_path);
             return InstallerInProgressMarkerReading.Present;
         }
         catch (FileNotFoundException)

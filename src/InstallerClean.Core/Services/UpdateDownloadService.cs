@@ -24,7 +24,7 @@ public sealed class UpdateDownloadService
     /// <summary>Several times the size of any download the project publishes.</summary>
     internal const long MaxBytes = 512L * 1024 * 1024;
 
-    private static readonly TimeSpan DefaultStallTimeout = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan DefaultStallTimeout = Durations.FromSeconds(30);
 
     private const int MaxRedirects = 10;
 
@@ -32,7 +32,7 @@ public sealed class UpdateDownloadService
     private readonly TimeSpan _stallTimeout;
 
     public UpdateDownloadService()
-        : this(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false }, null) { }
+        : this(UpdateCheckService.CreateShippingHandler(), null) { }
 
     /// <summary>
     /// Test seam: a handler stands in for the network, and a shorter stall timeout
@@ -86,7 +86,7 @@ public sealed class UpdateDownloadService
                     destinationPath, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways)
                 ?? throw new UpdateFailedException(UpdateFailureStage.Install,
                     "The file the download is saved to could not be created.");
-            using var file = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+            using var file = StorageHelpers.UnbufferedWriter(handle);
 
             stall.CancelAfter(_stallTimeout);
             using var body = await response.Content.ReadAsStreamAsync(stall.Token).ConfigureAwait(false);
@@ -284,7 +284,13 @@ public sealed class UpdateDownloadService
 
     private static bool IsRedirect(HttpStatusCode status) => status is
         HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.SeeOther
-        or HttpStatusCode.TemporaryRedirect or HttpStatusCode.PermanentRedirect;
+        or HttpStatusCode.TemporaryRedirect or PermanentRedirect;
+
+    /// <summary>
+    /// 308 Permanent Redirect, which .NET Framework's <see cref="HttpStatusCode"/> has no name
+    /// for.
+    /// </summary>
+    private const HttpStatusCode PermanentRedirect = (HttpStatusCode)308;
 
     private static UpdateFailedException Download(string message) =>
         new(UpdateFailureStage.Download, message);

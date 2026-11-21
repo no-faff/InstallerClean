@@ -65,11 +65,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), null, overrideFiles, null, null, null) { }
+        : this(queryService, new AppFileSystem(), null, overrideFiles, null, null, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), null, overrideFiles, installerFolderOverride, null, null) { }
+        : this(queryService, new AppFileSystem(), null, overrideFiles, installerFolderOverride, null, null) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -243,7 +243,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // reports the folder.
         if (cacheRoot.Proven && !SpellsTheSameFolder(walkedFolder, cacheRoot.Resolved))
             throw new LocalisedInvalidOperationException(string.Format(
-                Strings.Error_ScanInstallerFolderElsewhere, ShownAsAFolder(cacheRoot.Resolved)));
+                Strings.Error_ScanInstallerFolderElsewhere, ShownAsAFolder(cacheRoot.Resolved)), Strings.Error_NothingOfferedNothingRemoved);
 
         // Walk the disk BEFORE querying the API, and materialise the walk here
         // rather than leaving it lazy. A package cached after the walk finishes
@@ -327,7 +327,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // type and HRESULT, so without them the budget's novel-cause escape
         // hatch would fire once and swallow the other three.
         var refusalLog = new PerItemFailureLog("Scan",
-            "The file behind each of them was kept rather than offered.");
+            "The file behind each of them was left alone.");
 
         long stillUsedBytes = 0;
         // Registrations Windows reports superseded (2) and obsoleted (4), counted off
@@ -425,7 +425,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             // Re-checked rather than trusted from the walk: the walk filters on
             // the same test, but an override file list does not go through it.
-            var ext = _fs.Path.GetExtension(filePath);
+            var ext = PathText.GetExtension(filePath);
             if (!IsCacheExtension(ext))
                 continue;
 
@@ -469,7 +469,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 refusalLog.Record(new InvalidOperationException(
                     walkSafety == CandidateGuard.RemovalSafety.Refused
                         ? $"Removal candidate refused (not directly in the Installer cache, or a reparse point): {filePath}"
-                        : $"Removal candidate not offered (its symlink status or location could not be read): {filePath}"),
+                        : $"Removal candidate left alone (its symlink status or location could not be read): {filePath}"),
                     cause: $"walk/{walkSafety}");
                 withheld.Add(file);
                 withheldBy.Contained(walkSafety);
@@ -544,7 +544,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // keys and contributes the same paths. When the fallback is ALSO failing
         // reads, the scan does not offer the file: it refuses outright, at
         // InstallerQueryService's records-unreadable gate, on one unreadable
-        // product and any fallback failure. And a recorded path holding an
+        // product and any fallback failure but a program's own patch list, which
+        // records no cached file. And a recorded path holding an
         // environment variable is expanded before it is resolved, so it is compared
         // as the path it names.
         //
@@ -647,10 +648,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // question is asked of the census, where its members live, on the same rule as
         // the two above.
         //
-        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED. The key that
-        // would not read may be the only claim on a cached file, and it may be a program no
-        // walk lists, so the keys handed to the screen below can be short by it. It is
-        // asked of the census too.
+        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED, on any key but a program's
+        // own Patches key, which records no cached file. The key that would not read may be
+        // the only claim on a cached file, and it may be a program no walk lists, so the
+        // keys handed to the screen below can be short by it. It is asked of the census too.
         //
         // A SECOND COPY THE SCAN LISTED IS NOT A CONDITION HERE. Each listed
         // installation carries whether its own InstanceType reading ruled it out as one,
@@ -803,7 +804,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 refusalLog.Record(new InvalidOperationException(
                     safety == CandidateGuard.RemovalSafety.Refused
                         ? $"Registered removal candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
-                        : $"Registered removal candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
+                        : $"Registered removal candidate left alone (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
                     cause: $"registered/{safety}");
                 supersededContained.Record(safety);
             }
@@ -921,7 +922,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var candidatesFromComparison = candidatesFromWalk;
 
         if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesFromComparison == 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved, Strings.Error_NothingRemoved);
 
         // The registered rows this scan is keeping. A superseded patch that reached
         // the offer is not among them, having been left out at the loop above rather
@@ -1006,7 +1007,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (registered.Count > 0
             && registeredNamingFolder == 0
             && candidatesFromComparison > 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanNoRegisteredFileInFolder);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanNoRegisteredFileInFolder, Strings.Error_NothingOfferedNothingRemoved);
 
         // Correlation sanity gate. On any real machine some registered path
         // resolves to a file that is actually there. If next to none do, yet the
@@ -1089,7 +1090,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (presentRegistered <= 2
             && survivorsForBound * 20 < survivorsForBound + missingInFolder
             && candidatesFromComparison > 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed, Strings.Error_NothingOfferedNothingRemoved);
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             DisplayHelpers.FormatCount(removable.Count),
@@ -1356,7 +1357,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             SourcePackageNotRuledOut: By(DeclaredProductInstalledCause.SourcePackageNotRuledOut),
             MissingSparePackageCodeUnread: By(DeclaredProductInstalledCause.MissingSparePackageCodeUnread),
             MissingSpareIsIt: By(DeclaredProductInstalledCause.MissingSpareIsIt),
-            ByName: By(DeclaredProductInstalledCause.ByName));
+            ByName: By(DeclaredProductInstalledCause.ByName),
+            UndeclaredPackageCodeIsIt: By(DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt),
+            UndeclaredPackageCodeUnread: By(DeclaredProductInstalledCause.UndeclaredPackageCodeUnread));
 
         private int By(DeclaredProductInstalledCause cause) => _declaredProductInstalledBy[(int)cause];
 
@@ -1697,7 +1700,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
-        var parent = Path.GetDirectoryName(
+        var parent = PathText.GetDirectoryName(
             path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
         return parent is not null && SpellsTheSameFolder(parent, folder);
     }
@@ -1877,6 +1880,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         new(cause is DirectoryNotFoundException
                 ? Strings.Error_ScanInstallerFolderNotFound
                 : Strings.Error_ScanInstallerFolderListFailed,
+            Strings.Error_NothingOfferedNothingRemoved,
             cause);
 
     private static bool IsCacheExtension(string extension) =>

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -18,12 +19,12 @@ public sealed class DestinationGuardTests : IDisposable
 {
     private const int ErrorAccessDenied = 5;
 
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-dest-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-dest-");
     private readonly IDestinationGuard _guard = new HandleDestinationGuard();
 
     public void Dispose()
     {
-        try { Directory.Delete(_root, recursive: true); } catch { }
+        TestTemp.Delete(_root);
     }
 
     [Fact]
@@ -147,6 +148,36 @@ public sealed class DestinationGuardTests : IDisposable
         Assert.Equal(FolderCreation.Failed, _guard.TryCreateFolder(Path.Combine(parent, "child")));
 
         Assert.False(Directory.Exists(parent));
+    }
+
+    [Theory]
+    [InlineData(248)]
+    [InlineData(259)]
+    public void A_folder_of_248_characters_or_more_is_made(int length)
+    {
+        // Each is one folder below the root, so its parent is there.
+        var folder = _root + @"\" + new string('g', length - _root.Length - 1);
+        try
+        {
+            Assert.Equal(FolderCreation.Made, _guard.TryCreateFolder(folder));
+
+            Assert.True(Directory.Exists(@"\\?\" + folder));
+        }
+        finally
+        {
+            try { Directory.Delete(@"\\?\" + folder); } catch { }
+        }
+    }
+
+    [Fact]
+    public void A_folder_is_made_under_its_name_with_a_no_break_space_after_it()
+    {
+        var plain = Path.Combine(_root, "n");
+
+        Assert.Equal(FolderCreation.Made, _guard.TryCreateFolder(plain + "\u00A0"));
+
+        Assert.True(Directory.Exists(@"\\?\" + plain + "\u00A0"));
+        Assert.False(Directory.Exists(@"\\?\" + plain));
     }
 
     [Fact]
@@ -339,7 +370,7 @@ public sealed class DestinationGuardTests : IDisposable
         using (var child = OpenTheCopyAsTheDiscardDoes(folder!, "payload.dll", out var attributes))
         {
             deleted = DirectoryGuard.DeleteClearingReadOnly(child, attributes);
-            cause = Marshal.GetLastPInvokeError();
+            cause = Marshal.GetLastWin32Error();
         }
 
         Assert.False(deleted);

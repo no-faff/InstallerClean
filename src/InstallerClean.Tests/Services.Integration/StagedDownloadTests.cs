@@ -20,7 +20,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class StagedDownloadTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-staged-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-staged-");
     private readonly string _stagingRoot;
     private readonly string _exe;
     private readonly List<PreparedUpdate> _prepared = [];
@@ -48,7 +48,7 @@ public sealed class StagedDownloadTests : IDisposable
                 }
                 catch { }
             }
-            try { Directory.Delete(_root, recursive: true); } catch { }
+            TestTemp.Delete(_root);
         }
         finally
         {
@@ -121,14 +121,13 @@ public sealed class StagedDownloadTests : IDisposable
 
         Assert.True(seen.Count >= 2);
         Assert.Equal(new UpdateProgress(null, Checking: true), seen[^1]);
-        Assert.All(seen[..^1], step => Assert.False(step.Checking));
+        Assert.All(seen.GetRange(0, seen.Count - 1), step => Assert.False(step.Checking));
         Assert.Equal(1d, seen[^2].Fraction);
     }
 
     [Theory]
     [InlineData(AppCopyKind.Setup)]
     [InlineData(AppCopyKind.Portable)]
-    [InlineData(AppCopyKind.Slim)]
     [InlineData(AppCopyKind.CommandLineDownload)]
     public async Task A_prepared_download_is_held_from_its_check_until_its_undo(AppCopyKind kind)
     {
@@ -236,8 +235,10 @@ public sealed class StagedDownloadTests : IDisposable
     public async Task The_holds_last_once_nothing_references_the_prepared_update(bool stagedRun)
     {
         var network = new ByName(new() { [AppCopy.CommandLineFileName] = Release(2) });
-        // Undo is never called, so the file stays held for the rest of the test run.
+        // Undo is never called, so the file stays held for the rest of the test run, and the
+        // folder it is in is left for the next run to delete.
         var path = await PrepareAndDrop(Updater(AppCopyKind.CommandLineDownload, network), stagedRun);
+        TestTemp.LeaveForRunEnd(Path.GetDirectoryName(path)!);
 
         GC.Collect();
         GC.WaitForPendingFinalizers();
@@ -323,7 +324,6 @@ public sealed class StagedDownloadTests : IDisposable
 
     [Theory]
     [InlineData(AppCopyKind.Portable)]
-    [InlineData(AppCopyKind.Slim)]
     [InlineData(AppCopyKind.Scoop)]
     [InlineData(AppCopyKind.FromSource)]
     [InlineData(AppCopyKind.Undetermined)]
@@ -369,8 +369,7 @@ public sealed class StagedDownloadTests : IDisposable
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        foreach (var arg in new[] { "/d", "/c", "mklink", "/J", linkedRoot, _stagingRoot })
-            start.ArgumentList.Add(arg);
+        start.Arguments = CommandLineArguments.Join(new[] { "/d", "/c", "mklink", "/J", linkedRoot, _stagingRoot });
         using (var mklink = Process.Start(start)!)
         {
             var output = mklink.StandardOutput.ReadToEnd() + mklink.StandardError.ReadToEnd();
@@ -421,7 +420,7 @@ public sealed class StagedDownloadTests : IDisposable
         // The stand-in's "exit" ends with 1 once it has written its files.
         var attached = Directory.CreateDirectory(Path.Combine(folder, "attached")).FullName;
         var info = new ProcessStartInfo(exe) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in DetachedStandIn.Before(attached, "exit")) info.ArgumentList.Add(argument);
+        info.Arguments = CommandLineArguments.Join(DetachedStandIn.Before(attached, "exit"));
         using (var process = Process.Start(info)!)
         {
             try

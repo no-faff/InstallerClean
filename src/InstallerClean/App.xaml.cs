@@ -27,6 +27,82 @@ namespace InstallerClean;
 /// </summary>
 public partial class App : Application
 {
+    /// <summary>
+    /// Runs as Main does, before Application's constructor: checks for Windows 10 version
+    /// 1607 and .NET Framework 4.8, writes what the module initializer kept for the crash
+    /// log, then pins the AppContext switches. Application's constructor creates the
+    /// Dispatcher, which is WPF's first read of the accessibility switches, and by this point
+    /// the domain knows it targets .NET Framework 4.8, so the runtime's own defaults are those
+    /// of 4.8.
+    /// </summary>
+    /// <remarks>
+    /// On a PC older than Windows 10 version 1607 the window says which Windows it needs,
+    /// and on a PC without .NET Framework 4.8 it says what to install, in a plain message
+    /// box, and ends, before Application's constructor and before anything scans.
+    /// The portable carries no config naming the runtime, so .NET Framework starts it on any
+    /// 4.x. The runtime compiles a method whole the first time it runs, and a member the PC's
+    /// .NET Framework lacks fails that compile, so the checks run first, in a method of their
+    /// own, ahead of Application's constructor and every method the window's start compiles.
+    /// The two calls after it are never compiled into this method, so nothing they name is
+    /// compiled before the checks have answered. The message is in the language picked in the
+    /// app, where one is, and otherwise in the language Windows displays.
+    /// </remarks>
+    static App()
+    {
+        EndOnAPcThatCannotRunIt();
+        SystemLibraries.WriteWhatTheInitializerKept();
+        FrameworkSwitches.Pin();
+    }
+
+    /// <summary>
+    /// Where the PC runs Windows older than Windows 10 version 1607, or does not have .NET
+    /// Framework 4.8, shows the message saying so and ends the process with exit code 1.
+    /// Windows is checked first, as 1507 and 1511 cannot take .NET Framework 4.8.
+    /// </summary>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void EndOnAPcThatCannotRunIt()
+    {
+        // A throw out of a type initializer reaches no handler the app has set, so a check or
+        // a box that fails lets the start go on, where the app's own handlers catch what
+        // follows, unless it failed to load what it needs (StartChecks.IsLoadFailure).
+        try
+        {
+            var refusal = StartChecks.OfThisPc();
+            if (refusal == StartRefusal.None) return;
+            // In the language picked in the app where one is, as the window would have been. A
+            // pick that cannot be read or set leaves the message in the language Windows displays.
+            try
+            {
+                if (PickedLanguageAtStart.Read() is { } picked)
+                    Localisation.SetPickedLanguage(picked);
+            }
+            catch (Exception)
+            {
+            }
+            MessageBox.Show(StartChecks.Message(refusal, commandLine: false), Strings.FrameworkCheck.Window_Main_Title,
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Exception ex) when (StartChecks.IsLoadFailure(ex))
+        {
+            // The PC's .NET Framework is older than 4.8, where the strings cannot be trusted
+            // to read, so the message is in English. The start ends whether or not the box
+            // shows.
+            try
+            {
+                MessageBox.Show(NetFrameworkCheck.EnglishMessage(commandLine: false),
+                    NetFrameworkCheck.NeutralText.WindowMainTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception)
+            {
+            }
+        }
+        catch (Exception)
+        {
+            return;
+        }
+        Environment.Exit(1);
+    }
+
     private static InstanceLock? _instanceLock;
     // Set where an update that did not hand over could not take the mutex back.
     private static bool _instanceLockLost;
@@ -170,7 +246,7 @@ public partial class App : Application
         // Windows set to a language the app does not ship, Automatic displays the
         // neutral en-GB text, and tagging that English prose Swedish would be a
         // fresh instance of the same fault. Active() walks the parent chain the
-        // satellite resolution walks and answers en-GB when nothing matches, so
+        // string lookup walks and answers en-GB when nothing matches, so
         // the value is always one of the languages the app ships: all ASCII, all
         // inside RFC 3066, so none of them can reach
         // XmlLanguage.GetLanguage's throw.
@@ -196,6 +272,22 @@ public partial class App : Application
         // this entry.
         LanguageFonts.Initialise((System.Windows.Media.FontFamily)Resources["Type.FontFamily"]);
         Resources["Type.FontFamily"] = LanguageFonts.For(SupportedLanguages.Active(Localisation.UiCulture));
+
+        // A .exe.config beside the copy that says more than the build's own is a file
+        // somebody else wrote, which on .NET Framework the runtime reads. A config beside
+        // the setup's copy is not refused. Refused here, in the language the user chose and
+        // before anything scans, and read here rather than in a module initializer, which
+        // reaches System.IO and the registry. The replace request above runs first and
+        // reads no section of the config: it moves files, starts a process and writes to
+        // the Application log, and .NET Framework reads none of those from the config. A
+        // network request, a trace or a section of the app's own would, so none of them
+        // may join the replace without this check moving above it.
+        if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
+        {
+            MessageDialog.Show(plantedConfig, Strings.Startup_ErrorTitle, MessageKind.Error);
+            EndFailedStart(splash: null);
+            return;
+        }
 
         // A process without administrator rights is told so and closes, before
         // anything scans. The manifest asks Windows for the rights, and Windows can
@@ -337,27 +429,8 @@ public partial class App : Application
             // paint, and tracks the slider if it moves at runtime.
             ApplyTextScaling();
 
-            // WPF hides a tooltip five seconds after it opens, whether or not
-            // the pointer is still on the control and whatever the tooltip
-            // says. The app's longest is the sentence explaining why Cancel
-            // has gone dead mid-operation: 160 characters in English, longer
-            // in German, and the one tooltip with no HelpText twin to reach
-            // by another route. Sixty seconds is a timeout rather than a
-            // reading pace, so what a user meets instead is a tooltip that
-            // lasts as long as they keep the pointer on it, which is one of
-            // WCAG 1.4.13's three requirements of hover content. The other
-            // two, hoverable and dismissable, would need a custom popup and
-            // are knowingly not met.
-            //
-            // A default rather than a Setter on the two ToolTip styles: this
-            // is an attached property, read from the element the tooltip
-            // hangs off, and those are Buttons, TextBlocks and Borders in
-            // every window of the app. Changing the default covers each of
-            // them without an opinion about which end the framework reads.
-            // Before any window exists, because OverrideMetadata is refused
-            // once the property has been used on the type.
-            ToolTipService.ShowDurationProperty.OverrideMetadata(
-                typeof(FrameworkElement), new FrameworkPropertyMetadata(60000));
+            // Before any window exists: what it sets and why is on ToolTipDuration.
+            ToolTipDuration.KeepOpenWhileThePointerRests();
 
             // Before any window is shown, so no element can take focus without
             // being tracked. What it is for is on FocusRing itself.
@@ -475,8 +548,8 @@ public partial class App : Application
             // over the time the window has left, what remains of the minimum plus
             // the close, rather than over the bar's own step, so the last of the
             // fill arrives as the window goes instead of being cut off by it.
-            var splashFloor = TimeSpan.FromMilliseconds(800);
-            var splashClose = TimeSpan.FromMilliseconds(200);
+            var splashFloor = Durations.FromMilliseconds(800);
+            var splashClose = Durations.FromMilliseconds(200);
 
             // Throttled, because the scan's ticker fires once per installed
             // program and many times while the files are counted, so its rate
@@ -624,7 +697,7 @@ public partial class App : Application
     /// closing and holding it, and Windows hands the mutex to the waiting thread as that copy
     /// lets go of it.
     /// </summary>
-    private static readonly TimeSpan InstanceLockWait = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan InstanceLockWait = Durations.FromSeconds(15);
 
     /// <summary>
     /// Ends a start that failed, with exit code 1, and closes <paramref name="splash"/>
@@ -905,7 +978,7 @@ public partial class App : Application
     /// release needs inside the check's own timeout (ChromeViewModel's
     /// AutomaticCheckWindow), so a find is shown within this wait.
     /// </summary>
-    private static readonly TimeSpan UpdateCheckGrace = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan UpdateCheckGrace = Durations.FromSeconds(1);
 
     /// <summary>
     /// Hands over to the newer version <paramref name="prepared"/> holds and closes the
@@ -941,7 +1014,7 @@ public partial class App : Application
         var info = new ProcessStartInfo(fileToStart, arguments)
         {
             UseShellExecute = false,
-            WorkingDirectory = Path.GetDirectoryName(fileToStart) ?? string.Empty,
+            WorkingDirectory = PathText.GetDirectoryName(fileToStart) ?? string.Empty,
         };
 
         try

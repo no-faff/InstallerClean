@@ -170,6 +170,9 @@ public partial class AboutWindow : Window
             UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
     }
 
+    private void NoticesClick(object sender, RoutedEventArgs e) =>
+        new NoticesWindow { Owner = this }.ShowDialog();
+
     private void StarClick(object sender, RoutedEventArgs e) =>
         UrlLauncher.OpenUrl("https://github.com/no-faff/InstallerClean");
 

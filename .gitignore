@@ -217,7 +217,6 @@ publish-repro/
 # Note: Comment the next line if you want to checkin your web deploy settings,
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
-!src/InstallerClean/Properties/PublishProfiles/FrameworkDependent.pubxml
 *.publishproj
 
 # Microsoft Azure Web App publish settings. Comment the next line if you want to

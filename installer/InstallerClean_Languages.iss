@@ -162,6 +162,26 @@ korean.SetupAppRunningError=InstallerClean이 아직 실행 중이므로 설치�
 korean.UninstallAppRunningError=InstallerClean이 아직 실행 중이므로 제거할 수 없습니다.%n%n앱 창일 수도 있고, 백그라운드에서 실행 중인 명령줄 또는 예약 작업 프로세스일 수도 있습니다. 창을 닫거나 작업 관리자에서 InstallerClean.exe 및 installerclean-cli.exe를 종료한 다음 [확인]을 클릭하여 계속하거나 [취소]를 클릭하여 종료하세요.
 
 [CustomMessages]
+; Shown where the PC does not have .NET Framework 4.8, and Setup stops: the sentence,
+; then the link to Microsoft's installer on a line of its own.
+english.NeedsNetFramework48=InstallerClean needs .NET Framework 4.8, and this PC doesn't have it. Install it from Microsoft, restart the PC, then run this setup again.%n%nDownload .NET Framework 4.8 from Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+indonesian.NeedsNetFramework48=InstallerClean memerlukan .NET Framework 4.8, dan PC ini belum memilikinya. Pasang dari Microsoft, mulai ulang PC, lalu jalankan program pemasangan ini lagi.%n%nUnduh .NET Framework 4.8 dari Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+german.NeedsNetFramework48=InstallerClean benötigt .NET Framework 4.8, das auf diesem PC nicht installiert ist. Installieren Sie es von Microsoft, starten Sie den PC neu und führen Sie dieses Setup dann erneut aus.%n%n.NET Framework 4.8 von Microsoft herunterladen:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+spanish.NeedsNetFramework48=InstallerClean necesita .NET Framework 4.8, y este PC no lo tiene. Instálalo desde Microsoft, reinicia el PC y luego vuelve a ejecutar este programa de instalación.%n%nDescarga .NET Framework 4.8 de Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+french.NeedsNetFramework48=InstallerClean nécessite .NET Framework 4.8, qui n'est pas installé sur ce PC. Installez-le depuis le site de Microsoft, redémarrez le PC, puis relancez ce programme d'installation.%n%nTélécharger .NET Framework 4.8 sur le site de Microsoft :%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+italian.NeedsNetFramework48=InstallerClean richiede .NET Framework 4.8, che non è presente in questo PC. Installalo dal sito di Microsoft, riavvia il PC, poi esegui di nuovo questo programma di installazione.%n%nScarica .NET Framework 4.8 da Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+dutch.NeedsNetFramework48=InstallerClean heeft .NET Framework 4.8 nodig, maar dat staat niet op deze pc. Installeer het van Microsoft, herstart de pc en voer deze installatie daarna opnieuw uit.%n%nDownload .NET Framework 4.8 van Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+polish.NeedsNetFramework48=InstallerClean wymaga .NET Framework 4.8, którego nie ma na tym komputerze. Zainstaluj go ze strony Microsoftu, uruchom ponownie komputer, a potem znów uruchom ten instalator.%n%nPobierz .NET Framework 4.8 ze strony Microsoftu:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+brazilianportuguese.NeedsNetFramework48=O InstallerClean precisa do .NET Framework 4.8, que não está instalado neste PC. Instale-o pelo site da Microsoft, reinicie o PC e depois execute este instalador de novo.%n%nBaixe o .NET Framework 4.8 no site da Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+vietnamese.NeedsNetFramework48=InstallerClean cần .NET Framework 4.8, nhưng PC này chưa có. Hãy cài đặt nó từ Microsoft, khởi động lại PC, rồi chạy lại trình cài đặt này.%n%nTải .NET Framework 4.8 về từ Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+turkish.NeedsNetFramework48=InstallerClean için .NET Framework 4.8 gerekiyor ve bu bilgisayarda yüklü değil. Microsoft'tan yükleyin, bilgisayarı yeniden başlatın, ardından bu kurulumu yeniden çalıştırın.%n%n.NET Framework 4.8'i Microsoft'tan indirin:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+russian.NeedsNetFramework48=Для InstallerClean нужен .NET Framework 4.8, а на этом компьютере его нет. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите эту программу установки.%n%nСкачать .NET Framework 4.8 с сайта Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+ukrainian.NeedsNetFramework48=Для InstallerClean потрібен .NET Framework 4.8, а на цьому комп'ютері його немає. Встановіть його з сайту Microsoft, перезавантажте комп'ютер, а потім знову запустіть цю програму встановлення.%n%nЗавантажити .NET Framework 4.8 з сайту Microsoft:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+japanese.NeedsNetFramework48=InstallerClean には .NET Framework 4.8 が必要ですが、この PC にはインストールされていません。Microsoft からインストールして PC を再起動し、このセットアップをもう一度実行してください。%n%nMicrosoft から .NET Framework 4.8 をダウンロード：%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+chinesetraditional.NeedsNetFramework48=InstallerClean 需要 .NET Framework 4.8，但這台電腦尚未安裝。請從 Microsoft 安裝，重新啟動電腦，然後再次執行此安裝程式。%n%n從 Microsoft 下載 .NET Framework 4.8：%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+chinesesimplified.NeedsNetFramework48=InstallerClean 需要 .NET Framework 4.8，但这台电脑尚未安装。请从 Microsoft 安装它，重启电脑，然后再次运行此安装程序。%n%n从 Microsoft 下载 .NET Framework 4.8：%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+korean.NeedsNetFramework48=InstallerClean에는 .NET Framework 4.8이 필요하지만 이 PC에는 설치되어 있지 않습니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 이 설치 프로그램을 다시 실행하세요.%n%nMicrosoft에서 .NET Framework 4.8 내려받기:%nhttps://go.microsoft.com/fwlink/?linkid=2088631
+
 english.UninstallApp=Uninstall InstallerClean
 english.LaunchApp=Launch InstallerClean
 

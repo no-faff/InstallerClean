@@ -10,25 +10,29 @@ public class AppCopyLabelTests
     private static readonly string[] ReceiverValues =
         ["setup", "portable", "slim", "commandLine", "scoop", "fromSource", "undetermined"];
 
+    // The receiver's value that only copies of earlier versions send: the slim download is
+    // the portable's file, which reports as the portable.
+    private const string EarlierVersionsOnly = "slim";
+
     [Fact]
     public void Every_kind_of_copy_has_a_label_the_receiver_accepts()
     {
         var kinds = Enum.GetValues<AppCopyKind>();
 
         // Both directions: a kind added to the enum has to be named by the receiver, and a
-        // value the receiver accepts has to be one the client can send.
-        Assert.Equal(ReceiverValues.Length, kinds.Length);
+        // value the receiver accepts has to be one the client can send, or the one only
+        // earlier versions send.
         foreach (var kind in kinds)
             Assert.Contains(AppCopyLabel.For(kind), ReceiverValues);
         Assert.Equal(
-            ReceiverValues.Order(),
+            ReceiverValues.Where(v => v != EarlierVersionsOnly).Order(),
             kinds.Select(AppCopyLabel.For).Order());
+        Assert.DoesNotContain(EarlierVersionsOnly, kinds.Select(AppCopyLabel.For));
     }
 
     [Theory]
     [InlineData(AppCopyKind.Setup, "setup")]
     [InlineData(AppCopyKind.Portable, "portable")]
-    [InlineData(AppCopyKind.Slim, "slim")]
     [InlineData(AppCopyKind.CommandLineDownload, "commandLine")]
     [InlineData(AppCopyKind.Scoop, "scoop")]
     [InlineData(AppCopyKind.FromSource, "fromSource")]

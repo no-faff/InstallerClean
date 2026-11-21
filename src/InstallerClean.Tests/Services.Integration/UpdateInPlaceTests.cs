@@ -19,7 +19,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class UpdateInPlaceTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-update-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-update-");
 
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
 
@@ -62,7 +62,7 @@ public sealed class UpdateInPlaceTests : IDisposable
                 }
                 catch { }
             }
-            try { Directory.Delete(_root, recursive: true); } catch { }
+            TestTemp.Delete(_root);
         }
         finally
         {

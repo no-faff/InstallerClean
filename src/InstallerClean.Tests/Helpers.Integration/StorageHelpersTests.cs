@@ -23,7 +23,7 @@ public class StorageHelpersTests
     {
         const int writers = 8;
         const int linesEach = 25;
-        var file = Path.Combine(Path.GetTempPath(), $"ic-append-{Guid.NewGuid():N}.log");
+        var file = TestTemp.NewFilePath("ic-append-", ".log");
         // Long enough that a lost write is a lost line rather than a few
         // scrambled characters, and that the writers genuinely overlap.
         var filler = new string('x', 300);
@@ -36,7 +36,7 @@ public class StorageHelpersTests
                 {
                     using var handle = StorageHelpers.OpenAtomicAppend(file);
                     Assert.NotNull(handle);
-                    using var fs = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+                    using var fs = StorageHelpers.UnbufferedWriter(handle);
                     fs.Seek(0, SeekOrigin.End);
                     var bytes = Encoding.UTF8.GetBytes($"{w}:{i}:{filler}\n");
                     fs.Write(bytes, 0, bytes.Length);
@@ -56,14 +56,14 @@ public class StorageHelpersTests
     [Fact]
     public void OpenAtomicAppend_creates_the_file_and_keeps_what_is_already_there()
     {
-        var file = Path.Combine(Path.GetTempPath(), $"ic-append-{Guid.NewGuid():N}.log");
+        var file = TestTemp.NewFilePath("ic-append-", ".log");
 
         try
         {
             using (var first = StorageHelpers.OpenAtomicAppend(file))
             {
                 Assert.NotNull(first);
-                using var fs = new FileStream(first, FileAccess.Write, bufferSize: 0);
+                using var fs = StorageHelpers.UnbufferedWriter(first);
                 // Length is readable on an append-only handle: it is what
                 // CrashLog uses to decide whether the file is fresh.
                 Assert.Equal(0, fs.Length);
@@ -74,7 +74,7 @@ public class StorageHelpersTests
             using (var second = StorageHelpers.OpenAtomicAppend(file))
             {
                 Assert.NotNull(second);
-                using var fs = new FileStream(second, FileAccess.Write, bufferSize: 0);
+                using var fs = StorageHelpers.UnbufferedWriter(second);
                 Assert.Equal(4, fs.Length);
                 var bytes = Encoding.UTF8.GetBytes("two\n");
                 fs.Write(bytes, 0, bytes.Length);
@@ -99,8 +99,7 @@ public class StorageHelpersTests
     public void GetNamesInFolder_reads_a_files_name_and_short_name_from_its_folder_entry()
     {
         const string Name = "InstallerClean folder entry test.msi";
-        var folder = Path.Combine(Path.GetTempPath(), $"ic-names-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(folder);
+        var folder = TestTemp.NewFolder("ic-names-");
         var file = Path.Combine(folder, Name);
         File.WriteAllBytes(file, []);
 
@@ -114,28 +113,28 @@ public class StorageHelpersTests
             Assert.Equal(expected, StorageHelpers.GetNamesInFolder(Path.Combine(folder, shortName)));
             Assert.Null(StorageHelpers.GetNamesInFolder(Path.Combine(folder, "not there.msi")));
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(folder)) { }
         finally
         {
-            Directory.Delete(folder, recursive: true);
+            TestTemp.Delete(folder);
         }
     }
 
     /// <summary>
     /// WIN32_FIND_DATAW as the API writes it: a DWORD, three FILETIMEs and four DWORDs, then
     /// the name's 260 characters at byte 44 and the short name's 14 at byte 564, 592 bytes in
-    /// all. A name read from any other offset is another part of the entry.
+    /// all. A name read from any other offset is another part of the entry. The struct is
+    /// the same size in memory as the marshaller makes it, so the marshaller's offsets are the
+    /// offsets in memory too.
     /// </summary>
     [Fact]
     public void The_folder_entry_is_laid_out_as_FindFirstFile_writes_it()
     {
-        var entry = default(Kernel32.WIN32_FIND_DATA);
-        ref var start = ref Unsafe.As<Kernel32.WIN32_FIND_DATA, byte>(ref entry);
-
         Assert.Equal(592, Unsafe.SizeOf<Kernel32.WIN32_FIND_DATA>());
-        Assert.Equal(44, (int)Unsafe.ByteOffset(
-            ref start, ref Unsafe.As<Kernel32.FileNameBuffer, byte>(ref entry.cFileName)));
-        Assert.Equal(564, (int)Unsafe.ByteOffset(
-            ref start, ref Unsafe.As<Kernel32.AlternateFileNameBuffer, byte>(ref entry.cAlternateFileName)));
+        Assert.Equal(592, Marshal.SizeOf<Kernel32.WIN32_FIND_DATA>());
+        Assert.Equal(44, (int)Marshal.OffsetOf<Kernel32.WIN32_FIND_DATA>(nameof(Kernel32.WIN32_FIND_DATA.cFileName)));
+        Assert.Equal(564, (int)Marshal.OffsetOf<Kernel32.WIN32_FIND_DATA>(
+            nameof(Kernel32.WIN32_FIND_DATA.cAlternateFileName)));
     }
 
     /// <summary>The path GetShortPathName answers for <paramref name="path"/>.</summary>

@@ -6,7 +6,7 @@ namespace InstallerClean.Tests.Helpers;
 /// The decision both hosts make before a Move: is there room.
 /// </summary>
 /// <remarks>
-/// <c>IsOnInstallerCacheDrive</c> asks Windows which volume a folder is on, so every
+/// <c>RenamesOnInstallerCacheDrive</c> asks Windows which volume a folder is on, so every
 /// case that reaches that question is in
 /// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>, with the ancestor walk.
 ///
@@ -27,14 +27,14 @@ public class MoveSpaceCheckTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    // A share is not a local volume, so it is not the one the cache is on, and
-    // no query could make it so. Answered from the spelling, which is why this
+    // A Move through a share copies every file, onto whatever volume the share
+    // is, so it is never a rename. Answered from the spelling, which is why this
     // case is still arithmetic when the rest are not.
     [InlineData(@"\\server\backup")]
     [InlineData("//server/backup")]
     [InlineData(@"\\?\UNC\server\backup")]
-    public void IsOnInstallerCacheDrive_is_false_when_it_cannot_prove_otherwise(string destination) =>
-        Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive(destination));
+    public void RenamesOnInstallerCacheDrive_is_false_for_nothing_and_for_a_share(string destination) =>
+        Assert.False(MoveSpaceCheck.RenamesOnInstallerCacheDrive(destination));
 
     [Fact]
     public void RefusalFreeSpace_refuses_and_reports_what_is_there()

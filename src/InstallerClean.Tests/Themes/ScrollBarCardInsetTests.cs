@@ -109,7 +109,7 @@ public class ScrollBarCardInsetTests
     }
 
     private static double[] Split(string value)
-        => value.Split(',', StringSplitOptions.TrimEntries)
+        => value.Split(',', (StringSplitOptions)2) // TrimEntries, which .NET Framework's enum does not name
             .Select(v => double.Parse(v, CultureInfo.InvariantCulture))
             .ToArray();
 }

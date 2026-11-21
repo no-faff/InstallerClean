@@ -60,6 +60,6 @@ public class CliNewerVersionCtrlCTests
         {
             Console.SetOut(original);
         }
-        return buffer.ToString().Split(Environment.NewLine)[..^1];
+        return buffer.ToString().Split(Environment.NewLine).Slice(..^1);
     }
 }

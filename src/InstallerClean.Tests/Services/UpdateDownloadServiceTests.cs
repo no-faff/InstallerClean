@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services;
 
@@ -17,13 +18,13 @@ public sealed class UpdateDownloadServiceTests : IDisposable
     private static readonly Uri AssetAddress =
         new("https://release-assets.githubusercontent.com/some/asset");
 
-    private readonly string _folder = Directory.CreateTempSubdirectory("ic-download-").FullName;
+    private readonly string _folder = TestTemp.NewFolder("ic-download-");
 
     private string Destination => Path.Combine(_folder, "download.exe");
 
     public void Dispose()
     {
-        try { Directory.Delete(_folder, recursive: true); } catch { }
+        TestTemp.Delete(_folder);
     }
 
     /// <summary>Answers each request from a table keyed by its address, and records the addresses.</summary>
@@ -443,15 +444,27 @@ public sealed class UpdateDownloadServiceTests : IDisposable
     [Fact]
     public async Task A_download_held_at_the_gate_past_the_stall_timeout_fails_as_stalled()
     {
-        var (file, gate, _) = GatedLocalFile();
-        var service = new UpdateDownloadService(new AppUpdater.LocalFileAnswer(file, gate), TimeSpan.FromMilliseconds(500));
+        // A download whose reads are slower than the timeout stalls before it reaches the gate,
+        // and fails in the same way without showing anything about the hold. Such an attempt
+        // is made again with a timeout twice as long. A download the timeout does not end fails
+        // the test rather than waiting on it.
+        const int attempts = 5;
+        var milliseconds = 500;
+        for (var attempt = 1; ; attempt++, milliseconds *= 2)
+        {
+            var (file, gate, _) = GatedLocalFile();
+            var service = new UpdateDownloadService(new AppUpdater.LocalFileAnswer(file, gate), TimeSpan.FromMilliseconds(milliseconds));
 
-        var failure = await Assert.ThrowsAsync<UpdateFailedException>(
-            () => service.DownloadAsync(ReleaseAddress, Destination, null, CancellationToken.None));
+            var download = service.DownloadAsync(ReleaseAddress, Destination, null, CancellationToken.None);
+            var ended = await Task.WhenAny(download, Task.Delay(milliseconds + 30_000));
+            Assert.True(ReferenceEquals(ended, download), "the stall timeout did not end a download held at the gate");
 
-        Assert.Equal(UpdateFailureStage.Download, failure.Stage);
-        Assert.True(File.Exists(gate + AppUpdater.GateReachedSuffix));
-        Assert.False(File.Exists(Destination));
+            var failure = await Assert.ThrowsAsync<UpdateFailedException>(() => download);
+            Assert.Equal(UpdateFailureStage.Download, failure.Stage);
+            Assert.False(File.Exists(Destination));
+            if (File.Exists(gate + AppUpdater.GateReachedSuffix)) return;
+            Assert.True(attempt < attempts, $"the download stalled before it reached the gate in each of {attempts} attempts");
+        }
     }
 
     [Theory]
@@ -562,17 +575,19 @@ public sealed class UpdateDownloadServiceTests : IDisposable
     {
         private bool _sent;
 
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!_sent)
             {
                 _sent = true;
-                first.CopyTo(buffer);
+                if (count < first.Length)
+                    throw new ArgumentException("The read is smaller than the bytes held.", nameof(count));
+                Array.Copy(first, 0, buffer, offset, first.Length);
                 return first.Length;
             }
             try
             {
-                await Task.Delay(Timeout.Infinite, cancellationToken);
+                await FrameworkTask.Delay(Timeout.Infinite, cancellationToken);
             }
             catch (OperationCanceledException ex) when (breaksOffOnCancel)
             {
@@ -580,9 +595,6 @@ public sealed class UpdateDownloadServiceTests : IDisposable
             }
             return 0;
         }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) =>
-            ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
 
         public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
         public override bool CanRead => true;

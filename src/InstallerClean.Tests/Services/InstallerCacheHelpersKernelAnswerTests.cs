@@ -1,5 +1,7 @@
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 using Microsoft.Win32.SafeHandles;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services;
 
@@ -11,27 +13,26 @@ namespace InstallerClean.Tests.Services;
 /// </summary>
 /// <remarks>
 /// The walk up to the ancestor is real. The path names a file not yet created, in a
-/// folder made under the temp folder, and is spelled with a "." segment, so the walk
+/// folder made under the test run's folder, and is spelled with a "." segment, so the walk
 /// opens that folder and <see cref="Path.GetFullPath(string)"/> spells the path
 /// differently from the way it was passed in. Every failure hands back that
-/// GetFullPath spelling.
+/// GetFullPath spelling; a path given with \\?\, \\.\ or \??\ in front of a drive or
+/// share comes back without it.
 /// </remarks>
 public sealed class InstallerCacheHelpersKernelAnswerTests : IDisposable
 {
-    private readonly string _folder =
-        Path.Combine(Path.GetTempPath(), "installerclean-kernel-answer-" + Guid.NewGuid().ToString("N"));
+    private readonly string _folder = TestTemp.NewFolder("installerclean-kernel-answer-");
 
     private readonly string _path;
 
     public InstallerCacheHelpersKernelAnswerTests()
     {
-        Directory.CreateDirectory(_folder);
         _path = Path.Combine(_folder, ".", "not-yet-created.msi");
     }
 
     public void Dispose()
     {
-        try { Directory.Delete(_folder, recursive: true); } catch { }
+        TestTemp.Delete(_folder);
     }
 
     [Fact]
@@ -134,6 +135,76 @@ public sealed class InstallerCacheHelpersKernelAnswerTests : IDisposable
     {
         name.CopyTo(0, buffer, 0, name.Length);
         return (uint)name.Length;
+    }
+
+    [Theory]
+    [InlineData(@"\\?\")]
+    [InlineData(@"\??\")]
+    [InlineData(@"\\.\")]
+    public void A_prefixed_path_whose_open_is_refused_is_handed_back_without_the_prefix(string prefix)
+    {
+        var path = _folder + @"\not-yet-created.msi";
+
+        var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(prefix + path, out var resolved, new ScriptedKernel(refuseOpen: true));
+
+        // A \\.\ path is made full, short names expanded, as any ordinary path is; a \\?\ or
+        // \??\ path is taken as given.
+        Assert.Equal(PathResolution.OpenRefused, outcome);
+        Assert.Equal(prefix == @"\\.\" ? FullPaths.GetFullPath(path) : path, resolved);
+    }
+
+    [Fact]
+    public void A_prefixed_path_is_walked_and_opened_in_the_spelling_it_was_given()
+    {
+        // Windows opens a \\?\ path as written, so the walk does too.
+        var answered = Path.Combine(Path.GetTempPath(), "answered-by-the-kernel");
+        var kernel = new ScriptedKernel((buffer, length) => Write(buffer, answered));
+
+        var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(
+            @"\\?\" + Path.Combine(_folder, "not-yet-created.msi"), out var resolved, kernel);
+
+        Assert.Equal(PathResolution.Resolved, outcome);
+        Assert.Equal(@"\\?\" + _folder, kernel.OpenedOn);
+        Assert.Equal(Path.Combine(answered, "not-yet-created.msi"), resolved);
+    }
+
+    [Theory]
+    [InlineData(@"\\?\")]
+    [InlineData(@"\??\")]
+    [InlineData(@"\\.\")]
+    public void A_prefixed_path_into_the_cache_whose_open_is_refused_is_still_inside_it(string prefix)
+    {
+        var installer = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
+
+        var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(
+            prefix + installer + @"\new", out var resolved, new ScriptedKernel(refuseOpen: true));
+
+        Assert.Equal(PathResolution.OpenRefused, outcome);
+        Assert.True(InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved, proven: false), resolved);
+    }
+
+    [Fact]
+    public void A_dot_dot_after_the_prefix_is_kept_as_a_name_so_the_path_stays_inside_the_cache()
+    {
+        // The path is compared as written, as the Move goes on to use it.
+        var installer = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
+
+        InstallerCacheHelpers.ResolveFinalPathOutcome(
+            @"\\?\" + installer + @"\new\..\..\..\Users\x", out var resolved, new ScriptedKernel(refuseOpen: true));
+
+        Assert.True(InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved, proven: false), resolved);
+    }
+
+    [Theory]
+    [InlineData(@"\\?\C:")]
+    [InlineData(@"\\?\C:Windows\Installer")]
+    [InlineData(@"\\.\pipe\ic-no-such-pipe")]
+    public void A_prefixed_path_with_no_drive_root_after_it_that_does_not_resolve_is_handed_back_as_given(string path)
+    {
+        var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(path, out var resolved, new ScriptedKernel(refuseOpen: true));
+
+        Assert.NotEqual(PathResolution.Resolved, outcome);
+        Assert.Equal(FullPaths.GetFullPath(path), resolved);
     }
 
     /// <summary>

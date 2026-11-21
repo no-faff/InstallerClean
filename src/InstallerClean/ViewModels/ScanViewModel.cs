@@ -181,7 +181,7 @@ public partial class ScanViewModel : ObservableObject
     /// arm (ScanViewModelPendingRebootTests).
     ///
     /// THE SAME SENTENCE IS ALSO THE IN-PROGRESS FILE'S OWN, named in its arm
-    /// above: it says Windows Installer has something in progress, which is what
+    /// above: it says Windows Installer has something unfinished, which is what
     /// that file records. A member added later without a banner falls through to
     /// the same text and meets the test's distinctness check, which the file's arm
     /// keeps armed.
@@ -627,8 +627,10 @@ public partial class ScanViewModel : ObservableObject
     /// METHOD. The account is shown and then gone: on the overlay it lasts as long
     /// as the window, and at the two act-time callers it is a dialog the reader
     /// dismisses. Writing it leaves a file that can be attached to a report and read
-    /// back afterwards. The command line reaches the same condition through its own
-    /// catch and writes the reason to the Windows event log.
+    /// back afterwards. The log takes it without its closing sentence, which says what the
+    /// stop left as it was and is not true of the scan that runs after a Move or Delete
+    /// (<see cref="IClosingSentenceMessage"/>). The command line reaches the same
+    /// condition through its own catch and writes the reason to the Windows event log.
     ///
     /// The closing sentence is added only where the write succeeded, following the
     /// generic branch's two forms: a message naming a file that was never written
@@ -692,7 +694,7 @@ public partial class ScanViewModel : ObservableObject
             var progress = new ThrottledScanProgress(
                 new Progress<ScanProgressUpdate>(ApplyProgressUpdate));
             var scanTask = RunScanCoreAsync(progress, cts.Token);
-            if (await Task.WhenAny(scanTask, Task.Delay(200, cts.Token)) != scanTask)
+            if (await Task.WhenAny(scanTask, FrameworkTask.Delay(200, cts.Token)) != scanTask)
                 IsScanning = true;
             await scanTask;
 

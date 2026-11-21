@@ -66,7 +66,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// scan found until the check made as the app starts has answered, so this bounds
     /// that wait too.
     /// </summary>
-    public static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
+    public static readonly TimeSpan RequestTimeout = Durations.FromSeconds(8);
 
     /// <summary>
     /// What the check asks for: GitHub answers it with a redirect to the newest
@@ -88,6 +88,11 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
     private static readonly Uri ReleasesPage = new(ReleasesPageUrl);
 
+    // How a crash.log entry for a failed check opens. It names what was asked
+    // for, because whatever answered may have been a proxy, a filter or a sign-in
+    // page rather than GitHub.
+    private const string RequestNamed = "The request for the GitHub releases page";
+
     /// <summary>
     /// The path a usable Location has to sit under, built from
     /// <see cref="ReleasesPageUrl"/> so a repository move cannot leave the
@@ -104,10 +109,11 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// because the elevated process has no use for the session cookie
     /// github.com offers, and declining it is cheaper than holding it.
     /// Internal so a test can pin both, neither being reachable through the
-    /// handler seam the rest of the tests use.
+    /// handler seam the rest of the tests use. It carries the proxy .NET 10 takes
+    /// by default (<see cref="ProxyFromVariables"/>).
     /// </summary>
     internal static HttpClientHandler CreateShippingHandler() =>
-        new() { AllowAutoRedirect = false, UseCookies = false };
+        ProxyFromVariables.Carrying(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 
     private static readonly HttpClient SharedClient = CreateClient(CreateShippingHandler());
 
@@ -134,7 +140,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// message name the file only when there is a file, which is why this is not
     /// an <c>Action</c>.
     /// </summary>
-    private readonly Func<Exception, (string Path, bool Written)> _logDiagnostic;
+    private readonly Func<Exception, CrashLogEntry> _logDiagnostic;
 
     public UpdateCheckService() : this(SharedClient, ex => CrashLog.TryWrite(ex)) { }
 
@@ -148,11 +154,11 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// so the timeout and body cap under test are the shipping values.
     /// </summary>
     internal UpdateCheckService(
-        HttpMessageHandler handler, Func<Exception, (string Path, bool Written)> logDiagnostic)
+        HttpMessageHandler handler, Func<Exception, CrashLogEntry> logDiagnostic)
         : this(CreateClient(handler), logDiagnostic) { }
 
     private UpdateCheckService(
-        HttpClient http, Func<Exception, (string Path, bool Written)> logDiagnostic)
+        HttpClient http, Func<Exception, CrashLogEntry> logDiagnostic)
     {
         _http = http;
         _logDiagnostic = logDiagnostic;
@@ -168,7 +174,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
 #if DEBUG
             if (Environment.GetEnvironmentVariable(SlowCheckVariable) is { Length: > 0 })
             {
-                await Task.Delay(RequestTimeout, cancellationToken).ConfigureAwait(false);
+                await FrameworkTask.Delay(RequestTimeout, cancellationToken).ConfigureAwait(false);
                 return new CheckFailed(UpdateCheckFailureReason.Timeout);
             }
             if (Environment.GetEnvironmentVariable(PretendLatestVariable) is { Length: > 0 } pretendedTag)
@@ -195,16 +201,18 @@ public sealed class UpdateCheckService : IUpdateCheckService
             {
                 // Two different situations wearing one status range each,
                 // and the sentence on screen differs accordingly. A 4xx or
-                // 5xx is GitHub refusing. A 2xx is something answering in
-                // GitHub's place, a captive portal or a filtering proxy
-                // serving its own page, because the releases page itself
-                // does not answer this request with a body.
+                // 5xx is an error, from GitHub or from a proxy or filter on
+                // the way, and the status does not say which. A 2xx is
+                // something answering in GitHub's place, a captive portal or
+                // a filtering proxy serving its own page, because the
+                // releases page itself does not answer this request with a
+                // body.
                 //
                 // Either way the status alone is useless for diagnosis
                 // after the fact, and nothing in the breadcrumb names a
                 // user, a path or a machine.
                 LogIfUserIsWaiting(origin, new HttpRequestException(
-                    $"GitHub releases page returned {status} " +
+                    $"{RequestNamed} got {status} " +
                     $"({response.StatusCode}).{DescribeThrottling(response.Headers)}"));
                 return new CheckFailed(response.IsSuccessStatusCode
                     ? UpdateCheckFailureReason.ResponseParseError
@@ -218,7 +226,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
                 // GitHub having changed how /latest answers, which is the
                 // one assumption this check rests on.
                 LogIfUserIsWaiting(origin, new HttpRequestException(
-                    $"GitHub releases page returned {status} with an unusable " +
+                    $"{RequestNamed} got {status} with an unusable " +
                     $"Location: {Clamp(response.Headers.Location?.ToString() ?? "(absent)")}"));
                 return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
             }
@@ -226,7 +234,8 @@ public sealed class UpdateCheckService : IUpdateCheckService
             if (Compare(tagName, currentVersion) is { } answer)
                 return answer;
             LogIfUserIsWaiting(origin, new HttpRequestException(
-                $"GitHub redirected to a tag that is not a version: {Clamp(tagName)}"));
+                $"{RequestNamed} got {status}, a redirect to a tag that is not a version: " +
+                $"{Clamp(tagName)}"));
             return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)

@@ -367,5 +367,9 @@ public class InstallerQueryServiceRecoveredProductTests
                 return new PackageIdentity(string.Empty, isPatch, new[] { Enumerated });
             return new PackageIdentity(string.Empty, isPatch, targets);
         }
+
+        public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoRevisionNumber(string filePath) => false;
     }
 }

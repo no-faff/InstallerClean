@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -184,6 +185,27 @@ public class MoveFilesServiceUnitTests
         Assert.Equal(1, reports[0].CurrentFile);
         Assert.Equal(3, reports[2].CurrentFile);
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
+    }
+
+    // The window's progress label counts the file a report names as still in hand.
+    [Fact]
+    public async Task MoveFilesAsync_reports_each_file_before_moving_it()
+    {
+        var fs = new MockFileSystem();
+        var sources = new[] { "a.msi", "b.msi", "c.msi" }
+            .Select(n => $@"{SourceDir}\{n}").ToArray();
+        foreach (var s in sources) fs.AddFile(s, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+
+        var stillThere = new List<bool>();
+        var progress = new Helpers.SyncProgress<OperationProgress>(p =>
+            stillThere.Add(fs.File.Exists(sources[p.CurrentFile - 1])));
+
+        var svc = new MoveFilesService(fs);
+        await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
+
+        Assert.Equal(new[] { true, true, true }, stillThere);
+        Assert.All(sources, s => Assert.False(fs.File.Exists(s)));
     }
 
     [Fact]
@@ -462,9 +484,11 @@ public class MoveFilesServiceUnitTests
     public async Task The_claims_are_handed_to_the_re_read_untouched()
     {
         // The re-read can only re-ask about what it is given, and a service that
-        // dropped, merged or reordered the claims on the way in would still pass
-        // every held-back assertion above, because the fake decides what to
-        // reclaim without looking at them. Its Delete twin pins the same thing.
+        // dropped, merged, swapped or reordered the claims on the way in would still
+        // pass every held-back assertion above, because the fake decides what to
+        // reclaim without looking at them. The batch half and the siblings half are
+        // two different lists, so each is pinned to its own. Its Delete twin pins
+        // the same thing.
         var fs = new MockFileSystem();
         var source = $@"{SourceDir}\a.msp";
         fs.AddFile(source, new MockFileData("payload"));
@@ -474,13 +498,19 @@ public class MoveFilesServiceUnitTests
             new PatchClaim(source, "{AAAA0000-0000-0000-0000-000000000001}",
                 "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
         };
+        var siblings = new[]
+        {
+            new PatchClaim($@"{SourceDir}\b.msp", "{AAAA0000-0000-0000-0000-000000000002}",
+                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
+        };
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
         var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new MoveFilesService(fs, mutex, null, reverifier);
 
-        await svc.MoveFilesAsync(new[] { source }, DestDir, new UnderLeaseClaims(claims, claims));
+        await svc.MoveFilesAsync(new[] { source }, DestDir, new UnderLeaseClaims(claims, siblings));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
+        Assert.Equal(siblings, reverifier.SiblingsSeen);
     }
 
     [Fact]
@@ -507,7 +537,7 @@ public class MoveFilesServiceUnitTests
     {
         var fs = Substitute.For<IFileSystem>();
         // MockFileSystem's Path is a working implementation; a bare substitute
-        // returns an empty string from Combine and GetRandomFileName.
+        // returns an empty string from GetFullPath and GetRandomFileName.
         fs.Path.Returns(new MockFileSystem().Path);
         // The service creates the destination folder through IFileSystem.Directory
         // before the loop. A bare IFileSystem substitute returns null there, so the
@@ -593,7 +623,7 @@ public class MoveFilesServiceUnitTests
     {
         var source = $@"{SourceDir}\locked.msi";
         var fs = FileSystemThatFailsMove(source,
-            new IOException("held open") { HResult = unchecked((int)hresult) });
+            new IOException("held open", unchecked((int)hresult)));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -611,7 +641,7 @@ public class MoveFilesServiceUnitTests
         var source = $@"{SourceDir}\a.msi";
         // ERROR_DISK_FULL: real, and nothing to do with the file being held.
         var fs = FileSystemThatFailsMove(source,
-            new IOException("disk full") { HResult = unchecked((int)0x80070070) });
+            new IOException("disk full", unchecked((int)0x80070070)));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -715,7 +745,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(source, new MockFileData("payload"));
         fs.AddDirectory(DestDir);
         fs.DeleteFailures[source] =
-            new IOException("held open") { HResult = unchecked((int)0x80070020) };
+            new IOException("held open", unchecked((int)0x80070020));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -760,7 +790,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly });
         fs.AddDirectory(DestDir);
         fs.DeleteFailures[source] =
-            new IOException("held open") { HResult = unchecked((int)0x80070020) };
+            new IOException("held open", unchecked((int)0x80070020));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -851,6 +881,46 @@ public class MoveFilesServiceUnitTests
             string.Format(InstallerClean.Resources.Strings.Error_DestinationInSystemFolder, InsideSystemFolder),
             ex.Message);
         Assert.False(fs.Directory.Exists(InsideSystemFolder));
+        Assert.True(fs.File.Exists(source));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_destination_where_a_moved_file_would_reach_260_characters()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        // 254 characters, a separator and "a.msi" make 260.
+        var destination = @"D:\" + new string('d', 254 - 3);
+
+        var svc = new MoveFilesService(fs);
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            svc.MoveFilesAsync(new[] { source }, destination, UnderLeaseClaims.None));
+
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            ex.Message);
+        Assert.False(fs.Directory.Exists(destination));
+        Assert.True(fs.File.Exists(source));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_destination_too_long_before_reading_where_it_leads()
+    {
+        // Inside the installer cache as well, so the refusal the message names is the
+        // check that answered first.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var destination = PathText.Combine(InsideInstallerCache, new string('d', 260));
+
+        var svc = new MoveFilesService(fs);
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            svc.MoveFilesAsync(new[] { source }, destination, UnderLeaseClaims.None));
+
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            ex.Message);
         Assert.True(fs.File.Exists(source));
     }
 

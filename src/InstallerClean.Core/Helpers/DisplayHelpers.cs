@@ -27,11 +27,12 @@ internal static class DisplayHelpers
     /// THE UNIT IS CHOSEN ON THE FIGURE AS IT PRINTS. A size a few bytes short of the
     /// next unit rounds up to 1,024 of the one below it, so each step compares the
     /// rounded figure rather than the raw one, and such a size reads "1.00 GB" where
-    /// comparing the raw one would print "1,024.0 MB". The rounding sends a figure
-    /// exactly halfway between two printed values to the even one, which is what .NET
-    /// does when it formats a double, so for any size the digits match those
-    /// <see cref="FormatSizeForMachine"/> prints, apart from three things: the group
-    /// separator, the terabyte unit and the step just described.
+    /// comparing the raw one would print "1,024.0 MB". The rounding is
+    /// <see cref="Printed"/>'s, which sends a figure exactly halfway between two
+    /// printed values to the even one. <see cref="FormatSizeForMachine"/> rounds
+    /// through it too, so for any size the digits match those it prints, apart from
+    /// three things: the group separator, the terabyte unit and the step just
+    /// described.
     ///
     /// THE MACHINE-READ LINES DO NOT COME THROUGH HERE. The Application-channel
     /// entries take <see cref="FormatSizeForMachine"/>, for the reason given there.
@@ -57,11 +58,17 @@ internal static class DisplayHelpers
     }
 
     /// <summary>
-    /// The size in <paramref name="unit"/>s, rounded to the places it prints to.
-    /// Decimal rather than double so that the figure the unit is chosen on and the
-    /// figure printed are one value: a whole number of bytes over a power of two has
-    /// a finite decimal expansion, so the division is exact to far more places than
-    /// the rounding reads.
+    /// The size in <paramref name="unit"/>s, rounded to the places it prints to, a
+    /// figure exactly halfway going to the even digit. Both size forms round through
+    /// here, so the window and the Application-channel entries print the same digits,
+    /// and <see cref="FormatSize"/> chooses its unit on the figure it prints.
+    ///
+    /// Decimal holds the quotient to 28 significant digits. A whole number of bytes
+    /// over a power of two lands either exactly on a halfway point, which decimal
+    /// holds exactly, or many orders of magnitude further from one than that, so the
+    /// rounding gives what it would give the exact quotient. Double formatting is not
+    /// used: .NET Framework rounds a halfway figure away from zero when it formats a
+    /// double, where this rounds it to the even digit.
     /// </summary>
     private static decimal Printed(long bytes, long unit, int places) =>
         Math.Round((decimal)bytes / unit, places, MidpointRounding.ToEven);
@@ -79,15 +86,19 @@ internal static class DisplayHelpers
     /// terabyte unit is one no match written against these entries expects, so
     /// gigabytes stay the largest unit here.
     ///
+    /// The figure is rounded by <see cref="Printed"/>, as on the window, so the two
+    /// forms print the same digits for a size in the same unit, a figure exactly
+    /// halfway between two printed values included.
+    ///
     /// The culture is the caller's. On those lines it is the en-GB scope
     /// MachineContract puts round the whole entry, which is what makes the decimal
     /// separator a full stop on every machine.
     /// </summary>
     internal static string FormatSizeForMachine(long bytes) => bytes switch
     {
-        >= 1_073_741_824 => string.Format(Strings.Display_Size_GB, (bytes / 1_073_741_824.0).ToString("F2", Localisation.FormatCulture)),
-        >= 1_048_576 => string.Format(Strings.Display_Size_MB, (bytes / 1_048_576.0).ToString("F1", Localisation.FormatCulture)),
-        >= 1_024 => string.Format(Strings.Display_Size_KB, (bytes / 1_024.0).ToString("F1", Localisation.FormatCulture)),
+        >= 1_073_741_824 => Sized(Strings.Display_Size_GB, Printed(bytes, 1_073_741_824, 2), "F2"),
+        >= 1_048_576 => Sized(Strings.Display_Size_MB, Printed(bytes, 1_048_576, 1), "F1"),
+        >= 1_024 => Sized(Strings.Display_Size_KB, Printed(bytes, 1_024, 1), "F1"),
         _ => string.Format(Strings.Display_Size_B, bytes.ToString(Localisation.FormatCulture)),
     };
 
@@ -230,10 +241,19 @@ internal static class DisplayHelpers
         return null;
     }
 
-    internal static string FormatElapsed(TimeSpan elapsed) =>
-        elapsed.TotalSeconds < 1
-            ? string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_Ms, elapsed.TotalMilliseconds)
-            : string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_S, elapsed.TotalSeconds);
+    /// <summary>
+    /// A scan's time for the status line: in whole milliseconds where that figure is under
+    /// a thousand, otherwise in seconds to one decimal place, each rounded as
+    /// <see cref="WholeUnits"/> rounds. The unit is chosen on the rounded figure, so 999.6
+    /// ms reads 1.0s.
+    /// </summary>
+    internal static string FormatElapsed(TimeSpan elapsed)
+    {
+        var milliseconds = WholeUnits(elapsed.Ticks, TimeSpan.TicksPerMillisecond);
+        return milliseconds < 1000
+            ? string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_Ms, milliseconds)
+            : string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_S, SecondsToATenth(elapsed));
+    }
 
     /// <summary>
     /// Natural-language elapsed time for body copy. Renders sub-second
@@ -243,9 +263,33 @@ internal static class DisplayHelpers
     /// the right call for the short-form metadata pills.
     /// </summary>
     internal static string FormatElapsedLong(TimeSpan elapsed) =>
-        elapsed.TotalSeconds < 1
+        elapsed.Ticks < TimeSpan.TicksPerSecond
             ? Strings.Display_ElapsedLong_LessThanASecond
-            : string.Format(Localisation.FormatCulture, Strings.Display_ElapsedLong_Seconds, elapsed.TotalSeconds);
+            : string.Format(Localisation.FormatCulture, Strings.Display_ElapsedLong_Seconds, SecondsToATenth(elapsed));
+
+    /// <summary>
+    /// <paramref name="elapsed"/> in seconds to the nearest tenth, as a decimal, which the
+    /// resx value's F1 prints digit for digit.
+    /// </summary>
+    private static decimal SecondsToATenth(TimeSpan elapsed) =>
+        WholeUnits(elapsed.Ticks, TimeSpan.TicksPerSecond / 10) / 10m;
+
+    /// <summary>
+    /// <paramref name="ticks"/> as a whole number of units <paramref name="unit"/> ticks
+    /// long, to the nearest, a tie going to the even one. Worked out on the tick count
+    /// itself, the answer is the same on both runtimes. F0 and F1 on a double from
+    /// TotalMilliseconds or TotalSeconds round it differently on each: .NET Framework
+    /// rounds the double's fifteen-digit form with a tie away from zero, giving 13ms for
+    /// 12.5 ms where .NET 10 gives 12ms.
+    /// </summary>
+    internal static long WholeUnits(long ticks, long unit)
+    {
+        var whole = ticks / unit;
+        var twiceTheRest = Math.Abs(ticks % unit) * 2;
+        if (twiceTheRest > unit || (twiceTheRest == unit && whole % 2 != 0))
+            whole += ticks < 0 ? -1 : 1;
+        return whole;
+    }
 
     internal enum PluralCategory { One, Few, Many, Other }
 
@@ -473,7 +517,7 @@ internal static class DisplayHelpers
     /// sentences and carries any disagreement into them.
     ///
     /// <see cref="SupportedLanguages.Active"/> walks the same parent chain the
-    /// ResourceManager probes, which is why it is the right answer and not merely a
+    /// ResourceManager walks, which is why it is the right answer and not merely a
     /// closer one, and it is the reason this is not simply the culture's own parent:
     /// zh-CN resolves through zh-Hans and zh-TW through zh-Hant, and both render Chinese.
     /// </summary>

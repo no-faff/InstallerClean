@@ -38,7 +38,7 @@ internal sealed class CancelKey
     /// How long a close or shutdown event holds the process: a second inside the five
     /// seconds Windows allows a console close by default.
     /// </summary>
-    internal static readonly TimeSpan CloseHold = TimeSpan.FromSeconds(4);
+    internal static readonly TimeSpan CloseHold = Durations.FromSeconds(4);
 
     public CancelKey() : this(OpenEvent, Thread.Sleep) { }
 
@@ -139,8 +139,9 @@ internal sealed class CancelKey
 
     /// <summary>
     /// What Ctrl+C does: keeps the process running and cancels <see cref="Pressed"/>,
-    /// running the answer registered on it. It runs on the console's control-handler
-    /// thread, where a throw is unhandled, so it never throws.
+    /// running the answer registered on it. The runtime runs it on a thread-pool thread
+    /// while the console's control-handler thread waits for it, and a throw there is
+    /// unhandled, so it never throws.
     /// </summary>
     internal void Take(object? sender, ConsoleCancelEventArgs cancelArgs)
     {

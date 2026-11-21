@@ -10,8 +10,8 @@ namespace InstallerClean.Resources;
 /// XAML markup extension that resolves a key from <c>Strings.resx</c>.
 /// Used as <c>{loc:Translate Window.Main.Title}</c>; the key uses dot
 /// notation matching the resx data names. Resolution happens at the
-/// current UI culture, so a satellite assembly for a different locale
-/// flows through automatically.
+/// current UI culture, so the text is in the language the app is
+/// displaying.
 /// </summary>
 /// <remarks>
 /// C# code paths use the strongly-typed <c>Strings</c> class directly

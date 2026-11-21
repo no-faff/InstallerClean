@@ -36,6 +36,8 @@ namespace InstallerClean.Models;
 /// <param name="MissingSparePackageCodeUnread">The files kept for <see cref="DeclaredProductInstalledCause.MissingSparePackageCodeUnread"/>.</param>
 /// <param name="MissingSpareIsIt">The files kept for <see cref="DeclaredProductInstalledCause.MissingSpareIsIt"/>.</param>
 /// <param name="ByName">The files kept for <see cref="DeclaredProductInstalledCause.ByName"/>.</param>
+/// <param name="UndeclaredPackageCodeIsIt">The files kept for <see cref="DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt"/>.</param>
+/// <param name="UndeclaredPackageCodeUnread">The files kept for <see cref="DeclaredProductInstalledCause.UndeclaredPackageCodeUnread"/>.</param>
 public sealed record DeclaredProductInstalledCauses(
     int IsItsCachedPackage,
     int IsAtItsSources,
@@ -60,11 +62,13 @@ public sealed record DeclaredProductInstalledCauses(
     int SourcePackageNotRuledOut,
     int MissingSparePackageCodeUnread,
     int MissingSpareIsIt,
-    int ByName)
+    int ByName,
+    int UndeclaredPackageCodeIsIt,
+    int UndeclaredPackageCodeUnread)
 {
     /// <summary>A scan that kept no file for this reason.</summary>
     public static DeclaredProductInstalledCauses None { get; } =
-        new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     /// <summary>
     /// The files kept because their program's sources hold a form the check does not compare,

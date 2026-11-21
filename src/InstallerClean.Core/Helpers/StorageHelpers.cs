@@ -62,6 +62,21 @@ internal static class StorageHelpers
             Kernel32.OPEN_ALWAYS);
 
     /// <summary>
+    /// A stream that writes to <paramref name="handle"/> with no buffer of its own, so each
+    /// Write is one write to the file. .NET 10 reads a buffer size of 0 or 1 as no buffer;
+    /// .NET Framework refuses 0 and with 1 passes every Write of one byte or more straight
+    /// to the file. A WriteByte would sit in that one-byte buffer, and on an append-only
+    /// handle .NET Framework can then refuse the next write because the handle's position
+    /// has moved, so callers write whole arrays. BannedSymbols.txt refuses, in the projects
+    /// that ship, the FileStream constructors and File.Create overloads that take a buffer
+    /// size, so this is the one stream over a handle made with one.
+    /// </summary>
+#pragma warning disable RS0030
+    internal static FileStream UnbufferedWriter(SafeFileHandle handle) =>
+        new(handle, FileAccess.Write, bufferSize: 1);
+#pragma warning restore RS0030
+
+    /// <summary>
     /// Creates <paramref name="path"/> as a new file, with the same reparse-point refusal as
     /// <see cref="OpenAtomic"/>, shared with nothing, and deleted by Windows as the handle
     /// closes, however the process holding it ends. Returns null on any failure, a file
@@ -100,17 +115,17 @@ internal static class StorageHelpers
         uint flags = Kernel32.FILE_FLAG_OPEN_REPARSE_POINT | moreFlags;
 
         var handle = Kernel32.CreateFile(
-            path, desiredAccess, share, IntPtr.Zero,
+            FullPaths.ForWindowsCall(path), desiredAccess, share, IntPtr.Zero,
             disposition, flags, IntPtr.Zero);
         if (handle.IsInvalid)
         {
-            error = Marshal.GetLastPInvokeError();
+            error = Marshal.GetLastWin32Error();
             return null;
         }
 
         if (!Kernel32.GetFileInformationByHandle(handle, out var info))
         {
-            error = Marshal.GetLastPInvokeError();
+            error = Marshal.GetLastWin32Error();
             handle.Dispose();
             return null;
         }
@@ -147,8 +162,8 @@ internal static class StorageHelpers
     {
         try
         {
-            if (File.Exists(path))
-                File.Delete(path);
+            if (FrameworkFile.Exists(path))
+                FrameworkFile.Delete(path);
         }
         catch
         {
@@ -360,7 +375,7 @@ internal static class StorageHelpers
     {
         using var noBox = WithNoCriticalErrorBox();
         var handle = Kernel32.CreateFile(
-            path,
+            FullPaths.ForWindowsCall(path),
             0,
             Kernel32.FILE_SHARE_ALL,
             IntPtr.Zero,
@@ -442,14 +457,17 @@ internal static class StorageHelpers
 
         try
         {
-            var search = Kernel32.FindFirstFile(path, out var entry);
+            var search = Kernel32.FindFirstFile(FullPaths.ForWindowsCall(path), out var entry);
             if (search == InvalidHandle) return null;
             Kernel32.FindClose(search);
 
-            ReadOnlySpan<char> nameBuffer = entry.cFileName;
-            ReadOnlySpan<char> shortNameBuffer = entry.cAlternateFileName;
-            var name = NullTerminated(nameBuffer);
-            var shortName = NullTerminated(shortNameBuffer);
+            string name, shortName;
+            unsafe
+            {
+                name = NullTerminated(entry.cFileName, Kernel32.WIN32_FIND_DATA.FileNameLength);
+                shortName = NullTerminated(
+                    entry.cAlternateFileName, Kernel32.WIN32_FIND_DATA.AlternateFileNameLength);
+            }
             if (name.Length == 0) return null;
 
             return shortName.Length == 0 ? [name] : [name, shortName];
@@ -459,10 +477,13 @@ internal static class StorageHelpers
             return null;
         }
 
-        static string NullTerminated(ReadOnlySpan<char> buffer)
+        // The UTF-16 code units of a buffer up to its first null, or the whole buffer
+        // where it holds none.
+        static unsafe string NullTerminated(ushort* buffer, int length)
         {
-            var end = buffer.IndexOf('\0');
-            return new string(end < 0 ? buffer : buffer[..end]);
+            var end = 0;
+            while (end < length && buffer[end] != 0) end++;
+            return new string((char*)buffer, 0, end);
         }
     }
 
@@ -481,7 +502,7 @@ internal static class StorageHelpers
 
         try
         {
-            if (!Kernel32.GetDiskFreeSpaceEx(path, out var free, out _, out _))
+            if (!Kernel32.GetDiskFreeSpaceEx(FullPaths.ForWindowsCall(path), out var free, out _, out _))
                 return null;
             return (long)free;
         }
@@ -516,16 +537,17 @@ internal static class StorageHelpers
     /// junction or symlink. Move and Delete refuse a source in
     /// C:\Windows\Installer that has been replaced with one.
     ///
-    /// A move can read straight through a link. .NET calls MoveFileEx with
-    /// MOVEFILE_COPY_ALLOWED (dotnet/runtime, Interop.MoveFileEx.cs), Win32
-    /// documents that flag as simulating a cross-volume move with CopyFile plus
-    /// DeleteFile, and CopyFile documents that "if the source file is a symbolic
-    /// link, the actual file copied is the target of the symbolic link". So a
-    /// link planted in the cache and pointing anywhere this elevated process can
-    /// read copies THAT file's contents into a folder the user picked, which is
-    /// an arbitrary read wearing the shape of a relocation. Whether a same-volume
-    /// rename would follow the link is documented neither way and does not need
-    /// to be: the flag is always set, so the copy path is always available.
+    /// A move can read straight through a link. The move calls MoveFileEx with
+    /// MOVEFILE_COPY_ALLOWED, as .NET 10's File.Move does (dotnet/runtime,
+    /// Interop.MoveFileEx.cs), Win32 documents that flag as simulating a
+    /// cross-volume move with CopyFile plus DeleteFile, and CopyFile documents that
+    /// "if the source file is a symbolic link, the actual file copied is the target
+    /// of the symbolic link". So a link planted in the cache and pointing anywhere
+    /// this elevated process can read copies THAT file's contents into a folder the
+    /// user picked, which is an arbitrary read wearing the shape of a relocation.
+    /// Whether a same-volume rename would follow the link is documented neither way
+    /// and does not need to be: the flag is always set, so the copy path is always
+    /// available.
     ///
     /// Delete has no equivalent, DeleteFile being documented to remove the link
     /// and not the target, and refuses on the plainer ground that a link is not
@@ -553,7 +575,7 @@ internal static class StorageHelpers
         error = null;
         try
         {
-            var attrs = File.GetAttributes(path);
+            var attrs = FrameworkFile.GetAttributes(path);
             return (attrs & FileAttributes.ReparsePoint) != 0 ? ReparseCheck.Yes : ReparseCheck.No;
         }
         catch (FileNotFoundException)

@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using System.Security;
 using Microsoft.Win32;
 
@@ -19,7 +20,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(relativePath);
+            using var key = hive.OpenSubKeyEarned(relativePath);
             return key is not null ? RegistryKeyPresence.Present : RegistryKeyPresence.Absent;
         }
         catch (SecurityException) { return RegistryKeyPresence.Unreadable; }
@@ -33,7 +34,7 @@ internal sealed class RegistryReader : IRegistryReader
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(keyPath);
+            using var key = hive.OpenSubKeyEarned(keyPath);
 
             // A key that is not there and a value that is not there answer alike,
             // because the question is what the value holds and "nothing" is true of
@@ -41,7 +42,7 @@ internal sealed class RegistryReader : IRegistryReader
             // leaves the caller with no answer at all and comes out of the catches.
             if (key is null) return new RegistryMultiStringRead(RegistryMultiStringState.Absent);
 
-            var raw = key.GetValue(valueName);
+            var raw = RegistryData.ValueOf(key, valueName);
             if (raw is null) return new RegistryMultiStringRead(RegistryMultiStringState.Absent);
 
             // A REG_MULTI_SZ comes back as string[]. Anything else is a value
@@ -58,23 +59,32 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return new RegistryMultiStringRead(RegistryMultiStringState.Unreadable); }
     }
 
-    public RegistryDwordRead LocalMachineDwordValue(string keyPath, string valueName)
+    public RegistryDwordRead LocalMachineDwordValue(string keyPath, string valueName) =>
+        LocalMachineDword(keyPath, valueName);
+
+    /// <summary>
+    /// <see cref="LocalMachineDwordValue"/> without an instance. A copy's start check reads
+    /// through this: creating a RegistryReader would bring every one of its methods into what
+    /// the check compiles.
+    /// </summary>
+    internal static RegistryDwordRead LocalMachineDword(string keyPath, string valueName)
     {
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(keyPath);
+            using var key = hive.OpenSubKeyEarned(keyPath);
             if (key is null) return new RegistryDwordRead(RegistryDwordState.Absent);
 
-            // DoNotExpandEnvironmentNames is inert on a REG_DWORD and is passed
+            // Not expanding is inert on a REG_DWORD and is asked for
             // so that a value stored as REG_EXPAND_SZ answers as the string it
             // is rather than as whatever the expansion produces, which would be
             // one more shape to tell apart from a number for no gain.
-            var raw = key.GetValue(valueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            var raw = RegistryData.ValueOf(key, valueName, doNotExpand: true);
             if (raw is null) return new RegistryDwordRead(RegistryDwordState.Absent);
 
-            // A REG_DWORD comes back as int; REG_QWORD comes back as long and is
-            // not what this asks for. Neither is silently coerced: the caller is
+            // Four bytes of number come back as int, eight as long, which is not
+            // what this asks for, and any other length as bytes (RegistryData).
+            // Nothing is silently coerced: the caller is
             // measuring how machines are configured, and a coercion would hide
             // exactly the configuration worth hearing about.
             return raw is int value
@@ -87,17 +97,18 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return new RegistryDwordRead(RegistryDwordState.Unreadable); }
     }
 
-    public RegistryKeyValues LocalMachineValues(string keyPath) => ValuesOf(RegistryHive.LocalMachine, keyPath);
+    public RegistryKeyValues LocalMachineValues(string keyPath, CancellationToken cancellationToken) =>
+        ValuesOf(RegistryHive.LocalMachine, keyPath, cancellationToken);
 
-    public RegistryKeyValues UserValues(string sid, string keyPath) =>
-        ValuesOf(RegistryHive.Users, sid + @"\" + keyPath);
+    public RegistryKeyValues UserValues(string sid, string keyPath, CancellationToken cancellationToken) =>
+        ValuesOf(RegistryHive.Users, sid + @"\" + keyPath, cancellationToken);
 
     public RegistryKeyPresence UserHivePresence(string sid)
     {
         try
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(sid);
+            using var key = hive.OpenSubKeyEarned(sid);
             return key is not null ? RegistryKeyPresence.Present : RegistryKeyPresence.Absent;
         }
         catch (SecurityException) { return RegistryKeyPresence.Unreadable; }
@@ -106,26 +117,26 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return RegistryKeyPresence.Unreadable; }
     }
 
-    private static RegistryKeyValues ValuesOf(RegistryHive root, string keyPath)
+    private static RegistryKeyValues ValuesOf(RegistryHive root, string keyPath, CancellationToken cancellationToken)
     {
         try
         {
             using var hive = RegistryKey.OpenBaseKey(root, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(keyPath);
+            using var key = hive.OpenSubKeyEarned(keyPath);
             if (key is null) return new RegistryKeyValues(RegistryKeyPresence.Absent);
 
             // The default value is listed under the empty name when it is set, so a
             // caller sees it as a value like any other. Each value's type is read beside
-            // its text. DoNotExpandEnvironmentNames gives a REG_EXPAND_SZ as the text it
+            // its text. Not expanding gives a REG_EXPAND_SZ as the text it
             // holds; a REG_SZ and a REG_EXPAND_SZ come back as strings and every other
             // type as something else, which is reported as no text rather than converted.
-            var names = key.GetValueNames();
+            var names = RegistryNames.ValuesOf(key, cancellationToken);
             var values = new RegistryValue[names.Length];
             for (var i = 0; i < names.Length; i++)
                 values[i] = new RegistryValue(
                     names[i],
                     key.GetValueKind(names[i]),
-                    key.GetValue(names[i], null, RegistryValueOptions.DoNotExpandEnvironmentNames) as string);
+                    RegistryData.ValueOf(key, names[i], doNotExpand: true) as string);
 
             return new RegistryKeyValues(RegistryKeyPresence.Present, values);
         }

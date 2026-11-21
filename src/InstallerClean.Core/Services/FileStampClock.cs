@@ -9,9 +9,10 @@ namespace InstallerClean.Services;
 /// stamps.
 ///
 /// THE ORDINARY CLOCK IS THE WRONG ONE HERE. <see cref="TimeProvider.System"/> answers
-/// with the precise system time, which runs up to a tick ahead of this one, so judged
-/// against it a file written just after the clock is read can carry a time just before
-/// it.
+/// with <see cref="DateTimeOffset.UtcNow"/>, whose source the runtime chooses. Where that
+/// is the precise system time, it runs up to a tick ahead of this one, so judged against
+/// it a file written just after the clock is read can carry a time just before it. This
+/// clock asks Windows for each time itself.
 ///
 /// Timers and timestamps are the base class's, so the timestamp is the system's monotonic
 /// one. The age check measures the precise time's advance against it

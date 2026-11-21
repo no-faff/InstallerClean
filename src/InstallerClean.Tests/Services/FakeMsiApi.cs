@@ -4,6 +4,12 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
+/// The four lists the scan walks, for <see cref="FakeMsiApi.PassingError"/> and
+/// <see cref="FakeMsiApi.WalksStarted"/>. Public so a theory can take one as a parameter.
+/// </summary>
+public enum MsiWalk { Products, RouteA, Patches, Instances }
+
+/// <summary>
 /// Scriptable fake over <see cref="IMsiApi"/>. Reproduces the double-call
 /// buffer contract of msi.dll: a sizing call with a null buffer returns the
 /// char count (excluding the terminator) and MoreData; the second call
@@ -25,6 +31,10 @@ internal sealed class FakeMsiApi : IMsiApi
     public List<(string Code, uint Result)> Products { get; } = new();
     public bool NeverEndProducts { get; set; }
     public string? NeverEndPatchesFor { get; set; }
+
+    /// <summary>The row a patch list <see cref="NeverEndPatchesFor"/> names returns at every index.</summary>
+    public const string EndlessPatch = "{FFFFFFFF-0000-0000-0000-000000000001}";
+
     public Dictionary<string, List<string>> PatchCodes { get; } = new();
     public Dictionary<string, uint> PatchEnumResult { get; } = new();
 
@@ -129,6 +139,106 @@ internal sealed class FakeMsiApi : IMsiApi
 
     private readonly HashSet<uint> _sidRetried = new();
 
+    private readonly Dictionary<(MsiWalk Walk, string? ProductCode, uint Index), (uint Error, int Calls)> _passing = new();
+    private readonly Dictionary<(MsiWalk Walk, string? ProductCode), int> _walksStarted = new();
+
+    /// <summary>
+    /// An error that passes: the next <paramref name="calls"/> calls for this row of the
+    /// list answer <paramref name="error"/>, and every call after them answers as the
+    /// fixture scripts the row. <paramref name="productCode"/> is null for the two
+    /// machine-wide walks.
+    /// </summary>
+    public void PassingError(MsiWalk walk, string? productCode, uint index, uint error, int calls = 1) =>
+        _passing[(walk, productCode, index)] = (error, calls);
+
+    /// <summary>
+    /// How many times a list was asked for its first row: once for each walk of it, and
+    /// once more where a first row is asked again with a larger SID buffer.
+    /// <paramref name="productCode"/> is null for the two machine-wide walks.
+    /// </summary>
+    public int WalksStarted(MsiWalk walk, string? productCode = null) =>
+        _walksStarted.TryGetValue((walk, productCode), out var started) ? started : 0;
+
+    private bool PassingErrorAt(MsiWalk walk, string? productCode, uint index, out uint error)
+    {
+        if (index == 0)
+            _walksStarted[(walk, productCode)] = WalksStarted(walk, productCode) + 1;
+
+        error = Success;
+        if (!_passing.TryGetValue((walk, productCode, index), out var passing) || passing.Calls <= 0) return false;
+
+        _passing[(walk, productCode, index)] = (passing.Error, passing.Calls - 1);
+        error = passing.Error;
+        return true;
+    }
+
+    // Keyed by (patch code or null, product code, property, whether the value call).
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property, bool ValueCall), (uint Error, int Calls)>
+        _passingReads = new();
+
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property), int> _reads = new();
+
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property), Queue<string>> _passingValues = new();
+    private readonly Dictionary<(string? PatchCode, string ProductCode, string Property), string> _valueBeingRead = new();
+
+    /// <summary>
+    /// Values that pass: the next reads of <paramref name="property"/> that no passing error
+    /// answers give <paramref name="values"/>, one a read in order, and every read after them
+    /// answers as the fixture scripts the property. <paramref name="patchCode"/> is null for
+    /// a product's own property.
+    /// </summary>
+    public void PassingReadValues(string? patchCode, string productCode, string property, params string[] values) =>
+        _passingValues[(patchCode, productCode, property)] = new Queue<string>(values);
+
+    // The value a passing value gives this read: taken from the queue at the sizing call and
+    // kept for the value call after it.
+    private bool PassingValueAt(string? patchCode, string productCode, string property, char[]? value, out string passing)
+    {
+        var key = (patchCode, productCode, property);
+        if (value is null)
+        {
+            _valueBeingRead.Remove(key);
+            if (_passingValues.TryGetValue(key, out var queue) && queue.Count > 0)
+                _valueBeingRead[key] = queue.Dequeue();
+        }
+
+        return _valueBeingRead.TryGetValue(key, out passing!);
+    }
+
+    /// <summary>
+    /// An error that passes, on a property read: the next <paramref name="calls"/> reads of
+    /// <paramref name="property"/> answer <paramref name="error"/>, and every read after
+    /// them answers as the fixture scripts the property. <paramref name="patchCode"/> is
+    /// null for a product's own property. Where <paramref name="onValueCall"/> is true the
+    /// error answers the call that writes the value, after a sizing call that answered
+    /// with the value's length.
+    /// </summary>
+    public void PassingReadError(string? patchCode, string productCode, string property, uint error,
+        int calls = 1, bool onValueCall = false) =>
+        _passingReads[(patchCode, productCode, property, onValueCall)] = (error, calls);
+
+    /// <summary>
+    /// How many times <paramref name="property"/> was read: one for each sizing call, which
+    /// every read makes once, whether or not a value call follows it.
+    /// <paramref name="patchCode"/> is null for a product's own property.
+    /// </summary>
+    public int Reads(string? patchCode, string productCode, string property) =>
+        _reads.TryGetValue((patchCode, productCode, property), out var reads) ? reads : 0;
+
+    private bool PassingReadErrorAt(string? patchCode, string productCode, string property, char[]? value, out uint error)
+    {
+        var valueCall = value is not null;
+        if (!valueCall) _reads[(patchCode, productCode, property)] = Reads(patchCode, productCode, property) + 1;
+
+        error = Success;
+        var key = (patchCode, productCode, property, valueCall);
+        if (!_passingReads.TryGetValue(key, out var passing) || passing.Calls <= 0) return false;
+
+        _passingReads[key] = (passing.Error, passing.Calls - 1);
+        error = passing.Error;
+        return true;
+    }
+
     private static readonly List<(string? Sid, MsiInstallContext Context)> OneMachineInstance =
         new() { (null, MsiInstallContext.Machine) };
 
@@ -185,6 +295,7 @@ internal sealed class FakeMsiApi : IMsiApi
         // returns may be read as absence.
         if (productCode is not null)
         {
+            if (PassingErrorAt(MsiWalk.Instances, productCode, index, out var passingInstance)) return passingInstance;
             if (KeyedRowResult.TryGetValue((productCode, index), out var forcedRow)) return forcedRow;
             if (NotInstalled.Contains(productCode)) return MsiError.UnknownProduct;
 
@@ -204,6 +315,7 @@ internal sealed class FakeMsiApi : IMsiApi
             return Success;
         }
 
+        if (PassingErrorAt(MsiWalk.Products, null, index, out var passingProduct)) return passingProduct;
         if (NeverEndProducts)
         {
             WriteCode(installedProductCode, "{FFFFFFFF-0000-0000-0000-000000000000}");
@@ -244,6 +356,7 @@ internal sealed class FakeMsiApi : IMsiApi
         // answers NoMoreItems at once: a route A that succeeds and names nothing.
         if (productCode is null)
         {
+            if (PassingErrorAt(MsiWalk.RouteA, null, index, out var passingHolder)) return passingHolder;
             if (RouteAResult is { } forcedRouteA) return forcedRouteA;
             if (index >= RouteAHolders.Count) return NoMoreItems;
             var (heldCode, heldTarget) = RouteAHolders[(int)index];
@@ -255,9 +368,10 @@ internal sealed class FakeMsiApi : IMsiApi
         // context, which is what every row below answers.
         targetProductContext = context;
         if (productCode is not null && index == 0) PatchEnumerationsStarted.Add(productCode);
+        if (PassingErrorAt(MsiWalk.Patches, productCode, index, out var passingPatch)) return passingPatch;
         if (productCode is not null && productCode == NeverEndPatchesFor)
         {
-            WriteCode(patchCode, "{FFFFFFFF-0000-0000-0000-000000000001}");
+            WriteCode(patchCode, EndlessPatch);
             return Success;
         }
         if (productCode is not null && PatchEnumResult.TryGetValue(productCode, out var err))
@@ -275,6 +389,15 @@ internal sealed class FakeMsiApi : IMsiApi
     public uint GetProductInfo(string productCode, string? userSid, MsiInstallContext context, string property,
         char[]? value, ref uint valueLength)
     {
+        if (PassingReadErrorAt(null, productCode, property, value, out var passingRead))
+        {
+            valueLength = 0;
+            return passingRead;
+        }
+
+        if (PassingValueAt(null, productCode, property, value, out var passingValue))
+            return DoubleCall(passingValue, value, ref valueLength);
+
         // A forced code answers the sizing call, so the real API's second
         // call never happens either: nothing survives a failed first call.
         if (ProductPropertyResult.TryGetValue((productCode, property), out var forced))
@@ -309,6 +432,15 @@ internal sealed class FakeMsiApi : IMsiApi
         string property, char[]? value, ref uint valueLength)
     {
         PatchInfoReads.Add((patchCode, productCode, userSid, context, property));
+
+        if (PassingReadErrorAt(patchCode, productCode, property, value, out var passingRead))
+        {
+            valueLength = 0;
+            return passingRead;
+        }
+
+        if (PassingValueAt(patchCode, productCode, property, value, out var passingValue))
+            return DoubleCall(passingValue, value, ref valueLength);
 
         if (PatchPropertyResult.TryGetValue((patchCode, productCode, property), out var forced))
         {

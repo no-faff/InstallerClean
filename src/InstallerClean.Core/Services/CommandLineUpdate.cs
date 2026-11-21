@@ -169,17 +169,18 @@ internal sealed class CommandLineUpdate
     /// How long the check may take where a person is waiting on the console. Where nobody
     /// is, the check's own <see cref="UpdateCheckService.RequestTimeout"/> bounds it.
     /// </summary>
-    internal static readonly TimeSpan WatchedCheckBound = TimeSpan.FromSeconds(3);
+    internal static readonly TimeSpan WatchedCheckBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// How long the run waits for Ctrl+C's cancellation once something Ctrl+C can end has
     /// ended without it: the question's read, which Ctrl+C can end as the end of input, or
     /// the newer version, which Windows ends with <see cref="ControlCExit"/> where it has
-    /// no handler for Ctrl+C yet. The host's handler cancels the token on the console's
-    /// control-handler thread, which can run after either has ended, so the run waits up
-    /// to this long for it and reads that Ctrl+C as its own.
+    /// no handler for Ctrl+C yet. The host's handler cancels the token on a thread-pool
+    /// thread, where the runtime queues it while the console's control-handler thread
+    /// waits, and it can run after either has ended, so the run waits up to this long for
+    /// it and reads that Ctrl+C as its own.
     /// </summary>
-    internal static readonly TimeSpan ControlCBound = TimeSpan.FromMilliseconds(500);
+    internal static readonly TimeSpan ControlCBound = Durations.FromMilliseconds(500);
 
     /// <summary>
     /// The exit code of a console process Windows ended for Ctrl+C because it had no
@@ -408,8 +409,11 @@ internal sealed class CommandLineUpdate
     /// is cancelled, by Ctrl+C or by the console being closed, and the question then
     /// answers cancelled. The end of input is no, unless the token is cancelled while the
     /// question waits on it, up to <see cref="ControlCBound"/> in a run, since Ctrl+C at the
-    /// prompt can itself be read as the end of input. Nothing answered within the answer
-    /// bound is <see cref="Answer.TimedOut"/>.
+    /// prompt can itself be read as the end of input. A yes waits on the token for the same
+    /// bound, so a Ctrl+C whose handler comes within it after the answer is read cancels
+    /// rather than updates. Nothing answered within the answer bound is
+    /// <see cref="Answer.TimedOut"/>, unless the token is cancelled within the same bound
+    /// after it.
     /// </summary>
     private Answer Ask(CancellationToken token)
     {
@@ -510,7 +514,7 @@ internal sealed class CommandLineUpdate
         // the other line nor the run with it.
         void SayRunningNewer()
         {
-            SayLine(string.Format(Strings.Cli_UpdateRunningNewer, run[0], latest));
+            SayLine(string.Format(Strings.Cli_UpdateRunningNewer, canAsk ? "/s" : command, latest));
             if (token.IsCancellationRequested) return;
             if (canAsk && command == "/d") SayLine(Strings.Cli_UpdateListsOnlyAfterDelete);
             if (canAsk && command == "/m") SayLine(Strings.Cli_UpdateListsOnlyAfterMove);

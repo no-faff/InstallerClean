@@ -437,7 +437,7 @@ public class RemovableReverifierWalkDerivedTests
     {
         // Half a millisecond behind after one second, inside a thousandth of it.
         const string spare = Folder + @"\spare.msi";
-        var clock = new SteppingClock(Now, TimeSpan.FromMicroseconds(999_500), TimeSpan.FromSeconds(1));
+        var clock = new SteppingClock(Now, TimeSpan.FromTicks(9_995_000), TimeSpan.FromSeconds(1));
 
         var result = await Reverifier(Query(), IdentitiesFor(spare), Screen(), OldTimes(spare),
             new ScriptedInstallerActivity(PendingRebootResult.Clean), clock)

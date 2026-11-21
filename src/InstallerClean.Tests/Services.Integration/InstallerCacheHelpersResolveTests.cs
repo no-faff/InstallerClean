@@ -34,8 +34,7 @@ public class InstallerCacheHelpersResolveTests
         // that does not exist. ResolveFinalPath should resolve the existing
         // ancestor (canonicalising any symlinks) and reattach the missing
         // suffix so the caller sees the expected path shape.
-        var root = Path.Combine(Path.GetTempPath(), "ic-resolve-" + Guid.NewGuid());
-        Directory.CreateDirectory(root);
+        var root = TestTemp.NewFolder("ic-resolve-");
         try
         {
             var uncreated = Path.Combine(root, "not-yet", "still-not-yet");
@@ -45,9 +44,10 @@ public class InstallerCacheHelpersResolveTests
             Assert.EndsWith(Path.Combine("not-yet", "still-not-yet"), resolved);
             Assert.StartsWith(root.Substring(0, 3), resolved, StringComparison.OrdinalIgnoreCase);
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(root)) { }
         finally
         {
-            try { Directory.Delete(root, recursive: true); } catch { }
+            TestTemp.Delete(root);
         }
     }
 
@@ -100,16 +100,16 @@ public class InstallerCacheHelpersResolveTests
         // The walk-up case, which is most of what the source gate meets: the
         // leaf need not exist, because an ancestor being resolved is what shows
         // no junction stands between the cache root and the file.
-        var root = Path.Combine(Path.GetTempPath(), "ic-tryresolve-" + Guid.NewGuid());
-        Directory.CreateDirectory(root);
+        var root = TestTemp.NewFolder("ic-tryresolve-");
         try
         {
             Assert.True(InstallerCacheHelpers.TryResolveFinalPath(
                 Path.Combine(root, "not-yet.msi"), out _));
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(root)) { }
         finally
         {
-            try { Directory.Delete(root, recursive: true); } catch { }
+            TestTemp.Delete(root);
         }
     }
 
@@ -522,15 +522,15 @@ public class InstallerCacheHelpersResolveTests
     /// </summary>
     private static void WithCacheSandbox(Action<string> body)
     {
-        var root = Path.Combine(Path.GetTempPath(), "ic-cache-" + Guid.NewGuid());
-        Directory.CreateDirectory(root);
+        var root = TestTemp.NewFolder("ic-cache-");
         try
         {
             body(root);
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(root)) { }
         finally
         {
-            try { Directory.Delete(root, recursive: true); } catch { }
+            TestTemp.Delete(root);
         }
     }
 }

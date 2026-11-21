@@ -83,13 +83,20 @@ public enum FolderCreation
 /// </summary>
 internal sealed class HandleDestinationGuard : IDestinationGuard
 {
+    /// <summary>
+    /// Makes the one folder through CreateDirectoryW, given its full path with <c>\\?\</c> in
+    /// front whatever its length, as .NET 10's own CreateDirectory gives it: without the
+    /// prefix, CreateDirectoryW's documented limit is 248 characters. A folder whose full path
+    /// cannot be made is <see cref="FolderCreation.Failed"/>.
+    /// </summary>
     public FolderCreation TryCreateFolder(string folder)
     {
         try
         {
             var attributes = Kernel32.SECURITY_ATTRIBUTES.With(IntPtr.Zero);
-            if (Kernel32.CreateDirectory(folder, in attributes)) return FolderCreation.Made;
-            return Marshal.GetLastPInvokeError() == Kernel32.ERROR_ALREADY_EXISTS
+            var path = PathText.EnsureExtendedPrefix(FullPaths.GetFullPath(folder));
+            if (Kernel32.CreateDirectory(path, in attributes)) return FolderCreation.Made;
+            return Marshal.GetLastWin32Error() == Kernel32.ERROR_ALREADY_EXISTS
                 ? FolderCreation.AlreadyThere
                 : FolderCreation.Failed;
         }
@@ -105,8 +112,8 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
     public bool TryDiscardCopy(string destinationPath, out int failureCode)
     {
         failureCode = 0;
-        var folder = Path.GetDirectoryName(destinationPath);
-        var leaf = Path.GetFileName(destinationPath);
+        var folder = PathText.GetDirectoryName(destinationPath);
+        var leaf = PathText.GetFileName(destinationPath);
         if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(leaf)) return false;
         return DirectoryGuard.TryDiscardChildCopy(folder, leaf, out failureCode);
     }
@@ -115,8 +122,8 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
     {
         if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(existingAncestor)) return false;
 
-        var relative = Path.GetRelativePath(existingAncestor, folder);
-        if (Path.IsPathRooted(relative)) return false;
+        var relative = FullPaths.GetRelativePath(existingAncestor, folder);
+        if (PathText.IsPathRooted(relative)) return false;
         var names = relative.Split(
             [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
             StringSplitOptions.RemoveEmptyEntries);
@@ -168,7 +175,12 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
     {
         failureCode = 0;
         refusal = WriteProbeRefusal.None;
-        var probe = _fs.Path.Combine(folder, _fs.Path.GetRandomFileName());
+        var probe = PathText.Combine(folder, _fs.Path.GetRandomFileName());
+        // BannedSymbols.txt refuses WriteAllBytes and ReadAllBytes, which reach .NET
+        // Framework's own File. They are allowed here alone: the app's composition
+        // registers HandleDestinationGuard, which the wiring test holds, so this guard
+        // writes only through the filesystem a test substitutes.
+#pragma warning disable RS0030
         try
         {
             _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
@@ -186,6 +198,7 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
             _fs.File.ReadAllBytes(probe);
             return true;
         }
+#pragma warning restore RS0030
         catch (Exception ex)
         {
             failureCode = Win32CodeOf(ex);

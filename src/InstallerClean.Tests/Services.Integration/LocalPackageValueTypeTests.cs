@@ -1,5 +1,9 @@
+using System.Runtime.InteropServices;
+using System.Text;
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -9,12 +13,11 @@ namespace InstallerClean.Tests.Services.Integration;
 /// <c>ManagedLocalPackage</c> for a per-user managed installation. Every test here
 /// runs once per name, from <see cref="InstallerQueryService.CachedPackageValueNames"/>.
 ///
-/// AN INTEGRATION TEST BECAUSE THE SUBJECT IS THE FRAMEWORK'S OWN BEHAVIOUR, not
-/// this code's. <c>RegistryKey.GetValue</c> is documented as not supporting
-/// REG_NONE or REG_LINK, returning null for both "instead of the actual value", so
-/// a fake registry cannot exercise the case at all: a PRESENT value of either type
-/// arrives looking exactly like an absent one. Only a real key
-/// holding a real REG_NONE puts the framework in the loop.
+/// AN INTEGRATION TEST BECAUSE THE SUBJECT IS WHAT A REAL VALUE READS AS.
+/// <see cref="RegistryData.ValueOf"/> answers null for a REG_LINK value and a
+/// REG_NONE's bytes for a REG_NONE, as .NET 10's <c>RegistryKey.GetValue</c> does, so
+/// a fake registry would test whichever answer it was written to give. Only a real
+/// key holding a real value of each type puts the reading Windows gives in the loop.
 ///
 /// Writes are confined to a GUID-named key under HKCU and removed in a finally, so
 /// nothing needs elevation and nothing outlives the test. HKCU rather than HKLM for
@@ -45,7 +48,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue(valueName, Array.Empty<byte>(), RegistryValueKind.None);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.False(read);
             Assert.Null(path);
@@ -64,7 +67,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue("SomethingElse", "x", RegistryValueKind.String);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.True(read);
             Assert.Null(path);
@@ -79,7 +82,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue(valueName, @"C:\Windows\Installer\9f05cba.msi", RegistryValueKind.String);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.True(read);
             Assert.Equal(@"C:\Windows\Installer\9f05cba.msi", path);
@@ -96,7 +99,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue(valueName, 42, RegistryValueKind.DWord);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.False(read);
             Assert.Null(path);
@@ -109,16 +112,48 @@ public class LocalPackageValueTypeTests
     {
         // Registry value names are case-insensitive, so a key holding
         // "localpackage" holds a LocalPackage. A case-sensitive presence test
-        // would send this one down the absence path.
+        // would send this one down the absence path. The value is a REG_LINK,
+        // which GetValue hands back as null, so only the presence test sees it.
         WithTestKey(key =>
         {
-            key.SetValue(valueName.ToLowerInvariant(), Array.Empty<byte>(), RegistryValueKind.None);
+            SetLink(key, valueName.ToLowerInvariant());
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out _);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out _, CancellationToken.None);
 
             Assert.False(read);
         });
     }
+
+    [Theory]
+    [MemberData(nameof(ValueNames))]
+    public void A_value_stored_as_REG_LINK_is_a_failed_read_and_not_an_absence(string valueName)
+    {
+        WithTestKey(key =>
+        {
+            SetLink(key, valueName);
+            Assert.Null(RegistryData.ValueOf(key, valueName));
+
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
+
+            Assert.False(read);
+            Assert.Null(path);
+        });
+    }
+
+    // RegistryKey.SetValue writes no REG_LINK, so the value goes in through Windows
+    // directly: a path as UTF-16 without a terminator, as a symbolic link's target is
+    // stored.
+    private static void SetLink(RegistryKey key, string valueName)
+    {
+        const int REG_LINK = 6;
+        var data = Encoding.Unicode.GetBytes(@"\Registry\Machine\Software");
+        var result = RegSetValueEx(key.Handle, valueName, 0, REG_LINK, data, data.Length);
+        Assert.Equal(0, result);
+    }
+
+    [DllImport("advapi32.dll", EntryPoint = "RegSetValueExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    private static extern int RegSetValueEx(
+        SafeRegistryHandle hKey, string lpValueName, int reserved, int dwType, byte[] lpData, int cbData);
 
     [Fact]
     public void Each_name_answers_for_its_own_value_and_not_the_other()
@@ -132,9 +167,9 @@ public class LocalPackageValueTypeTests
             key.SetValue("LocalPackage", Array.Empty<byte>(), RegistryValueKind.None);
             key.SetValue("ManagedLocalPackage", @"C:\Windows\Installer\1a2b3c.msi", RegistryValueKind.String);
 
-            Assert.False(InstallerQueryService.TryReadLocalPackage(key, "LocalPackage", out var local));
+            Assert.False(InstallerQueryService.TryReadLocalPackage(key, "LocalPackage", out var local, CancellationToken.None));
             Assert.Null(local);
-            Assert.True(InstallerQueryService.TryReadLocalPackage(key, "ManagedLocalPackage", out var managed));
+            Assert.True(InstallerQueryService.TryReadLocalPackage(key, "ManagedLocalPackage", out var managed, CancellationToken.None));
             Assert.Equal(@"C:\Windows\Installer\1a2b3c.msi", managed);
         });
     }
@@ -143,7 +178,7 @@ public class LocalPackageValueTypeTests
     [MemberData(nameof(ValueNames))]
     public void A_null_key_is_an_absence(string valueName)
     {
-        var read = InstallerQueryService.TryReadLocalPackage(null, valueName, out var path);
+        var read = InstallerQueryService.TryReadLocalPackage(null, valueName, out var path, CancellationToken.None);
 
         Assert.True(read);
         Assert.Null(path);

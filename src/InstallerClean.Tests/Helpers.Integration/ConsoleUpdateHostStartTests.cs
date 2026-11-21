@@ -12,14 +12,14 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// </summary>
 public sealed class ConsoleUpdateHostStartTests : IDisposable
 {
-    private readonly string _folder = Directory.CreateTempSubdirectory("ic-host-start-").FullName;
+    private readonly string _folder = TestTemp.NewFolder("ic-host-start-");
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
 
     public void Dispose()
     {
         try
         {
-            TestCrashLog.TryDelete(_folder);
+            TestTemp.Delete(_folder);
         }
         finally
         {

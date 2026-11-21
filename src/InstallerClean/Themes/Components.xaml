@@ -34,59 +34,6 @@
         <Setter Property="FontFamily" Value="{DynamicResource Type.FontFamily}"/>
     </Style>
 
-    <!-- Selectable text. A read-only TextBox styled to look like a
-         TextBlock but with user-selectable contents. Useful for
-         showing values worth copying (file paths, version strings,
-         hashes). -->
-    <Style x:Key="SelectableText" TargetType="TextBox">
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="FontFamily" Value="{DynamicResource Type.FontFamily}"/>
-        <!-- IsTabStop=True so keyboard-only users can Tab onto a value
-             and Ctrl+C it. Consumers that genuinely shouldn't be in
-             the tab order set IsTabStop="False" at the site. -->
-        <Setter Property="IsTabStop" Value="True"/>
-        <!-- Text shown here can carry the word joiners and zero-width spaces
-             that hold a path together or let it wrap. What is copied, by
-             Ctrl+C, the menu below or a drag, is the text without them. -->
-        <Setter Property="a11y:PlainCopy.IsEnabled" Value="True"/>
-        <Setter Property="ContextMenu">
-            <Setter.Value>
-                <ContextMenu>
-                    <MenuItem Header="{loc:Translate Action.Copy}" Command="ApplicationCommands.Copy"/>
-                </ContextMenu>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- A value row in the detail panels' metadata grids (Orphaned and
-         Registered): SelectableText's copyable, borderless look, in the
-         heading colour at body size, and wrapping so a long value (a signing
-         certificate, a long product field) breaks onto the next line rather
-         than clipping. The wrap lives here, not on each of the value boxes, so
-         a metadata row cannot be added without it. -->
-    <Style x:Key="MetadataValueText" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
-        <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
-        <Setter Property="TextWrapping" Value="Wrap"/>
-    </Style>
-
-    <!-- Cards. Rounded surface containers. Card has standard inner
-         padding; CardNoPad lets the consumer control its own padding
-         (used for lists that paint their own row spacing). -->
-    <Style x:Key="Card" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
-        <Setter Property="Padding" Value="{StaticResource Gap.Lg}"/>
-    </Style>
-
-    <Style x:Key="CardNoPad" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
-    </Style>
-
     <!-- Focus visuals. Three sizes match the three pill heights
          (40 / 30 / 28). The default focus visual at the bottom of
          this file applies to anything else that takes focus
@@ -136,9 +83,12 @@
 
     <!-- Focus ring for flat, rectangular controls: the checkbox row
          further down (whose focusable extent is the box plus its
-         label, a rectangle) and, through the app-default focus visual
-         near the end of this file, in-body Hyperlinks and anything
-         else with no override of its own. The pill visuals above sit
+         label, a rectangle), the selectable text boxes, the lists, the
+         in-body links (SubtleLink) and the scrolling regions
+         (BodyScrollRegion), each of which names it. A focusable element
+         whose style names no FocusVisualStyle gets the Windows theme's
+         ring rather than this one, so every focusable element's style
+         names one of these visuals. The pill visuals above sit
          around rounded controls and paint a 16 to 22 px rounded ring,
          which outside a sharp-cornered edge traces a shape the control
          does not have. This one uses a 2px corner radius so the ring
@@ -155,6 +105,74 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- The same ring drawn inside the element's edge, for the rows of a
+         list, the items of a menu and the column headers. Each of those
+         sits in a scrolling viewport that clips what is drawn beyond it, so
+         a ring outside the edge would lose its top on the first row and its
+         bottom on the last. -->
+    <Style x:Key="InsetFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border CornerRadius="{StaticResource Radius.Tight}"
+                            BorderThickness="{StaticResource BorderThickness.Focus}"
+                            BorderBrush="{DynamicResource Text.Body}"
+                            SnapsToDevicePixels="True"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Selectable text. A read-only TextBox styled to look like a
+         TextBlock but with user-selectable contents. Useful for
+         showing values worth copying (file paths, version strings,
+         hashes). -->
+    <Style x:Key="SelectableText" TargetType="TextBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontFamily" Value="{DynamicResource Type.FontFamily}"/>
+        <!-- IsTabStop=True so keyboard-only users can Tab onto a value
+             and Ctrl+C it. Consumers that genuinely shouldn't be in
+             the tab order set IsTabStop="False" at the site. -->
+        <Setter Property="IsTabStop" Value="True"/>
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu>
+                    <MenuItem Header="{loc:Translate Action.Copy}" Command="ApplicationCommands.Copy"/>
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A value row in the detail panels' metadata grids (Orphaned and
+         Registered): SelectableText's copyable, borderless look, in the
+         heading colour at body size, and wrapping so a long value (a signing
+         certificate, a long product field) breaks onto the next line rather
+         than clipping. The wrap lives here, not on each of the value boxes, so
+         a metadata row cannot be added without it. -->
+    <Style x:Key="MetadataValueText" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- Cards. Rounded surface containers. Card has standard inner
+         padding; CardNoPad lets the consumer control its own padding
+         (used for lists that paint their own row spacing). -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
+        <Setter Property="Padding" Value="{StaticResource Gap.Lg}"/>
+    </Style>
+
+    <Style x:Key="CardNoPad" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
     </Style>
 
     <!-- Pill buttons. Four flavours share one visual language (40px
@@ -636,8 +654,12 @@
                                  text), so binding Padding to this ScrollViewer's
                                  Margin too would apply it twice and push the
                                  typed text and caret a whole Padding.Left right
-                                 of the placeholder. -->
+                                 of the placeholder. Not focusable, as in the
+                                 stock template: the box takes the focus, and
+                                 the ScrollViewer inside it is no stop of its
+                                 own. -->
                             <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
                                           VerticalAlignment="Center"/>
                             <!-- Placeholder text comes from the box's Tag. Its
                                  Margin is the box Padding, the single inset
@@ -699,7 +721,17 @@
          the list shuffles under the selection as it moves. -->
 
 
+    <!-- A list takes the focus itself where it has no rows to give it to. -->
+    <Style TargetType="ListView">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+    </Style>
+
+    <Style TargetType="ListBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+    </Style>
+
     <Style TargetType="ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <!-- Stretch, not the Left default: GridViewRowPresenter arranges each
              cell's content at its own desired width and packs it to the left
@@ -742,9 +774,9 @@
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
                         </MultiTrigger>
                         <!-- Declared last so it wins over the selection rule
-                             above. A row wearing the 2px ring does not also want
-                             a rule immediately inside it, two boundaries doing
-                             one job. The condition is FocusRing.IsShowing rather
+                             above. A row wearing the 2px ring, drawn just inside
+                             its edge, does not also want the rule under it, two
+                             boundaries doing one job. The condition is FocusRing.IsShowing rather
                              than IsKeyboardFocused because those are not the
                              same state: a clicked row has keyboard focus and no
                              ring, and keying on focus would leave it with
@@ -764,6 +796,7 @@
     </Style>
 
     <Style TargetType="ListBoxItem">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -827,6 +860,7 @@
          which also keeps the ▲/▼ glyph appended to the visible header text out
          of speech. -->
     <Style TargetType="GridViewColumnHeader">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Caption}"/>
         <Setter Property="IsTabStop" Value="True"/>
@@ -890,6 +924,9 @@
          the focus to the next stop when a region that has it stops
          overflowing and the trigger takes its stop away. -->
     <Style x:Key="BodyScrollRegion" TargetType="ScrollViewer">
+        <!-- The app's flat ring, named here: neither the theme's ScrollViewer
+             style nor the stock default draws it. -->
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
         <Setter Property="a11y:FocusRing.KeepsInView" Value="True"/>
         <Setter Property="a11y:ScrollRegionFocus.PassesFocusOn" Value="True"/>
         <Style.Triggers>
@@ -910,6 +947,10 @@
          keyboard focus. -->
 
     <Style x:Key="SubtleLink" TargetType="Hyperlink">
+        <!-- The app's flat ring at the app's one focus weight, named here for
+             the reason BodyScrollRegion gives: a link drawn with a thinner or
+             dotted ring would look less focused than every other control. -->
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Link.Rest}"/>
         <!-- Underlined at rest, not only on hover/focus. An in-sentence link
              set apart by its hue alone fails WCAG 1.4.1: the rest hue is
@@ -1241,17 +1282,6 @@
         </Setter>
     </Style>
 
-    <!-- Default focus visual. Catches anything that takes focus but
-         has no FocusVisualStyle override (plain Buttons, Hyperlinks).
-         Pill buttons opt out via their own *FocusVisual styles above.
-         BasedOn the flat ring rather than carrying a template of its
-         own so the catch-all cannot drift from the app's one focus
-         weight (BorderThickness.Focus): a ring drawn thinner here
-         would make links look less focused than every other
-         control. -->
-    <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}"
-           BasedOn="{StaticResource FlatTextBoxFocusVisual}"/>
-
     <!-- Progress bar. Slim dark bar. Determinate uses PART_Indicator
          (WPF stock). Indeterminate has two presentations: an 80 px stripe
          sweeping across the bar when animations are on, and a static
@@ -1387,6 +1417,7 @@
     </Style>
 
     <Style TargetType="MenuItem">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
         <Setter Property="Padding" Value="12,6"/>

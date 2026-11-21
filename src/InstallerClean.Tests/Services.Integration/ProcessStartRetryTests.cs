@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -15,7 +16,7 @@ public sealed class ProcessStartRetryTests : IDisposable
     public void Dispose() => _crashLog.Dispose();
 
     private static ProcessStartInfo Missing() =>
-        new(Path.Combine(Path.GetTempPath(), $"InstallerClean-missing-{Guid.NewGuid():N}.exe"))
+        new(TestTemp.NewFilePath("InstallerClean-missing-", ".exe"))
         {
             UseShellExecute = false,
         };
@@ -81,5 +82,50 @@ public sealed class ProcessStartRetryTests : IDisposable
         Assert.Equal(refusedAt, asked);
         Assert.Equal(refusedAt - 1, waits);
         Assert.Equal(refusedAt - 1, TestCrashLog.FailedStartsOf(info.FileName));
+    }
+
+    [Fact]
+    public void A_refused_start_names_the_file_and_the_folder_as_dotnet_10_does()
+    {
+        var info = Missing();
+        var thrown = Assert.Throws<Win32Exception>(() => ProcessStartRetry.Start(info, _ => false, _ => { }));
+
+        // ERROR_FILE_NOT_FOUND, in the text .NET 10 gives it.
+        Assert.Equal(2, thrown.NativeErrorCode);
+        Assert.StartsWith(
+            $"An error occurred trying to start process '{info.FileName}' with working directory '{Environment.CurrentDirectory}'. ",
+            thrown.Message,
+            StringComparison.Ordinal);
+        Assert.EndsWith("The system cannot find the file specified.", thrown.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_start_from_a_named_folder_names_that_folder()
+    {
+        var info = Missing();
+        info.WorkingDirectory = TestTemp.NewFolder("InstallerClean-start-folder-");
+        var thrown = Assert.Throws<Win32Exception>(() => ProcessStartRetry.Start(info, _ => false, _ => { }));
+
+        Assert.StartsWith(
+            $"An error occurred trying to start process '{info.FileName}' with working directory '{info.WorkingDirectory}'. ",
+            thrown.Message,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_file_that_is_not_a_program_is_answered_with_dotnet_10s_own_text()
+    {
+        var file = TestTemp.NewFilePath("InstallerClean-not-a-program-", ".exe");
+        File.WriteAllText(file, "not a program");
+        var info = new ProcessStartInfo(file) { UseShellExecute = false };
+        var thrown = Assert.Throws<Win32Exception>(() => ProcessStartRetry.Start(info, _ => false, _ => { }));
+
+        // ERROR_BAD_EXE_FORMAT or ERROR_EXE_MACHINE_TYPE_MISMATCH, as Windows reads the file;
+        // .NET 10 gives both the one text.
+        Assert.Contains(thrown.NativeErrorCode, new[] { 193, 216 });
+        Assert.EndsWith(
+            "'. The specified executable is not a valid application for this OS platform.",
+            thrown.Message,
+            StringComparison.Ordinal);
     }
 }

@@ -8,34 +8,25 @@ namespace InstallerClean.Tests.Helpers;
 /// and the opt-in report.
 /// </summary>
 /// <remarks>
-/// THE ARMS THAT ANSWER FROM THE PATH'S SPELLING ARE HERE, and they are worth
-/// pinning because they are the ones that run BEFORE anything goes to the
-/// network. Classify reads the volume a folder is on
-/// rather than the letter its path starts with, so the fixed and removable arms
-/// go on to ask what is mounted where and want real storage to answer. The
-/// same-drive arm takes its answer from the resolve the method is handed, and it
-/// is covered end to end by
+/// A SHARE IS LABELLED BY THE VOLUME QUESTION FIRST. A Move through this PC's own share,
+/// or a drive mapped onto it, lands on the cache's own volume, so the classifier asks the
+/// resolve it is handed before calling a share a share. The fixed and removable arms go on
+/// to ask what is mounted where and want real storage to answer. The same-drive arm is
+/// covered end to end by
 /// <c>CleanupPreFlightTests.A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space</c>
 /// with the predicate underneath it in
-/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>.
-///
-/// AND "ANSWERS FROM THE SPELLING" IS PROVED HERE RATHER THAN READ. Both
-/// theories hand the classifier a resolve that throws, so an arm that consulted
-/// the volume before answering would fail rather than return the right kind by a
-/// route these tests cannot see.
+/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>, and the share side of the
+/// predicate in <c>MoveSpaceCheckShareTests</c>.
 /// </remarks>
 public class MoveDestinationClassifierTests
 {
     /// <summary>
-    /// The volume question, handed to <c>Classify</c> by the two
-    /// theories below. Both cover an arm that answers from the spelling of the
-    /// path, and reaching this is the failure those theories exist to catch:
-    /// a reordering that asked the volume first would still return the right
-    /// kind, and would have moved those answers onto the network to get it.
+    /// The volume question for the empty-destination theory below, which answers before
+    /// asking it: reaching this is the failure that theory exists to catch.
     /// </summary>
     private static bool? TheVolumeIsNeverAsked(string dest) =>
         throw new InvalidOperationException(
-            $"the volume was asked about '{dest}' on an arm that answers from the path's spelling");
+            $"the volume was asked about '{dest}', which is not a path");
 
     [Theory]
     [InlineData(@"\\server\backup")]
@@ -47,9 +38,21 @@ public class MoveDestinationClassifierTests
     // is one of the few things this project knows about real machines.
     [InlineData("//server/backup")]
     [InlineData(@"\\?\UNC\server\backup")]
-    public void Classify_calls_a_share_a_share(string dest) =>
+    public void Classify_calls_a_share_on_another_volume_a_share(string dest) =>
         Assert.Equal(MoveDestinationKinds.UncShare,
-            MoveDestinationClassifier.Classify(dest, TheVolumeIsNeverAsked));
+            MoveDestinationClassifier.Classify(dest, _ => false));
+
+    [Theory]
+    [InlineData(@"\\localhost\C$\Moved")]
+    [InlineData(@"\\?\UNC\localhost\C$\Moved")]
+    public void Classify_calls_a_share_on_the_cache_volume_the_same_drive(string dest) =>
+        Assert.Equal(MoveDestinationKinds.SameDrive,
+            MoveDestinationClassifier.Classify(dest, _ => true));
+
+    [Fact]
+    public void Classify_says_unknown_for_a_share_whose_volume_was_not_settled() =>
+        Assert.Equal(MoveDestinationKinds.Unknown,
+            MoveDestinationClassifier.Classify(@"\\localhost\C$\Moved", _ => null));
 
     [Theory]
     [InlineData("")]

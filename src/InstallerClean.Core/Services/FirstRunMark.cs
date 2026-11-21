@@ -26,7 +26,7 @@ internal sealed class FirstRunMark : IFirstRunMark
     /// How long <see cref="TryClaim"/> waits for the lock before it answers false, and how
     /// long <see cref="Set"/> waits before it writes the mark without the lock.
     /// </summary>
-    internal static readonly TimeSpan ClaimLockWait = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan ClaimLockWait = Durations.FromSeconds(2);
 
     private readonly RegistryHive _hive;
     private readonly string _keyPath;
@@ -63,12 +63,12 @@ internal sealed class FirstRunMark : IFirstRunMark
         try
         {
             using var hive = RegistryKey.OpenBaseKey(_hive, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(_keyPath);
+            using var key = hive.OpenSubKeyEarned(_keyPath);
             if (key is null) return FirstRunMarkState.NotSet;
 
             // Not expanded and not converted: whatever is stored under the name, of
             // any type, is enough to answer.
-            var value = key.GetValue(ValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            var value = RegistryData.ValueOf(key, ValueName, doNotExpand: true);
             return value is null ? FirstRunMarkState.NotSet : FirstRunMarkState.Set;
         }
         catch (SecurityException) { return FirstRunMarkState.Unreadable; }
@@ -127,12 +127,12 @@ internal sealed class FirstRunMark : IFirstRunMark
                 return false;
             }
             var wrote = false;
-            if (key.GetValue(ValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames) is null)
+            if (RegistryData.ValueOf(key, ValueName, doNotExpand: true) is null)
             {
                 key.SetValue(ValueName, 1, RegistryValueKind.DWord);
                 wrote = true;
             }
-            if (key.GetValue(ValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames) is null)
+            if (RegistryData.ValueOf(key, ValueName, doNotExpand: true) is null)
                 return false;
             if (wrote && createdUnderLock) _setHere = true;
             return true;

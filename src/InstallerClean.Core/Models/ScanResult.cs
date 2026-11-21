@@ -433,8 +433,9 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="UnlistedKeysWithoutInstallPropertiesListUnread">
 /// The keys counted in <paramref name="UnlistedKeysWithoutInstallProperties"/> one of whose source
-/// lists did not read (<see cref="Services.IDeclaredProductCheck.CountKeysWithAListUnread"/>), asked
-/// of every such key whatever the screen read. 0 where the scan has no declared-product check.
+/// lists did not read or holds a value in a form the check does not compare
+/// (<see cref="Services.IDeclaredProductCheck.CountKeysWithAListUnread"/>), each key counted once,
+/// asked of every such key whatever the screen read. 0 where the scan has no declared-product check.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
@@ -626,10 +627,11 @@ public record ScanResult(
     /// nobody established.
     ///
     /// AND THE WHOLESALE READING NEEDS NOTHING WALK-DERIVED ON THE OFFER. The wholesale
-    /// sentences say the scan offered nothing it found by looking in the folder, so a run
-    /// offering a walk-derived file takes the per-file reading, whose sentences are true of
-    /// every held file. An offered superseded patch comes from its own registration and
-    /// not from the folder, so it does not count against the wholesale reading.
+    /// sentences say no file the scan found by looking in the folder was listed as safe to
+    /// delete, so a run listing a walk-derived file takes the per-file reading, whose
+    /// sentences are true of every file left alone. A superseded patch listed as safe to
+    /// delete comes from its own registration and not from the folder, so it does not
+    /// count against the wholesale reading.
     ///
     /// A RUN WHOSE WITHHELD FILES WERE ALL COUNTED BY THE DECLARED-PRODUCT-INSTALLED AND
     /// DECLARED-PATCH-REGISTERED ARMS AND <see cref="WithholdingSplit.NotBeforeTheClockCount"/> READS AS
@@ -1198,9 +1200,9 @@ public enum WithholdingLeg
     RegistryProductUnaskable,
 
     /// <summary>
-    /// A read of Windows Installer's own records in the registry failed, so nothing shows
-    /// what the key that would not read would have kept
-    /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
+    /// A read of Windows Installer's own records in the registry failed on a key that can
+    /// record a cached file, so nothing shows what the key that would not read would have
+    /// kept (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
     /// </summary>
     RegistryRecordsUnread,
 }

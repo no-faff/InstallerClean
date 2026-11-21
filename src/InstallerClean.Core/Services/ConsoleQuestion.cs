@@ -1,18 +1,26 @@
 using System.Globalization;
+using InstallerClean.Compatibility;
 using InstallerClean.Resources;
 
+using InstallerClean.Helpers;
 namespace InstallerClean.Services;
 
 /// <summary>How a question put to the console was answered.</summary>
 internal enum ConsoleAnswer
 {
-    /// <summary>Enter, or an answer starting with this language's letter for yes or with Y.</summary>
+    /// <summary>
+    /// Enter, or an answer starting with this language's letter for yes or with Y, and no Ctrl+C
+    /// or close while the question waited or within <c>controlCBound</c> of the answer.
+    /// </summary>
     Yes,
 
     /// <summary>An answer starting with this language's letter for no or with N, or the end of input.</summary>
     No,
 
-    /// <summary>Ctrl+C or a closing console came while the question waited.</summary>
+    /// <summary>
+    /// Ctrl+C or a closing console came while the question waited, or within <c>controlCBound</c>
+    /// of a yes, the end of input or the question running out of time.
+    /// </summary>
     Cancelled,
 
     /// <summary>Nothing was answered within <see cref="ConsoleQuestion.AnswerBound"/>.</summary>
@@ -34,7 +42,7 @@ internal static class ConsoleQuestion
     /// nobody is there to answer it, and the run waits this long before going on as an
     /// unanswered run does. The lines saying so name the time as a minute.
     /// </summary>
-    internal static readonly TimeSpan AnswerBound = TimeSpan.FromMinutes(1);
+    internal static readonly TimeSpan AnswerBound = Durations.FromMinutes(1);
 
     /// <summary>
     /// Discards what was typed before the question appears, prints the question and reads
@@ -47,10 +55,13 @@ internal static class ConsoleQuestion
     /// the answer is then <see cref="ConsoleAnswer.Cancelled"/>. The end of input is
     /// <see cref="ConsoleAnswer.No"/>, unless the token is cancelled while the question
     /// waits on it, up to <paramref name="controlCBound"/> in a run, since Ctrl+C at the
-    /// prompt can itself be read as the end of input. Where nothing is answered within
+    /// prompt can itself be read as the end of input. A yes waits on the token for the same
+    /// bound before it counts, so a Ctrl+C that comes just before or as the answer is read,
+    /// whose handler cancels the token on a thread of its own within that bound, answers
+    /// <see cref="ConsoleAnswer.Cancelled"/> rather than yes. Where nothing is answered within
     /// <paramref name="answerBound"/>, the read ends, the cursor moves past the question
-    /// and the answer is <see cref="ConsoleAnswer.TimedOut"/>, for the caller to say what
-    /// happens next. <paramref name="answer"/> is the answer typed, trimmed.
+    /// and, unless the token is cancelled within the same bound after it, the answer is
+    /// <see cref="ConsoleAnswer.TimedOut"/>, for the caller to say what happens next. <paramref name="answer"/> is the answer typed, trimmed.
     /// </summary>
     internal static ConsoleAnswer Ask(
         IConsolePrompt console, Func<string, string, string> prompt,
@@ -68,20 +79,30 @@ internal static class ConsoleQuestion
             line = console.ReadLine(bound.Token);
             if (line is null && bound.IsCancellationRequested && !token.IsCancellationRequested)
             {
+                // A Ctrl+C as the minute runs out is a cancel, not nobody answering, which
+                // a caller can take as leave to go on.
+                if (token.WaitHandle.WaitOne(controlCBound))
+                {
+                    answer = string.Empty;
+                    console.WriteLine(string.Empty);
+                    return ConsoleAnswer.Cancelled;
+                }
                 answer = string.Empty;
                 console.WriteLine(string.Empty);
                 return ConsoleAnswer.TimedOut;
             }
         }
-        if (line is null) token.WaitHandle.WaitOne(controlCBound);
         answer = line?.Trim() ?? string.Empty;
+        var saysYes = line is not null
+            && (answer.Length == 0 || StartsWith(answer, yes) || StartsWith(answer, "Y"));
+        if (line is null || saysYes) token.WaitHandle.WaitOne(controlCBound);
         if (token.IsCancellationRequested) return ConsoleAnswer.Cancelled;
         if (line is null) return ConsoleAnswer.No;
-        if (answer.Length == 0 || StartsWith(answer, yes) || StartsWith(answer, "Y")) return ConsoleAnswer.Yes;
+        if (saysYes) return ConsoleAnswer.Yes;
         if (StartsWith(answer, no) || StartsWith(answer, "N")) return ConsoleAnswer.No;
         return ConsoleAnswer.Other;
 
         static bool StartsWith(string answer, string letter) =>
-            letter.Length > 0 && answer.StartsWith(letter, StringComparison.CurrentCultureIgnoreCase);
+            letter.Length > 0 && FrameworkCollation.StartsWithIgnoringCase(answer, letter, CultureInfo.CurrentCulture);
     }
 }

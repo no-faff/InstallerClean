@@ -49,14 +49,16 @@ public class DisplayHelpersTests
     [Theory]
     [InlineData(1_280, "1.2 KB")]
     [InlineData(1_792, "1.8 KB")]
+    [InlineData(1_310_720, "1.2 MB")]
+    [InlineData(1_835_008, "1.8 MB")]
     [InlineData(1_207_959_552, "1.12 GB")]
     [InlineData(1_744_830_464, "1.62 GB")]
     public void FormatSize_rounds_a_figure_exactly_halfway_to_the_even_digit(long bytes, string expected)
     {
         // A whole number of bytes over a power of two can land exactly halfway
-        // between two printed values: 1,280 bytes is 1.25 KB. The rounding is the
-        // one .NET applies when it formats a double, so the machine form, which
-        // formats a double, prints the same digits for the same size.
+        // between two printed values: 1,280 bytes is 1.25 KB. Both forms round it
+        // to the even digit, so the window and the Application-channel entry print
+        // the same digits for a size both give in the same unit.
         using var scope = new LocalisationScope(British, British);
         Assert.Equal(expected, DisplayHelpers.FormatSize(bytes));
         Assert.Equal(expected, DisplayHelpers.FormatSizeForMachine(bytes));
@@ -117,6 +119,61 @@ public class DisplayHelpersTests
         // rounding step either.
         using var scope = new LocalisationScope(British, British);
         Assert.Equal(expected, DisplayHelpers.FormatSizeForMachine(bytes));
+    }
+
+    [Theory]
+    // Ticks, and the status line's time. A time whose milliseconds round to a thousand
+    // reads in seconds. On the halfway rows .NET 10 prints the same, and .NET
+    // Framework's F0 and F1 give 13ms for 125,000 ticks, 1.3s for 12,500,000 and 1.5s
+    // for 14,500,000.
+    [InlineData(0, "0ms")]
+    [InlineData(125_000, "12ms")]
+    [InlineData(135_000, "14ms")]
+    [InlineData(9_994_000, "999ms")]
+    [InlineData(9_995_000, "1.0s")]
+    [InlineData(9_999_999, "1.0s")]
+    [InlineData(10_000_000, "1.0s")]
+    [InlineData(12_500_000, "1.2s")]
+    [InlineData(13_500_000, "1.4s")]
+    [InlineData(14_500_000, "1.4s")]
+    [InlineData(25_000_000, "2.5s")]
+    [InlineData(610_500_000, "61.0s")]
+    public void The_scan_time_rounds_a_halfway_figure_to_the_even_digit(long ticks, string expected)
+    {
+        using var scope = new LocalisationScope(British, British);
+        Assert.Equal(expected, DisplayHelpers.FormatElapsed(new TimeSpan(ticks)));
+    }
+
+    // 1.15 s is a true tie, and the even tenth is 1.2. .NET 10 prints 1.1s, from the
+    // double nearest 1.15, which lies just under it.
+    [Fact]
+    public void A_halfway_tenth_of_a_second_goes_to_the_even_digit_on_the_exact_tick_count()
+    {
+        using var scope = new LocalisationScope(British, British);
+        Assert.Equal("1.2s", DisplayHelpers.FormatElapsed(new TimeSpan(11_500_000)));
+        Assert.Equal("1.2 seconds", DisplayHelpers.FormatElapsedLong(new TimeSpan(11_500_000)));
+    }
+
+    [Theory]
+    [InlineData(9_999_999, "less than a second")]
+    [InlineData(10_000_000, "1.0 seconds")]
+    [InlineData(12_500_000, "1.2 seconds")]
+    public void The_long_scan_time_rounds_as_the_short_one_does(long ticks, string expected)
+    {
+        using var scope = new LocalisationScope(British, British);
+        Assert.Equal(expected, DisplayHelpers.FormatElapsedLong(new TimeSpan(ticks)));
+    }
+
+    [Theory]
+    [InlineData(25, 10, 2)]
+    [InlineData(35, 10, 4)]
+    [InlineData(-25, 10, -2)]
+    [InlineData(-35, 10, -4)]
+    [InlineData(-26, 10, -3)]
+    [InlineData(24, 10, 2)]
+    public void WholeUnits_rounds_to_the_nearest_unit_a_tie_to_the_even_one(long ticks, long unit, long expected)
+    {
+        Assert.Equal(expected, DisplayHelpers.WholeUnits(ticks, unit));
     }
 
     [Theory]
@@ -366,7 +423,7 @@ public class DisplayHelpersTests
 
         Assert.Equal(
             "Waiting for drive D: to respond... Press Alt+W to carry on without it. "
-            + "Any file still to be checked against it will be left alone.",
+            + "Any file InstallerClean still needs it to check will be left alone.",
             DisplayHelpers.WaitingLineWithStopKey(DisplayHelpers.WaitingFor("D:")));
     }
 

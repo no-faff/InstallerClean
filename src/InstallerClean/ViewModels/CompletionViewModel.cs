@@ -173,7 +173,7 @@ public partial class CompletionViewModel : ObservableObject
     /// </summary>
     public AppCopyKind ReportCopy { get; }
 
-    /// <summary>The program that sends the reports this window writes: the window.</summary>
+    /// <summary>The program named in the reports this window writes: the window.</summary>
     public ReportHost ReportHost => ReportHost.Window;
 
     /// <summary>
@@ -194,14 +194,14 @@ public partial class CompletionViewModel : ObservableObject
     /// before it is revealed. Where the bound passes first the check answers that
     /// the PC has had its first run, and sets the mark.
     /// </summary>
-    internal static readonly TimeSpan ReportCheckBound = TimeSpan.FromSeconds(3);
+    internal static readonly TimeSpan ReportCheckBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// How long closing the app waits for the report's send and its settings saves
     /// before it lets the process go. A report cut off here is still waiting
     /// (<see cref="AppSettings.ReportSendPending"/>) and goes from a later start.
     /// </summary>
-    internal static readonly TimeSpan ExitWaitBound = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan ExitWaitBound = Durations.FromSeconds(2);
 
     private readonly IResultLogService _resultLogService;
     private readonly ISettingsService _settingsService;
@@ -295,7 +295,7 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_NothingToCleanUpReceipt,
             DisplayHelpers.FormatCount(scannedFileCount),
             DisplayHelpers.PluraliseFile(scannedFileCount),
-            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+            DisplayHelpers.FormatElapsedLong(Durations.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
         Skipped = string.Empty;
         ScanStartLine = string.Empty;
@@ -364,7 +364,7 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_NothingToCleanUpReceipt,
             DisplayHelpers.FormatCount(scannedFileCount),
             DisplayHelpers.PluraliseFile(scannedFileCount),
-            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+            DisplayHelpers.FormatElapsedLong(Durations.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
         Skipped = string.Empty;
         ScanStartLine = string.Empty;
@@ -748,7 +748,7 @@ public partial class CompletionViewModel : ObservableObject
     /// <summary>
     /// The line about files <paramref name="scan"/> held back because their times are not
     /// before the moment it began (<see cref="RecentChangeReport.Line(ScanResult)"/>), or
-    /// empty. "Nothing offered on this PC" gets it here for its own scan.
+    /// empty. "No files can be deleted" gets it here for its own scan.
     /// </summary>
     private static string RecentChangeLine(ScanResult? scan) => RecentChangeReport.Line(scan);
 
@@ -1070,7 +1070,7 @@ public partial class CompletionViewModel : ObservableObject
             // font the app draws in is, so the hyphen is what separates a
             // filename from the sentence above it.
             foreach (var err in bucket)
-                sb.Append("- ").Append(Path.GetFileName(err.FilePath)).AppendLine();
+                sb.Append("- ").Append(PathText.GetFileName(err.FilePath)).AppendLine();
         }
         return sb.ToString().TrimEnd();
     }

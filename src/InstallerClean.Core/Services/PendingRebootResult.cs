@@ -114,7 +114,7 @@ public enum PendingRebootReason
     ///
     /// Its sentence is <c>Body.PendingReboot.Other</c> and
     /// <c>Cli.PendingRebootBlocked.Other</c>, which say that Windows Installer has
-    /// something in progress, and its Application-log label is its own name.
+    /// something unfinished, and its Application-log label is its own name.
     /// </summary>
     InstallerInProgressMarker,
 

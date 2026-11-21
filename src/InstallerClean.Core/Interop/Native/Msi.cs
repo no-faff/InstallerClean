@@ -1,11 +1,16 @@
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
 /// P/Invoke surface for msi.dll (Windows Installer API). All entry
-/// points are the Unicode ("W") variants.
+/// points are the Unicode ("W") variants, and every declaration passing
+/// text is CharSet.Unicode, so a string and a char[] each reach the
+/// function as a pointer to UTF-16 characters, as a W function reads them.
+///
+/// A char[] buffer is passed as a pointer to its first element, and
+/// [Out] copies what the function wrote back into the array wherever
+/// the marshaller copies the array rather than pinning it.
 ///
 /// The double-call pattern: pass a buffer plus a ref count of the
 /// buffer's character capacity. On success the count is updated to the
@@ -14,7 +19,7 @@ namespace InstallerClean.Interop.Native;
 /// updated to the size required and the call should be retried with a
 /// larger buffer.
 /// </summary>
-internal static partial class Msi
+internal static class Msi
 {
     private const string Library = "msi.dll";
 
@@ -34,22 +39,22 @@ internal static partial class Msi
     /// <remarks>
     /// szInstalledProductCode is a fixed 39-char buffer in the native
     /// signature (a GUID + null terminator); the native function takes
-    /// no count parameter for it. ConstantElementCount keeps the C#
-    /// signature aligned with the 8-parameter native signature.
-    /// CountElementName would inject a phantom 9th parameter that the
-    /// x64 calling convention passes harmlessly but is undefined
+    /// no count parameter for it, so the caller allocates it at
+    /// <see cref="GuidBufferLength"/> and the declaration has the native
+    /// signature's eight parameters exactly. A count parameter added for
+    /// the buffer would be a ninth argument the function does not take,
+    /// which the x64 calling convention passes harmlessly but is undefined
     /// behaviour and crashes on x86.
     /// </remarks>
-    [LibraryImport(Library, EntryPoint = "MsiEnumProductsExW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiEnumProductsEx(
+    [DllImport(Library, EntryPoint = "MsiEnumProductsExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiEnumProductsEx(
         string? szProductCode,
         string? szUserSid,
         MsiInstallContext dwContext,
         uint dwIndex,
-        [MarshalUsing(ConstantElementCount = GuidBufferLength)] char[]? szInstalledProductCode,
+        [Out] char[]? szInstalledProductCode,
         out MsiInstallContext pdwInstalledContext,
-        [MarshalUsing(CountElementName = nameof(pcchSid))] char[]? szSid,
+        [Out] char[]? szSid,
         ref uint pcchSid);
 
     /// <summary>
@@ -57,14 +62,13 @@ internal static partial class Msi
     /// single registered product. <paramref name="pcchValue"/> is the
     /// double-call buffer-size in/out parameter.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiGetProductInfoExW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiGetProductInfoEx(
+    [DllImport(Library, EntryPoint = "MsiGetProductInfoExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiGetProductInfoEx(
         string szProductCode,
         string? szUserSid,
         MsiInstallContext dwContext,
         string szProperty,
-        [MarshalUsing(CountElementName = nameof(pcchValue))] char[]? szValue,
+        [Out] char[]? szValue,
         ref uint pcchValue);
 
     /// <summary>
@@ -82,15 +86,14 @@ internal static partial class Msi
     /// property is read, answers ERROR_INVALID_PARAMETER at every index after the
     /// first.
     /// </remarks>
-    [LibraryImport(Library, EntryPoint = "MsiSourceListEnumSourcesW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiSourceListEnumSources(
+    [DllImport(Library, EntryPoint = "MsiSourceListEnumSourcesW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiSourceListEnumSources(
         string szProductCodeOrPatchCode,
         string? szUserSid,
         MsiInstallContext dwContext,
         uint dwOptions,
         uint dwIndex,
-        [MarshalUsing(CountElementName = nameof(pcchSource))] char[]? szSource,
+        [Out] char[]? szSource,
         ref uint pcchSource);
 
     /// <summary>
@@ -100,15 +103,14 @@ internal static partial class Msi
     /// in/out parameter, as on <see cref="MsiGetProductInfoEx"/>.
     /// <paramref name="szUserSid"/> is null for a per-machine installation.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiSourceListGetInfoW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiSourceListGetInfo(
+    [DllImport(Library, EntryPoint = "MsiSourceListGetInfoW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiSourceListGetInfo(
         string szProductCodeOrPatchCode,
         string? szUserSid,
         MsiInstallContext dwContext,
         uint dwOptions,
         string szProperty,
-        [MarshalUsing(CountElementName = nameof(pcchValue))] char[]? szValue,
+        [Out] char[]? szValue,
         ref uint pcchValue);
 
     /// <summary>
@@ -120,9 +122,8 @@ internal static partial class Msi
     /// for a per-machine installation. The walk keeps its position between calls, as
     /// <see cref="MsiSourceListEnumSources"/>'s does, and a call at index 0 starts it again.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiSourceListEnumMediaDisksW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiSourceListEnumMediaDisks(
+    [DllImport(Library, EntryPoint = "MsiSourceListEnumMediaDisksW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiSourceListEnumMediaDisks(
         string szProductCodeOrPatchCode,
         string? szUserSid,
         MsiInstallContext dwContext,
@@ -141,21 +142,21 @@ internal static partial class Msi
     /// <remarks>
     /// szPatchCode and szTargetProductCode are both fixed 39-char
     /// buffers in the native signature; the native function takes no
-    /// count parameter for them. See MsiEnumProductsEx remarks for the
-    /// rationale on ConstantElementCount vs CountElementName here.
+    /// count parameter for them, and the declaration has the native
+    /// signature's ten parameters exactly. MsiEnumProductsEx's remarks say
+    /// what a count parameter added here would do.
     /// </remarks>
-    [LibraryImport(Library, EntryPoint = "MsiEnumPatchesExW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiEnumPatchesEx(
+    [DllImport(Library, EntryPoint = "MsiEnumPatchesExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiEnumPatchesEx(
         string? szProductCode,
         string? szUserSid,
         MsiInstallContext dwContext,
         MsiPatchFilter dwFilter,
         uint dwIndex,
-        [MarshalUsing(ConstantElementCount = GuidBufferLength)] char[]? szPatchCode,
-        [MarshalUsing(ConstantElementCount = GuidBufferLength)] char[]? szTargetProductCode,
+        [Out] char[]? szPatchCode,
+        [Out] char[]? szTargetProductCode,
         out MsiInstallContext pdwTargetProductContext,
-        [MarshalUsing(CountElementName = nameof(pcchTargetUserSid))] char[]? szTargetUserSid,
+        [Out] char[]? szTargetUserSid,
         ref uint pcchTargetUserSid);
 
     /// <summary>
@@ -163,15 +164,14 @@ internal static partial class Msi
     /// patch. <paramref name="pcchValue"/> is the double-call buffer-
     /// size in/out parameter.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiGetPatchInfoExW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiGetPatchInfoEx(
+    [DllImport(Library, EntryPoint = "MsiGetPatchInfoExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiGetPatchInfoEx(
         string szPatchCode,
         string szProductCode,
         string? szUserSid,
         MsiInstallContext dwContext,
         string szProperty,
-        [MarshalUsing(CountElementName = nameof(pcchValue))] char[]? szValue,
+        [Out] char[]? szValue,
         ref uint pcchValue);
 
     /// <summary>
@@ -186,9 +186,8 @@ internal static partial class Msi
     /// in argument registers) and would crash on x86 where pushing
     /// 8 bytes for a 4-byte argument breaks the stack frame.
     /// </remarks>
-    [LibraryImport(Library, EntryPoint = "MsiGetSummaryInformationW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiGetSummaryInformation(
+    [DllImport(Library, EntryPoint = "MsiGetSummaryInformationW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiGetSummaryInformation(
         uint hDatabase,
         string? szDatabasePath,
         uint uiUpdateCount,
@@ -199,9 +198,8 @@ internal static partial class Msi
     /// The returned <paramref name="puiDataType"/> indicates which of
     /// the value out-params holds the actual data.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiSummaryInfoGetPropertyW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiSummaryInfoGetProperty(
+    [DllImport(Library, EntryPoint = "MsiSummaryInfoGetPropertyW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiSummaryInfoGetProperty(
         uint hSummaryInfo,
         uint uiProperty,
         out uint puiDataType,
@@ -212,14 +210,14 @@ internal static partial class Msi
         // including when a malformed file declares that type in a slot
         // read for a string.
         out long pftValue,
-        [MarshalUsing(CountElementName = nameof(pcchValueBuf))] char[]? szValueBuf,
+        [Out] char[]? szValueBuf,
         ref uint pcchValueBuf);
 
     /// <summary>
     /// Closes any handle returned by an Msi* function.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiCloseHandle")]
-    public static partial uint MsiCloseHandle(uint hAny);
+    [DllImport(Library, EntryPoint = "MsiCloseHandle", ExactSpelling = true)]
+    public static extern uint MsiCloseHandle(uint hAny);
 
     /// <summary>
     /// Opens an installation package as a database. The handle MUST be closed
@@ -235,9 +233,8 @@ internal static partial class Msi
     /// it by passing the text "0", which is a pointer into the first page and
     /// not a mode. <see cref="MsiDbOpen.ReadOnly"/> carries the value.
     /// </param>
-    [LibraryImport(Library, EntryPoint = "MsiOpenDatabaseW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiOpenDatabase(
+    [DllImport(Library, EntryPoint = "MsiOpenDatabaseW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiOpenDatabase(
         string szDatabasePath,
         IntPtr szPersist,
         out uint phDatabase);
@@ -247,9 +244,8 @@ internal static partial class Msi
     /// via <see cref="MsiCloseHandle"/>. A query naming a table the database does
     /// not have fails here rather than at execute time.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiDatabaseOpenViewW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiDatabaseOpenView(
+    [DllImport(Library, EntryPoint = "MsiDatabaseOpenViewW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiDatabaseOpenView(
         uint hDatabase,
         string szQuery,
         out uint phView);
@@ -258,8 +254,8 @@ internal static partial class Msi
     /// Executes a prepared view. <paramref name="hRecord"/> supplies the query's
     /// parameters and is 0 for a query that has none.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiViewExecute")]
-    public static partial uint MsiViewExecute(uint hView, uint hRecord);
+    [DllImport(Library, EntryPoint = "MsiViewExecute", ExactSpelling = true)]
+    public static extern uint MsiViewExecute(uint hView, uint hRecord);
 
     /// <summary>
     /// Fetches the next row of an executed view, returning
@@ -267,18 +263,17 @@ internal static partial class Msi
     /// set is exhausted. Each record handle MUST be closed via
     /// <see cref="MsiCloseHandle"/>.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiViewFetch")]
-    public static partial uint MsiViewFetch(uint hView, out uint phRecord);
+    [DllImport(Library, EntryPoint = "MsiViewFetch", ExactSpelling = true)]
+    public static extern uint MsiViewFetch(uint hView, out uint phRecord);
 
     /// <summary>
     /// Reads one field of a fetched record as text, using the same double-call
     /// buffer pattern as the property reads above. Fields are 1-based.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MsiRecordGetStringW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint MsiRecordGetString(
+    [DllImport(Library, EntryPoint = "MsiRecordGetStringW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiRecordGetString(
         uint hRecord,
         uint iField,
-        [MarshalUsing(CountElementName = nameof(pcchValueBuf))] char[]? szValueBuf,
+        [Out] char[]? szValueBuf,
         ref uint pcchValueBuf);
 }

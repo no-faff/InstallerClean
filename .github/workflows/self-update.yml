@@ -1,45 +1,46 @@
-# Updates the command line from a build of the pushed commit to the current
-# release, on a Windows runner, the way a copy on somebody's machine updates
-# itself.
+# Updates a copy of the command line built from the v3.5.0 tag, on .NET 10, to the .NET
+# Framework 4.8 builds of the pushed commit, on a Windows runner, the way a copy on
+# somebody's machine updates itself.
 #
-# The command line is published from the commit with release.yml's flags and an
-# older version number than the current release, then run with /s and its input
-# and output redirected, which is how a scheduled task or a script runs it: it
-# updates without asking, and the newer version runs the command as given. One leg
-# runs it as the command line's own download, from a folder of its own; the other
-# installs a setup built the same way and runs the copy the setup put in Program
-# Files. Each leg has a runner to itself, so neither route's files, registry or
-# Application-log entries can answer for the other's.
+# The old copy is the tag's command line published as a single file with the Debug
+# configuration, so it reads INSTALLERCLEAN_DEBUG_PRETEND_LATEST, which has its update
+# check answer that the version the commit builds is the newest release, and
+# INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST, INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD and
+# INSTALLERCLEAN_DEBUG_LOCAL_SETUP, which have it read an update.json and take the newer
+# command line and the setup from files in place of GitHub's. The newer files are the
+# commit's own merged command line and the setup built from the commit's script, which
+# carry the merged exes, so what the old copy downloads, checks and starts is what a
+# release would carry. The old copy is run with /s and its input and output redirected,
+# which is how a scheduled task or a script runs it: it updates without asking, and the
+# newer version runs the command as given. One leg runs it as the command line's own
+# download, from a folder of its own; the other installs the tag's setup and runs the copy
+# the setup put in Program Files. Each leg has a runner to itself, so neither route's files,
+# registry or Application-log entries can answer for the other's.
 #
-# What this covers is the half of an update the pushed code does: finding the
-# newer version, downloading it into a staging folder and handing the run over to
-# it there. The newer version, whichever release is current, then runs the command
-# and puts itself at the running copy's path once both have ended, and the checks
-# read what it left. A current release older than the first that can do that
-# refuses the switches and runs nothing: the old copy runs the command itself, the
-# checks read that, and the job says the update itself was not tested.
+# What this covers is the half of an update the old copy does: finding the newer version,
+# downloading it into a staging folder and handing the run over to it there, and the half the
+# newer version does: running the command and putting itself, or its setup, at the running
+# copy's path once both have ended. The checks read what the update left.
 #
-# The builds are single-file Release builds, as shipped, and have to stay so. A
-# build from source loads its assemblies from loose files beside the exe, which a
-# shipped build does not have, so this workflow would pass over loads the shipped
-# build cannot make.
+# Three more legs update the window the same way, from a folder of its own: the tag's
+# window, published as a Debug single file and told by INSTALLERCLEAN_DEBUG_PRETEND_COPY
+# whether it is the portable or the slim, offers the commit's merged window as its update,
+# and an update button is pressed through UI Automation, as a user would press it. The
+# window opens with the card offering the update over the scan, and the update notice sits
+# at the top of the scan behind it; each has its own Update now. The portable's leg and
+# the slim's press the card's. The notice's leg, a portable, presses the card's Continue
+# without updating, which takes the card away, and then the notice's. Two legs more do the
+# same from this commit's own window, built with the Debug configuration and merged into
+# one file, with this commit's merged window built as the next patch version as its
+# update: one presses the card's Update now and one the notice's. The checks read the file
+# at the path, which keeps its name and holds the bytes the old window was given, the
+# newer window it starts and the Application log, where a window that updated writes
+# nothing.
 #
-# Process Monitor records the update, and the files the old copy looks for to load and
-# the images it loads are judged with the functions and the list in
-# scripts/native-libraries.ps1, as the native-libraries job in ci.yml judges the
-# command line's run that checks for updates: the same exe, built from the same code.
-# Nothing of the newer version is judged, since it is the release, the setup it starts
-# on the setup's copy included; the permissions of the folder that setup's setup.tmp
-# runs from are printed as it made them. On the command line's own download the update is
-# then made again from a copy of this build in a folder of its own, with the genuine
-# file planted at every path the first update looked at for a file to load and the
-# list does not name, hostfxr.dll and hostpolicy.dll aside, and the job fails where
-# the old copy reads or loads one. A copy in Program Files, the setup's, is not
-# planted for, since only an administrator can write a file there.
-#
-# It runs apart from ci.yml because it reaches GitHub for the release. A run that
-# cannot reach GitHub fails here, with the command line's own output saying
-# nothing was tried, and never reads as a pass.
+# No command line the job runs makes a request of the network: the old copy's check is
+# answered by the Debug switch, and the newer version is started with /noupdate. The newer
+# window, which the replace starts as a user would start it, checks GitHub for a newer
+# release as any copy does.
 
 name: Self-update
 
@@ -48,88 +49,162 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Read-only. The one call that needs the token reads the current release.
+# Read-only.
 permissions:
   contents: read
 
 env:
-  # Below the current release, so the build finds a newer version to update to.
-  OLD_VERSION: '3.3.0'
+  # The release the old copy is built from. Its Debug switches are what let the update be
+  # tried offline against this commit's builds.
+  OLD_TAG: v3.5.0
+  OLD_VERSION: '3.5.0'
 
 jobs:
   update:
-    name: Update ${{ matrix.route == 'setup' && 'the setup''s copy' || 'the command line''s own download' }}
+    name: Update ${{ matrix.title }}
     # The same image as ci.yml and release.yml.
     runs-on: windows-2025
     timeout-minutes: 45
 
     strategy:
       fail-fast: false
+      # A window leg names the copy the old window takes itself for and the Update now it
+      # presses: the card's, or the notice's once the card has gone. A leg marked current
+      # has this commit's window as the old copy in place of the tag's.
       matrix:
-        route: [download, setup]
+        include:
+          - route: download
+            title: the command line's own download
+          - route: setup
+            title: the setup's copy
+          - route: window
+            title: the portable by the card's Update now
+            window: true
+            copy: portable
+            button: card
+          - route: slim
+            title: the slim by the card's Update now
+            window: true
+            copy: slim
+            button: card
+          - route: notice
+            title: the portable by the update notice's Update now
+            window: true
+            copy: portable
+            button: notice
+          - route: current-card
+            title: this commit's window by the card's Update now
+            window: true
+            current: true
+            copy: portable
+            button: card
+          - route: current-notice
+            title: this commit's window by the update notice's Update now
+            window: true
+            current: true
+            copy: portable
+            button: notice
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
 
-      # Read here through GitHub's API, apart from the app, which reads where
-      # github.com's releases/latest page redirects to. The checks below compare
-      # what the app installed against this.
-      - name: Read the current release
+      # The version this commit builds, which the old copy is told is the newest release.
+      - name: Read the version this commit builds
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = gh release view --repo $env:GITHUB_REPOSITORY --json tagName --jq .tagName
-          if ($LASTEXITCODE -ne 0 -or -not $tag) { throw "Could not read the current release." }
-          $latest = $tag.Trim() -replace '^v', ''
-          if (-not ($latest -as [version])) { throw "The current release's tag '$tag' is not a version." }
-          if ([version]$latest -le [version]$env:OLD_VERSION) {
-            throw "The current release, $latest, is not newer than $env:OLD_VERSION, so there is nothing to update to."
-          }
-          "  The current release is $latest; the build is numbered $env:OLD_VERSION."
-          "LATEST=$latest" | Add-Content $env:GITHUB_ENV
-          # The old copy runs the command with the newer version from its download folder,
-          # passing it the switches that ask it to stand for this copy and take its place
-          # afterwards. A release before the first to read them refuses them as arguments it
-          # does not know and runs nothing, so against such a release the old copy runs the
-          # command itself, and the checks read that instead of an update,
-          # saying so here and in the summary. What the old copy looks for and loads is
-          # judged either way.
-          $first = '3.5.0'
-          $v = [version]$latest
-          if ([version]"$($v.Major).$($v.Minor).$([Math]::Max($v.Build, 0))" -lt [version]$first) {
-            $said = "The update itself was not tested: the current release, $latest, is older than $first, the first release that can run a command standing for an older copy. The checks read that the old copy, $env:OLD_VERSION, ran the command itself, and judge what it looked for and loaded."
-            "::warning::$said"
-            "## Self-update: the update itself not tested`n`n$said" | Add-Content $env:GITHUB_STEP_SUMMARY
-            "STAGED=false" | Add-Content $env:GITHUB_ENV
-          } else {
-            "STAGED=true" | Add-Content $env:GITHUB_ENV
-          }
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if (-not ($version -as [version])) { throw "Directory.Build.props holds no version." }
+          if ([version]$version -le [version]$env:OLD_VERSION) { throw "This commit builds $version, which is not newer than $env:OLD_VERSION, so there is nothing to update to." }
+          "  This commit builds $version; the old copy is $env:OLD_VERSION."
+          "NEWER_VERSION=$version" | Add-Content $env:GITHUB_ENV
+          # The version the old window is offered and takes: this commit's, or on the legs
+          # whose old window is this commit's, the next patch version, which the newer
+          # window is built as.
+          $target = if ('${{ matrix.current }}' -eq 'true') { $v = [version]$version; "$($v.Major).$($v.Minor).$([Math]::Max($v.Build, 0) + 1)" } else { $version }
+          if ($target -ne $version) { "  The old window is this commit's $version, offered $target." }
+          "TARGET_VERSION=$target" | Add-Content $env:GITHUB_ENV
 
-      - name: Publish the command line at the older version
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:Version=${{ env.OLD_VERSION }} --nologo -o publish/cli
+      - name: Extract the old version's source
+        shell: pwsh
+        run: |
+          $tree = Join-Path $env:RUNNER_TEMP 'old-tree'
+          git archive --format=zip -o "$tree.zip" $env:OLD_TAG
+          if ($LASTEXITCODE -ne 0) { throw "git archive failed for $env:OLD_TAG." }
+          Expand-Archive -Path "$tree.zip" -DestinationPath $tree -Force
+          "OLD_TREE=$tree" | Add-Content $env:GITHUB_ENV
 
-      - name: Publish the portable GUI at the older version
-        if: matrix.route == 'setup'
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:Version=${{ env.OLD_VERSION }} --nologo -o publish/self-contained
+      - name: Publish the old version's command line
+        if: matrix.route == 'download' || matrix.route == 'setup'
+        run: dotnet publish "$env:OLD_TREE/src/InstallerClean.Cli/InstallerClean.Cli.csproj" -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o "$env:OLD_TREE/publish/cli"
+
+      - name: Publish the old version's window
+        if: matrix.route != 'download' && !matrix.current
+        run: dotnet publish "$env:OLD_TREE/src/InstallerClean/InstallerClean.csproj" -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o "$env:OLD_TREE/publish/self-contained"
+
+      - name: Build the newer version's two exes
+        run: |
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The newer command line did not build." }
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The newer window did not build." }
+          "TARGET_WINDOW=$((Resolve-Path 'publish/window/InstallerClean.exe').Path)" | Add-Content $env:GITHUB_ENV
+
+      # On the legs whose old window is this commit's: that window built with the Debug
+      # configuration, which reads the Debug switches the update is tried with, and merged
+      # into one file as the portable is (OneFileDebug lets Directory.Build.targets merge a
+      # Debug build); and a newer window, this commit's merged window built as the next
+      # patch version.
+      - name: Build this commit's window as the old copy and as a newer version
+        if: matrix.current
+        run: |
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Debug -p:RestoreLockedMode=true -p:OneFile=true -p:OneFileDebug=true -p:OneFileDir=publish/old-debug --nologo
+          if ($LASTEXITCODE -ne 0) { throw "This commit's window did not build and merge with the Debug configuration." }
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:OneFileDir=publish/newer "-p:Version=$env:TARGET_VERSION" --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The window did not build as $env:TARGET_VERSION." }
+          $newer = (Resolve-Path 'publish/newer/InstallerClean.exe').Path
+          $v = (Get-Item $newer).VersionInfo.FileVersion
+          "  $newer carries $v"
+          if (-not $v.StartsWith("$env:TARGET_VERSION.")) { throw "$newer carries $v, not $env:TARGET_VERSION." }
+          "TARGET_WINDOW=$newer" | Add-Content $env:GITHUB_ENV
 
       - name: Install Inno Setup
         if: matrix.route == 'setup'
         run: choco install innosetup --version=6.7.1 --no-progress -y
 
-      - name: Compile the setup at the older version
+      # Each setup is compiled from the script of the tree whose exes it carries: the old
+      # one from the tag, the newer from this commit.
+      - name: Compile the old and the newer setup
         if: matrix.route == 'setup'
+        shell: pwsh
         run: |
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
           if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
+          Push-Location $env:OLD_TREE
           & $iscc "/DAppVersion=$env:OLD_VERSION" installer\InstallerClean.iss
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed for the old version." }
+          Pop-Location
+          & $iscc "/DAppVersion=$env:NEWER_VERSION" installer\InstallerClean.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed for the newer version." }
+          foreach ($path in "$env:OLD_TREE/publish/InstallerClean-$env:OLD_VERSION-setup.exe", "publish/InstallerClean-$env:NEWER_VERSION-setup.exe") {
+            if (-not (Test-Path $path)) { throw "$path was not written." }
+          }
+
+      # The update.json the old copy reads as the release's.
+      - name: Write the update.json
+        shell: pwsh
+        run: |
+          $manifest = Join-Path $env:RUNNER_TEMP 'update.json'
+          node scripts/write-update-manifest.mjs $manifest setup portable slim cli
+          if ($LASTEXITCODE -ne 0) { throw "The writer did not write $manifest." }
+          "UPDATE_MANIFEST=$manifest" | Add-Content $env:GITHUB_ENV
 
       # The setup's copy is recognised by the folder the setup records in its
       # uninstall key, so the path is read from there rather than assumed. A window
@@ -137,10 +212,11 @@ jobs:
       # stops for, so the step fails on one rather than letting the update fail
       # for a reason that is not the code.
       - name: Put the older version in place
+        if: matrix.route == 'download' || matrix.route == 'setup'
         shell: pwsh
         run: |
           if ('${{ matrix.route }}' -eq 'setup') {
-            $setup = (Resolve-Path "publish/InstallerClean-$env:OLD_VERSION-setup.exe").Path
+            $setup = (Resolve-Path "$env:OLD_TREE/publish/InstallerClean-$env:OLD_VERSION-setup.exe").Path
             $log = Join-Path $env:RUNNER_TEMP 'setup-install.log'
             $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', "/LOG=`"$log`"" -Wait -PassThru
             if ($p.ExitCode -ne 0) { throw "The setup exited with code $($p.ExitCode)." }
@@ -150,7 +226,7 @@ jobs:
           } else {
             $folder = Join-Path $env:RUNNER_TEMP 'download'
             New-Item -ItemType Directory -Force -Path $folder | Out-Null
-            Copy-Item publish/cli/installerclean-cli.exe $folder
+            Copy-Item "$env:OLD_TREE/publish/cli/installerclean-cli.exe" $folder
           }
           $exe = Join-Path $folder 'installerclean-cli.exe'
           $files = @($exe)
@@ -173,38 +249,21 @@ jobs:
           auditpol /set /subcategory:'{0CCE922C-69AE-11D9-BED3-505054503030}' /success:enable
           if ($LASTEXITCODE -ne 0) { throw "auditpol could not turn on Process Termination." }
 
-      # native.ps1 names the build as the native-libraries job's command line that
-      # checks for updates, so the list's entries for that run apply to the old copy.
-      #
-      # A failure of Process Monitor's own leaves the update and its checks to run, and
-      # the judging step fails on the record that is missing.
-      - name: Get Process Monitor and start recording
-        continue-on-error: true
-        shell: pwsh
-        run: |
-          Set-Content -Path (Join-Path $env:RUNNER_TEMP 'native.ps1') -Value @'
-          $builds = @(
-            [pscustomobject]@{ Label = 'command line, checking for updates'; Exe = 'publish/cli/installerclean-cli.exe'; Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; MustLoad = @('winhttp.dll'); Marker = 'replace leftovers' }
-          )
-          . (Join-Path $env:GITHUB_WORKSPACE 'scripts/native-libraries.ps1')
-          '@
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          $procmon = Get-Procmon (Join-Path $env:RUNNER_TEMP 'procmon')
-          "PROCMON=$procmon" | Add-Content $env:GITHUB_ENV
-          Start-Record 'update'
-
       # Standard input and output both redirected, which is what makes the run
       # one nobody can answer. The newer version is started in the same console
       # and inherits the output, so it is read to the end of both. The function
       # is kept in a file for the second run the checks make.
       - name: Run the update
+        if: matrix.route == 'download' || matrix.route == 'setup'
         shell: pwsh
         run: |
           $helper = Join-Path $env:RUNNER_TEMP 'run.ps1'
           Set-Content -Path $helper -Value @'
-          function Run([string]$exe, [int]$seconds = 0) {
-            $info = [System.Diagnostics.ProcessStartInfo]::new($exe, '/s')
+          function Run([string]$exe, [int]$seconds = 0, [hashtable]$environment = @{}, [string[]]$arguments = @('/s')) {
+            $info = [System.Diagnostics.ProcessStartInfo]::new($exe)
+            foreach ($a in $arguments) { $info.ArgumentList.Add($a) }
             $info.UseShellExecute = $false
+            foreach ($name in $environment.Keys) { $info.Environment[$name] = $environment[$name] }
             $info.RedirectStandardInput = $true
             $info.RedirectStandardOutput = $true
             $info.RedirectStandardError = $true
@@ -234,7 +293,14 @@ jobs:
           }
           $runStarted = Get-Date
           "RUN_STARTED=$($runStarted.ToUniversalTime().ToString('o'))" | Add-Content $env:GITHUB_ENV
-          $run = Run $env:EXE
+          $switches = @{
+            INSTALLERCLEAN_DEBUG_PRETEND_LATEST = "v$env:NEWER_VERSION"
+            INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST = $env:UPDATE_MANIFEST
+            INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD = (Resolve-Path 'publish/cli/installerclean-cli.exe').Path
+          }
+          # Only the setup's copy takes a setup, and the download route builds none.
+          if ('${{ matrix.route }}' -eq 'setup') { $switches.INSTALLERCLEAN_DEBUG_LOCAL_SETUP = (Resolve-Path "publish/InstallerClean-$env:NEWER_VERSION-setup.exe").Path }
+          $run = Run $env:EXE 0 $switches
           Set-Content -Path (Join-Path $env:RUNNER_TEMP 'update-run.txt') -Value $run.Output -NoNewline
           "UPDATE_EXIT=$($run.ExitCode)" | Add-Content $env:GITHUB_ENV
           "UPDATE_PID=$($run.Id)" | Add-Content $env:GITHUB_ENV
@@ -251,21 +317,312 @@ jobs:
           if ($left) { "Still running 300 s after the update run ended: $($left -join ', ')" | Set-Content (Join-Path $env:RUNNER_TEMP 'update-stuck.txt') }
           else { '  nothing the update started is running' }
 
-      - name: Stop recording
-        if: always() && env.PROCMON != ''
-        continue-on-error: true
+      # The window's legs. The old window goes in a folder of its own under the name the
+      # portable or the slim is downloaded as, by itself, as either is downloaded.
+      - name: Put the older window in place
+        if: matrix.window
         shell: pwsh
         run: |
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          $csv = Stop-Record 'update'
-          "UPDATE_RECORD=$csv" | Add-Content $env:GITHUB_ENV
+          $folder = Join-Path $env:RUNNER_TEMP 'portable'
+          New-Item -ItemType Directory -Force -Path $folder | Out-Null
+          $name = if ('${{ matrix.copy }}' -eq 'slim') { 'InstallerClean-slim.exe' } else { 'InstallerClean-portable.exe' }
+          $exe = Join-Path $folder $name
+          if ('${{ matrix.current }}' -eq 'true') {
+            Copy-Item 'publish/old-debug/InstallerClean.exe' $exe
+            $expected = $env:NEWER_VERSION
+          } else {
+            Copy-Item "$env:OLD_TREE/publish/self-contained/InstallerClean.exe" $exe
+            $expected = $env:OLD_VERSION
+          }
+          $v = (Get-Item $exe).VersionInfo.FileVersion
+          "  $exe carries $v"
+          if (-not $v.StartsWith("$expected.")) { throw "$exe carries $v, not $expected." }
+          if (Get-Process InstallerClean, InstallerClean-portable, InstallerClean-slim -ErrorAction SilentlyContinue) { throw "InstallerClean is already running." }
+          "WINDOW_EXE=$exe" | Add-Content $env:GITHUB_ENV
+
+      # Windows PowerShell, where UI Automation's assemblies are part of the framework. The
+      # step is elevated, as the window is, which UI Automation needs to reach it. A button
+      # is pressed only once it is enabled and on screen. The card's legs press the card's
+      # Update now. The notice's leg prints both Update nows while the card is up, presses
+      # the card's Continue without updating, waits for the card's Update now to leave the
+      # screen and presses the notice's. Where a button does not show in time, every element
+      # of the window is printed.
+      - name: Press the old window's update button
+        if: matrix.window
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+          $A = [System.Windows.Automation.AutomationElement]
+          function Put([string]$line) { [IO.File]::AppendAllText($env:GITHUB_ENV, "$line`n") }
+
+          $started = Get-Date
+          Put "RUN_STARTED=$($started.ToUniversalTime().ToString('o'))"
+          $info = New-Object System.Diagnostics.ProcessStartInfo $env:WINDOW_EXE
+          $info.UseShellExecute = $false
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_LATEST'] = "v$env:TARGET_VERSION"
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST'] = $env:UPDATE_MANIFEST
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD'] = $env:TARGET_WINDOW
+          $info.EnvironmentVariables['INSTALLERCLEAN_DEBUG_PRETEND_COPY'] = '${{ matrix.copy }}'
+          $old = [System.Diagnostics.Process]::Start($info)
+          Put "OLD_PID=$($old.Id)"
+          "  started the old window, process $($old.Id)"
+
+          # The element of the old window with this AutomationId, or null.
+          function Find([string]$id) {
+            $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $old.Id)
+            $named = New-Object System.Windows.Automation.PropertyCondition($A::AutomationIdProperty, $id)
+            foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
+              $found = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $named)
+              if ($found) { return $found }
+            }
+            $null
+          }
+          # Whether the element can be pressed: enabled and on screen. An element that has
+          # left the tree since it was found cannot.
+          function Pressable($e) {
+            if (-not $e) { return $false }
+            try { $e.Current.IsEnabled -and -not $e.Current.IsOffscreen } catch { $false }
+          }
+          function State([string]$id) {
+            $e = Find $id
+            if (-not $e) { return "  ${id}: not in the window's tree" }
+            try { "  ${id}: '$($e.Current.Name)', $(if ($e.Current.IsEnabled) { 'enabled' } else { 'disabled' }), $(if ($e.Current.IsOffscreen) { 'off screen' } else { 'on screen' })" }
+            catch { "  ${id}: left the window's tree as it was read" }
+          }
+          # Prints every element of the old window, ends it and fails the step.
+          function Stop-Leg([string]$message) {
+            if ($old.HasExited) { "::error::$message The old window ended with exit code $($old.ExitCode)." }
+            else { "::error::$message" }
+            $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $old.Id)
+            foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
+              foreach ($e in $window.FindAll([System.Windows.Automation.TreeScope]::Subtree, [System.Windows.Automation.Condition]::TrueCondition)) {
+                $c = $e.Current
+                "  $($c.ControlType.ProgrammaticName)  id '$($c.AutomationId)'  name '$($c.Name)'$(if (-not $c.IsEnabled) { '  (disabled)' })$(if ($c.IsOffscreen) { '  (off screen)' })"
+              }
+            }
+            if (-not $old.HasExited) { $old.Kill() }
+            exit 1
+          }
+          # Waits until the button can be pressed and presses it.
+          function Press([string]$id, [datetime]$deadline) {
+            $button = $null
+            while ((Get-Date) -lt $deadline -and -not $old.HasExited) {
+              $button = Find $id
+              if (Pressable $button) { break }
+              $button = $null
+              Start-Sleep -Seconds 1
+            }
+            if (-not $button) { Stop-Leg "$id did not show, enabled and on screen, by $($deadline.ToString('HH:mm:ss'))." }
+            "  pressing $id, '$($button.Current.Name)', $([int]((Get-Date) - $started).TotalSeconds) s after the start"
+            $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+          }
+
+          if ('${{ matrix.button }}' -eq 'notice') {
+            $deadline = $started.AddSeconds(300)
+            while (-not (Pressable (Find 'UpdateOfferContinueButton')) -and (Get-Date) -lt $deadline -and -not $old.HasExited) { Start-Sleep -Seconds 1 }
+            "While the card is up:"
+            State 'UpdateOfferUpdateNowButton'
+            State 'UpdateNowButton'
+            Press 'UpdateOfferContinueButton' $deadline
+            $clock = [System.Diagnostics.Stopwatch]::StartNew()
+            while ((Pressable (Find 'UpdateOfferUpdateNowButton')) -and $clock.Elapsed.TotalSeconds -lt 30) { Start-Sleep -Milliseconds 500 }
+            "Once the card has gone:"
+            State 'UpdateOfferUpdateNowButton'
+            State 'UpdateNowButton'
+            if (Pressable (Find 'UpdateOfferUpdateNowButton')) { Stop-Leg "The card's Update now is still on screen 30 s after Continue without updating was pressed." }
+            Press 'UpdateNowButton' (Get-Date).AddSeconds(120)
+          } else {
+            Press 'UpdateOfferUpdateNowButton' $started.AddSeconds(300)
+          }
+          Put "PRESSED=1"
+          if (-not $old.WaitForExit(120000)) { "::error::The old window was still running 120 s after its update button was pressed."; exit 1 }
+          "  the old window ended with exit code $($old.ExitCode)"
+
+      # The newer exe the old window staged replaces it at its path once it has ended and
+      # starts the copy there, which stays open. Each is waited for, then the checks read the
+      # file at the path, what is left beside it, the kind of copy it decides it is, the
+      # download folders, the crash log and the Application log.
+      - name: Check the window's update
+        if: ${{ !cancelled() && env.PRESSED == '1' }}
+        shell: pwsh
+        run: |
+          . scripts/native-libraries.ps1
+          $failures = [System.Collections.Generic.List[string]]::new()
+          function Fail([string]$message) { $failures.Add($message); Write-Host "::error::$message" }
+          function Same($a, $b) {
+            $a = $a -as [version]; $b = $b -as [version]
+            $null -ne $a -and $null -ne $b -and
+              $a.Major -eq $b.Major -and $a.Minor -eq $b.Minor -and [Math]::Max($a.Build, 0) -eq [Math]::Max($b.Build, 0)
+          }
+          $exe = $env:WINDOW_EXE
+          $folder = Split-Path $exe
+          $since = [datetime]::Parse($env:RUN_STARTED)
+
+          $left = Wait-StagingProcesses 300 $since
+          if ($left) { Fail "Still running 300 s after the old window ended: $($left -join ', ')" } else { '  nothing run from a staging folder is running' }
+
+          "The newer window:"
+          $newer = $null
+          $clock = [System.Diagnostics.Stopwatch]::StartNew()
+          while (-not $newer -and $clock.Elapsed.TotalSeconds -lt 120) {
+            # By its path: a process is named for its file, which here is the portable's or the slim's.
+            $newer = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and [string]::Equals($_.Path, $exe, 'OrdinalIgnoreCase') } | Select-Object -First 1
+            if (-not $newer) { Start-Sleep -Seconds 1 }
+          }
+          if ($newer) { "  process $($newer.Id) runs from $exe" } else { Fail "No InstallerClean runs from $exe 120 s after the staged exe ended." }
+
+          "The file at the path:"
+          $v = (Get-Item $exe).VersionInfo.FileVersion
+          if (Same $v $env:TARGET_VERSION) { "  $exe carries $v" } else { Fail "$exe carries $v, not $env:TARGET_VERSION." }
+          $hash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash
+          if ($hash -eq (Get-FileHash -LiteralPath $env:TARGET_WINDOW -Algorithm SHA256).Hash) { "  its bytes are the newer window's, $env:TARGET_WINDOW" }
+          else { Fail "$exe is not the newer window the old one was given, $env:TARGET_WINDOW (SHA-256 $hash)." }
+          foreach ($file in Get-ChildItem -LiteralPath $folder -File -Recurse) {
+            if ($file.FullName -eq $exe) { continue }
+            Fail "$($file.FullName) is beside the updated window."
+          }
+          foreach ($suffix in @(Get-ReplaceSuffixes) + '.old', '.new') {
+            if (Test-Path -LiteralPath "$exe$suffix") { Fail "$exe$suffix is still there." }
+          }
+
+          # The kind of copy the newer window takes itself for goes into every report it writes.
+          # It writes one only for the PC's first finished run, and a scan writes it only
+          # from the card for a scan that offers nothing, so on a runner whose scan offers
+          # files no report is written. Where there is one its kind is printed.
+          "The newer window's report:"
+          $report = Join-Path $env:LOCALAPPDATA 'InstallerClean\last-run.json'
+          $clock.Restart()
+          while (-not (Test-Path -LiteralPath $report) -and $newer -and -not $newer.HasExited -and $clock.Elapsed.TotalSeconds -lt 120) { Start-Sleep -Seconds 2 }
+          if (Test-Path -LiteralPath $report) {
+            "  $report names the copy kind '$((Get-Content -Raw -LiteralPath $report | ConvertFrom-Json).app.copyKind)'"
+          } else { "  no $report within 120 s of the newer window's start" }
+
+          # The kind the updated file's own code decides for its path, read through the same
+          # AppCopy.Decide the running window calls, with this runner's setup record and its
+          # Scoop check. The merged exe is its own entry assembly when it runs, which is what
+          # makes it a one-file build, so that answer is given as true. A copy in a folder
+          # of its own is the portable, whichever name it has.
+          "The kind of copy the updated file decides it is:"
+          $probe = Join-Path $env:RUNNER_TEMP 'copy-kind'
+          New-Item -ItemType Directory -Force -Path $probe | Out-Null
+          Set-Content -Path (Join-Path $probe 'CopyKind.csproj') -Value @'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net48</TargetFramework>
+              <PlatformTarget>x64</PlatformTarget>
+              <LangVersion>latest</LangVersion>
+            </PropertyGroup>
+          </Project>
+          '@
+          Set-Content -Path (Join-Path $probe 'Program.cs') -Value @'
+          using System;
+          using System.IO;
+          using System.Reflection;
+
+          // args[0]: the updated window. Prints the kind AppCopy.Decide answers for its folder.
+          static class Program
+          {
+              const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+
+              static int Main(string[] args)
+              {
+                  var exe = Assembly.LoadFrom(args[0]);
+                  var appCopy = exe.GetType("InstallerClean.Services.AppCopy", true);
+                  var registry = Activator.CreateInstance(exe.GetType("InstallerClean.Services.RegistryReader", true), nonPublic: true);
+                  var setup = appCopy.GetMethod("ReadSetupRecord", All).Invoke(null, new[] { registry });
+                  var exists = exe.GetType("System.IO.FrameworkFile", true).GetMethod("Exists", All);
+                  var fileExists = (Func<string, bool>)Delegate.CreateDelegate(typeof(Func<string, bool>), exists);
+                  var kind = appCopy.GetMethod("Decide", All).Invoke(null, new object[] { true, Path.GetDirectoryName(args[0]), setup, fileExists });
+                  Console.WriteLine("setup record " + setup + ", kind " + kind);
+                  return 0;
+              }
+          }
+          '@
+          $build = dotnet build (Join-Path $probe 'CopyKind.csproj') -c Release --nologo -o (Join-Path $probe 'out') 2>&1
+          if ($LASTEXITCODE -ne 0) { $build | Write-Host; Fail 'The copy kind harness did not build.' }
+          else {
+            $answer = & (Join-Path $probe 'out/CopyKind.exe') $exe
+            "  $answer"
+            if ($LASTEXITCODE -ne 0 -or "$answer" -notmatch ', kind Portable$') { Fail "The updated file does not decide it is the portable: $answer" }
+          }
+
+          if ($newer -and -not $newer.HasExited) { "NEWER_PID=$($newer.Id)" | Add-Content $env:GITHUB_ENV }
+
+          "The download folders:"
+          $staging = @(Get-ChildItem $env:ProgramData -Directory -Filter "$(Split-Path (Get-StagingPrefix) -Leaf)*" -ErrorAction SilentlyContinue)
+          if ($staging) { Fail "Download folders are left under ${env:ProgramData} after the newer window started: $($staging.Name -join ', ')" } else { "  no download folder under $env:ProgramData" }
+
+          "The crash log:"
+          foreach ($log in (Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'), (Join-Path $env:LOCALAPPDATA 'NoFaff\InstallerClean\crash.log')) {
+            if (-not (Test-Path $log)) { "  no $log"; continue }
+            "  $log holds:"
+            Get-Content $log | ForEach-Object { "    $_" }
+            foreach ($pattern in 'Could not load file or assembly', 'UpdateFailedException') {
+              foreach ($h in @(Select-String -Path $log -SimpleMatch $pattern)) { Fail "$log line $($h.LineNumber): $($h.Line.Trim())" }
+            }
+          }
+
+          # Neither window writes an Application log entry for an update that worked. The one
+          # entry a window update can write is the newer exe's, where nothing was at the path
+          # once the old window had ended. An entry needs the InstallerClean event source,
+          # and Get-WinEvent refuses a source that is not registered, so the registration is
+          # read first: where no log has the source, no entry was written.
+          "The Application log:"
+          $sources = @(Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Services\EventLog' -ErrorAction Stop |
+                       Where-Object { Test-Path -LiteralPath (Join-Path $_.PSPath 'InstallerClean') } | ForEach-Object PSChildName)
+          if (-not $sources) { "  no event log has the InstallerClean source, so nothing wrote an entry" }
+          else {
+            "  the InstallerClean source is registered in the $($sources -join ', ') log"
+            foreach ($logName in $sources) {
+              try {
+                $entries = @(Get-WinEvent -FilterHashtable @{ LogName = $logName; ProviderName = 'InstallerClean'; StartTime = $since.ToLocalTime() } -ErrorAction Stop)
+              } catch {
+                if ($_.FullyQualifiedErrorId -notlike 'NoMatchingEventsFound*') { Fail "The $logName log could not be read: $($_.Exception.Message)"; continue }
+                $entries = @()
+              }
+              if (-not $entries) { "  no $logName entry from InstallerClean since the old window started" }
+              foreach ($entry in $entries | Sort-Object TimeCreated) { Fail "$logName entry $($entry.Id) from InstallerClean at $($entry.TimeCreated.ToUniversalTime().ToString('HH:mm:ss.fff')) UTC: $($entry.Message)" }
+            }
+          }
+
+          if ($failures.Count -gt 0) {
+            "$($failures.Count) checks failed:"
+            $failures | ForEach-Object { "  $_" }
+            exit 1
+          }
+          'Every check passed.'
+
+      # What the newer window shows, read through UI Automation in Windows PowerShell, then
+      # the window is closed.
+      - name: Print the newer window and close it
+        if: ${{ !cancelled() && env.NEWER_PID != '' }}
+        shell: powershell
+        run: |
+          Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+          $A = [System.Windows.Automation.AutomationElement]
+          $newer = Get-Process -Id ([int]$env:NEWER_PID) -ErrorAction SilentlyContinue
+          if (-not $newer) { "  the newer window had already ended"; exit 0 }
+          $mine = New-Object System.Windows.Automation.PropertyCondition($A::ProcessIdProperty, $newer.Id)
+          foreach ($window in $A::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $mine)) {
+            "  window '$($window.Current.Name)':"
+            foreach ($e in $window.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)) {
+              $c = $e.Current
+              if ($c.IsOffscreen -or -not $c.Name) { continue }
+              "    $($c.ControlType.ProgrammaticName)  id '$($c.AutomationId)'  name '$($c.Name)'"
+            }
+          }
+          $null = $newer.CloseMainWindow()
+          if (-not $newer.WaitForExit(30000)) { $newer.Kill(); '  the newer window did not close in 30 s and was ended' }
+          else { '  the newer window closed' }
 
       # What the update left, read before the checks make their second run,
       # which changes it. This explains a result and decides none, so it runs
       # whatever happened and never fails the job.
       #
-      # Every file beside the exe is described with the release's own command
-      # line, so a file that is not the release's shows by its hash, and so is
+      # Every file beside the exe is described with the newer command line, so a
+      # file that is not the newer version's shows by its hash, and so is
       # every file in a staging folder under %ProgramData%, which is what the
       # newer version ran from. On the setup's copy the Security log gives every
       # process start and exit and the Application log its entries, each to the
@@ -274,8 +631,6 @@ jobs:
         if: always() && env.EXE != ''
         continue-on-error: true
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           function Stamp([datetime]$t) { $t.ToUniversalTime().ToString('HH:mm:ss.fff') }
           function Describe([string]$path) {
@@ -299,11 +654,8 @@ jobs:
           Get-ChildItem -LiteralPath $env:ProgramData -Directory -Filter "$(Split-Path (Get-StagingPrefix) -Leaf)*" -ErrorAction SilentlyContinue |
             ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -File } | ForEach-Object { Describe $_.FullName }
 
-          $release = Join-Path $env:RUNNER_TEMP 'release'
-          New-Item -ItemType Directory -Force -Path $release | Out-Null
-          gh release download "v$env:LATEST" --repo $env:GITHUB_REPOSITORY --pattern installerclean-cli.exe --dir $release --clobber
-          "The release's own command line:"
-          Describe (Join-Path $release 'installerclean-cli.exe')
+          "The newer command line the old copy was given:"
+          Describe (Resolve-Path 'publish/cli/installerclean-cli.exe').Path
 
           if ('${{ matrix.route }}' -ne 'setup') { return }
 
@@ -324,21 +676,21 @@ jobs:
             } | Where-Object { $_ -notmatch '\\(conhost|svchost|WmiPrvSE|backgroundTaskHost|RuntimeBroker|auditpol)\.exe' }
 
       # Every check runs and prints what it read, and the step fails if any of
-      # them did. The lines the command line prints are built from Strings.resx,
-      # so a reworded string moves the check with it. The runner's UI language
-      # has no satellite, so the command line prints the neutral English.
+      # them did. The lines the old copy prints are built from the Strings.resx
+      # of the tag it was built from. The runner's UI language has no satellite,
+      # so the old copy prints the neutral English.
       #
       # The crash log is not required to be empty: a scan writes entries of its
       # own for registrations it cannot read, on any machine. What fails is an
       # entry for an assembly that could not be loaded or for an update that
-      # failed, other than the one saying a release that refuses the switches
-      # ended before it said it had started.
+      # failed.
       #
       # The permissions are compared with a file the same account makes in the
       # same folder. On the command line's own download that file is the
       # update's own work, written into the folder; on the setup's copy the setup
       # writes it, so there the check reads what the setup leaves.
       - name: Check the result
+        if: matrix.route == 'download' || matrix.route == 'setup'
         shell: pwsh
         run: |
           # For Get-ReplaceSuffixes and Get-StagingPrefix. Its Fail and its failures are
@@ -354,41 +706,36 @@ jobs:
 
           . (Join-Path $env:RUNNER_TEMP 'run.ps1')
 
-          $resx = [xml](Get-Content -Raw src/InstallerClean.Core/Resources/Strings.resx)
+          $resx = [xml](Get-Content -Raw (Join-Path $env:OLD_TREE 'src/InstallerClean.Core/Resources/Strings.resx'))
           function Line([string]$name) {
             $value = ($resx.root.data | Where-Object name -eq $name).value
-            if (-not $value) { throw "Strings.resx has no $name." }
+            if (-not $value) { throw "The old version's Strings.resx has no $name." }
             $value
           }
 
           $exe = $env:EXE
           $folder = Split-Path $exe
           $old = $env:OLD_VERSION
-          $latest = $env:LATEST
+          $newer = $env:NEWER_VERSION
 
           $run = [pscustomobject]@{
             ExitCode = [int]$env:UPDATE_EXIT
             Output = Get-Content -Raw (Join-Path $env:RUNNER_TEMP 'update-run.txt')
           }
 
-          # A release that refuses the switches runs nothing and writes its own 4000, and
-          # the old copy runs the command itself, so the file stays the old copy.
-          $staged = $env:STAGED -eq 'true'
-          $runningNewer = (Line 'Cli.UpdateRunningNewer') -f '/s', $latest
+          $runningNewer = (Line 'Cli.UpdateRunningNewer') -f '/s', $newer
           $notRun = Line 'Cli.UpdateNotRun'
           $runningInstead = (Line 'Cli.UpdateRunningInstead') -f '/s', $old
-          $wanted = if ($staged) { $latest } else { $old }
-          if ($staged) { "The update to $latest, run by the newer version:" }
-          else { "The update to $latest, which refuses the switches, so the old copy runs the command itself:" }
+          "The update to $newer, run by the newer version:"
 
           "The command line's output:"
           foreach ($expected in @(
-              ((Line 'UpdateNotice.Available') -f $latest),
-              ((Line 'UpdateNotice.Downloading') -f $latest)) + $(if ($staged) { @($runningNewer) } else { @($notRun, $runningInstead) })) {
+              ((Line 'UpdateNotice.Available') -f $newer),
+              ((Line 'UpdateNotice.Downloading') -f $newer),
+              $runningNewer)) {
             if ($run.Output.Contains($expected)) { "  printed: $expected" } else { Fail "It did not print: $expected" }
           }
-          foreach ($unexpected in @(
-              (Line 'UpdateNotice.DownloadFailed')) + $(if ($staged) { @($notRun, $runningInstead) } else { @($runningNewer) })) {
+          foreach ($unexpected in @((Line 'UpdateNotice.DownloadFailed'), $notRun, $runningInstead)) {
             if ($run.Output.Contains($unexpected)) { Fail "It printed: $unexpected" } else { "  did not print: $unexpected" }
           }
 
@@ -400,11 +747,11 @@ jobs:
           if ('${{ matrix.route }}' -eq 'setup') { $files += Join-Path $folder 'InstallerClean.exe' }
           foreach ($f in $files) {
             $v = (Get-Item $f).VersionInfo.FileVersion
-            if (Same $v $wanted) { "  $f carries $v" } else { Fail "$f carries $v, not $wanted." }
+            if (Same $v $newer) { "  $f carries $v" } else { Fail "$f carries $v, not $newer." }
           }
           if ('${{ matrix.route }}' -eq 'setup') {
             $shown = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InstallerClean_is1').DisplayVersion
-            if (Same $shown $wanted) { "  the uninstall key's DisplayVersion is $shown" } else { Fail "The uninstall key's DisplayVersion is $shown, not $wanted." }
+            if (Same $shown $newer) { "  the uninstall key's DisplayVersion is $shown" } else { Fail "The uninstall key's DisplayVersion is $shown, not $newer." }
           }
           foreach ($suffix in @(Get-ReplaceSuffixes) + '.old', '.new') {
             $left = "$exe$suffix"
@@ -428,7 +775,8 @@ jobs:
           $notInstalled = @($events | Where-Object Id -eq (Get-NothingAtPathEventId))
           $summaries = @($events | Where-Object { $_.Id -in 1000, 1002, 2000, 4000 })
           $unavailable = $run.Output.Contains((Line 'Cli.EventLogUnavailable'))
-          $expectedId, $otherId, $like = if ($staged) { 3005, 3006, ('*' + ((Line 'Cli.EventLogUpdated') -f '/s', $old, $latest, '/s') + '*') } else { 3006, 3005, ('*' + ((Line 'Cli.EventLogUpdateNotRun') -f '/s', $old, $latest) + '*') }
+          $expectedId, $otherId = 3005, 3006
+          $like = '*' + ((Line 'Cli.EventLogUpdated') -f '/s', $old, $newer, '/s') + '*'
           $expectedEntries = @($events | Where-Object Id -eq $expectedId)
           if ($expectedEntries.Count -ne 1) {
             Fail "$($expectedEntries.Count) entries with Event ID $expectedId, where one was expected$(if ($unavailable) { '; the run printed that the Application log refused its entries' })."
@@ -438,40 +786,28 @@ jobs:
           $other = @($events | Where-Object Id -eq $otherId)
           if ($other) { Fail "$($other.Count) entries with Event ID $otherId." }
           if ($notInstalled) { Fail "$($notInstalled.Count) entries with Event ID $(Get-NothingAtPathEventId)." }
-          # The run's own summary, and against a release that refuses the switches, the 4000
-          # that release writes for them.
+          # The run's own summary alone: a 4000 is the entry a version that refuses the switches
+          # writes for them.
           $refusals = @($summaries | Where-Object Id -eq 4000)
           $own = @($summaries | Where-Object Id -ne 4000)
-          $wantRefusals = if ($staged) { 0 } else { 1 }
           if ($own.Count -ne 1) { Fail "$($own.Count) run summaries other than 4000, where the run's own was expected alone." }
-          if ($refusals.Count -ne $wantRefusals) { Fail "$($refusals.Count) entries with Event ID 4000, where $wantRefusals was expected." }
+          if ($refusals.Count) { Fail "$($refusals.Count) entries with Event ID 4000, where none was expected." }
 
           "The crash log:"
           $logs = @(
             (Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'),
             (Join-Path $env:LOCALAPPDATA 'NoFaff\InstallerClean\crash.log'))
-          # Against a release that refuses the switches, the old copy writes the one line
-          # saying the newer version ended before it said it had started, and that line alone
-          # is expected.
-          $notStartedLines = 0
-          # The end of that line, read from NewerVersionProcess.cs so a reworded line moves
-          # the check with it.
-          $notStartedText = ' before it said it had started.'
-          if (-not (Get-Content -Raw src/InstallerClean.Core/Services/NewerVersionProcess.cs).Contains($notStartedText)) { throw "NewerVersionProcess.cs no longer ends a line with '$notStartedText'." }
           foreach ($log in $logs) {
             if (-not (Test-Path $log)) { "  no $log"; continue }
             "  $log holds:"
             Get-Content $log | ForEach-Object { "    $_" }
             $hits = @(foreach ($pattern in 'Could not load file or assembly', 'UpdateFailedException') { Select-String -Path $log -SimpleMatch $pattern })
-            $expectedHits = @($hits | Where-Object { -not $staged -and $_.Line.Contains('UpdateFailedException') -and $_.Line.Contains($notStartedText) })
-            $notStartedLines += $expectedHits.Count
-            foreach ($h in @($hits | Where-Object { $_ -notin $expectedHits })) { Fail "$log line $($h.LineNumber): $($h.Line.Trim())" }
+            foreach ($h in $hits) { Fail "$log line $($h.LineNumber): $($h.Line.Trim())" }
           }
-          if (-not $staged -and $notStartedLines -ne 1) { Fail "The crash logs hold $notStartedLines lines saying the newer version ended before it said it had started, where they hold one." }
 
           "The exit code:"
           Write-Host "::group::A second run of the file now at the path"
-          $again = Run $exe
+          $again = Run $exe 0 @{} @('/s', '/noupdate')
           $again.Output
           "Exit code: $($again.ExitCode)"
           Write-Host "::endgroup::"
@@ -492,88 +828,22 @@ jobs:
           }
           'Every check passed.'
 
-      # The old copy is judged by its process ID. The job fails where the old copy
-      # loads an image from its own folder other than its own exe, and where it shows no
-      # act of its own code or never loads winhttp.dll, which would leave too little of
-      # the update recorded to judge. Every look it makes for a file to load in its own
-      # folder or under %TEMP%\.net is printed, with those the list names. The paths of the looks the list does not name are written
-      # down for the step after this one, which plants them on the command line's own
-      # download, less hostfxr.dll and hostpolicy.dll: a build that takes a planted copy
-      # of either may not start at all.
-      #
-      # The old copy starts one installerclean-cli.exe, the newer command line from a
-      # staging folder, and the job fails where it started none, more than one, one from
-      # anywhere else, or any other process but the console host in System32, which
-      # Windows starts itself. Every process it starts is printed. What that process does,
-      # the setup it starts on the setup's copy included, is the release's and is not
-      # judged here.
-      - name: Judge what the update looked for and loaded
-        if: ${{ !cancelled() && env.UPDATE_PID != '' }}
-        shell: pwsh
-        run: |
-          if (-not $env:UPDATE_RECORD -or -not (Test-Path -LiteralPath $env:UPDATE_RECORD)) { throw "Process Monitor saved no record of the update, so its looks were not judged." }
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          # The run takes the build's label, which is how the list matches its entries to it.
-          $build = $builds[0]
-          $notPlanted = @(Select-NotPlanted @(Get-NotPlanted) $builds -OnlyWhatThisRuns)
-          $old = [pscustomobject]@{ Label = $build.Label; Build = $build; Folder = (Split-Path $env:EXE); Exe = (Split-Path $env:EXE -Leaf); Id = [int]$env:UPDATE_PID }
-          $byProcess = Read-Record $env:UPDATE_RECORD @($old)
-          $read = Read-Run $old $byProcess
-          $kept = [System.Collections.Generic.List[string]]::new()
-          $kept.Add("$($old.Id)`t$($old.Exe)")
-          if ($read) {
-            Test-MustLoad $old $read.Loads
-            if (-not $read.Marker) { Fail "The old copy showed no act of its own code." }
-            elseif ($read.Marker.Kind -ne $build.Marker) { Fail "The old copy's first act of its own code seen is the $($read.Marker.Kind) at row $($read.Marker.Index), where it should be the $($build.Marker)." }
-            foreach ($load in ($read.Loads | Where-Object Place -eq 'own')) {
-              Fail "The old copy loaded $($load.Path) from its own folder, row $($load.Index), $(Get-When $load $read.Marker)."
-            }
-            $extractionFolders = @($read.Loads | Where-Object Place -eq 'extraction' | ForEach-Object { Split-Path $_.Path } | Sort-Object -Unique)
-            $bundleFiles = @(foreach ($folder in $extractionFolders) { Get-ChildItem -LiteralPath $folder -File | ForEach-Object FullName })
-            $plants = @(Get-RunPlants $old $read $notPlanted @{} $extractionFolders |
-              Where-Object { -not ($_.Place -eq 'beside' -and (Split-Path $_.Path -Leaf) -in $plantedAlone) })
-            "== The looks the list does not name"
-            if (-not $plants) { '  none' }
-            foreach ($plant in $plants) { "  $($plant.Place) $($plant.Path): $($plant.Kind), $($plant.Source)" }
-            ConvertTo-Json -Depth 5 -InputObject ([pscustomobject]@{ Plants = $plants; BundleFiles = $bundleFiles }) |
-              Set-Content (Join-Path $env:RUNNER_TEMP 'plants.json')
-
-            $prefix = Get-StagingPrefix
-            $allCreated = @($byProcess[(Get-RunKey $old)] | Where-Object Operation -eq 'Process Create')
-            foreach ($row in $allCreated) { "  the old copy started $($row.Path)" }
-            $created = @($allCreated | Where-Object { (Split-Path $_.Path -Leaf) -eq 'installerclean-cli.exe' })
-            # The console host Windows starts for a console program from System32 may sit
-            # beside it, and nothing else: a setup, a crash report or anything the old copy
-            # starts on its own fails.
-            $conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
-            foreach ($row in @($allCreated | Where-Object { (Split-Path $_.Path -Leaf) -ne 'installerclean-cli.exe' })) {
-              if (($row.Path -replace '^\\\?\?\\', '') -eq $conhost) { "  $($row.Path) is the console host Windows starts, so it is allowed" }
-              else { Fail "The old copy started $($row.Path), where it starts only installerclean-cli.exe from a staging folder." }
-            }
-            if ($created.Count -ne 1) { Fail "The old copy started $($created.Count) installerclean-cli.exe processes, where it starts one, the newer command line from a staging folder." }
-            elseif (-not $created[0].Path.StartsWith($prefix, 'OrdinalIgnoreCase')) {
-              Fail "The old copy started $($created[0].Path), where it starts installerclean-cli.exe from a folder under $prefix."
-            }
-          }
-          Set-Content -Path (Join-Path $env:RUNNER_TEMP 'kept-update.txt') -Value $kept
-          Exit-IfFailed
-
-      # The release's setup, started on the setup's copy by the newer version once both
+      # The newer setup, started on the setup's copy by the newer version once both
       # copies have ended, runs setup.tmp from an is-*.tmp folder Inno Setup's loader makes
       # in a temp folder. Each such folder the watch saw made is printed with its owner and its
       # permissions, and the step fails where it saw none, since the setup then did not
-      # run as an update to a release that runs the newer version does.
-      - name: Print the temp folders the release's setup made
-        if: ${{ !cancelled() && matrix.route == 'setup' && env.STAGED == 'true' && env.UPDATE_PID != '' }}
+      # run as an update does.
+      - name: Print the temp folders the newer setup made
+        if: ${{ !cancelled() && matrix.route == 'setup' && env.UPDATE_PID != '' }}
         shell: pwsh
         run: |
           $out = Join-Path $env:RUNNER_TEMP 'setup-temp.txt'
           . scripts/native-libraries.ps1
-          "The is-*.tmp folders made in $((Get-TempFolders) -join ', ') by the release's setup (path, owner, permissions):"
+          "The is-*.tmp folders made in $((Get-TempFolders) -join ', ') by the newer setup (path, owner, permissions):"
           $made = @(Get-Content $out -ErrorAction SilentlyContinue | Where-Object { $_ })
           foreach ($line in $made) { "  $line" }
-          if (-not $made) { "::error::The watch on the temp folders saw no is-*.tmp folder made, so the release's setup did not run."; exit 1 }
-          # setup.tmp is the release's setup's own: the Security log, which audits each
+          if (-not $made) { "::error::The watch on the temp folders saw no is-*.tmp folder made, so the newer setup did not run."; exit 1 }
+          # setup.tmp is the newer setup's own: the Security log, which audits each
           # process start on the setup's copy, has to show one starting from a folder the
           # watch saw made, each path compared in its long spelling.
           $folders = @($made | ForEach-Object { $path = ($_ -split "`t")[0]; $long = Get-FullPath $path; "$(if ($long) { $long } else { $path })".TrimEnd('\') + '\' })
@@ -584,114 +854,9 @@ jobs:
             if ($long) { $long } else { $name }
           } | Where-Object { $path = $_; @($folders | Where-Object { $path.StartsWith($_, 'OrdinalIgnoreCase') }).Count })
           foreach ($start in $starts) { "  started from one of them: $start" }
-          if (-not $starts) { "::error::No process started from an is-*.tmp folder the watch saw made, so the folders printed are not shown to be the release's setup's."; exit 1 }
+          if (-not $starts) { "::error::No process started from an is-*.tmp folder the watch saw made, so the folders printed are not shown to be the newer setup's."; exit 1 }
 
-      # A copy of this build at the older version is put in a folder of its own with the
-      # genuine file at every path the step above wrote down, and makes the update
-      # again. The event source the first update registered is deleted first, so this
-      # run registers it as the first did and its looks while it does are planted for
-      # too. The job fails where the old copy reads or loads a planted file or any image its
-      # bundle did not put under %TEMP%\.net, and where a plant was not looked for, not
-      # found, gone or changed. Its exit code and output are not judged; the entries the
-      # crash log gains are printed.
-      - name: Update again with the genuine files planted
-        if: ${{ !cancelled() && matrix.route == 'download' && env.UPDATE_PID != '' }}
-        shell: pwsh
-        run: |
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          . (Join-Path $env:RUNNER_TEMP 'run.ps1')
-          $plantsFile = Join-Path $env:RUNNER_TEMP 'plants.json'
-          if (-not (Test-Path $plantsFile)) { throw "The judging step wrote nothing to plant." }
-          $plan = Get-Content -Raw $plantsFile | ConvertFrom-Json
-          $build = $builds[0]
-
-          if ([System.Diagnostics.EventLog]::SourceExists('InstallerClean')) { [System.Diagnostics.EventLog]::DeleteEventSource('InstallerClean') }
-          if ([System.Diagnostics.EventLog]::SourceExists('InstallerClean')) { throw "The InstallerClean event source is still registered." }
-          '  the InstallerClean event source is not registered'
-
-          $folder = Join-Path $env:RUNNER_TEMP 'second-update'
-          New-Item -ItemType Directory -Force -Path $folder | Out-Null
-          Copy-Item publish/cli/installerclean-cli.exe $folder
-          $exe = Join-Path $folder 'installerclean-cli.exe'
-          foreach ($suffix in @(Get-ReplaceSuffixes) + '.old', '.new') { if (Test-Path -LiteralPath "$exe$suffix") { throw "$exe$suffix is there before the run." } }
-          $placed = @(Add-Plants $folder @($plan.Plants))
-          "  planted $($placed.Count): $(($placed | ForEach-Object Path) -join ', ')"
-
-          $logs = @(foreach ($name in $crashLogFolders) {
-            $log = Join-Path $env:LOCALAPPDATA "$name\crash.log"
-            [pscustomobject]@{ Path = $log; Length = $(if (Test-Path -LiteralPath $log) { (Get-Item -LiteralPath $log).Length } else { 0 }) }
-          })
-
-          Start-Record 'second'
-          try {
-            $secondStarted = Get-Date
-            $run = Run $exe 600
-            # Its replace runs from a staging folder once it has ended, and is recorded too.
-            $left = Wait-StagingProcesses 300 $secondStarted
-            if ($left) { Fail "Still running 300 s after the second update run ended: $($left -join ', ')" }
-          }
-          finally { $csv = Stop-Record 'second' }
-          "  the run exited with $($run.ExitCode)"
-
-          $old = [pscustomobject]@{ Label = $build.Label; Build = $build; Folder = $folder; Exe = 'installerclean-cli.exe'; Id = $run.Id
-            Placed = $placed; BundleFiles = @($plan.BundleFiles | Where-Object { $_ }) }
-          Set-Content -Path (Join-Path $env:RUNNER_TEMP 'kept-second.txt') -Value "$($old.Id)`t$($old.Exe)"
-          $byProcess = Read-Record $csv @($old)
-          $read = Read-Run $old $byProcess
-          if ($read) {
-            Test-PlantedRun $old $read
-            Test-MustLoad $old $read.Loads
-          }
-
-          foreach ($log in $logs) {
-            if (-not (Test-Path -LiteralPath $log.Path)) { continue }
-            $stream = [IO.File]::Open($log.Path, 'Open', 'Read', 'ReadWrite')
-            try {
-              $null = $stream.Seek($log.Length, 'Begin')
-              $added = [IO.StreamReader]::new($stream).ReadToEnd()
-            }
-            finally { $stream.Dispose() }
-            if ($added) { "  $($log.Path) gained:"; $added -split "`r?`n" | Where-Object { $_ } | ForEach-Object { "    $_" } }
-          }
-          Exit-IfFailed
-
-      # Only the rows of the processes judged are kept, each matched by its process ID and
-      # its name, since Windows can give a later process an ID an earlier one had. The
-      # Detail of each Process Start and Process Create row is emptied, since those carry
-      # a process's environment and its command line. The artifact is public.
-      - name: Keep the Process Monitor rows
-        if: always() && env.PROCMON != ''
-        shell: pwsh
-        run: |
-          $kept = Join-Path $env:RUNNER_TEMP 'kept'
-          New-Item -ItemType Directory -Force -Path $kept | Out-Null
-          foreach ($name in 'update', 'second') {
-            $csv = Join-Path $env:RUNNER_TEMP "procmon\$name.csv"
-            $ids = Join-Path $env:RUNNER_TEMP "kept-$name.txt"
-            if (-not (Test-Path $csv) -or -not (Test-Path $ids)) { "  no $name record to keep"; continue }
-            $pids = @(Get-Content $ids | Where-Object { $_ } | ForEach-Object { ($_ -split "`t")[0] })
-            $names = @{}
-            foreach ($line in @(Get-Content $ids | Where-Object { $_ })) { $id, $name = $line -split "`t"; $names[$id] = $name }
-            $rows = @(Import-Csv $csv | Where-Object { $_.PID -in $pids -and $_.'Process Name' -eq $names[$_.PID] } | ForEach-Object {
-              if ($_.Operation -in 'Process Start', 'Process Create') { $_.Detail = '' }
-              $_
-            })
-            $rows | Export-Csv -Path (Join-Path $kept "$name.csv") -NoTypeInformation -UseQuotes Always
-            "  kept $($rows.Count) rows of $csv, for the processes $($pids -join ', ')"
-          }
-
-      - name: Upload the Process Monitor rows
-        if: always() && env.PROCMON != ''
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: process-monitor-records-${{ matrix.route }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/kept
-          if-no-files-found: warn
-          retention-days: 7
-
-      # "Check the result" prints all of this itself, unless it stopped before its
-      # end. On the command line's own download the entries of the update made again
-      # with the files planted come after the first update's.
+      # "Check the result" prints all of this itself, unless it stopped before its end.
       - name: Print the crash log and the Application log
         if: failure()
         shell: pwsh
@@ -699,8 +864,14 @@ jobs:
           foreach ($log in (Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'), (Join-Path $env:LOCALAPPDATA 'NoFaff\InstallerClean\crash.log')) {
             if (Test-Path $log) { "$log holds:"; Get-Content $log } else { "No $log." }
           }
-          Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'InstallerClean' } -ErrorAction SilentlyContinue |
-            Sort-Object TimeCreated | ForEach-Object { "$($_.Id)  $($_.Message)" }
+          # Get-WinEvent refuses a provider no entry has registered, whatever its error action,
+          # which on a leg whose copy wrote no entry is the answer rather than a failure.
+          try {
+            Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'InstallerClean' } -ErrorAction Stop |
+              Sort-Object TimeCreated | ForEach-Object { "$($_.Id)  $($_.Message)" }
+          } catch {
+            "No Application log entries from InstallerClean: $($_.Exception.Message)"
+          }
 
       - name: Print the setup's log
         if: always() && matrix.route == 'setup'

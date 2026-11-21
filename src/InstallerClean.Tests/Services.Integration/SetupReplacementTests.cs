@@ -3,6 +3,7 @@ using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
 using Microsoft.Win32.SafeHandles;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -15,7 +16,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class SetupReplacementTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-setup-replace-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-setup-replace-");
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
     private readonly string _staging;
     private readonly string _version;
@@ -41,7 +42,7 @@ public sealed class SetupReplacementTests : IDisposable
         try
         {
             _started.Dispose();
-            TestCrashLog.TryDelete(_root);
+            TestTemp.Delete(_root);
         }
         finally
         {
@@ -312,7 +313,42 @@ public sealed class SetupReplacementTests : IDisposable
             Assert.False(SetupReplacement.AnotherProcessMayRunFrom(elsewhere));
         }
 
-        Assert.False(SetupReplacement.AnotherProcessMayRunFrom(running));
+        if (SetupReplacement.AnotherProcessMayRunFrom(running))
+            Assert.Fail("A process was still found running from the file after it had ended. " + WhatIsListedFor(running));
+    }
+
+    /// <summary>
+    /// What Windows lists under the file name of <paramref name="path"/>, each process by its id
+    /// and image path or the error that refused it, and what the crash log holds. Taken after
+    /// the check answered, so a process that had gone by then is not in it.
+    /// </summary>
+    private static string WhatIsListedFor(string path)
+    {
+        var lines = new List<string>();
+        var listed = System.Diagnostics.Process.GetProcessesByName(Path.GetFileNameWithoutExtension(path));
+        try
+        {
+            foreach (var process in listed)
+            {
+                using var handle = Kernel32.OpenProcess(
+                    Kernel32.PROCESS_QUERY_LIMITED_INFORMATION, bInheritHandle: false, (uint)process.Id);
+                if (handle.IsInvalid)
+                {
+                    lines.Add($"{process.Id}: OpenProcess error {Marshal.GetLastWin32Error()}");
+                    continue;
+                }
+                var buffer = new char[32768];
+                var length = (uint)buffer.Length;
+                lines.Add(Kernel32.QueryFullProcessImageName(handle, 0, buffer, ref length)
+                    ? $"{process.Id}: {new string(buffer, 0, (int)length)}"
+                    : $"{process.Id}: QueryFullProcessImageName error {Marshal.GetLastWin32Error()}");
+            }
+        }
+        finally
+        {
+            foreach (var process in listed) process.Dispose();
+        }
+        return $"Listed now ({lines.Count}): {(lines.Count == 0 ? "none" : string.Join("; ", lines))}. Crash log: {TestCrashLog.Text()}";
     }
 
     /// <summary>
@@ -334,48 +370,21 @@ public sealed class SetupReplacementTests : IDisposable
 
         public static SuspendedProcess Start(string path)
         {
-            var startup = new StartupInfo { cb = Marshal.SizeOf<StartupInfo>() };
-            if (!CreateProcess(path, null, IntPtr.Zero, IntPtr.Zero, false, CreateSuspended,
-                    IntPtr.Zero, null, ref startup, out var started))
+            var startup = new Kernel32.STARTUPINFO { cb = (uint)Marshal.SizeOf<Kernel32.STARTUPINFO>() };
+            var commandLine = $"\"{path}\"\0".ToCharArray();
+            if (!Kernel32.CreateProcess(path, commandLine, IntPtr.Zero, IntPtr.Zero, bInheritHandles: false, CreateSuspended,
+                    IntPtr.Zero, Path.GetDirectoryName(path)!, in startup, out var started))
                 throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
             return new SuspendedProcess(started.hProcess, started.hThread);
         }
 
         public void Dispose()
         {
-            TerminateProcess(_process, 1);
+            Kernel32.TerminateProcess(_process, 1);
             WaitForSingleObject(_process, 10_000);
             CloseHandle(_thread);
             CloseHandle(_process);
         }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct StartupInfo
-        {
-            public int cb;
-            public string? lpReserved;
-            public string? lpDesktop;
-            public string? lpTitle;
-            public int dwX, dwY, dwXSize, dwYSize, dwXCountChars, dwYCountChars, dwFillAttribute, dwFlags;
-            public short wShowWindow, cbReserved2;
-            public IntPtr lpReserved2, hStdInput, hStdOutput, hStdError;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct ProcessInformation
-        {
-            public IntPtr hProcess, hThread;
-            public int dwProcessId, dwThreadId;
-        }
-
-        [DllImport("kernel32.dll", EntryPoint = "CreateProcessW", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern bool CreateProcess(
-            string lpApplicationName, string? lpCommandLine, IntPtr lpProcessAttributes, IntPtr lpThreadAttributes,
-            bool bInheritHandles, uint dwCreationFlags, IntPtr lpEnvironment, string? lpCurrentDirectory,
-            ref StartupInfo lpStartupInfo, out ProcessInformation lpProcessInformation);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);

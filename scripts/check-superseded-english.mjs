@@ -145,6 +145,23 @@ const satellites = readdirSync(dir)
   .filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f) && f !== 'Strings.resx')
   .sort();
 
+// A KEY THAT HAS LEFT THE NEUTRAL TAKES ITS HISTORY WITH IT, and a key renamed under
+// a satellite that still holds the English is one: the satellite's value is the old
+// key's English, and the new key's history starts at the rename. So every wording a
+// retired key ever held is a former English value too, matched against every
+// satellite value whatever its key. A wording some key holds now is left out: a
+// satellite holding it is check-still-english's question, or a keep.
+const current = new Set(neutral.values());
+const retiredHolding = new Map(); // value -> the retired keys that held it
+for (const [key, values] of history) {
+  if (neutral.has(key)) continue;
+  for (const v of values) {
+    if (current.has(v)) continue;
+    if (!retiredHolding.has(v)) retiredHolding.set(v, []);
+    retiredHolding.get(v).push(key);
+  }
+}
+
 // The neutral key an override overrides, by the generators' own rule.
 const overrideBase = (key) => {
   const prefix = key.replace(/\.(?:One|Few|Many)$/, '');
@@ -163,19 +180,22 @@ for (const file of satellites) {
     const base = neutral.has(key) ? key : overrideBase(key);
     if (base === null) continue;                       // an override with no neutral counterpart
     if (value === neutral.get(base)) continue;         // check-still-english's job, not this one
-    if (history.get(base)?.has(value)) hits.push({ key, base });
+    if (history.get(base)?.has(value)) { hits.push({ key, base }); continue; }
+    const retired = retiredHolding.get(value);
+    if (retired) hits.push({ key, base, retired });
   }
   if (hits.length) {
     total += hits.length;
     for (const h of hits) distinct.add(h.key);
     console.log(`${code}: ${hits.length} value(s) holding a superseded English value:`);
     for (const h of hits)
-      console.log(`  ${h.key}${h.key === h.base ? '' : ` (against ${h.base})`}`);
+      console.log(`  ${h.key}${h.key === h.base ? '' : ` (against ${h.base})`}`
+        + `${h.retired ? `, a former wording of ${h.retired.join(', ')}, no longer in the English` : ''}`);
   }
 }
 
 console.log(`\nTOTALS: ${revs.length} commit(s) of the neutral read, ${history.size} key(s) with a value `
-  + `history, ${satellites.length} satellite(s) checked; ${total} key-slot(s) holding superseded English `
+  + `history (${[...history.keys()].filter((k) => !neutral.has(k)).length} no longer in the English), ${satellites.length} satellite(s) checked; ${total} key-slot(s) holding superseded English `
   + `across ${distinct.size} distinct key(s).`);
 
 if (drift) {

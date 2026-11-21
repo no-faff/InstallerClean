@@ -64,7 +64,6 @@
                          TextWrapping="NoWrap"
                          VerticalScrollBarVisibility="Auto"
                          HorizontalScrollBarVisibility="Auto"
-                         FocusVisualStyle="{StaticResource FlatTextBoxFocusVisual}"
                          AutomationProperties.LabeledBy="{Binding ElementName=Heading}"
                          AutomationProperties.Name="{loc:Translate Window.Report.Title}"/>
             </Border>

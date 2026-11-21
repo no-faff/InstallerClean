@@ -41,15 +41,15 @@ internal static class DirectoryGuard
     /// </summary>
     internal readonly struct FolderExpectation
     {
-        internal FolderExpectation(IReadOnlySet<string> ownerSids, IReadOnlySet<string> daclSids, bool requireProtected)
+        internal FolderExpectation(HashSet<string> ownerSids, HashSet<string> daclSids, bool requireProtected)
         {
             OwnerSids = ownerSids;
             DaclSids = daclSids;
             RequireProtected = requireProtected;
         }
 
-        internal IReadOnlySet<string> OwnerSids { get; }
-        internal IReadOnlySet<string> DaclSids { get; }
+        internal HashSet<string> OwnerSids { get; }
+        internal HashSet<string> DaclSids { get; }
         internal bool RequireProtected { get; }
 
         /// <summary>A real folder: owned by SYSTEM or Administrators, granting only those two, sealed.</summary>
@@ -77,17 +77,17 @@ internal static class DirectoryGuard
         if (string.IsNullOrEmpty(path)) return null;
 
         var handle = Kernel32.CreateFile(
-            path, Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
+            FullPaths.ForWindowsCall(path), Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
             Kernel32.OPEN_EXISTING, Kernel32.FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero);
         if (handle.IsInvalid)
         {
-            failureCode = Marshal.GetLastPInvokeError();
+            failureCode = Marshal.GetLastWin32Error();
             return null;
         }
 
         if (!Kernel32.GetFileInformationByHandle(handle, out var info))
         {
-            failureCode = Marshal.GetLastPInvokeError();
+            failureCode = Marshal.GetLastWin32Error();
             handle.Dispose();
             return null;
         }
@@ -134,7 +134,7 @@ internal static class DirectoryGuard
         }
     }
 
-    private static unsafe bool EveryAceSidIsExpected(IntPtr dacl, IReadOnlySet<string> allowed)
+    private static unsafe bool EveryAceSidIsExpected(IntPtr dacl, HashSet<string> allowed)
     {
         // The ACL header carries its entry count in its third field; each entry begins
         // with a four-byte header, then a four-byte mask, then the SID. An entry whose
@@ -495,7 +495,7 @@ internal static class DirectoryGuard
 
         if (!Kernel32.GetFileInformationByHandle(child, out var info))
         {
-            failureCode = Marshal.GetLastPInvokeError();
+            failureCode = Marshal.GetLastWin32Error();
             return false;
         }
 
@@ -509,7 +509,7 @@ internal static class DirectoryGuard
         if (DeleteByHandle(child, info.dwFileAttributes)) return true;
 
         // The cause the disposition call itself left.
-        failureCode = Marshal.GetLastPInvokeError();
+        failureCode = Marshal.GetLastWin32Error();
         return false;
     }
 
@@ -564,7 +564,7 @@ internal static class DirectoryGuard
         // answer is a refusal and stays one: the older form takes effect when the last
         // handle closes, so with another program holding the file open it would answer
         // success while the name is still there.
-        if (!PosixFormIsNotTaken(Marshal.GetLastPInvokeError())) return false;
+        if (!PosixFormIsNotTaken(Marshal.GetLastWin32Error())) return false;
 
         return fileAttributes is { } attributes
             ? DeleteClearingReadOnly(handle, attributes)
@@ -590,12 +590,12 @@ internal static class DirectoryGuard
         SetAttributesByHandle(handle, attributes & ~FILE_ATTRIBUTE_READONLY);
         if (DeleteByPlainForm(handle)) return true;
 
-        var error = Marshal.GetLastPInvokeError();
+        var error = Marshal.GetLastWin32Error();
         // The attributes as they are now, with read-only put back.
         var current = Kernel32.GetFileInformationByHandle(handle, out var info)
             ? info.dwFileAttributes : attributes & ~FILE_ATTRIBUTE_READONLY;
         SetAttributesByHandle(handle, (current & ~FILE_ATTRIBUTE_NORMAL) | FILE_ATTRIBUTE_READONLY);
-        Marshal.SetLastPInvokeError(error);
+        Kernel32.SetLastError(unchecked((uint)error));
         return false;
     }
 }

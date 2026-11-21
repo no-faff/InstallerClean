@@ -57,13 +57,6 @@ public interface IPackageIdentityReader
     PackageIdentity? Read(string filePath, bool isPatch, out string detail, out PackageReadRefusal refusal);
 
     /// <summary>
-    /// <see cref="Read(string, bool, out string, out PackageReadRefusal)"/>, for a caller
-    /// that does not count the refusals.
-    /// </summary>
-    PackageIdentity? Read(string filePath, bool isPatch, out string detail) =>
-        Read(filePath, isPatch, out detail, out _);
-
-    /// <summary>
     /// The package code of the installation package at <paramref name="filePath"/>: the
     /// Revision Number of its summary information, in the braced upper-case form a product
     /// code is read in. Windows Installer records, for each installation, the package code
@@ -72,7 +65,32 @@ public interface IPackageIdentityReader
     /// one braced GUID, and from a reader that does not read package codes; a caller
     /// comparing package codes keeps the file then.
     /// </summary>
-    string? PackageCodeOf(string filePath) => null;
+    string? PackageCodeOf(string filePath);
+
+    /// <summary>
+    /// Whether the installation package at <paramref name="filePath"/> has no Revision Number: its
+    /// summary information opens and the property is not set (VT_EMPTY), whatever else the summary
+    /// holds, a file with no summary information at all among them. The Revision Number is where a
+    /// package carries its package code, and Windows Installer, looking for an installation's
+    /// package among its sources, takes one only where it carries the package code that
+    /// installation records, so a file with no Revision Number is not that package. False for
+    /// every other answer: a summary that will not open, a Revision Number the read gives a type
+    /// for, text with no characters included, and a read that fails, and from a reader that does
+    /// not read package codes.
+    /// </summary>
+    bool HoldsNoRevisionNumber(string filePath);
+}
+
+/// <summary>Reads made through <see cref="IPackageIdentityReader"/>'s own members.</summary>
+public static class PackageIdentityReaderExtensions
+{
+    /// <summary>
+    /// <see cref="IPackageIdentityReader.Read(string, bool, out string, out PackageReadRefusal)"/>,
+    /// for a caller that does not count the refusals.
+    /// </summary>
+    public static PackageIdentity? Read(
+        this IPackageIdentityReader reader, string filePath, bool isPatch, out string detail) =>
+        reader.Read(filePath, isPatch, out detail, out _);
 }
 
 /// <summary>

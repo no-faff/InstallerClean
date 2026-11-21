@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using InstallerClean.Helpers;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -14,7 +15,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class NewerVersionStartTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-start-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-start-");
     private readonly List<Process> _started = [];
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
 
@@ -24,10 +25,18 @@ public sealed class NewerVersionStartTests : IDisposable
         {
             foreach (var process in _started)
             {
-                try { if (!process.HasExited) process.Kill(); } catch { }
+                try
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                        process.WaitForExit(10_000);
+                    }
+                }
+                catch { }
                 process.Dispose();
             }
-            try { Directory.Delete(_root, recursive: true); } catch { }
+            TestTemp.Delete(_root);
         }
         finally
         {
@@ -41,7 +50,7 @@ public sealed class NewerVersionStartTests : IDisposable
     private Process Start(string file, params string[] arguments)
     {
         var info = new ProcessStartInfo(file) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in arguments) info.ArgumentList.Add(argument);
+        info.Arguments = CommandLineArguments.Join(arguments);
         var process = Process.Start(info)!;
         _started.Add(process);
         return process;
@@ -115,7 +124,7 @@ public sealed class NewerVersionStartTests : IDisposable
         var answer = NewerVersionProcess.AwaitStart(newer, started, bound, cancel: null, out var waitError);
 
         Assert.Equal(NewerVersionStart.Ended, answer);
-        Assert.True(clock.Elapsed < bound / 2, $"The wait took {clock.Elapsed}.");
+        Assert.True(clock.Elapsed < Durations.Times(bound, 0.5), $"The wait took {clock.Elapsed}.");
         Assert.Contains("exit code 7", NewerVersionProcess.NotStartedFailure(answer, waitError, newer, bound).Message);
         Assert.True(NewerVersionProcess.EndNewerVersion(newer));
     }

@@ -1,15 +1,12 @@
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
 public class MsiFileInfoServiceTests : IDisposable
 {
-    private readonly string _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly string _tempDir = TestTemp.NewFolder("ic-msi-info-");
 
-    public MsiFileInfoServiceTests()
-    {
-        Directory.CreateDirectory(_tempDir);
-    }
 
     [Fact]
     public void GetSummaryInfo_returns_null_for_empty_path()
@@ -66,7 +63,6 @@ public class MsiFileInfoServiceTests : IDisposable
 
     public void Dispose()
     {
-        if (Directory.Exists(_tempDir))
-            Directory.Delete(_tempDir, recursive: true);
+        TestTemp.Delete(_tempDir);
     }
 }

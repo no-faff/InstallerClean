@@ -26,6 +26,12 @@ internal enum CliCommand
     /// </summary>
     Version,
 
+    /// <summary>
+    /// A request for the third-party notices (<c>--notices</c>): print them, and exit Ok where
+    /// all of them were written and Error where a write failed.
+    /// </summary>
+    Notices,
+
     /// <summary><c>/s</c>: scan and list removable files, read-only.</summary>
     ScanOnly,
 
@@ -449,6 +455,9 @@ internal static class CliContract
 
         if (first is "--version" or "-v")
             return new CliInvocation(CliCommand.Version, null, null);
+
+        if (first is "--notices")
+            return new CliInvocation(CliCommand.Notices, null, null);
 
         if (first is not "/d" and not "/m" and not "/s")
             return new CliInvocation(CliCommand.UnknownArgument, args[0], null);

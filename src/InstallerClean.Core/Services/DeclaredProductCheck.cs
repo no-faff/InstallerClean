@@ -38,7 +38,8 @@ namespace InstallerClean.Services;
 /// <c>InstallProperties</c> key records no cached package either and they can all be seen. An
 /// installation whose recorded cached package names nothing is judged by its sources as well, and a
 /// candidate carrying the package code it records, read through the API and from the registry
-/// alike, is kept as that missing package, as is one whose own package code does not read. For each
+/// alike, is kept as that missing package, as is one whose own package code does not read, unless
+/// its summary information opens and holds no Revision Number. For each
 /// candidate patch it reads the patch's own code and the products its Template names, finds the
 /// registrations of that patch through the machine-wide patch enumeration and the keyed patch read,
 /// and reads the <c>LocalPackage</c> each registration records. A product's source list in another
@@ -159,7 +160,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // by both halves, for the same reason and with the same lifetime, and the
         // installations the caller's enumeration listed, which every answer about a
         // product is held against.
-        var pass = new PassAnswers(_msi, installations, cancellationToken, waitingOn)
+        var pass = new PassAnswers(_msi, installations, cancellationToken, waitingOn, WalkPause)
         {
             InstallerFolderVolume = new Lazy<VolumeName?>(
                 () => installerFolder is null || _fileIdentities is null
@@ -209,7 +210,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     recordRefusal?.Invoke(
                         new InvalidOperationException(
                             "A cached package did not yield the product code it declares, so it is "
-                            + "kept rather than offered. Reader detail: "
+                            + "left alone. Reader detail: "
                             + (detail.Length == 0 ? "none given" : detail) + "."),
                         CandidateCause + detail);
 
@@ -257,7 +258,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     public int CountKeysWithAListUnread(
         IReadOnlyList<UnlistedProductKey> unlisted, CancellationToken cancellationToken = default)
     {
-        var pass = new PassAnswers(_msi, [], cancellationToken, null);
+        var pass = new PassAnswers(_msi, [], cancellationToken, null, WalkPause);
         var count = 0;
         foreach (var key in unlisted)
         {
@@ -356,7 +357,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// A CANDIDATE THAT IS, OR COULD BE, A MISSING PACKAGE IS KEPT FIRST. Where an
     /// installation of its own product records a package that names nothing, a candidate
     /// carrying the package code that installation records, or whose own package code does
-    /// not read, is <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>
+    /// not read, unless it has no Revision Number, is
+    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>
     /// (<see cref="AsAMissingPackage"/>), its cause being the package of its own product it
     /// opens as where it opens as one. Every other candidate goes on to the comparisons
     /// below.
@@ -387,6 +389,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// by its name (<see cref="DeclaredProductInstalledCause.ByName"/>), the missing package it is or
     /// could be where it opens as none of its own product's packages (<see cref="AsAMissingPackage"/>),
     /// or the step that could not see its own product's packages (<see cref="DeclarationAnswer.Cause"/>).
+    ///
+    /// LAST, A CANDIDATE THE COMPARISONS WOULD LET THROUGH is put to the package codes recorded
+    /// by ordinary installations whose cached package does not say what it declares, and is
+    /// kept where it carries one or where its own package code does not read, unless it has no
+    /// Revision Number (<see cref="AsAnUndeclaredPackage"/>).
     /// </summary>
     private DeclaredProductOutcome Settle(
         string candidatePath,
@@ -472,10 +479,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             return DeclaredProductOutcome.SecondCopyUnestablished;
         }
 
-        return recorded.Count == 0 && secondCopies.Count == 0
+        var outcome = recorded.Count == 0 && secondCopies.Count == 0
             ? letThrough
             : CompareWithOpened(
                 candidatePath, recorded, recordedCached, secondCopies, secondCopiesCached, letThrough, out cause);
+        if (outcome.Withholds()) return outcome;
+
+        // A file let through so far can still be the package of an installation registered under
+        // a code its cached package does not show, by the package code that installation records.
+        var carried = AsAnUndeclaredPackage(candidatePath, links.RecordedPackageCodes);
+        if (carried == DeclaredProductInstalledCause.None) return outcome;
+
+        cause = carried;
+        return DeclaredProductOutcome.DeclaredProductInstalled;
     }
 
     /// <summary>
@@ -541,7 +557,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Where there is such an installation:
     /// <see cref="DeclaredProductInstalledCause.MissingSparePackageCodeUnread"/> where the
     /// candidate's own package code (<see cref="IPackageIdentityReader.PackageCodeOf"/>) does not
-    /// read, and <see cref="DeclaredProductInstalledCause.MissingSpareIsIt"/> where it is one such
+    /// read, unless it has no Revision Number, and
+    /// <see cref="DeclaredProductInstalledCause.MissingSpareIsIt"/> where it is one such
     /// an installation records. <see cref="DeclaredProductInstalledCause.None"/> otherwise, and the
     /// candidate is not kept here. The candidate's package code is read only where there is such
     /// an installation.
@@ -553,13 +570,55 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// file at the recorded path against the recorded one, and ignores a file carrying another.
     /// </summary>
     private DeclaredProductInstalledCause AsAMissingPackage(
-        string candidatePath, IReadOnlyList<string>? missingPackageCodes)
+        string candidatePath, IReadOnlyList<string>? missingPackageCodes) =>
+        CarriesOneOf(
+            candidatePath, missingPackageCodes,
+            DeclaredProductInstalledCause.MissingSpareIsIt, DeclaredProductInstalledCause.MissingSparePackageCodeUnread);
+
+    /// <summary>
+    /// Whether the candidate at <paramref name="candidatePath"/> is, or could be, the package of an
+    /// ordinary installation whose cached package did not say what it declares, by the package code
+    /// that installation records (<see cref="InstallationLinks.RecordedPackageCodes"/>,
+    /// <see cref="KeptByItsPackageCode"/>), and the cause it is kept for if so:
+    /// <see cref="DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt"/> where it carries one,
+    /// <see cref="DeclaredProductInstalledCause.UndeclaredPackageCodeUnread"/> where its own package
+    /// code does not read, unless it has no Revision Number, and
+    /// <see cref="DeclaredProductInstalledCause.None"/> otherwise. The
+    /// candidate's package code is read only where there is such an installation.
+    /// </summary>
+    private DeclaredProductInstalledCause AsAnUndeclaredPackage(
+        string candidatePath, IReadOnlyList<string>? recordedPackageCodes) =>
+        CarriesOneOf(
+            candidatePath, recordedPackageCodes,
+            DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt,
+            DeclaredProductInstalledCause.UndeclaredPackageCodeUnread);
+
+    /// <summary>
+    /// <paramref name="isIt"/> where the candidate's own package code
+    /// (<see cref="IPackageIdentityReader.PackageCodeOf"/>) is one of <paramref name="packageCodes"/>,
+    /// <paramref name="unread"/> where there are any and it does not read, unless the candidate has
+    /// no Revision Number (<see cref="IPackageIdentityReader.HoldsNoRevisionNumber"/>), and
+    /// <see cref="DeclaredProductInstalledCause.None"/> otherwise, the candidate's package code
+    /// not being read where there are none.
+    /// </summary>
+    private DeclaredProductInstalledCause CarriesOneOf(
+        string candidatePath,
+        IReadOnlyList<string>? packageCodes,
+        DeclaredProductInstalledCause isIt,
+        DeclaredProductInstalledCause unread)
     {
-        if (missingPackageCodes is not { Count: > 0 }) return DeclaredProductInstalledCause.None;
+        if (packageCodes is not { Count: > 0 }) return DeclaredProductInstalledCause.None;
+
+        // A file whose own package code does not read could carry the one recorded, and is kept,
+        // unless it has no Revision Number, the summary property a package carries its package
+        // code in. Such a file carries no package code, so it is not the package any installation
+        // records (IPackageIdentityReader.HoldsNoRevisionNumber). It goes on to the comparisons
+        // every other candidate is put to, and is kept where it opens as a package an
+        // installation has at its sources.
         if (_identityReader.PackageCodeOf(candidatePath) is not { } candidatePackageCode)
-            return DeclaredProductInstalledCause.MissingSparePackageCodeUnread;
-        return missingPackageCodes.Contains(candidatePackageCode, StringComparer.Ordinal)
-            ? DeclaredProductInstalledCause.MissingSpareIsIt
+            return _identityReader.HoldsNoRevisionNumber(candidatePath) ? DeclaredProductInstalledCause.None : unread;
+        return packageCodes.Contains(candidatePackageCode, StringComparer.Ordinal)
+            ? isIt
             : DeclaredProductInstalledCause.None;
     }
 
@@ -664,7 +723,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         var context = (MsiInstallContext)installation.Context;
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, installation.ProductCode, installation.UserSid, context, MsiInstallProperty.LocalPackage);
+            _msi, installation.ProductCode, installation.UserSid, context, MsiInstallProperty.LocalPackage, pass.Restarts);
         reading = SecondCopyReading.PathUnreadable;
         if (read.Unreadable) return false;
 
@@ -749,12 +808,18 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// EVERY CONTEXT IS READ, AND A FAILED READ KEEPS UNLESS THE RECORD RULES IT OUT. A
     /// link only ever adds an installation to the ones a candidate is compared with, so
     /// it can keep a file and never offer one. Where an installation's cached package
-    /// does not say what it declares, nothing links it to any candidate, so that
-    /// installation keeps every file unless its own record shows it to be an ordinary
+    /// does not say what it declares, nothing links it to any candidate by product code, so
+    /// that installation keeps every file unless its own record shows it to be an ordinary
     /// installation (<see cref="WhatItsOwnRecordShows"/>), or it records no cached package
     /// and Windows Installer has no package to open for it (<see cref="OpensNoPackage"/>):
     /// <see cref="Settle"/> then gives every candidate the answer would let through
     /// <see cref="DeclaredProductOutcome.SecondCopyUnestablished"/>.
+    ///
+    /// AN ORDINARY ONE IS LINKED BY THE PACKAGE CODE IT RECORDS instead, and a candidate
+    /// carrying that code is kept (<see cref="KeptByItsPackageCode"/>,
+    /// <see cref="AsAnUndeclaredPackage"/>), and where the API and the product key give two
+    /// different package codes, by both. Where either gives none, its sources are read, and
+    /// where they cannot be ruled out either, it keeps every file as above.
     ///
     /// AN INSTALLATION RECORDING NO CACHED PACKAGE OPENS WHAT ITS SOURCES NAME. Where it has a
     /// package to open and its record does not show an ordinary installation, its sources are
@@ -787,7 +852,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 StringComparer.Ordinal);
         List<FileIdentity> opened = [];
         List<PackageByName> byName = [];
+        List<string>? recordedPackageCodes = null;
         string? unread = null;
+        string? ordinaryUnread = null;
         string? givenUp = null;
         var keptOtherwise = false;
 
@@ -797,7 +864,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             var context = (MsiInstallContext)installation.Context;
             var declared = CodeTheCachedPackageDeclares(
-                installation.ProductCode, installation.UserSid, context, out var reading, out var detail);
+                installation.ProductCode, installation.UserSid, context, pass.Restarts, out var reading, out var detail);
             if (declared is null)
             {
                 var noPackage = reading == CachedPackageReading.NoneRecorded
@@ -809,7 +876,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     continue;
                 }
 
-                var record = WhatItsOwnRecordShows(installation.ProductCode, installation.UserSid, context);
+                var record = WhatItsOwnRecordShows(installation.ProductCode, installation.UserSid, context, pass.Restarts);
                 if (record != RecordReading.Ordinary)
                 {
                     if (noPackage is { } found)
@@ -847,6 +914,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
                     unread ??= detail;
                 }
+                else if (reading != CachedPackageReading.NoReaders
+                         && !KeptByItsPackageCode(installation.ProductCode, installation.UserSid, context,
+                             noneRecorded: reading == CachedPackageReading.NoneRecorded,
+                             pass, namesAFileInInstallerFolder, recordedPackageCodes ??= [], opened, byName,
+                             out var ordinaryGivenUp, out var ordinaryRefusal))
+                {
+                    pass.Census.OrdinaryPackageCodeNotRuledOut();
+                    ordinaryUnread ??= detail + "; the package code its record holds did not read as a GUID both "
+                        + "through Windows Installer and from the registry, and its sources were not ruled out ("
+                        + ordinaryRefusal + ")";
+                    if (ordinaryGivenUp is null) keptOtherwise = true;
+                    else givenUp ??= ordinaryGivenUp;
+                }
 
                 pass.Census.Undeclared(reading, record, context);
                 continue;
@@ -867,14 +947,83 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 new InvalidOperationException(
                     "A program's cached package did not yield the product code it declares, and its own "
                     + "record did not show it to be an ordinary installation, so every installation package "
-                    + "is kept rather than offered. Detail: " + unread + "."),
+                    + "is left alone. Detail: " + unread + "."),
                 LinksCause + unread);
 
+        if (ordinaryUnread is not null)
+            recordRefusal?.Invoke(
+                new InvalidOperationException(
+                    "A program's cached package did not yield the product code it declares, and the package "
+                    + "code its record holds did not read as a GUID both through Windows Installer and from the "
+                    + "registry, nor could its sources be ruled out, so every installation package is left "
+                    + "alone. Detail: " + ordinaryUnread + "."),
+                OrdinaryLinksCause + ordinaryUnread);
+
+        var keepsEvery = unread is not null || ordinaryUnread is not null;
         return pass.Links = new InstallationLinks(
             byDeclaredCode,
-            unread is not null,
+            keepsEvery,
             new OpenedPackages(opened, byName, []),
-            unread is not null && !keptOtherwise ? givenUp : null);
+            keepsEvery && !keptOtherwise ? givenUp : null,
+            recordedPackageCodes);
+    }
+
+    /// <summary>
+    /// For an ordinary installation whose cached package did not say what product it declares
+    /// (<see cref="LinksOf"/>), adds to <paramref name="packageCodes"/> the package code its
+    /// record holds (<see cref="RecordedPackageCode"/>), or both where the API and the product key
+    /// give two different codes (<see cref="BothPackageCodesItsRecordHolds"/>), or, where either
+    /// gives none, adds to <paramref name="opened"/> and <paramref name="byName"/> the packages its
+    /// sources name (<see cref="AddSourcePackages"/>). False, which keeps every installation
+    /// package, where neither settles, with <paramref name="refusal"/> what refused the sources
+    /// and <paramref name="givenUp"/> the root given up where they stopped at one.
+    ///
+    /// WHY THE PACKAGE CODE IS ENOUGH. The installation can be one made from a copy of a package
+    /// in the Installer folder through a transform that gave it a new product code, so its own
+    /// product code is not the one the copy declares and no other step ties the two together.
+    /// Where its cached package is gone, a repair needs a package carrying the package code its
+    /// record holds, whatever product that package declares, and that copy is the one that puts
+    /// the installation right. Where its cached package is there, nothing is needed from the
+    /// folder. So the package code is asked whether or not the cached package can be seen, and
+    /// a candidate carrying it is kept (<see cref="AsAnUndeclaredPackage"/>).
+    /// </summary>
+    private bool KeptByItsPackageCode(
+        string code,
+        string? sid,
+        MsiInstallContext context,
+        bool noneRecorded,
+        PassAnswers pass,
+        Func<string, bool?>? namesAFileInInstallerFolder,
+        List<string> packageCodes,
+        List<FileIdentity> opened,
+        List<PackageByName> byName,
+        out string? givenUp,
+        out SourceRefusal refusal)
+    {
+        givenUp = null;
+        refusal = SourceRefusal.None;
+        if (RecordedPackageCode(code, sid, context, pass.Restarts, pass.CancellationToken) is { } packageCode)
+        {
+            if (!packageCodes.Contains(packageCode, StringComparer.Ordinal)) packageCodes.Add(packageCode);
+            return true;
+        }
+
+        // WHERE BOTH READS GIVE A PACKAGE CODE AND THEY DIFFER, BOTH ARE KEPT AND THE SOURCES ARE NOT
+        // READ. Windows Installer takes a package at a source only where it carries the package code
+        // the installation's record holds, and the record is what the API answers and the product
+        // key keeps, so a file carrying neither code is no source of the installation. Where either
+        // read gives no package code, nothing is taken from the other, and the sources are read.
+        if (BothPackageCodesItsRecordHolds(code, sid, context, pass.Restarts, pass.CancellationToken) is { Count: > 0 } either)
+        {
+            foreach (var one in either)
+                if (!packageCodes.Contains(one, StringComparer.Ordinal)) packageCodes.Add(one);
+            return true;
+        }
+
+        // A false answer keeps every installation package, so what a refused read added here is
+        // never compared.
+        return AddSourcePackages(code, sid, context, noneRecorded, pass, namesAFileInInstallerFolder,
+            opened, byName, out givenUp, out refusal);
     }
 
     /// <summary>
@@ -922,16 +1071,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// ordinary looks the same whether the record carries no such value or did not answer
     /// at all. A <c>PackageCode</c> that comes back as a value tells the two apart.
     /// </summary>
-    private RecordReading WhatItsOwnRecordShows(string code, string? sid, MsiInstallContext context)
+    private RecordReading WhatItsOwnRecordShows(
+        string code, string? sid, MsiInstallContext context, WalkRestarts restarts)
     {
         if (!ReadsItsOwnRecord(sid, context)) return RecordReading.AnotherAccount;
 
         var packageCode = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.PackageCode);
+            _msi, code, sid, context, MsiInstallProperty.PackageCode, restarts);
         if (packageCode.Unreadable || packageCode.Value.TrimEnd('\0').Length == 0)
             return RecordReading.PackageCodeUnanswered;
 
-        return InstallerQueryService.ReadInstanceType(_msi, code, sid, context)
+        return InstallerQueryService.ReadInstanceType(_msi, code, sid, context, restarts)
             == InstallerQueryService.InstanceReading.Ordinary
             ? RecordReading.Ordinary
             : RecordReading.InstanceTypeNotOrdinary;
@@ -979,6 +1129,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///   <c>InstallProperties</c> key (<see cref="InstallPropertiesKeyPath"/>) is absent or
     ///   records no cached package (<see cref="RecordsNoCachedPackage"/>), a key that will not
     ///   read answering false;
+    /// - <c>S-1-5-18</c> keeps no source list for its own per-user installation of the code
+    ///   (<see cref="SystemKeepsNoOwnPerUserList"/>), whose record the per-machine one shares;
     /// - where that key is there, its <c>InstallSource</c>, read through the API and from the key
     ///   alike (<see cref="InstallSourceOf"/>), is none or a web address, or names a folder shown
     ///   not to be the Installer folder itself, on a local drive as on any other root
@@ -1041,8 +1193,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             || SourceListKeyPath(code, sid, context) is not { } listKey)
             return new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
 
-        var key = registry.LocalMachineValues(properties);
-        if (!RecordsNoCachedPackage(key) || ValuesOf(registry, listKey).Presence != RegistryKeyPresence.Absent)
+        var key = registry.LocalMachineValues(properties, pass.CancellationToken);
+        if (!RecordsNoCachedPackage(key) || ValuesOf(registry, listKey, pass.CancellationToken).Presence != RegistryKeyPresence.Absent
+            || !SystemKeepsNoOwnPerUserList(code, pass))
             return new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
 
         if (key.Presence == RegistryKeyPresence.Absent)
@@ -1121,10 +1274,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="AddSourcePackages"/> asks it before it reads the sources of an installation whose
     /// cached package reads as none.
     /// </summary>
-    private bool RegistryRecordsNoCachedPackage(string code, string? sid, MsiInstallContext context) =>
+    private bool RegistryRecordsNoCachedPackage(
+        string code, string? sid, MsiInstallContext context, CancellationToken cancellationToken) =>
         _registry is not null
         && InstallPropertiesKeyPath(code, sid, context) is { } path
-        && RecordsNoCachedPackage(_registry.LocalMachineValues(path));
+        && RecordsNoCachedPackage(_registry.LocalMachineValues(path, cancellationToken));
 
     /// <summary>
     /// Whether an installation's <c>InstallProperties</c> key, <paramref name="key"/>, records no
@@ -1221,7 +1375,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// was built without its file readers, having no way to look.
     /// </summary>
     private string? CodeTheCachedPackageDeclares(
-        string registeredCode, string? sid, MsiInstallContext context,
+        string registeredCode, string? sid, MsiInstallContext context, WalkRestarts restarts,
         out CachedPackageReading reading, out string detail)
     {
         if (!ComparesRecordedPackages)
@@ -1232,7 +1386,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage);
+            _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage, restarts);
         if (read.Unreadable)
         {
             reading = CachedPackageReading.PathUnreadable;
@@ -1504,6 +1658,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private int _keptNoneRecordedOtherAnswer;
         private int _keptNoneRecordedRegistryDisagrees;
         private int _keptNoneRecordedSourcesNotRuledOut;
+        private int _keptOrdinaryPackageCodeNotRuledOut;
         private int _perMachine;
         private int _unruledChecked;
         private int _unseenPerMachine;
@@ -1567,8 +1722,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         /// An installation whose cached package gave <paramref name="reading"/> rather than a
         /// product code, and whose own record showed <paramref name="record"/>. Unless the check
         /// has no file readers, every one is counted as checked and by what its record showed,
-        /// and only one that sets the hold is counted by what its cached package gave and by its
-        /// context.
+        /// and only one that sets the hold for what its record showed is counted by what its
+        /// cached package gave and by its context. An ordinary one that sets it all the same is
+        /// counted in <see cref="OrdinaryPackageCodeNotRuledOut"/> instead.
         /// </summary>
         internal void Undeclared(CachedPackageReading reading, RecordReading record, MsiInstallContext context)
         {
@@ -1606,6 +1762,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         /// </summary>
         internal void UnseenByName() => _unseenByNameFiles++;
 
+        /// <summary>
+        /// An ordinary installation whose cached package did not say what it declares, whose
+        /// recorded package code did not read as a GUID both through the API and from the registry
+        /// and whose sources could not be ruled out, so it keeps every installation package
+        /// (<see cref="KeptByItsPackageCode"/>).
+        /// It is counted as released by its record as well (<see cref="Undeclared"/>).
+        /// </summary>
+        internal void OrdinaryPackageCodeNotRuledOut() => _keptOrdinaryPackageCodeNotRuledOut++;
+
         /// <summary>The counts taken.</summary>
         internal CachedPackageCensus Census() => new(
             ListedChecked: _listedChecked,
@@ -1635,7 +1800,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             ReleasedBySources: _releasedBySources,
             KeptNoneRecordedOtherAnswer: _keptNoneRecordedOtherAnswer,
             KeptNoneRecordedRegistryDisagrees: _keptNoneRecordedRegistryDisagrees,
-            KeptNoneRecordedSourcesNotRuledOut: _keptNoneRecordedSourcesNotRuledOut);
+            KeptNoneRecordedSourcesNotRuledOut: _keptNoneRecordedSourcesNotRuledOut,
+            KeptOrdinaryPackageCodeNotRuledOut: _keptOrdinaryPackageCodeNotRuledOut);
     }
 
     /// <summary>Whether two spellings name one product code.</summary>
@@ -1664,7 +1830,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// AN INSTALLATION WHOSE RECORDED PACKAGE NAMES NOTHING ADDS THE PACKAGES ITS SOURCES NAME
     /// TOO, Windows Installer having no cached package to open for it, and its package code
     /// goes into <see cref="OpenedPackages.MissingPackageCodes"/>: a candidate is kept where it
-    /// carries that code or its own does not read (<see cref="AsAMissingPackage"/>).
+    /// carries that code or its own does not read, unless it has no Revision Number
+    /// (<see cref="AsAMissingPackage"/>).
     /// The value has to be shown to name nothing (<see cref="NamesNothing"/>), the package code
     /// has to read (<see cref="RecordedPackageCode"/>), and the installation must not be in
     /// another account's per-user-unmanaged context.
@@ -1705,7 +1872,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         foreach (var (registeredCode, sid, context) in installations)
         {
             var read = InstallerQueryService.ReadProductProperty(
-                _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage);
+                _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage, pass.Restarts);
             if (read.Unreadable)
             {
                 cause = DeclaredProductInstalledCause.PathUnreadable;
@@ -1762,7 +1929,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     return null;
                 }
 
-                if (RecordedPackageCode(registeredCode, sid, context) is not { } packageCode)
+                if (RecordedPackageCode(registeredCode, sid, context, pass.Restarts, pass.CancellationToken) is not { } packageCode)
                 {
                     cause = DeclaredProductInstalledCause.MissingPackageCodeUnread;
                     return null;
@@ -1867,7 +2034,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (_fileIdentities.ReadOutcome(path, out _) != FileIdentityRead.NamesNothing) return false;
 
         if (InstallPropertiesKeyPath(code, sid, context) is not { } keyPath) return false;
-        var key = _registry.LocalMachineValues(keyPath);
+        var key = _registry.LocalMachineValues(keyPath, pass.CancellationToken);
         if (key.Presence != RegistryKeyPresence.Present || key.Values is null) return false;
 
         var held = 0;
@@ -1892,23 +2059,28 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Installer keeps it there, apart from the cached package, so it reads whether or not
     /// that file is there.
     ///
-    /// NULL, WHICH KEEPS EVERY CANDIDATE, where either read fails, is empty or is not a
-    /// GUID, where the key holds the value more than once or as anything but a REG_SZ,
-    /// where the two disagree, for a per-user installation not shown to be the running
-    /// account's (<see cref="ReadsItsOwnRecord"/>), and for a check built without its registry
-    /// reader.
+    /// THE API'S READ IS MADE AGAIN WHERE IT FAILS (<paramref name="restarts"/>), and the key is
+    /// read after it, so a value read again is compared with a key read later, never earlier.
+    ///
+    /// NULL where either read fails, is empty or is not a GUID, where the key holds the value
+    /// more than once or as anything but a REG_SZ, where the two disagree, for a per-user
+    /// installation not shown to be the running account's (<see cref="ReadsItsOwnRecord"/>),
+    /// and for a check built without its registry reader. <see cref="PackagesOpenedBy"/> keeps
+    /// the candidate on a null, and <see cref="KeptByItsPackageCode"/> goes on to
+    /// <see cref="BothPackageCodesItsRecordHolds"/>.
     /// </summary>
-    private string? RecordedPackageCode(string code, string? sid, MsiInstallContext context)
+    private string? RecordedPackageCode(
+        string code, string? sid, MsiInstallContext context, WalkRestarts restarts, CancellationToken cancellationToken)
     {
         if (_registry is null || !ReadsItsOwnRecord(sid, context)
             || ProductKeyPath(code, sid, context) is not { } productKey)
             return null;
 
-        var read = InstallerQueryService.ReadProductProperty(_msi, code, sid, context, MsiInstallProperty.PackageCode);
+        var read = InstallerQueryService.ReadProductProperty(_msi, code, sid, context, MsiInstallProperty.PackageCode, restarts);
         if (read.Unreadable || PackageIdentityReader.Canonicalise(read.Value.TrimEnd('\0')) is not { } answered)
             return null;
 
-        var key = ValuesOf(_registry, productKey);
+        var key = ValuesOf(_registry, productKey, cancellationToken);
         if (key.Presence != RegistryKeyPresence.Present || key.Values is null) return null;
 
         // The key holds the value under the name the API reads it by.
@@ -1919,6 +2091,37 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             && PackageIdentityReader.Canonicalise(unpacked) == answered
                 ? answered
                 : null;
+    }
+
+    /// <summary>
+    /// The two package codes one installation's record holds where they differ: the one the API
+    /// answers and the one the product key holds, each in the braced upper-case form. Empty unless
+    /// both read, as one REG_SZ value for the key, and both are GUIDs, so neither read is taken
+    /// without the other; empty as well where <see cref="RecordedPackageCode"/> would not read the
+    /// record at all. The API's read is made again where it fails, as
+    /// <see cref="RecordedPackageCode"/>'s is, and the key is read after it.
+    /// </summary>
+    private List<string> BothPackageCodesItsRecordHolds(
+        string code, string? sid, MsiInstallContext context, WalkRestarts restarts, CancellationToken cancellationToken)
+    {
+        if (_registry is null || !ReadsItsOwnRecord(sid, context)
+            || ProductKeyPath(code, sid, context) is not { } productKey)
+            return [];
+
+        var read = InstallerQueryService.ReadProductProperty(_msi, code, sid, context, MsiInstallProperty.PackageCode, restarts);
+        if (read.Unreadable || PackageIdentityReader.Canonicalise(read.Value.TrimEnd('\0')) is not { } answered)
+            return [];
+
+        var key = ValuesOf(_registry, productKey, cancellationToken);
+        if (key.Presence != RegistryKeyPresence.Present || key.Values is null) return [];
+
+        var value = ValueNamed(key.Values, MsiInstallProperty.PackageCode, out var count);
+        if (count != 1 || value is not { Kind: RegistryValueKind.String, Text: { } packed }
+            || InstallerQueryService.UnpackRegistryProductCode(packed) is not { } unpacked
+            || PackageIdentityReader.Canonicalise(unpacked) is not { } stored)
+            return [];
+
+        return stored == answered ? [answered] : [answered, stored];
     }
 
     /// <summary>
@@ -2019,6 +2222,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// first put to the Installer-folder test, and one that would be a file directly in the
     /// Installer folder keeps every copy.
     ///
+    /// A PER-MACHINE INSTALLATION'S SOURCES INCLUDE THE LISTS <c>S-1-5-18</c> KEEPS FOR ITS OWN
+    /// PER-USER INSTALLATION OF THE SAME CODE, where it has one, read once the per-machine list
+    /// is seen (<see cref="AddSystemsOwnPerUserSources"/>).
+    ///
     /// THE RUNNING ACCOUNT'S OWN PER-USER-UNMANAGED LIST IS COUNTED FOR THE PASS once it is
     /// read, by whether every package it names was read or left to be compared by name
     /// (<see cref="PassAnswers.OwnPerUserListRead"/>). A list stopped by the gates before the
@@ -2040,8 +2247,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// where it is not shown to be on another volume than the Installer folder, one whose
     /// read has not answered within the time limit, and one under a drive, a share
     /// or any other root (<see cref="RootOf"/>) given up for the pass
-    /// (<see cref="ReadSourcePackage"/>). A source package that is not there is skipped,
-    /// being no file.
+    /// (<see cref="ReadSourcePackage"/>); and, for a per-machine installation, a list
+    /// <c>S-1-5-18</c> keeps for its own per-user installation of the code that does not
+    /// settle (<see cref="AddSystemsOwnPerUserSources"/>). A source package that is not there
+    /// is skipped, being no file.
     ///
     /// Where false is a package read refused for a root given up for the pass,
     /// <paramref name="givenUp"/> is that root (<see cref="ReadSourcePackage"/>); for every
@@ -2069,7 +2278,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // or one that will not read, keeps the copy, and no source of it is read. This comes
         // before the per-user-unmanaged refusal below, so such an installation is counted by
         // what its key holds whatever its context and account.
-        if (noneRecorded && !RegistryRecordsNoCachedPackage(code, sid, context))
+        if (noneRecorded && !RegistryRecordsNoCachedPackage(code, sid, context, pass.CancellationToken))
             return Refuse(SourceRefusal.CachedPackageNotRuledOut, out refusal);
 
         // ANOTHER ACCOUNT'S PER-USER-UNMANAGED SOURCE LIST IS NOT READ, AND THE COPY IS KEPT.
@@ -2088,7 +2297,82 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var seen = AddPackagesAtSources(
             code, sid, context, pass, namesAFileInInstallerFolder, _registry, opened, byName, out givenUp, out refusal);
         if (context == MsiInstallContext.UserUnmanaged) pass.OwnPerUserListRead(code, sid, seen);
+        if (seen && context == MsiInstallContext.Machine)
+            seen = AddSystemsOwnPerUserSources(
+                code, pass, namesAFileInInstallerFolder, opened, byName, out givenUp, out refusal);
         return seen;
+    }
+
+    /// <summary>
+    /// The account <c>S-1-5-18</c>'s own per-user places for a product's source list, unmanaged in
+    /// its hive and managed in HKLM: the places <see cref="SourceListPlaces"/> gives that account
+    /// other than the machine's.
+    /// </summary>
+    private static readonly (string? Sid, MsiInstallContext Context)[] SystemsOwnPerUserPlaces =
+        SourceListPlaces(DirectoryGuard.SystemSid).Where(place => place.Context != MsiInstallContext.Machine).ToArray();
+
+    /// <summary>
+    /// Whether neither of <c>S-1-5-18</c>'s own per-user places holds a source list for
+    /// <paramref name="code"/>, each read as <see cref="AddSystemsOwnPerUserSources"/> reads it. A
+    /// list there, one that will not read, and a hive that is not loaded each answer false.
+    /// </summary>
+    private bool SystemKeepsNoOwnPerUserList(string code, PassAnswers pass) =>
+        SystemsOwnPerUserPlaces.All(place => ReadListAt(code, place.Sid, place.Context, pass, out _) == ListReading.NotThere);
+
+    /// <summary>
+    /// Adds the packages named by the source lists the account <c>S-1-5-18</c> keeps for its own
+    /// per-user installation of <paramref name="code"/>, for a code installed per machine, read
+    /// from the registry alone (<see cref="ReadListAt"/>, <see cref="AddPackagesInFolders"/>), as
+    /// <see cref="AddRegistrySources"/> reads a product key no installation accounts for. True where
+    /// neither list is there, or every package they name was read or left to be compared by name.
+    ///
+    /// ONE CODE CAN BE INSTALLED PER MACHINE AND PER USER UNDER <c>S-1-5-18</c> AT ONCE. Where the
+    /// account installs it per user first and an administrator then installs it per machine, Windows
+    /// Installer keeps one <c>UserData\S-1-5-18</c> record for both, with one cached package, and
+    /// publishes each installation with its own source list. The enumeration lists the code per
+    /// machine only, and a per-machine listing accounts for that record
+    /// (<see cref="InstallerQueryService.UserDataAccount"/>), so the per-user list is read here. A
+    /// repair of the per-user installation opens what that list names, which can be a copy of the
+    /// package in the Installer folder.
+    ///
+    /// No API call is made for these places: the account's own reads do not tell its per-user
+    /// installation from its per-machine one.
+    ///
+    /// FALSE, WHICH KEEPS THE FILE AS EVERY OTHER SOURCE READ OF THE INSTALLATION DOES, where a list
+    /// will not read or its hive is not loaded (<see cref="SourceRefusal.WouldNotRead"/>), where it
+    /// holds a value in a form this check does not compare (<see cref="SourceRefusal.FormOther"/>),
+    /// and where a package it names does not settle (<see cref="SourceRefusal.PackageNotRuledOut"/>,
+    /// or <see cref="SourceRefusal.GivenUp"/> with <paramref name="givenUp"/> the root given up).
+    /// </summary>
+    private bool AddSystemsOwnPerUserSources(
+        string code,
+        PassAnswers pass,
+        Func<string, bool?> namesAFileInInstallerFolder,
+        List<FileIdentity> opened,
+        List<PackageByName> byName,
+        out string? givenUp,
+        out SourceRefusal refusal)
+    {
+        givenUp = null;
+        foreach (var (sid, context) in SystemsOwnPerUserPlaces)
+        {
+            var reading = ReadListAt(code, sid, context, pass, out var read);
+            if (reading == ListReading.NotThere) continue;
+            if (reading == ListReading.NotRead) return Refuse(SourceRefusal.WouldNotRead, out refusal);
+            if (read is not { } sources) return Refuse(SourceRefusal.FormOther, out refusal);
+
+            // The media search opens the file named by the package name on each drive it tries, so a
+            // list that searches media keeps every candidate whose name the package could be.
+            if (sources.MediaSearch) byName.Add(new PackageByName(null, sources.PackageName));
+
+            if (!AddPackagesInFolders(
+                    sources.Folders, sources.PackageName, pass, namesAFileInInstallerFolder, _registry!, opened, byName,
+                    out givenUp))
+                return Refuse(givenUp is null ? SourceRefusal.PackageNotRuledOut : SourceRefusal.GivenUp, out refusal);
+        }
+
+        refusal = SourceRefusal.None;
+        return true;
     }
 
     /// <summary>
@@ -2112,7 +2396,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     {
         givenUp = null;
         var name = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.PackageName);
+            _msi, code, sid, context, MsiInstallProperty.PackageName, pass.Restarts);
         if (name.Unreadable) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         var packageName = name.Value.TrimEnd('\0');
@@ -2126,10 +2410,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (SpellsMoreThanAName(packageName))
             return Refuse(SourceRefusal.FormPackageName, out refusal);
 
-        var sources = SourcesOf(code, sid, context, MsiSourceListOptions.Network);
+        var sources = SourcesOf(code, sid, context, MsiSourceListOptions.Network, pass);
         if (sources is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
-        var urls = SourcesOf(code, sid, context, MsiSourceListOptions.Url);
+        var urls = SourcesOf(code, sid, context, MsiSourceListOptions.Url, pass);
         if (urls is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         // A web address on the list is not compared, and any other URL keeps the copy.
@@ -2148,7 +2432,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (SourceListKeyPath(code, sid, context) is not { } listKey)
             return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
-        var sourceList = ValuesOf(registry, listKey);
+        var sourceList = ValuesOf(registry, listKey, pass.CancellationToken);
         if (sourceList.Presence != RegistryKeyPresence.Present || sourceList.Values is null)
             return Refuse(KeyRefusal(sourceList), out refusal);
 
@@ -2158,13 +2442,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (!HoldsThePackageName(sourceList.Values, packageName))
             return Refuse(SourceRefusal.RegistryDiffers, out refusal);
 
-        var net = ValuesOf(registry, listKey.Below("Net"));
+        var net = ValuesOf(registry, listKey.Below("Net"), pass.CancellationToken);
         if (!IsTheList(net, sources)) return Refuse(KeyRefusal(net), out refusal);
 
-        var urlKey = ValuesOf(registry, listKey.Below("URL"));
+        var urlKey = ValuesOf(registry, listKey.Below("URL"), pass.CancellationToken);
         if (!IsTheList(urlKey, urls)) return Refuse(KeyRefusal(urlKey), out refusal);
 
-        var media = ValuesOf(registry, listKey.Below("Media"));
+        var media = ValuesOf(registry, listKey.Below("Media"), pass.CancellationToken);
         var mediaPath = MediaPackagePathOf(code, sid, context, media, out refusal);
         if (mediaPath is null) return false;
 
@@ -2174,13 +2458,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // keeps every copy while Windows follows a symbolic link reached through a network path.
         if (mediaPath.Length > 0 && RemoteLinksCanBeFollowed(registry, pass))
             return Refuse(SourceRefusal.FormMedia, out refusal);
-        if (mediaPath.Length > 0 || !HasNoMediaSource(code, sid, context, media))
+        if (mediaPath.Length > 0 || !HasNoMediaSource(code, sid, context, media, pass))
             byName.Add(new PackageByName(null, packageName));
 
         var usedLast = SourceUsedLastOf(code, sid, context, sourceList.Values, out refusal);
         if (usedLast is null) return false;
 
-        var installSource = InstallSourceOf(registry, code, sid, context, out refusal);
+        var installSource = InstallSourceOf(registry, code, sid, context, pass.CancellationToken, out refusal);
         if (installSource is null) return false;
 
         // The source used last and the InstallSource join the folders compared, each
@@ -2238,11 +2522,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// <paramref name="name"/> in <paramref name="folder"/>, joined with a backslash by hand
-    /// rather than with <c>Path.Combine</c>, whose separator is the host's.
+    /// <paramref name="name"/> in <paramref name="folder"/>, joined with one backslash.
     /// </summary>
     private static string PathOfPackage(string folder, string name) =>
-        folder.EndsWith('\\') ? folder + name : folder + '\\' + name;
+        folder.EndsWith("\\", StringComparison.Ordinal) ? folder + name : folder + '\\' + name;
 
     /// <summary>
     /// Whether <paramref name="packageName"/> holds a '\', a '/', a ':', a '%' or a null, each of
@@ -2346,7 +2629,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// for a product code (<see cref="PackagesOpenedBy"/>), it keeps every candidate declaring
     /// that code. Read for the installations not ruled out as second copies
     /// (<see cref="PackagesSecondCopiesOpen"/>), or for an installation recording no cached
-    /// package whose record does not show an ordinary installation (<see cref="LinksOf"/>), it
+    /// package whose record does not show an ordinary installation, or for an ordinary one whose
+    /// recorded package code does not read as a GUID both ways (<see cref="LinksOf"/>), it
     /// keeps every installation package the answer about its own product would let through.
     /// Read for one candidate whose name it could be (<see cref="WithPackagesItCouldBe"/>), it
     /// keeps that candidate. Read for a product key no installation accounts for, it keeps what
@@ -2559,7 +2843,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // not told.
         Task[] answerOrStop = [answered.Task, stopped];
         bool EndsWithin(TimeSpan timeout) =>
-            Task.WaitAny(answerOrStop, WholeMilliseconds(timeout), pass.CancellationToken) >= 0;
+            FrameworkTask.WaitAny(answerOrStop, WholeMilliseconds(timeout), pass.CancellationToken) >= 0;
 
         var notice = SourceFolderWaitThreshold < SourceFolderTimeLimit ? SourceFolderWaitThreshold : SourceFolderTimeLimit;
         var ended = EndsWithin(notice);
@@ -2595,7 +2879,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>
     /// <paramref name="timeout"/> in whole milliseconds, the unit
-    /// <see cref="Task.WaitAny(Task[], int, CancellationToken)"/> takes, held between nought and
+    /// <see cref="FrameworkTask.WaitAny(Task[], int, CancellationToken)"/> takes, held between nought and
     /// the longest wait that can be given.
     /// </summary>
     private static int WholeMilliseconds(TimeSpan timeout) => (int)Math.Clamp(timeout.TotalMilliseconds, 0, int.MaxValue);
@@ -2810,7 +3094,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// depends on it kept in the pass it is slow in. Lengthen it and a root that does not
     /// answer at all costs each pass that much longer.
     /// </summary>
-    internal TimeSpan SourceFolderTimeLimit { get; init; } = TimeSpan.FromSeconds(30);
+    internal TimeSpan SourceFolderTimeLimit { get; init; } = Durations.FromSeconds(30);
 
     /// <summary>
     /// How long a source folder's package read can take to answer false before its root is
@@ -2820,7 +3104,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="SourceFolderFailedWaitBudget"/>. Lower it and a root that is only slow to
     /// answer that one package will not open is given up with every package under it.
     /// </summary>
-    internal TimeSpan SourceFolderSlowFailure { get; init; } = TimeSpan.FromSeconds(5);
+    internal TimeSpan SourceFolderSlowFailure { get; init; } = Durations.FromSeconds(5);
 
     /// <summary>
     /// How long, in one pass, the package reads under one root that each answered false can
@@ -2833,7 +3117,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// costs each pass that much longer, up to <see cref="SourceFolderReadBudget"/>, which
     /// counts these reads too.
     /// </summary>
-    internal TimeSpan SourceFolderFailedWaitBudget { get; init; } = TimeSpan.FromMinutes(1);
+    internal TimeSpan SourceFolderFailedWaitBudget { get; init; } = Durations.FromMinutes(1);
 
     /// <summary>
     /// How long, in one pass, all the reads under one root can add up to before the root is
@@ -2844,7 +3128,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// of the copies that depend on it are kept; raise it and such a root holds each pass that
     /// much longer.
     /// </summary>
-    internal TimeSpan SourceFolderReadBudget { get; init; } = TimeSpan.FromMinutes(5);
+    internal TimeSpan SourceFolderReadBudget { get; init; } = Durations.FromMinutes(5);
 
     /// <summary>
     /// How long a read under a root can take before it is a wait, and the pass's caller is
@@ -2853,7 +3137,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// whatever this is. Raise it and a read waits that much longer before the caller is
     /// told; lower it and a read that is only not instant flashes a line on screen.
     /// </summary>
-    internal TimeSpan SourceFolderWaitThreshold { get; init; } = TimeSpan.FromSeconds(1);
+    internal TimeSpan SourceFolderWaitThreshold { get; init; } = Durations.FromSeconds(1);
 
     /// <summary>
     /// The clock <see cref="AnswersWithin"/> times each read on. Every read adds the time it
@@ -2866,9 +3150,38 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     internal TimeProvider Clock { get; init; } = TimeProvider.System;
 
     /// <summary>
+    /// The wait before a Windows Installer list is walked again
+    /// (<see cref="WalkRestarts"/>). Null waits on the pass's own token, so a cancel ends
+    /// the wait; a test hands in one that records the wait.
+    /// </summary>
+    internal Action<TimeSpan>? WalkPause { get; init; }
+
+    /// <summary>
     /// The entries on one installation's source list, network or URL as
     /// <paramref name="sourceType"/> says, in the order Windows lists them, or null where
     /// the list did not read to its end.
+    ///
+    /// A WALK THAT AN ERROR STOPS IS MADE AGAIN FROM THE FIRST INDEX
+    /// (<see cref="WalkRestarts.KeyedWalk"/>), and the first walk that reaches the end is
+    /// the list. Null, which keeps the file, is the answer only where none of them does.
+    /// A list that no walk read is walked once each time the pass asks for it again.
+    /// </summary>
+    private IReadOnlyList<string>? SourcesOf(
+        string code, string? sid, MsiInstallContext context, uint sourceType, PassAnswers pass)
+    {
+        var list = (code, sid, context, sourceType);
+        if (pass.SourceListsNoWalkRead.Contains(list)) return WalkSources(code, sid, context, sourceType).Sources;
+
+        var walk = pass.Restarts.KeyedWalk(
+            () => WalkSources(code, sid, context, sourceType), walked => !walked.StoppedAtAnError);
+        if (walk.StoppedAtAnError) pass.SourceListsNoWalkRead.Add(list);
+        return walk.Sources;
+    }
+
+    /// <summary>
+    /// One walk of a source list from index 0, for <see cref="SourcesOf"/>: the entries, or
+    /// null where the walk did not read the list to its end. <c>StoppedAtAnError</c> is true
+    /// where an error return ended the walk.
     ///
     /// ONE CALL PER ENTRY, WITH THE BUFFER. Windows keeps the position of the walk
     /// between calls. A call at index 0 starts the walk again, a call at the position
@@ -2879,13 +3192,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Microsoft requires every call of one walk to come from the same thread, and this
     /// loop makes them all with nothing awaited between them.
     ///
-    /// ONLY <see cref="MsiError.NoMoreItems"/> ENDS THE LIST. Every other return keeps
-    /// the file, <see cref="MsiError.MoreData"/> from an entry longer than the buffer
-    /// among them, and so does a list that runs past <see cref="MaxSourceIndex"/>
-    /// without ending, since what lies beyond it is unread. The index moves on only
-    /// after a success, so no entry is passed over.
+    /// ONLY <see cref="MsiError.NoMoreItems"/> ENDS THE LIST. Every other return ends the
+    /// walk with the list unread, and so does a list that runs past
+    /// <see cref="MaxSourceIndex"/> without ending, since what lies beyond it is unread.
+    /// The index moves on only after a success, so no entry is passed over.
+    ///
+    /// <see cref="MsiError.MoreData"/> from an entry longer than the buffer, an entry that
+    /// reads as empty and a list that runs past <see cref="MaxSourceIndex"/> are not
+    /// errors a second walk gets past: the entry is the same on every walk.
     /// </summary>
-    private IReadOnlyList<string>? SourcesOf(string code, string? sid, MsiInstallContext context, uint sourceType)
+    private (IReadOnlyList<string>? Sources, bool StoppedAtAnError) WalkSources(
+        string code, string? sid, MsiInstallContext context, uint sourceType)
     {
         var options = MsiSourceListOptions.Product | sourceType;
         var sources = new List<string>();
@@ -2899,15 +3216,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             uint length = (uint)buffer.Length;
             var error = _msi.EnumSources(code, sid, context, options, index, buffer, ref length);
-            if (error == MsiError.NoMoreItems) return sources;
-            if (error != MsiError.Success) return null;
+            if (error == MsiError.NoMoreItems) return (sources, false);
+            if (error == MsiError.MoreData) return (null, false);
+            if (error != MsiError.Success) return (null, true);
 
             var source = new string(buffer, 0, (int)Math.Min(length, (uint)buffer.Length)).TrimEnd('\0');
-            if (source.Length == 0) return null;
+            if (source.Length == 0) return (null, false);
             sources.Add(source);
         }
 
-        return null;
+        return (null, false);
     }
 
     /// <summary>
@@ -2924,8 +3242,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private string? MediaPackagePathOf(
         string code, string? sid, MsiInstallContext context, RegistryKeyValues media, out SourceRefusal refusal)
     {
+        // Read once: the answer is compared with registry keys read before it, so a value
+        // read again after an error would be compared with keys read while the record may
+        // have been changing.
         var answered = InstallerQueryService.ReadSourceListProperty(
-            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.MediaPackagePath);
+            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.MediaPackagePath,
+            WalkRestarts.ReadsOnce);
         if (answered.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var path = answered.Value.TrimEnd('\0');
@@ -2958,8 +3280,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// two disagreeing, is false, and the list keeps every candidate the package could be by
     /// its name (<see cref="AddSourcePackages"/>). A key that will not read does not reach
     /// here, its media package path having already kept the file (<see cref="MediaPackagePathOf"/>).
+    /// An answer that is neither a disk nor the end of the list is asked for again
+    /// (<see cref="WalkRestarts.KeyedWalk"/>), and the first that is one of those is taken.
     /// </summary>
-    private bool HasNoMediaSource(string code, string? sid, MsiInstallContext context, RegistryKeyValues media)
+    private bool HasNoMediaSource(
+        string code, string? sid, MsiInstallContext context, RegistryKeyValues media, PassAnswers pass)
     {
         if (media.Presence != RegistryKeyPresence.Absent)
         {
@@ -2968,7 +3293,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 if (value.Name.Length > 0 && value.Name.All(char.IsAsciiDigit)) return false;
         }
 
-        return _msi.EnumMediaDisks(code, sid, context, MsiSourceListOptions.Product, 0, out _) == MsiError.NoMoreItems;
+        return pass.Restarts.KeyedWalk(
+            () => _msi.EnumMediaDisks(code, sid, context, MsiSourceListOptions.Product, 0, out _),
+            answer => answer is MsiError.NoMoreItems or MsiError.Success) == MsiError.NoMoreItems;
     }
 
     /// <summary>
@@ -3007,10 +3334,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         IReadOnlyList<RegistryValue> sourceList,
         out SourceRefusal refusal)
     {
+        // Read once: the answer is compared with registry keys read before it, so a value
+        // read again after an error would be compared with keys read while the record may
+        // have been changing.
         var source = InstallerQueryService.ReadSourceListProperty(
-            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedSource);
+            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedSource,
+            WalkRestarts.ReadsOnce);
         var type = InstallerQueryService.ReadSourceListProperty(
-            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedType);
+            _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedType,
+            WalkRestarts.ReadsOnce);
         if (source.Unreadable || type.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = source.Value.TrimEnd('\0');
@@ -3072,12 +3404,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="SourceRefusal.None"/> for every other answer.
     /// </summary>
     private string? InstallSourceOf(
-        IRegistryReader registry, string code, string? sid, MsiInstallContext context, out SourceRefusal refusal)
+        IRegistryReader registry, string code, string? sid, MsiInstallContext context,
+        CancellationToken cancellationToken, out SourceRefusal refusal)
     {
         var path = InstallPropertiesKeyPath(code, sid, context);
         if (path is null) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
-        return InstallSourceIn(registry.LocalMachineValues(path), code, sid, context, out refusal);
+        return InstallSourceIn(registry.LocalMachineValues(path, cancellationToken), code, sid, context, out refusal);
     }
 
     /// <summary>
@@ -3087,8 +3420,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private string? InstallSourceIn(
         RegistryKeyValues properties, string code, string? sid, MsiInstallContext context, out SourceRefusal refusal)
     {
+        // Read once: the answer is compared with registry keys read before it, so a value
+        // read again after an error would be compared with keys read while the record may
+        // have been changing.
         var read = InstallerQueryService.ReadProductProperty(
-            _msi, code, sid, context, MsiInstallProperty.InstallSource);
+            _msi, code, sid, context, MsiInstallProperty.InstallSource, WalkRestarts.ReadsOnce);
         if (read.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = read.Value.TrimEnd('\0');
@@ -3282,10 +3618,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Every value of <paramref name="key"/>, read through <paramref name="registry"/> from HKLM
     /// or from its account's hive as it says.
     /// </summary>
-    private static RegistryKeyValues ValuesOf(IRegistryReader registry, KeyAt key) =>
+    private static RegistryKeyValues ValuesOf(IRegistryReader registry, KeyAt key, CancellationToken cancellationToken) =>
         key.Account is null
-            ? registry.LocalMachineValues(key.Path)
-            : registry.UserValues(key.Account, key.Path);
+            ? registry.LocalMachineValues(key.Path, cancellationToken)
+            : registry.UserValues(key.Account, key.Path, cancellationToken);
 
     /// <summary>
     /// The HKLM path this check reads a product installation's <c>InstallProperties</c>
@@ -3353,7 +3689,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 recordRefusal?.Invoke(
                     new InvalidOperationException(
                         "A cached patch did not yield the patch code and target products it "
-                        + "declares, so it is kept rather than offered. Reader detail: "
+                        + "declares, so it is left alone. Reader detail: "
                         + (detail.Length == 0 ? "none given" : detail) + "."),
                     PatchCause + detail);
 
@@ -3583,7 +3919,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             codes.Add(PackageIdentityReader.Canonicalise(key.Code) ?? key.Code);
 
             // A key gone since the walk reads as absent, and a path the walk read still counts.
-            var properties = InstallPropertiesOf(key);
+            var properties = InstallPropertiesOf(key, pass.CancellationToken);
             var recordsNone = key.CachedPackages.Count == 0 && RecordsNoCachedPackage(properties);
 
             var cachedSaid = key.CachedPackages.Count > 0 || recordsNone;
@@ -3618,7 +3954,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             recordRefusal?.Invoke(
                 new InvalidOperationException(
                     "A product key no installation Windows lists accounts for did not show which package it "
-                    + "opens, so every installation package is kept rather than offered. Detail: " + why + "."),
+                    + "opens, so every installation package is left alone. Detail: " + why + "."),
                 UnlistedKeyCause + why);
 
         return new UnlistedKeysRead(
@@ -3651,6 +3987,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// prefix of its own, for the reason on <see cref="CandidateCause"/>.
     /// </summary>
     internal const string LinksCause = "installation-links/";
+
+    /// <summary>
+    /// What the refusal log's cause starts with for an ordinary installation keeping every
+    /// installation package because the package code its record holds did not read two ways and
+    /// agree and its sources were not ruled out (<see cref="KeptByItsPackageCode"/>): under
+    /// <see cref="LinksCause"/>, the same step, and apart from every other installation it logs.
+    /// </summary>
+    internal const string OrdinaryLinksCause = LinksCause + "ordinary-package-code/";
 
     /// <summary>
     /// What the refusal log's cause starts with for a product key no installation accounts for
@@ -3953,7 +4297,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         string code, string? sid, MsiInstallContext context, PassAnswers pass, out ListedSources? sources)
     {
         sources = null;
-        if (!SourceListAt(code, sid, context, out var listKey, out var values)) return ListReading.NotRead;
+        if (!SourceListAt(code, sid, context, pass.CancellationToken, out var listKey, out var values)) return ListReading.NotRead;
         if (values is null) return ListReading.NotThere;
 
         sources = ReadSourceList(listKey, values, pass);
@@ -3966,7 +4310,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// that cannot be made, an account whose hive is not loaded, and a key that will not read.
     /// </summary>
     private bool SourceListAt(
-        string code, string? sid, MsiInstallContext context,
+        string code, string? sid, MsiInstallContext context, CancellationToken cancellationToken,
         out KeyAt listKey, out IReadOnlyList<RegistryValue>? values)
     {
         listKey = default;
@@ -3977,7 +4321,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (path.Account is { } account && _registry.UserHivePresence(account) != RegistryKeyPresence.Present)
             return false;
 
-        var list = ValuesOf(_registry, path);
+        var list = ValuesOf(_registry, path, cancellationToken);
         if (list.Presence == RegistryKeyPresence.Absent) return true;
         if (list.Presence != RegistryKeyPresence.Present || list.Values is null) return false;
 
@@ -3991,11 +4335,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="RegistryKeyPresence.Unreadable"/> where a check has no registry reader or the
     /// key's path cannot be made.
     /// </summary>
-    private RegistryKeyValues InstallPropertiesOf(UnlistedProductKey key)
+    private RegistryKeyValues InstallPropertiesOf(UnlistedProductKey key, CancellationToken cancellationToken)
     {
         var (sid, context) = SourceListPlaces(key.Account)[0];
         return _registry is not null && InstallPropertiesKeyPath(key.Code, sid, context) is { } path
-            ? _registry.LocalMachineValues(path)
+            ? _registry.LocalMachineValues(path, cancellationToken)
             : default;
     }
 
@@ -4073,7 +4417,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             || !IsAFileName(packageName))
             return null;
 
-        var net = ValuesOf(_registry!, listKey.Below("Net"));
+        var net = ValuesOf(_registry!, listKey.Below("Net"), pass.CancellationToken);
         var folders = new List<string>();
         if (net.Presence != RegistryKeyPresence.Absent)
         {
@@ -4087,7 +4431,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
         }
 
-        var urls = ValuesOf(_registry!, listKey.Below("URL"));
+        var urls = ValuesOf(_registry!, listKey.Below("URL"), pass.CancellationToken);
         if (urls.Presence != RegistryKeyPresence.Absent)
         {
             if (urls.Presence != RegistryKeyPresence.Present || urls.Values is null) return null;
@@ -4097,7 +4441,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         var mediaSearch = false;
-        var media = ValuesOf(_registry!, listKey.Below("Media"));
+        var media = ValuesOf(_registry!, listKey.Below("Media"), pass.CancellationToken);
         if (media.Presence != RegistryKeyPresence.Absent)
         {
             if (media.Presence != RegistryKeyPresence.Present || media.Values is null) return null;
@@ -4171,7 +4515,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// one the caller's enumeration listed, and an installation that would not answer
     /// the keyed read each leave registrations unfound, and the answer is
     /// <see cref="DeclaredProductOutcome.DeclaredPatchUnestablished"/>. The enumeration
-    /// is walked once per pass, so where it fails, every patch copy the pass asks about
+    /// is made once per pass, so where it fails, every patch copy the pass asks about
     /// is kept.
     /// </summary>
     private DeclarationAnswer AskAboutPatch(string code, IReadOnlyList<string> targets, PassAnswers pass)
@@ -4225,7 +4569,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         IReadOnlyList<FileIdentity>? copies = null;
         if (registrations.Count > 0)
         {
-            copies = CopiesRecordedBy(code, registrations);
+            copies = CopiesRecordedBy(code, registrations, pass.Restarts);
             if (copies is null)
                 return new DeclarationAnswer(DeclaredProductOutcome.DeclaredPatchRegistered, null);
         }
@@ -4254,7 +4598,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (registrations.Count == found)
             return new DeclarationAnswer(DeclaredProductOutcome.DeclaredPatchRegistered, copies);
 
-        var more = CopiesRecordedBy(code, registrations.GetRange(found, registrations.Count - found));
+        var more = CopiesRecordedBy(code, registrations.GetRange(found, registrations.Count - found), pass.Restarts);
         return new DeclarationAnswer(
             DeclaredProductOutcome.DeclaredPatchRegistered,
             more is null ? null : [.. copies ?? [], .. more]);
@@ -4306,7 +4650,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </summary>
     private IReadOnlyList<FileIdentity>? CopiesRecordedBy(
         string code,
-        IReadOnlyList<(string ProductCode, string? Sid, MsiInstallContext Context)> registrations)
+        IReadOnlyList<(string ProductCode, string? Sid, MsiInstallContext Context)> registrations,
+        WalkRestarts restarts)
     {
         if (_fileIdentities is null || _fileSystem is null) return null;
 
@@ -4316,7 +4661,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         foreach (var (productCode, sid, context) in registrations)
         {
             var read = InstallerQueryService.GetPatchProperty(
-                _msi, code, productCode, sid, context, MsiInstallProperty.LocalPackage);
+                _msi, code, productCode, sid, context, MsiInstallProperty.LocalPackage, restarts,
+                InstallerQueryService.PropertyRead.StandsWhereListedAsHeld);
             if (read.Unreadable) return null;
 
             var path = read.Value.TrimEnd('\0');
@@ -4592,11 +4938,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// were refused for roots given up for the pass, the first of those roots, and null
     /// otherwise (<see cref="LinksOf"/>).
     /// </param>
+    /// <param name="RecordedPackageCodes">
+    /// The package code each ordinary installation records whose cached package did not say what
+    /// it declares, read through the API and from the product key, and both codes where the two
+    /// differ (<see cref="KeptByItsPackageCode"/>), which every
+    /// candidate the answer would let through is put to (<see cref="AsAnUndeclaredPackage"/>).
+    /// Null where there is none.
+    /// </param>
     private sealed record InstallationLinks(
         Dictionary<string, List<(string RegisteredCode, string? Sid, MsiInstallContext Context)>> ByDeclaredCode,
         bool UnreadPackageNotRuledOut,
         OpenedPackages Opened,
-        string? GivenUp);
+        string? GivenUp,
+        IReadOnlyList<string>? RecordedPackageCodes = null);
 
     /// <summary>
     /// What one pass has asked Windows about installations and patch registrations,
@@ -4615,13 +4969,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? _holders;
         private bool _holdersRead;
 
+
         internal PassAnswers(
             IMsiApi msi,
             IReadOnlyList<ListedInstallation> installations,
             CancellationToken cancellationToken,
-            Action<SourceFolderWait?>? waitingOn)
+            Action<SourceFolderWait?>? waitingOn,
+            Action<TimeSpan>? walkPause)
         {
             _msi = msi;
+            Restarts = WalkRestarts.For(cancellationToken, walkPause);
             _listed = InstallerQueryService.InstallationsByCode(
                 installations.Select(i => (i.ProductCode, i.UserSid, (MsiInstallContext)i.Context)));
             Installations = installations;
@@ -4630,6 +4987,18 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         internal CancellationToken CancellationToken { get; }
+
+        /// <summary>
+        /// The restarts the pass shares among the Windows Installer lists it walks and the
+        /// properties it reads (<see cref="WalkRestarts.KeyedRead"/>).
+        /// </summary>
+        internal WalkRestarts Restarts { get; }
+
+        /// <summary>
+        /// The source lists an error stopped every walk of, so the pass walks each once where
+        /// it asks for it again (<see cref="SourcesOf"/>).
+        /// </summary>
+        internal HashSet<(string Code, string? Sid, MsiInstallContext Context, uint SourceType)> SourceListsNoWalkRead { get; } = [];
 
         /// <summary>
         /// Told each wait a read makes, naming the root it is under, and null when that wait
@@ -4675,7 +5044,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         // Made to run its continuations asynchronously, so code that continues from a stop runs
         // on the thread pool and not on the caller's thread, which completes it. The pass waits
-        // on it with Task.WaitAny, which the runtime wakes from the caller's thread all the same.
+        // on it with FrameworkTask.WaitAny, on the task's wait handle, which the caller's thread
+        // sets as it completes the task.
         private TaskCompletionSource<string> StopOf(string root) =>
             _stops.GetOrAdd(root, _ => new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously));
 
@@ -4813,7 +5183,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             var key = (patchCode.ToUpperInvariant(), productCode.ToUpperInvariant(), sid?.ToUpperInvariant(), context);
             if (!_patchStates.TryGetValue(key, out var read))
                 _patchStates[key] = read = InstallerQueryService.GetPatchProperty(
-                    _msi, patchCode, productCode, sid, context, MsiInstallProperty.State);
+                    _msi, patchCode, productCode, sid, context, MsiInstallProperty.State, Restarts);
 
             return read;
         }
@@ -4954,7 +5324,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             if (!_instances.TryGetValue(productCode, out var resolved))
             {
-                resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode);
+                resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode, Restarts);
                 if (!resolved.Unaskable
                     && !InstallerQueryService.HoldsEveryListedInstallation(_listed, productCode, resolved.Instances))
                     resolved = (Array.Empty<(string?, MsiInstallContext)>(), true);
@@ -4976,7 +5346,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             {
                 if (!_holdersRead)
                 {
-                    _holders = InstallerQueryService.EnumeratePatchHoldersAcrossAllProducts(_msi, CancellationToken);
+                    _holders = InstallerQueryService.EnumeratePatchHoldersAcrossAllProducts(_msi, Restarts, CancellationToken);
                     _holdersRead = true;
                 }
 

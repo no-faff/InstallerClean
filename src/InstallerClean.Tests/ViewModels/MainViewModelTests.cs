@@ -447,8 +447,8 @@ public class MainViewModelTests : IDisposable
     }
 
     private const string DriveDLine =
-        "InstallerClean carried on without drive D: and left alone any file still to be checked against it. "
-        + "Once it's responding normally, Re-scan.";
+        "InstallerClean stopped waiting for drive D:, so it left alone the files it needed that drive to check. "
+        + "Re-scan once it's responding normally.";
 
     [Fact]
     public async Task Files_kept_for_an_installed_program_at_a_drive_given_up_get_the_screen_naming_the_drive()
@@ -539,8 +539,8 @@ public class MainViewModelTests : IDisposable
 
         Assert.False(vm.Completion.IsComplete);
         Assert.Equal(
-            @"InstallerClean carried on without \\nas\installers and left alone any file still to be checked against it. "
-            + "Once it's responding normally, Re-scan.",
+            @"InstallerClean stopped waiting for \\nas\installers, so it left alone the files it needed that location to check. "
+            + "Re-scan once it's responding normally.",
             vm.Scan.SourcesGivenUpText);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
@@ -1108,6 +1108,7 @@ public class MainViewModelTests : IDisposable
         Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
 
         var release = new ManualResetEventSlim();
+        using var releaseOnExit = new SetOnExit(release);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {
@@ -1156,6 +1157,7 @@ public class MainViewModelTests : IDisposable
             registeredAnswers.Add(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
 
         var release = new ManualResetEventSlim();
+        using var releaseOnExit = new SetOnExit(release);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {
@@ -1193,6 +1195,7 @@ public class MainViewModelTests : IDisposable
     {
         var vm = CreateViewModel();
         var release = new ManualResetEventSlim();
+        using var releaseOnExit = new SetOnExit(release);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {
@@ -3283,7 +3286,7 @@ public class MainViewModelTests : IDisposable
     public async Task A_Move_or_Delete_report_carries_the_region_read_for_the_card_and_the_box_is_ticked(string kind)
     {
         var updater = Substitute.For<IAppUpdater>();
-        updater.Kind.Returns(AppCopyKind.Slim);
+        updater.Kind.Returns(AppCopyKind.Scoop);
         var vm = CreateViewModel(new AppSettings(), updater);
         _windowsRegion.Read().Returns("NO");
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -3317,7 +3320,7 @@ public class MainViewModelTests : IDisposable
         Assert.True(vm.Completion.SendsReport);
         await _resultLogService.Received(1).WriteAsync(
             Arg.Is<ResultLogEntry>(e => e.Operation.Kind == kind && e.App.WindowsRegion == "NO"
-                && e.App.Host == "window" && e.App.CopyKind == "slim"),
+                && e.App.Host == "window" && e.App.CopyKind == "scoop"),
             Arg.Any<CancellationToken>());
     }
 
@@ -4034,7 +4037,6 @@ public class MainViewModelTests : IDisposable
     [Theory]
     [InlineData(AppCopyKind.Setup, "setup")]
     [InlineData(AppCopyKind.Portable, "portable")]
-    [InlineData(AppCopyKind.Slim, "slim")]
     [InlineData(AppCopyKind.Scoop, "scoop")]
     [InlineData(AppCopyKind.FromSource, "fromSource")]
     [InlineData(AppCopyKind.Undetermined, "undetermined")]
@@ -4233,10 +4235,23 @@ public class MainViewModelTests : IDisposable
         var vm = FirstRunAllClear();
         _resultLogService.WriteAsync(Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(false));
+        // The card's write runs behind the scan rather than inside it, so the box is
+        // waited for, from being put up to being taken away, rather than the scan.
+        var boxUp = new TaskCompletionSource();
+        var boxGone = new TaskCompletionSource();
+        vm.Completion.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName != nameof(CompletionViewModel.OffersReport)) return;
+            if (vm.Completion.OffersReport) boxUp.TrySetResult();
+            else if (boxUp.Task.IsCompleted) boxGone.TrySetResult();
+        };
+
         await vm.Scan.ScanCommand.ExecuteAsync(null);
+        await boxGone.Task.WaitAsync(TimeSpan.FromSeconds(10));
 
         Assert.True(vm.Completion.IsComplete);
         Assert.False(vm.Completion.OffersReport);
+        await _resultLogService.Received(1).WriteAsync(Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
         // The write was attempted, so this was the PC's first run.
         _firstRunMark.Received(1).TryClaim();
 

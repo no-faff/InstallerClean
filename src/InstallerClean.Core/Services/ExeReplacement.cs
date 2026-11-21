@@ -63,24 +63,24 @@ internal static class ExeReplacement
     /// How long the copy is waited for before crash.log says the replace is still waiting
     /// for it to close. The wait goes on after that.
     /// </summary>
-    internal static readonly TimeSpan OldCopyNotice = TimeSpan.FromSeconds(60);
+    internal static readonly TimeSpan OldCopyNotice = Durations.FromSeconds(60);
 
     /// <summary>
     /// How long a move refused because the file is held is tried again. An antivirus can
     /// hold a program it has just seen written or ended while it looks at it, and a file
     /// held that way answers a move with a sharing violation, a lock violation or access denied.
     /// </summary>
-    internal static readonly TimeSpan MoveRetryBound = TimeSpan.FromSeconds(30);
+    internal static readonly TimeSpan MoveRetryBound = Durations.FromSeconds(30);
 
     /// <summary>
     /// How long a replace tries again to hold the file named with <see cref="LockSuffix"/>
     /// where it cannot. <see cref="TryRemoveLeftovers(string)"/> holds that file for as long as its
     /// deletes take, and a replace starting meanwhile takes it once they are done.
     /// </summary>
-    internal static readonly TimeSpan HoldRetryBound = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan HoldRetryBound = Durations.FromSeconds(2);
 
-    private static readonly TimeSpan FirstRetryInterval = TimeSpan.FromMilliseconds(100);
-    private static readonly TimeSpan LongestRetryInterval = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan FirstRetryInterval = Durations.FromMilliseconds(100);
+    private static readonly TimeSpan LongestRetryInterval = Durations.FromSeconds(2);
 
     /// <summary>The longest path Windows gives for a process's image, in characters.</summary>
     private const int MaxImagePathLength = 32768;
@@ -177,7 +177,7 @@ internal static class ExeReplacement
             Ntdll.SYNCHRONIZE | Kernel32.PROCESS_QUERY_LIMITED_INFORMATION, bInheritHandle: false, (uint)request.ProcessId);
         if (process.IsInvalid)
         {
-            var error = Marshal.GetLastPInvokeError();
+            var error = Marshal.GetLastWin32Error();
             process.Dispose();
             refused = Refusal($"The copy to be replaced, process {request.ProcessId}, could not be opened: error {error}.");
             return null;
@@ -466,10 +466,11 @@ internal static class ExeReplacement
         {
             var step = attempt();
             if (step != RetryStep.Again) return step == RetryStep.Done;
-            var left = bound - Stopwatch.GetElapsedTime(started);
+            var left = bound - Durations.Since(started);
             if (left <= TimeSpan.Zero) return false;
             Thread.Sleep(interval < left ? interval : left);
-            interval = interval * 2 < LongestRetryInterval ? interval * 2 : LongestRetryInterval;
+            var doubled = Durations.Times(interval, 2);
+            interval = doubled < LongestRetryInterval ? doubled : LongestRetryInterval;
         }
     }
 
@@ -479,7 +480,7 @@ internal static class ExeReplacement
         failure = null;
         try
         {
-            attributes = File.GetAttributes(path);
+            attributes = FrameworkFile.GetAttributes(path);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -496,7 +497,7 @@ internal static class ExeReplacement
         failure = null;
         try
         {
-            File.SetAttributes(path, attributes);
+            FrameworkFile.SetAttributes(path, attributes);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -550,7 +551,7 @@ internal static class ExeReplacement
         if (reader.ReadOutcome(image, out var imageIdentity) == FileIdentityRead.Read
             && reader.ReadOutcome(exePath, out var exeIdentity) == FileIdentityRead.Read)
             return imageIdentity == exeIdentity;
-        return string.Equals(Path.GetFullPath(image), Path.GetFullPath(exePath), StringComparison.OrdinalIgnoreCase);
+        return string.Equals(FullPaths.GetFullPath(image), FullPaths.GetFullPath(exePath), StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -568,12 +569,12 @@ internal static class ExeReplacement
         try
         {
             if (source is null) throw new IOException("This process has no path to copy.");
-            if (File.Exists(path)) DeletePlainFile(path);
-            using var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            if (FrameworkFile.Exists(path)) DeletePlainFile(path);
+            using var input = FrameworkFileStream.Open(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var handle = StorageHelpers.OpenAtomic(path, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateNew)
-                ?? throw new IOException($"The file ending {Path.GetExtension(path)} could not be created.");
+                ?? throw new IOException($"The file ending {PathText.GetExtension(path)} could not be created.");
             created = true;
-            using var output = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+            using var output = StorageHelpers.UnbufferedWriter(handle);
             input.CopyTo(output);
             output.Flush(flushToDisk: true);
             return true;
@@ -600,7 +601,7 @@ internal static class ExeReplacement
         linkError = 0;
         try
         {
-            if (File.Exists(backup)) DeletePlainFile(backup);
+            if (FrameworkFile.Exists(backup)) DeletePlainFile(backup);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -613,7 +614,7 @@ internal static class ExeReplacement
 
     /// <summary>Gives <paramref name="existing"/> the second name <paramref name="link"/>, and answers 0, or the error Windows refused it with.</summary>
     private static int HardLink(string link, string existing) =>
-        Kernel32.CreateHardLink(link, existing, IntPtr.Zero) ? 0 : Marshal.GetLastPInvokeError();
+        Kernel32.CreateHardLink(FullPaths.ForWindowsCall(link), FullPaths.ForWindowsCall(existing), IntPtr.Zero) ? 0 : Marshal.GetLastWin32Error();
 
     /// <summary>
     /// Moves <paramref name="from"/> over <paramref name="to"/> in one step, written through
@@ -625,11 +626,13 @@ internal static class ExeReplacement
     private static bool TryMoveOver(string from, string to, TimeSpan bound, out int error)
     {
         var last = 0;
+        var source = FullPaths.ForWindowsCall(from);
+        var target = FullPaths.ForWindowsCall(to);
         var moved = Retry(bound, () =>
         {
-            if (Kernel32.MoveFileEx(from, to, Kernel32.MOVEFILE_REPLACE_EXISTING | Kernel32.MOVEFILE_WRITE_THROUGH))
+            if (Kernel32.MoveFileEx(source, target, Kernel32.MOVEFILE_REPLACE_EXISTING | Kernel32.MOVEFILE_WRITE_THROUGH))
                 return RetryStep.Done;
-            last = Marshal.GetLastPInvokeError();
+            last = Marshal.GetLastWin32Error();
             return last is Kernel32.ERROR_ACCESS_DENIED or Kernel32.ERROR_SHARING_VIOLATION or Kernel32.ERROR_LOCK_VIOLATION
                 ? RetryStep.Again
                 : RetryStep.Stop;
@@ -683,9 +686,9 @@ internal static class ExeReplacement
             var info = new ProcessStartInfo(exePath)
             {
                 UseShellExecute = false,
-                WorkingDirectory = Path.GetDirectoryName(exePath) ?? string.Empty,
+                WorkingDirectory = PathText.GetDirectoryName(exePath) ?? string.Empty,
+                Arguments = CommandLineArguments.Join([HandOverContract.UpdateFailedSwitch]),
             };
-            info.ArgumentList.Add(HandOverContract.UpdateFailedSwitch);
             ProcessStartRetry.Start(info, _ => true, interval => Thread.Sleep(interval)).Dispose();
         }
         catch (Exception ex)
@@ -714,14 +717,14 @@ internal static class ExeReplacement
     {
         try
         {
-            if (!File.Exists(exePath)) return false;
+            if (!FrameworkFile.Exists(exePath)) return false;
             var replacing = exePath + ReplacingSuffix;
             var backup = exePath + BackupSuffix;
             // A folder that cannot be listed answers that something may be left, with
             // nothing written to crash.log, since the window asks again many times at
             // every start.
             var setupDone = SetupDoneCopies(exePath);
-            var replaceLeft = File.Exists(replacing) || File.Exists(backup) || File.Exists(exePath + LockSuffix);
+            var replaceLeft = FrameworkFile.Exists(replacing) || FrameworkFile.Exists(backup) || FrameworkFile.Exists(exePath + LockSuffix);
             if (!replaceLeft && setupDone is not { Count: > 0 }) return setupDone is not null;
             using var held = TryHold(exePath, TimeSpan.Zero, out _);
             if (held is null) return false;
@@ -750,14 +753,14 @@ internal static class ExeReplacement
     /// </summary>
     internal static List<string>? SetupDoneCopies(string exePath)
     {
-        var folder = Path.GetDirectoryName(exePath)!;
-        var stem = Path.GetFileName(exePath) + SetupDoneSuffix;
+        var folder = PathText.GetDirectoryName(exePath)!;
+        var stem = PathText.GetFileName(exePath) + SetupDoneSuffix;
         var found = new List<string>();
         try
         {
-            foreach (var path in Directory.EnumerateFiles(folder, stem + "*"))
+            foreach (var path in FrameworkDirectory.EnumerateFiles(folder, stem + "*"))
             {
-                var rest = Path.GetFileName(path)[stem.Length..];
+                var rest = PathText.GetFileName(path)[stem.Length..];
                 if (rest.Length == 0 || (rest.Length > 1 && rest[0] == '-' && rest[1..].All(char.IsAsciiDigit)))
                     found.Add(path);
             }
@@ -780,7 +783,7 @@ internal static class ExeReplacement
     {
         if (!TryDelete(path, out var error))
             CrashLog.TryWrite(new IOException(
-                $"The name ending {Path.GetExtension(path)} beside the exe could not be deleted, with error {error}, and is left there."));
+                $"The name ending {PathText.GetExtension(path)} beside the exe could not be deleted, with error {error}, and is left there."));
     }
 
     /// <summary>
@@ -793,7 +796,7 @@ internal static class ExeReplacement
     /// </summary>
     private static bool TryDelete(string path, out int error)
     {
-        if (DirectoryGuard.TryDiscardChildCopy(Path.GetDirectoryName(path)!, Path.GetFileName(path), out error))
+        if (DirectoryGuard.TryDiscardChildCopy(PathText.GetDirectoryName(path)!, PathText.GetFileName(path), out error))
         {
             error = 0;
             return true;
@@ -813,7 +816,7 @@ internal static class ExeReplacement
         {
             Kernel32.ERROR_REPARSE_POINT_ENCOUNTERED => new NotAPlainFileException(path, "a reparse point"),
             Kernel32.ERROR_DIRECTORY_NOT_SUPPORTED => new NotAPlainFileException(path, "a folder"),
-            _ => new IOException($"The file ending {Path.GetExtension(path)} could not be deleted: error {error}."),
+            _ => new IOException($"The file ending {PathText.GetExtension(path)} could not be deleted: error {error}."),
         };
     }
 
@@ -822,7 +825,7 @@ internal static class ExeReplacement
     /// folder, or a reparse point, which it never follows.
     /// </summary>
     private sealed class NotAPlainFileException(string path, string found)
-        : IOException($"The name ending {Path.GetExtension(path)} is {found}, not a plain file.");
+        : IOException($"The name ending {PathText.GetExtension(path)} is {found}, not a plain file.");
 }
 
 /// <summary>How a replace (<see cref="ExeReplacement.Run(ReplaceRequest, bool)"/>) ended.</summary>

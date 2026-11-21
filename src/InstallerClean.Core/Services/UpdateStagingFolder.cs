@@ -51,7 +51,7 @@ public sealed class UpdateStagingFolder
         _root = root;
         _leaf = leaf;
         _id = id;
-        FullPath = Path.Combine(root, leaf);
+        FullPath = PathText.Combine(root, leaf);
         Handle = handle;
     }
 
@@ -87,7 +87,7 @@ public sealed class UpdateStagingFolder
     /// </summary>
     internal static UpdateStagingFolder Create(string root, string descriptorSddl)
     {
-        if (!Directory.Exists(root))
+        if (!FrameworkDirectory.Exists(root))
             throw new IOException("The folder to create the update's folder in does not exist.");
 
         var leaf = NamePrefix + Guids.NewGuid().ToString("N");
@@ -99,14 +99,14 @@ public sealed class UpdateStagingFolder
 
         if (!Advapi32.ConvertStringSecurityDescriptorToSecurityDescriptor(
                 descriptorSddl, Advapi32.SDDL_REVISION_1, out var descriptor, IntPtr.Zero))
-            throw new Win32Exception(Marshal.GetLastPInvokeError());
+            throw new Win32Exception(Marshal.GetLastWin32Error());
         try
         {
             var handle = DirectoryGuard.CreateChildFolderHeld(rootHandle, leaf, descriptor, out var status)
                 ?? throw new Win32Exception((int)Ntdll.RtlNtStatusToDosError(status));
             if (DirectoryGuard.IdOf(handle) is not { } id)
             {
-                var error = Marshal.GetLastPInvokeError();
+                var error = Marshal.GetLastWin32Error();
                 handle.Dispose();
                 throw new Win32Exception(error);
             }
@@ -191,15 +191,15 @@ public sealed class UpdateStagingFolder
     {
         try
         {
-            if (!Directory.Exists(root)) return true;
+            if (!FrameworkDirectory.Exists(root)) return true;
 
             using var rootHandle = DirectoryGuard.OpenDirectoryFollow(root, out _);
             if (rootHandle is null) return false;
 
             var allGone = true;
-            foreach (var folder in Directory.EnumerateDirectories(root, NamePrefix + "*"))
+            foreach (var folder in FrameworkDirectory.EnumerateDirectories(root, NamePrefix + "*"))
             {
-                var leaf = Path.GetFileName(folder);
+                var leaf = PathText.GetFileName(folder);
                 try
                 {
                     if (!IsOurName(leaf)) continue;
@@ -220,9 +220,9 @@ public sealed class UpdateStagingFolder
                         continue;
 
                     var cleared = true;
-                    foreach (var file in Directory.EnumerateFiles(folder, "InstallerClean-*.exe"))
+                    foreach (var file in FrameworkDirectory.EnumerateFiles(folder, "InstallerClean-*.exe"))
                     {
-                        if (!DirectoryGuard.TryRemoveChildFile(folderHandle, Path.GetFileName(file)))
+                        if (!DirectoryGuard.TryRemoveChildFile(folderHandle, PathText.GetFileName(file)))
                             cleared = false;
                     }
 

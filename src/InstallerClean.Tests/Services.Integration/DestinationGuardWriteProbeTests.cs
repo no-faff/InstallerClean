@@ -3,6 +3,7 @@ using System.Security.Principal;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -28,7 +29,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class DestinationGuardWriteProbeTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-probe-acl-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-probe-acl-");
     private readonly IDestinationGuard _guard = new HandleDestinationGuard();
 
     private static readonly string ThisAccountSid = WindowsIdentity.GetCurrent().User!.Value;
@@ -92,7 +93,7 @@ public sealed class DestinationGuardWriteProbeTests : IDisposable
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
         }
 
-        try { Directory.Delete(_root, recursive: true); } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     private static void ResetAccess(string path, bool isFolder)

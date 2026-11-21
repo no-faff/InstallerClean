@@ -37,13 +37,24 @@ internal static class TestCulture
 }
 
 /// <summary>
+/// No test waits out the pause before a Windows Installer list is walked again
+/// (<see cref="WalkRestarts"/>): for the whole run the pause returns at once. A test
+/// that reads the pauses hands the scan a pause of its own.
+/// </summary>
+internal static class TestWalkPause
+{
+    [ModuleInitializer]
+    internal static void Skip() => WalkRestarts.PauseForTests = _ => { };
+}
+
+/// <summary>
 /// Every test that writes the crash log writes it to a folder of this run's own under the
 /// temp folder, never to the log of the PC running the suite. The folder is set before any
-/// test runs, so a test reaching the log by a path nobody planned for is covered too, and
-/// it is deleted when the test process exits, along with the shared InstallerClean.Tests
-/// folder above it where no other run's folder is left in it. A test that changes the
-/// folder for its run, through <see cref="OwnFolder"/> or by hand as CrashLogTests does,
-/// puts this one back.
+/// test runs, so a test reaching the log by a path nobody planned for is covered too. Each
+/// AppDomain's folder is deleted as that domain ends (<see cref="Helpers.DomainEnd"/>), along
+/// with the shared InstallerClean.Tests folder above it where nothing else is left in it. A
+/// test that changes the folder for its run, through <see cref="OwnFolder"/> or by hand as
+/// CrashLogTests does, puts this one back.
 /// </summary>
 internal static class TestCrashLog
 {
@@ -93,12 +104,15 @@ internal static class TestCrashLog
     {
         var folder = NewFolder();
         CrashLog.FolderForTests = folder;
-        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+        Helpers.DomainEnd.Then(() =>
         {
-            TryDelete(folder);
-            // Not recursive, so a folder another run is still using stays.
-            try { Directory.Delete(Shared); } catch (Exception) { }
-        };
+            // Deleted here rather than through TryDelete, so a refused delete reaches DomainEnd's
+            // trace. A domain that never wrote the log has no folder.
+            if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true);
+            // Not recursive, so a folder another run or domain is still using stays, and the
+            // refusal that keeps it is expected.
+            try { Directory.Delete(Shared); } catch (IOException) { }
+        });
     }
 
     /// <summary>
@@ -150,6 +164,8 @@ internal static class TestCrashLog
     /// </summary>
     internal static void TryDelete(string folder)
     {
-        try { Directory.Delete(folder, recursive: true); } catch (Exception) { }
+        try { Directory.Delete(folder, recursive: true); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 }

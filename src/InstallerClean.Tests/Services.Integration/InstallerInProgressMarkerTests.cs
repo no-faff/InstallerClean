@@ -1,4 +1,5 @@
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -11,14 +12,12 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public class InstallerInProgressMarkerTests : IDisposable
 {
-    private readonly string _folder =
-        Path.Combine(Path.GetTempPath(), "ic-marker-" + Guid.NewGuid());
+    private readonly string _folder = TestTemp.NewFolder("ic-marker-");
 
-    public InstallerInProgressMarkerTests() => Directory.CreateDirectory(_folder);
 
     public void Dispose()
     {
-        try { Directory.Delete(_folder, recursive: true); } catch { }
+        TestTemp.Delete(_folder);
     }
 
     private string MarkerPath => Path.Combine(_folder, InstallerInProgressMarker.FileName);

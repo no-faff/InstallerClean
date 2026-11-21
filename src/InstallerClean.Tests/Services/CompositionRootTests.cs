@@ -73,6 +73,21 @@ public class CompositionRootTests
     }
 
     [Fact]
+    public void The_file_system_is_the_apps_own_so_a_move_goes_through_the_port()
+    {
+        // BannedSymbols.txt refuses System.IO.Abstractions.FileSystem written as a
+        // constructor or a base class, but not as a type argument, so a registration
+        // naming it would compile, and its File would move through .NET Framework's
+        // File.Move.
+        using var services = new ServiceCollection()
+            .AddInstallerCleanCore()
+            .BuildServiceProvider();
+
+        var fileSystem = Assert.IsType<AppFileSystem>(services.GetRequiredService<System.IO.Abstractions.IFileSystem>());
+        Assert.IsType<FrameworkFileWrapper>(fileSystem.File);
+    }
+
+    [Fact]
     public void Every_headless_registration_is_a_singleton()
     {
         // ValidateScopes catches only the Scoped-inside-Singleton case, so a

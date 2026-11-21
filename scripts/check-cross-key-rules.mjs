@@ -16,15 +16,15 @@ import { readLedger, englishFor, recordedFreshness } from './translation-ledger.
 import { readCSharp, argumentSpan } from './csharp-source.mjs';
 import { sourceFiles, lineIndex } from './source-files.mjs';
 import { blankXmlComments } from './xml-source.mjs';
+import { supportedLanguages } from './supported-languages.mjs';
 
 const RESX_DIR = 'src/InstallerClean.Core/Resources';
 const GUI = 'src/InstallerClean';
 
-// Priority order, matching SupportedLanguages.CultureNames. The neutral is
-// checked too: en-GB's own pairs were only ever settled by hand, and it is the
-// language every satellite was generated from.
-const LANGS = ['en-GB', 'zh-Hans', 'ru', 'es', 'ja', 'pt-BR', 'pl', 'tr',
-  'ko', 'fr', 'it', 'de', 'id', 'vi', 'uk', 'nl', 'zh-Hant'];
+// Every language the app ships, from SupportedLanguages.CultureNames in its order. The
+// neutral is checked too: en-GB's own pairs were only ever settled by hand, and it is
+// the language every satellite was generated from.
+const LANGS = supportedLanguages().cultures;
 
 // ---------------------------------------------------------------------------
 // Rule 1. A control's spoken name says the same thing as its visible label.
@@ -129,6 +129,7 @@ const ELABORATES_A_LABEL_IN_CODE = [
 // until the control is classified again.
 const NAME_IS_THE_LABEL = new Set([
   'Window.Report.Title',
+  'Window.Notices.Title',
 ]);
 
 // Nothing visible to agree with: an icon-only button, a scroll region, a
@@ -357,6 +358,14 @@ for (const [value, oneSentence, stopped] of [
 // a screen reader. A satellite-only plural override has no typed accessor, and
 // Strings.Find is its door.
 //
+// The third door is Strings.FrameworkCheck, which serves only the strings of a copy's
+// start checks, for Windows 10 version 1607 and for .NET Framework 4.8, the first
+// thing a copy runs, on any .NET Framework 4.x.
+// Resolving the folder reaches code that needs more than 4.0 has, so this door
+// substitutes no token, and none of its keys may carry one in any language (rule
+// 8a below; StringsFrameworkCheckTests reads the same through the door itself).
+// check-designer-parity reports a door added beside the three.
+//
 // The two doors are internal to the Core assembly and so is the manager behind
 // them, and every project in the solution holds InternalsVisibleTo, so a compiler
 // cannot tell a sanctioned read from a bypass.
@@ -370,8 +379,8 @@ const RAW_READ = /\bResourceManager\b/;
 const RAW_READ_ALLOWED = [
   {
     file: 'src/InstallerClean.Core/Resources/Strings.Designer.cs',
-    reason: 'The doors themselves. The manager is private here and Get and Find are '
-      + 'what hold it.',
+    reason: 'The doors themselves. The manager is private here and Get, Find and '
+      + 'FrameworkCheck are what hold it.',
   },
   {
     file: 'src/InstallerClean.Tests/Resources/SatelliteResxParityTests.cs',
@@ -393,11 +402,16 @@ const RAW_READ_ALLOWED = [
       + 'through Find or Get.',
   },
   {
-    file: 'src/InstallerClean.Tests/Helpers/InstallerPathTextCopyingTests.cs',
-    reason: 'Enumerates a whole resource set per culture to prove no shipped value '
-      + 'carries a word joiner or a zero-width space, which a copy then removes. A door '
-      + 'that answers one named key cannot list a set, and the values have to be the '
-      + 'raw ones the drawing transform starts from.',
+    file: 'src/InstallerClean.Tests/Resources/StartCheckResourcesTests.cs',
+    reason: 'Holds StartCheckResources, which reads the embedded resources without the '
+      + 'manager, to the manager\'s own answer for every key at named cultures. The '
+      + 'expectation has to be the manager\'s raw value, and the set has to be listed.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Services/NeutralTextTests.cs',
+    reason: 'Holds each English constant a start shows when its check fails to load '
+      + 'to the neutral value in Strings.resx, which is the raw value at the invariant '
+      + 'culture rather than what a door answers at the UI culture.',
   },
   {
     file: 'src/InstallerClean.Tests/Helpers/LocalisationOverrideTests.cs',
@@ -414,12 +428,30 @@ const RAW_READ_ALLOWED = [
       + 'assert against is read through Strings.Get.',
   },
   {
+    file: 'src/InstallerClean.Tests/Helpers/AccessKeyTextTests.cs',
+    reason: 'Reads each confirmation label from one culture\'s own resource set, with '
+      + 'tryParents false, to show the label the door gives is that language\'s own '
+      + 'and not the English it would fall back to. No door answers without the '
+      + 'fallback. The label it asserts against is read through Strings.Get.',
+  },
+  {
     file: 'src/InstallerClean.Tests/Helpers/LinkPhraseCompositionTests.cs',
     reason: 'Enumerates the neutral resource set to derive which sentences carry a '
       + 'link phrase from the English punctuation, the way linkKeys below is built. A '
       + 'door that answers one named key cannot list a set, and a list written by hand '
       + 'would answer for the sentences that linked on the day it was written. Every '
       + 'value it goes on to assert against is read through Strings.Get.',
+  },
+  {
+    file: 'src/InstallerClean.Core/Resources/EmbeddedCultureResources.cs',
+    reason: 'The manager behind the doors, which names ResourceManager as its base '
+      + 'class. It hands its values only to Strings.Designer.cs, whose manager it is.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Resources/EmbeddedCultureResourcesTests.cs',
+    reason: 'Tests the manager itself: which resource set each culture reaches and '
+      + 'what it falls back to. Read through a door, a fallback and a missing key '
+      + 'would look alike, the door answering a missing key with the key.',
   },
 ];
 
@@ -986,6 +1018,22 @@ for (const key of [...new Set(declaredKeys)].sort())
 const tokenKeys = new Set(
   [...neutral].filter(([, v]) => v.includes(FOLDER_TOKEN)).map(([k]) => k));
 
+// Rule 8a. The keys Strings.FrameworkCheck serves, read off the members the
+// generator writes. The door spends no token, so a value carrying one would show
+// a literal {InstallerFolder} in the .NET Framework 4.8 message. Refused when none
+// is read, since an empty list would pass every language.
+const DESIGNER = `${RESX_DIR}/Strings.Designer.cs`;
+const frameworkCheckKeys = [...readFileSync(DESIGNER, 'utf8').matchAll(
+  /internal\s+static\s+string\s+\w+\s*=>\s*StartCheckResources\.GetString\("([^"]+)"/g)].map((m) => m[1]);
+if (frameworkCheckKeys.length === 0) {
+  console.error(`No Strings.FrameworkCheck member read from ${DESIGNER}. Refusing to report `
+    + 'on keys this check cannot show it read.');
+  process.exit(2);
+}
+for (const key of frameworkCheckKeys)
+  if (!neutral.has(key))
+    stale.push(`${key} is served by Strings.FrameworkCheck and Strings.resx does not hold it.`);
+
 // The same for the link phrase. Membership is any bracket at all rather than a
 // well-formed pair, so an unbalanced neutral is a finding here and not a key
 // that quietly leaves the rule.
@@ -1209,6 +1257,14 @@ for (const lang of LANGS) {
       failures.push(`${key} has lost its ${FOLDER_TOKEN} token, so the sentence names no folder`);
   }
 
+  for (const key of frameworkCheckKeys) {
+    const value = read(key);
+    if (value === null) continue;
+    if (value.includes(FOLDER_TOKEN))
+      failures.push(`${key} carries ${FOLDER_TOKEN} and is served by Strings.FrameworkCheck, `
+        + 'which substitutes no token, so the .NET Framework 4.8 message would show it raw');
+  }
+
   // A BRACKET IS MEASURED AGAINST A NEUTRAL SENTENCE, so a key the neutral does
   // not hold has nothing here to disagree with and is check-resx-parity's stray
   // finding rather than this one. The exception is a plural override, which is a
@@ -1292,7 +1348,8 @@ if (problems.length) {
 console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs `
   + `and ${ELABORATES_A_LABEL.length + ELABORATES_A_LABEL_IN_CODE.length} measured by containment `
   + `(${ELABORATES_A_LABEL_IN_CODE.length} of them built in code), `
-  + `${tokenKeys.size} keys carrying ${FOLDER_TOKEN}, ${linkKeys.size} carrying a [link phrase], `
+  + `${tokenKeys.size} keys carrying ${FOLDER_TOKEN}, ${frameworkCheckKeys.length} through `
+  + `Strings.FrameworkCheck carrying none, ${linkKeys.size} carrying a [link phrase], `
   + `${tooltipKeys.size} tooltips judged for a closing full stop, `
   + `${namedInXaml.size} automation names classified (${NAME_IS_THE_LABEL.size} by key identity), `
   + `${csFiles.length} C# files read through Strings bar ${rawAllowed.size} allowed direct.`);

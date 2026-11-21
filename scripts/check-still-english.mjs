@@ -153,6 +153,44 @@ const ALSO_KEEP = {
   'zh-Hant': [...UNITS, 'Cli.UpdateAnswerYes', 'Cli.UpdateAnswerNo'],
 };
 
+// A KEEP IS A JUDGEMENT OF ONE ENGLISH WORDING, so each kept key is pinned here to the
+// English it was judged against, raw as the resx holds it. A key's English reworded
+// fails the run until somebody reads each language keeping it against the new
+// wording and moves the pin, since a keep by key name alone would pass the new
+// English in every language keeping it, the translations flag-retranslation.mjs sets
+// back to English included. A kept key with no pin, and a pin no keep uses, fail too.
+const JUDGED_ENGLISH = {
+  'Action.Details': 'Details',
+  'Automation.ScanResultAnnouncement': '{0} ({1})',
+  'Automation.Section.Patches': 'Patches',
+  'Cli.UpdateAnswerNo': 'N',
+  'Cli.UpdateAnswerYes': 'Y',
+  'Cli.UpdateDownloadLink': '{0}: {1}',
+  'Display.DriveName': 'drive {0}',
+  'Display.Elapsed.Ms': '{0:F0}ms',
+  'Display.Elapsed.S': '{0:F1}s',
+  'Display.ListSeparator': ', ',
+  'Display.SentenceSeparator': '. ',
+  'Display.Size.B': '{0} B',
+  'Display.Size.GB': '{0} GB',
+  'Display.Size.KB': '{0} KB',
+  'Display.Size.MB': '{0} MB',
+  'Display.Size.TB': '{0} TB',
+  'Field.Application': 'Application',
+  'Field.File': 'File',
+  'Field.Patches': 'Patches',
+  'Plural.Error.Singular': 'error',
+  'Plural.File.Singular': 'file',
+  'Plural.Patch.Plural': 'patches',
+  'Plural.Patch.Singular': 'patch',
+  'Plural.Product.Singular': 'product',
+  'Section.Registered.Patches': 'PATCHES',
+  'Startup.AlreadyRunningTitle': 'InstallerClean',
+  'Startup.UnhandledTitle': 'InstallerClean',
+  'Version.Display': 'Version {0}',
+  'Window.Main.Title': 'InstallerClean',
+};
+
 const neutral = parse('Strings.resx');
 const satellites = readdirSync(dir)
   .filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f) && f !== 'Strings.resx')
@@ -172,6 +210,20 @@ const overrideBase = (key) => {
   if (neutral.has(`${prefix}.Plural`)) return `${prefix}.Plural`;
   return neutral.has(prefix) ? prefix : null;
 };
+
+const judged = [];
+{
+  const kept = new Set([...KEEP_ENGLISH, ...Object.values(ALSO_KEEP).flat()]);
+  for (const key of [...kept].sort()) {
+    if (!Object.hasOwn(JUDGED_ENGLISH, key)) judged.push(`${key} is kept and has no pin in JUDGED_ENGLISH`);
+    else if (!neutral.has(key)) judged.push(`${key} is kept and the English no longer holds it`);
+    else if (neutral.get(key) !== JUDGED_ENGLISH[key])
+      judged.push(`${key} is kept as judged against ${JSON.stringify(JUDGED_ENGLISH[key])}, and the English is now ${JSON.stringify(neutral.get(key))}: read each language keeping it against the new wording, then move the pin`);
+  }
+  for (const key of Object.keys(JUDGED_ENGLISH))
+    if (!kept.has(key)) judged.push(`JUDGED_ENGLISH pins ${key}, which no keep names`);
+  console.log(`Keeps: ${kept.size} kept key(s), each pinned to the English it was judged against; ${judged.length} out of step.`);
+}
 
 let totalStillEnglish = 0;
 let totalStranded = 0;
@@ -231,6 +283,10 @@ if (totalStillEnglish > 0) {
   console.error('the satellites are regenerated.');
   console.error('This is a required CI step, so translate these before the branch can go green.');
 }
-if (totalStillEnglish > 0 || totalStranded > 0) process.exit(1);
+if (judged.length) {
+  console.error('\nStill-English gate: a kept key and the English it was judged against are out of step.');
+  for (const j of judged) console.error(`  ${j}`);
+}
+if (totalStillEnglish > 0 || totalStranded > 0 || judged.length) process.exit(1);
 console.log(`\nStill-English gate: clean. Every satellite has a real translation for all required keys,`);
 console.log(`including its plural overrides.`);

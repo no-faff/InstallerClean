@@ -1,6 +1,6 @@
 namespace InstallerClean.Models;
 
-/// <summary>Which of the two programs is sending an opt-in report.</summary>
+/// <summary>Which of the two programs made the run an opt-in report describes.</summary>
 public enum ReportHost
 {
     /// <summary>InstallerClean, the window.</summary>

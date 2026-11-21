@@ -42,13 +42,8 @@ jobs:
       startsWith(github.head_ref, 'dependabot/nuget/') &&
       github.event.pull_request.head.repo.full_name == github.repository
     # Linux with EnableWindowsTargeting, which is the shape the four committed
-    # locks are in and the restore the owner's own machine performs. On
-    # windows-2025, which this was, System.Diagnostics.EventLog resolves out of
-    # the Desktop shared framework, so a regenerated lock can lose it and a
-    # locked restore on Windows still passes over the gap that the same restore
-    # on Linux fails as NU1004. A lock can lose the whole
-    # net10.0-windows7.0/win-x64 section that way. The runner that cannot see that
-    # gap must not be the one writing the file.
+    # locks are in and the restore the owner's own machine performs, so the
+    # file this job writes is the file a restore there writes.
     runs-on: ubuntu-latest
     concurrency:
       group: relock-${{ github.event.pull_request.number }}

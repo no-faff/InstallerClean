@@ -28,6 +28,10 @@
 ; The published binaries and the setup output all sit under ..\publish;
 ; defined once here so the [Files] sources and OutputDir cannot drift apart.
 #define PublishDir "..\publish"
+; The registry key and the Release value .NET Framework 4.8 writes. They repeat
+; UpdateManifest's, which the app's own check reads, and the two change together.
+#define NetFrameworkKey "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
+#define NetFramework48Release "528040"
 ; The single-instance mutex, named by AppMutex and by the wait in [Code]. It matches
 ; InstanceLock.Name in src/InstallerClean.Core/Services/InstanceLock.cs, and
 ; scripts/check-instance-lock-name.mjs holds the two together.
@@ -123,12 +127,11 @@ OutputBaseFilename=InstallerClean-{#AppVersion}-setup
 ; scanning the setup again.
 Compression=bzip
 SolidCompression=no
-; The .NET 10 Desktop Runtime's oldest supported Windows release is
-; Windows 10 version 1607 (build 14393), so an older build is blocked here
-; with a clear message instead of failing cryptically at first launch. Inno
-; Setup reads the true build via RtlGetVersion, which is not subject to the
-; GetVersionEx compatibility cap, so the build-level floor is enforced on
-; Windows 10 and 11.
+; InstallerClean supports Windows 10 version 1607 (build 14393) and later,
+; so an older build is blocked here with a clear message instead of failing
+; at first launch. Inno Setup reads the true build via RtlGetVersion, which
+; is not subject to the GetVersionEx compatibility cap, so the build-level
+; floor is enforced on Windows 10 and 11.
 MinVersion=10.0.14393
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -170,11 +173,17 @@ SignedUninstallerDir={#UninstallerSignatureDir}
 #include "InstallerClean_Languages.iss"
 
 [Files]
-Source: "{#PublishDir}\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\window\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+; The merged exe's .exe.config carries the supportedRuntime line that names .NET
+; Framework 4.8. The setup's copy in Program Files ships it; the portable and
+; command-line downloads are the exe alone. A drive-by download cannot write this
+; folder.
+Source: "{#PublishDir}\window\InstallerClean.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 ; CLI is a .NET console exe published from src/InstallerClean.Cli;
 ; ships alongside the GUI so PowerShell and cmd block on the process
 ; subsystem naturally.
 Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\cli\installerclean-cli.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 ; pad.xml's Distribution_Permissions requires the Apache 2.0 licence text to
 ; travel alongside any redistributed binary, so Setup installs it too.
 ; DestName gives the installed copy a .txt extension so a double-click opens it
@@ -183,7 +192,8 @@ Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ign
 Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 ; Same argument, for what is redistributed rather than what is licensed: the GUI
 ; embeds the fonts and icons THIRD-PARTY-NOTICES names, each under its own
-; licence, and this setup compiles in the wizard translations carried under
+; licence, InstallerClean.Core carries the code it names from the .NET runtime,
+; and this setup compiles in the wizard translations carried under
 ; installer\Languages. The DestName trick is the LICENSE one and is needed for
 ; the same reason.
 Source: "..\THIRD-PARTY-NOTICES"; DestDir: "{app}"; DestName: "THIRD-PARTY-NOTICES.txt"; Flags: ignoreversion
@@ -243,17 +253,42 @@ begin
   Result := HasSwitch('/UPDATEFROMCLI');
 end;
 
+// Whether this PC has .NET Framework 4.8: no where the Release value it writes is
+// missing or a number below {#NetFramework48Release}, yes where it is at least that, and
+// yes where a value is there but is not a REG_DWORD, which says nothing about the PC. RegQueryDWordValue answers False
+// both where the value is missing and where it is not a REG_DWORD, and RegValueExists tells
+// the two apart.
+function HasNetFramework48: Boolean;
+var
+  Release: Cardinal;
+begin
+  if RegQueryDWordValue(HKLM, '{#NetFrameworkKey}', 'Release', Release) then
+    Result := Release >= {#NetFramework48Release}
+  else
+    Result := RegValueExists(HKLM, '{#NetFrameworkKey}', 'Release');
+end;
+
 // Started by an update, Setup waits for every copy of the app to close before it
 // checks AppMutex, for up to 30 seconds: the copy that starts Setup, or the one it
 // stands for, may still be closing, and its handle to the mutex stays open until it
 // closes it as it exits. Setup calls InitializeSetup before its own AppMutex check,
 // which then asks for InstallerClean to be closed where the mutex is still open, and
 // fails the setup with nothing written where /SUPPRESSMSGBOXES answers that box.
+//
+// Before that, on a PC without .NET Framework 4.8, Setup says what to install and
+// stops with nothing written: the copies it installs run on 4.8, which their configs
+// name. With /SUPPRESSMSGBOXES no box is shown, and with /LOG the log says why it stopped.
 function InitializeSetup: Boolean;
 var
   Waited: Integer;
 begin
-  Result := True;
+  Result := HasNetFramework48;
+  if not Result then
+  begin
+    Log('.NET Framework 4.8 is not installed: the Release value under HKLM\{#NetFrameworkKey} is missing or below {#NetFramework48Release}.');
+    SuppressibleMsgBox(CustomMessage('NeedsNetFramework48'), mbCriticalError, MB_OK, IDOK);
+    Exit;
+  end;
   if not (UpdatingFromApp or UpdatingFromCommandLine) then Exit;
   Waited := 0;
   while CheckForMutexes('{#AppMutexName}') and (Waited < 30000) do
@@ -295,6 +330,8 @@ begin
     1: Result := 'installerclean-cli.exe';
     2: Result := 'LICENSE.txt';
     3: Result := 'THIRD-PARTY-NOTICES.txt';
+    4: Result := 'InstallerClean.exe.config';
+    5: Result := 'installerclean-cli.exe.config';
   else
     Result := '';
   end;

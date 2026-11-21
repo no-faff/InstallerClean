@@ -68,7 +68,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// value plus a small margin instead of hardcoding 700 ms (which
     /// drifts silently if the constant is ever tuned).
     /// </remarks>
-    internal static readonly TimeSpan MoveDestinationSaveDelay = TimeSpan.FromMilliseconds(400);
+    internal static readonly TimeSpan MoveDestinationSaveDelay = Durations.FromMilliseconds(400);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
@@ -92,9 +92,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// alike. The distinction is kept anyway, because a reader meeting a plain
     /// bool here would take false for "another volume" and write the next claim
     /// on it. <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> is
-    /// what keeps the three apart, and its bool sibling folds them together,
-    /// which is right for a caller that acts on the answer and wrong for one
-    /// that says something about it.
+    /// what keeps the three apart. The free-space check asks a different
+    /// question, whether the Move renames
+    /// (<see cref="MoveSpaceCheck.RenamesOnInstallerCacheDrive"/>), which a Move
+    /// through this PC's own share does not, though it lands on this volume.
     /// </remarks>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
@@ -129,6 +130,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (!SetProperty(ref _isMoveOrDeleteRunning, value)) return;
             MoveAllCommand.NotifyCanExecuteChanged();
             DeleteAllCommand.NotifyCanExecuteChanged();
+            BrowseDestinationCommand.NotifyCanExecuteChanged();
         }
     }
     private bool _isMoveOrDeleteRunning;
@@ -152,7 +154,19 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(MoveAllCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteAllCommand))]
+    [NotifyCanExecuteChangedFor(nameof(BrowseDestinationCommand))]
     private bool _isOperationInFlight;
+
+    /// <summary>
+    /// True while Browse works out the folder its picker starts in, which can take up to
+    /// <see cref="ConfirmationService.StartFolderBound"/> where the box names a network
+    /// share that does not answer. Move, Delete and Scan are out of use while it is
+    /// true, so none starts on a destination the picker is about to change.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(MoveAllCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteAllCommand))]
+    private bool _isChoosingDestination;
     private string _operationProgress = string.Empty;
 
     /// <summary>
@@ -183,10 +197,47 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
     }
 
-    [ObservableProperty] private int _operationCurrentFile;
-    [ObservableProperty] private int _operationTotalFiles;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OperationProgressPercentShown))]
+    private int _operationCurrentFile;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OperationProgressPercentShown))]
+    private int _operationTotalFiles;
+
     [ObservableProperty] private string _operationCurrentFileName = string.Empty;
     [ObservableProperty] private double _operationProgressPercent;
+
+    /// <summary>
+    /// The whole percentage the label beside the bar shows, of the files done: see
+    /// <see cref="ShownPercent"/> and <see cref="FilesDone"/>.
+    /// </summary>
+    public int OperationProgressPercentShown => ShownPercent(FilesDone(OperationCurrentFile), OperationTotalFiles);
+
+    /// <summary>
+    /// The files a batch has finished, from the count its progress names. The move and
+    /// delete services report a file's count as they start on it, so the file the count
+    /// names, the one the line under the bar shows, is still in hand.
+    /// </summary>
+    internal static int FilesDone(int currentFile) => currentFile > 0 ? currentFile - 1 : 0;
+
+    /// <summary>
+    /// <paramref name="done"/> of <paramref name="total"/> files as a whole percentage, to
+    /// the nearest, a tie going to the even one, worked out on the two counts: one file of
+    /// eight reads 12%, three 38%, and 23 of 40, exactly 57.5%, reads 58%. Taken as a double
+    /// first, the share for 23 of 40 is 57.49999999999999, and .NET Framework's F0 takes a
+    /// tie away from zero, so the label prints this whole number rather than formatting the
+    /// bar's double.
+    ///
+    /// 100% is the last file done. A share that rounds to 100 with a file still to go,
+    /// as 199 of 200 does, reads 99%.
+    /// </summary>
+    internal static int ShownPercent(int done, int total)
+    {
+        if (total <= 0) return 0;
+        var percent = (int)DisplayHelpers.WholeUnits(done * 100L, total);
+        return percent >= 100 && done < total ? 99 : percent;
+    }
 
     /// <summary>
     /// What a screen reader speaks for <see cref="OperationProgress"/>: the heading itself,
@@ -317,6 +368,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             MoveAllCommand.NotifyCanExecuteChanged();
             DeleteAllCommand.NotifyCanExecuteChanged();
+            BrowseDestinationCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -446,8 +498,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <remarks>
     /// The same debounce as the settings write-back, and the same constant: a
     /// typist should fire one resolve when they stop, not one per character, and
-    /// a resolve is two volume queries rather than the one it was before the
-    /// cache side started asking. Sharing <see cref="MoveDestinationSaveDelay"/>
+    /// a resolve is two volume queries, and for a share the opens of its folders
+    /// through the share as well. Sharing <see cref="MoveDestinationSaveDelay"/>
     /// rather than adding a second constant keeps the two from drifting apart
     /// for no reason anybody could later name.
     ///
@@ -480,7 +532,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         try
         {
-            await Task.Delay(MoveDestinationSaveDelay, token);
+            await FrameworkTask.Delay(MoveDestinationSaveDelay, token);
         }
         catch (OperationCanceledException)
         {
@@ -490,13 +542,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // OFF THE DISPATCHER, AND THAT IS THE WHOLE POINT OF THIS METHOD. The
         // resolve is MoveSpaceCheck.ResolveIsOnInstallerCacheDrive, which reaches
         // GetVolumePathName, and Win32 documents that as validating a remote path
-        // over the network; IsRemotePath turns away the shapes that say so in
-        // their spelling, and a mapped drive letter does not. ConfigureAwait(true)
-        // to come back and publish on the thread the binding is read from.
+        // over the network; for a share, or a drive mapped onto one, it also opens
+        // the destination's folder through the share. ConfigureAwait(true) to come
+        // back and publish on the thread the binding is read from.
         //
         // No token on the Task.Run: the debounce is the cancellable part and it
-        // is over, the body is two volume queries and a token cannot abandon a
-        // Win32 call once it has started, and the token check below is what
+        // is over, the body is two volume queries (and for a share, opens through
+        // it) and a token cannot abandon a Win32 call once it has started, and the token check below is what
         // decides whether the answer is still wanted.
         // The three-state answer, so that Windows declining the question is not
         // published as "somewhere else". The tooltip says something about this
@@ -548,7 +600,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         try
         {
-            await Task.Delay(MoveDestinationSaveDelay, token);
+            await FrameworkTask.Delay(MoveDestinationSaveDelay, token);
         }
         catch (OperationCanceledException)
         {
@@ -624,12 +676,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // command runs; asking tries to take it back.
     private bool CanMove() =>
         !_scan.IsScanInFlight && !IsOperationInFlight && !IsMoveOrDeleteRunning
+        && !IsChoosingDestination
         && !_scan.HasPendingReboot
         && _scan.HasOrphans
         && !_instanceLockLost();
 
     private bool CanDelete() =>
         !_scan.IsScanInFlight && !IsOperationInFlight && !IsMoveOrDeleteRunning
+        && !IsChoosingDestination
         && !_scan.HasPendingReboot
         && _scan.HasOrphans
         && !_instanceLockLost();
@@ -644,12 +698,32 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         DeleteAllCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand]
-    private void BrowseDestination()
+    /// <summary>
+    /// Opens the folder picker at the folder the box names. The picker opens only where
+    /// the box still holds, trimmed, the text it held when Browse was pressed: text typed
+    /// while the start folder was being worked out stands, and no picker comes up over it.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanBrowse))]
+    private async Task BrowseDestinationAsync()
     {
-        var chosen = _confirmationService.AskForMoveDestination(MoveDestination);
+        var asked = MoveDestination?.Trim();
+        IsChoosingDestination = true;
+        string? chosen;
+        try
+        {
+            chosen = await _confirmationService.AskForMoveDestinationAsync(
+                MoveDestination, () => MoveDestination?.Trim() == asked);
+        }
+        finally
+        {
+            IsChoosingDestination = false;
+        }
         if (chosen is not null) MoveDestination = chosen;
     }
+
+    // A picker answer written while a Move or Delete runs would change the box under it.
+    private bool CanBrowse() =>
+        !_scan.IsScanInFlight && !IsOperationInFlight && !IsMoveOrDeleteRunning;
 
     /// <summary>
     /// The source a Cancel press cancels. A Move or Delete installs one as it starts
@@ -777,7 +851,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // touches nothing; the box is left as it was, empty.
         if (string.IsNullOrWhiteSpace(MoveDestination))
         {
-            var chosen = _confirmationService.AskForMoveDestination();
+            var chosen = await _confirmationService.AskForMoveDestinationAsync();
             if (chosen is null) return;
             MoveDestination = chosen;
         }
@@ -792,17 +866,19 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var dest = MoveDestination.Trim();
 
         // Relative destinations are refused before anything resolves or creates
-        // them. Every gate below goes through Path.GetFullPath, which expands a
+        // them. Every gate below goes through FullPaths.GetFullPath, which expands a
         // bare "backup" against the process CWD, so the pre-flight would create
         // that folder and write its probe file somewhere the user never named,
         // elevated, and only then would MoveFilesService refuse the batch, after
         // the confirmation dialog. The CWD is wherever the process happened to be
         // started from and nothing in the app constrains it, so the two
         // out-of-bounds gates below catching such a path is luck, not a gate.
-        // Same three checks in the same order as the CLI's
-        // ResolveAndValidateMoveDestination; MoveFilesService keeps its own copy
-        // at the service boundary for callers that never come through here.
-        if (!Path.IsPathFullyQualified(dest))
+        // The same checks in the same order as the CLI's
+        // ResolveAndValidateMoveDestination, with the length check first in the
+        // pass below, where the scan's files are known; MoveFilesService keeps
+        // its own copy at the service boundary for callers that never come
+        // through here.
+        if (!PathText.IsPathFullyQualified(dest))
         {
             _dialogService.ShowWarning(
                 string.Format(Strings.Error_DestinationNotFullyQualified, dest),
@@ -840,8 +916,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // created. The write happens before the first await, and the await is
         // the barrier, so the read after it sees it.
         var createdFolders = new List<string>();
+        var batchPaths = preOpScan.RemovableFiles.Select(f => f.FullPath).ToList();
         var probeTask = Task.Run(() =>
         {
+            // A destination where a moved file's path would reach MAX_PATH is refused
+            // first, before anything reads or creates it. The batch measured is every
+            // file the scan offered, as the command line measures it, which holds every
+            // file the Move can be handed.
+            if (MoveDestinationLength.TooLong(dest, batchPaths))
+                return DestinationPreFlight.Rejected(pathTooLong: true);
+
             // Never let files move back inside C:\Windows\Installer.
             // ResolveFinalPath inside IsInstallerFolderOrChild expands
             // junctions so a reparse-point destination cannot smuggle the
@@ -965,6 +1049,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         IsOperating = false;
         OperationProgress = string.Empty;
+
+        if (preFlight.PathTooLong)
+        {
+            EndOperation();
+            _dialogService.ShowWarning(
+                string.Format(Strings.Error_PathTooLong, dest),
+                Strings.Error_InvalidDestinationTitle);
+            return;
+        }
 
         if (preFlight.InsideInstallerCache)
         {
@@ -1996,9 +2089,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <summary>
     /// What one off-thread pass over a Move destination found: whether it is
     /// out of bounds, and, when it is not, what kind of volume it sits on and
-    /// how much room is left there. <see cref="Kind"/> and
-    /// <see cref="AvailableFreeSpace"/> are only meaningful when neither
-    /// rejection flag is set, because the pass returns at the first gate that
+    /// how much room is left there. <see cref="PathTooLong"/> is set where the
+    /// Move would write a path of MAX_PATH or more. <see cref="Kind"/> and
+    /// <see cref="AvailableFreeSpace"/> are only meaningful when no
+    /// rejection is set, because the pass returns at the first gate that
     /// refuses and never touches the destination after that.
     ///
     /// Whether the pass created the destination folder is deliberately NOT on
@@ -2010,11 +2104,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         bool InsideInstallerCache,
         bool InsideSystemFolder,
         string Kind,
-        long? AvailableFreeSpace)
+        long? AvailableFreeSpace,
+        bool PathTooLong = false)
     {
         public static DestinationPreFlight Rejected(
-            bool insideInstallerCache = false, bool insideSystemFolder = false) =>
-            new(insideInstallerCache, insideSystemFolder, MoveDestinationKinds.Unknown, null);
+            bool insideInstallerCache = false, bool insideSystemFolder = false,
+            bool pathTooLong = false) =>
+            new(insideInstallerCache, insideSystemFolder, MoveDestinationKinds.Unknown, null, pathTooLong);
     }
 
     /// <summary>
@@ -2271,7 +2367,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OperationTotalFiles = p.TotalFiles;
         OperationCurrentFileName = p.CurrentFileName;
         OperationProgressPercent = p.TotalFiles > 0
-            ? (double)p.CurrentFile / p.TotalFiles * 100
+            ? (double)FilesDone(p.CurrentFile) / p.TotalFiles * 100
             : 0;
         // Heading stays at the original "Moving N files..." / "Deleting
         // N files..." action verb for the operation's duration; the
@@ -2293,13 +2389,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// volume the cached files came off being genuinely emptier once they are on
     /// it; only an unreadable destination declines to say either way.
     ///
-    /// THAT VOLUME IS THE SYSTEM DRIVE ON AN ORDINARY MACHINE AND IS NOT NAMED
-    /// AS ONE HERE. The files come off whatever volume holds
-    /// <c>C:\Windows\Installer</c>, and Windows lets a volume be mounted there.
-    /// Nothing in the mapping below turns on which volume it is, so naming one
-    /// bought nothing and was wrong on the machine where the two differ. The
-    /// mapping itself is unchanged: what a same-volume move's bytes count as is
-    /// settled and is not in question here.
+    /// The files come off whatever volume holds <c>C:\Windows\Installer</c>. That
+    /// is the system drive on an ordinary machine, and Windows lets another volume
+    /// be mounted there; nothing in the mapping below turns on which volume it is.
     /// </summary>
     internal static MoveSpaceOutcome ClassifySpaceOutcome(string destinationKind) => destinationKind switch
     {
@@ -2326,7 +2418,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </para>
     /// </summary>
     internal static string DescribeWriteFailure(
-        string dest, Exception ex, Func<(string Path, bool Written)> writeCrashLog) => ex switch
+        string dest, Exception ex, Func<CrashLogEntry> writeCrashLog) => ex switch
     {
         UnauthorizedAccessException =>
             string.Format(Strings.Error_AccessDeniedDestination, dest),
@@ -2341,7 +2433,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     };
 
     private static string NamingCrashLog(
-        string dest, Func<(string Path, bool Written)> writeCrashLog, string withLog, string withoutLog)
+        string dest, Func<CrashLogEntry> writeCrashLog, string withLog, string withoutLog)
     {
         var (path, written) = writeCrashLog();
         return written ? string.Format(withLog, dest, path) : string.Format(withoutLog, dest);

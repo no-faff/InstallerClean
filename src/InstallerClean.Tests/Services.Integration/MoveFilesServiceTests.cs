@@ -13,14 +13,9 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public class MoveFilesServiceTests : IDisposable
 {
-    private readonly string _sourceDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-    private readonly string _destDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly string _sourceDir = TestTemp.NewFolder("ic-move-source-");
+    private readonly string _destDir = TestTemp.NewFolder("ic-move-dest-");
 
-    public MoveFilesServiceTests()
-    {
-        Directory.CreateDirectory(_sourceDir);
-        Directory.CreateDirectory(_destDir);
-    }
 
     [Fact]
     public async Task MoveFilesAsync_moves_file_to_destination_on_real_filesystem()
@@ -104,8 +99,7 @@ public class MoveFilesServiceTests : IDisposable
         var second = Path.Combine(_sourceDir, "second.msi");
         await File.WriteAllTextAsync(first, "one");
         await File.WriteAllTextAsync(second, "two");
-        var decoy = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(decoy);
+        var decoy = TestTemp.NewFolder("ic-move-decoy-");
 
         // Asked before the batch, not during it: the swap happens inside a
         // progress callback, and a host that refuses the link there would leave
@@ -115,7 +109,7 @@ public class MoveFilesServiceTests : IDisposable
         // filed as one file's error rather than thrown, which makes the probe
         // more necessary than it was and not less: without it the failure would
         // arrive as a missing MoveAbortedException with nothing naming the cause.
-        var probe = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var probe = Path.Combine(TestTemp.Run, "ic-move-probe-" + Guid.NewGuid().ToString("N"));
         try
         {
             Directory.CreateSymbolicLink(probe, decoy);
@@ -123,7 +117,7 @@ public class MoveFilesServiceTests : IDisposable
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Directory.Delete(decoy, recursive: true);
+            TestTemp.Delete(decoy);
             return; // this host cannot create a directory symlink
         }
 
@@ -165,9 +159,10 @@ public class MoveFilesServiceTests : IDisposable
             Assert.NotEqual(decoy, ex.Destination);
             Assert.Equal(MoveAbortReason.ResolvesElsewhere, ex.Reason);
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(decoy)) { }
         finally
         {
-            if (Directory.Exists(decoy)) Directory.Delete(decoy, recursive: true);
+            TestTemp.Delete(decoy);
         }
     }
 
@@ -224,7 +219,7 @@ public class MoveFilesServiceTests : IDisposable
 
     public void Dispose()
     {
-        if (Directory.Exists(_sourceDir)) Directory.Delete(_sourceDir, recursive: true);
-        if (Directory.Exists(_destDir)) Directory.Delete(_destDir, recursive: true);
+        TestTemp.Delete(_sourceDir);
+        TestTemp.Delete(_destDir);
     }
 }

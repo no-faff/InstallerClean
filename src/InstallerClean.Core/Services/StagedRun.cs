@@ -58,7 +58,7 @@ internal static class StagedRun
         var answer = NewerVersionProcess.StartDetachedAndAwait(
             thisExe,
             id => [.. before, .. HandOverContract.ReplaceArguments(request.ExePath, request.ProcessId, id)],
-            Path.GetDirectoryName(thisExe) ?? string.Empty,
+            PathText.GetDirectoryName(thisExe) ?? string.Empty,
             bound,
             out var endedByItself);
         if (answer == NewerVersionAnswer.NotStarted && !endedByItself) CommandLineReplacement.WriteNotInstalled();

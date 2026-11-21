@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
@@ -10,7 +12,9 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using InstallerClean.Compatibility;
 using InstallerClean.Helpers;
+using InstallerClean.Interop.Native;
 using InstallerClean.Resources;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
@@ -1174,6 +1178,15 @@ public partial class MainWindow : Window
     // Closed has not fired yet at the Click, so the menu reopens in a flicker.)
     private bool _languageMenuOpen;
 
+    /// <summary>
+    /// Tells UI Automation that a language item's tick moved, through the item's own
+    /// peer, as MenuItem does for itself on .NET 10. An item with no
+    /// peer has had no client ask about it, so there is nobody to tell.
+    /// </summary>
+    private static void RaiseToggleStateChanged(MenuItem item, ToggleState from, ToggleState to) =>
+        UIElementAutomationPeer.FromElement(item)?.RaisePropertyChangedEvent(
+            TogglePatternIdentifiers.ToggleStateProperty, from, to);
+
     private void LanguageButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
@@ -1229,6 +1242,12 @@ public partial class MainWindow : Window
                 IsCheckable = true,
                 IsChecked = isActive,
             };
+            // .NET Framework's MenuItem raises Checked and Unchecked and no automation
+            // event, so a screen reader is not told the tick moved while the menu is
+            // open. The item's peer raises the Toggle pattern's change here, where it
+            // has one; with none, nothing is listening for the item yet.
+            item.Checked += (_, _) => RaiseToggleStateChanged(item, ToggleState.Off, ToggleState.On);
+            item.Unchecked += (_, _) => RaiseToggleStateChanged(item, ToggleState.On, ToggleState.Off);
             // A MenuItem takes its spoken name from a string Header, and the
             // header above is a StackPanel, which leaves the item unnamed: a
             // screen reader then has only the list position and the checked
@@ -1242,19 +1261,25 @@ public partial class MainWindow : Window
             // name and falls back to "item 12" and the checked state, which is
             // indistinguishable from the unnamed bug above. Appending the
             // culture's display name fixes that without touching the visible
-            // menu: it comes from ICU already translated into the running UI
-            // language, so an English UI hears "Russian", a French one "russe"
-            // and a Japanese one "ロシア語" - always a string the voice for that
-            // UI can pronounce, and never a resx key to keep in step.
-            var spokenName = new CultureInfo(culture).DisplayName;
+            // menu: FrameworkCultureDisplayName takes it from the ICU Windows ships,
+            // translated into the window's language, so an English UI hears "Russian",
+            // a French one "russe" and a Japanese one "ロシア語", and never a resx key
+            // to keep in step.
+            var spokenName = FrameworkCultureDisplayName.Of(new CultureInfo(culture), Localisation.UiCulture);
             AutomationProperties.SetName(item,
-                // Skip the suffix where it would repeat the endonym: exact for a
-                // language listed in its own UI ("日本語"), prefix for one whose
-                // display name only adds a region ("English (United Kingdom)").
-                // Case-insensitively, because several languages lowercase their
-                // own name where the endonym capitalises it, and "Français,
-                // français" is the same word twice.
-                spokenName.StartsWith(endonym, StringComparison.CurrentCultureIgnoreCase)
+                // Skip the suffix where ICU gave no name, and where it would repeat
+                // the endonym: exact for a language listed in its own UI ("日本語"),
+                // prefix for one whose display name only adds a region ("English
+                // (United Kingdom)"). Case-insensitively, because several languages
+                // lowercase their own name where the endonym capitalises it, and
+                // "Français, français" is the same word twice. Ordinally, so the
+                // answer does not turn on the thread's culture or on the runtime,
+                // with both names composed first, so an accented letter written as
+                // one character in one and as a letter and a mark in the other
+                // still matches.
+                spokenName.Length == 0
+                || spokenName.Normalize(NormalizationForm.FormC)
+                    .StartsWith(endonym.Normalize(NormalizationForm.FormC), StringComparison.OrdinalIgnoreCase)
                     ? endonym
                     // A separator, not brackets: pt-BR's display name carries its
                     // own parenthetical, and nesting them reads badly aloud. It comes
@@ -1308,9 +1333,8 @@ public partial class MainWindow : Window
     // is required before comparing the command code.
     private static IntPtr SuppressMaximize(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        const int WM_SYSCOMMAND = 0x0112;
         const int SC_MAXIMIZE = 0xF030;
-        if (msg == WM_SYSCOMMAND && (wParam.ToInt32() & 0xFFF0) == SC_MAXIMIZE)
+        if (msg == User32.WM_SYSCOMMAND && (wParam.ToInt32() & 0xFFF0) == SC_MAXIMIZE)
             handled = true;
         return IntPtr.Zero;
     }
@@ -1450,7 +1474,7 @@ public partial class MainWindow : Window
         ReportPanel.BeginAnimation(OpacityProperty, WobbleSteps(0, 1, 1, 1));
     }
 
-    private static readonly TimeSpan WobbleLength = TimeSpan.FromSeconds(0.5);
+    private static readonly TimeSpan WobbleLength = Durations.FromSeconds(0.5);
 
     // CSS's "ease" timing function, which a CSS animation applies to each step between
     // keyframes.

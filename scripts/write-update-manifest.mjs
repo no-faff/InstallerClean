@@ -6,9 +6,11 @@
 //   node scripts/write-update-manifest.mjs --check <file> <download>...
 //
 // The downloads are the ones the release uploads, named setup, portable, slim and cli.
-// The file lists those and no others, so an update from a copy whose download is not
-// among them is told the release has none, and an update never goes to a download the
-// release does not have. The text is update-manifest.mjs's manifestText.
+// The file lists those and no others, each requiring .NET Framework 4.8, so an update
+// from a copy whose download is not among them is told the release has none, an update
+// never goes to a download the release does not have, and a copy on a PC without .NET
+// Framework 4.8 is told to install it before it downloads anything. The text is
+// update-manifest.mjs's manifestText.
 //
 // --check reads <file> and compares its bytes with that text, so it answers for the
 // file being there, parsing, carrying the schema the app reads, listing exactly these

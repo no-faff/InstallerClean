@@ -9,23 +9,15 @@ updates:
       nuget:
         patterns:
           - "*"
-    # The three runtime packages (Microsoft.Extensions.DependencyInjection,
-    # .Abstractions, System.Diagnostics.EventLog) travel in the binary
-    # closure, so a patch bump changes the shipped bytes, and every new
-    # binary is a fresh VirusTotal result. They are held still between
+    # The runtime packages (Microsoft.Extensions.DependencyInjection,
+    # .Abstractions, System.Memory, System.Text.Json,
+    # Microsoft.Bcl.TimeProvider, Microsoft.Bcl.HashCode) travel in the
+    # binary closure, so a patch bump changes the shipped bytes, and every
+    # new binary is a fresh VirusTotal result. They are held still between
     # releases so a patch-level change does not re-roll one; no flag in
     # this project's history has been traced to a dependency bump.
     # Security advisories still PR through because Dependabot's
     # security-update path overrides version-update:ignore.
-    #
-    # Microsoft.NET.ILLink.Tasks is ignored outright (every version): it
-    # is SDK plumbing pinned in the root Directory.Build.props only so
-    # plain and publish restores compute one graph (locked-mode restore
-    # compares reference sets). Its version must match the SDK band the
-    # build pins, not nuget.org's latest, so it moves by hand when the
-    # SDK pin moves. Dependabot also can't bump it cleanly: it
-    # regenerates only the lock file in the directory it runs in, leaving
-    # the other three inconsistent (NU1004 under locked-mode restore).
     ignore:
       - dependency-name: Microsoft.Extensions.DependencyInjection
         update-types:
@@ -33,10 +25,18 @@ updates:
       - dependency-name: Microsoft.Extensions.DependencyInjection.Abstractions
         update-types:
           - version-update:semver-patch
-      - dependency-name: System.Diagnostics.EventLog
+      - dependency-name: System.Memory
         update-types:
           - version-update:semver-patch
-      - dependency-name: Microsoft.NET.ILLink.Tasks
+      - dependency-name: System.Text.Json
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.TimeProvider
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.HashCode
+        update-types:
+          - version-update:semver-patch
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Core
@@ -54,10 +54,18 @@ updates:
       - dependency-name: Microsoft.Extensions.DependencyInjection.Abstractions
         update-types:
           - version-update:semver-patch
-      - dependency-name: System.Diagnostics.EventLog
+      - dependency-name: System.Memory
         update-types:
           - version-update:semver-patch
-      - dependency-name: Microsoft.NET.ILLink.Tasks
+      - dependency-name: System.Text.Json
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.TimeProvider
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.HashCode
+        update-types:
+          - version-update:semver-patch
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Cli
@@ -75,10 +83,18 @@ updates:
       - dependency-name: Microsoft.Extensions.DependencyInjection.Abstractions
         update-types:
           - version-update:semver-patch
-      - dependency-name: System.Diagnostics.EventLog
+      - dependency-name: System.Memory
         update-types:
           - version-update:semver-patch
-      - dependency-name: Microsoft.NET.ILLink.Tasks
+      - dependency-name: System.Text.Json
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.TimeProvider
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.HashCode
+        update-types:
+          - version-update:semver-patch
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Tests
@@ -96,10 +112,18 @@ updates:
       - dependency-name: Microsoft.Extensions.DependencyInjection.Abstractions
         update-types:
           - version-update:semver-patch
-      - dependency-name: System.Diagnostics.EventLog
+      - dependency-name: System.Memory
         update-types:
           - version-update:semver-patch
-      - dependency-name: Microsoft.NET.ILLink.Tasks
+      - dependency-name: System.Text.Json
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.TimeProvider
+        update-types:
+          - version-update:semver-patch
+      - dependency-name: Microsoft.Bcl.HashCode
+        update-types:
+          - version-update:semver-patch
 
   - package-ecosystem: github-actions
     directory: /

@@ -62,6 +62,10 @@ public class InstallerQueryServiceRouteATests
                 ? new PackageIdentity(string.Empty, true, new[] { Enumerated })
                 : new PackageIdentity(string.Empty, false, Array.Empty<string>());
         }
+
+        public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoRevisionNumber(string filePath) => false;
     }
 
     /// <param name="routeANamesTheOtherHolder">

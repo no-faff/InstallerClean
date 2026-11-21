@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean.Tests.ViewModels;
@@ -7,9 +8,9 @@ public class DescribeWriteFailureTests
     private const string Dest = @"D:\backup\installer";
     private const string LogPath = @"C:\Users\Test\AppData\Local\InstallerClean\crash.log";
 
-    private static Func<(string Path, bool Written)> WrittenTo(string path) => () => (path, true);
+    private static Func<CrashLogEntry> WrittenTo(string path) => () => new CrashLogEntry(path, true);
 
-    private static readonly Func<(string Path, bool Written)> NotWritten = () => (string.Empty, false);
+    private static readonly Func<CrashLogEntry> NotWritten = () => new CrashLogEntry(string.Empty, false);
 
     private static readonly Dictionary<string, (Func<Exception> Create, bool NamesLog)> Failures = new()
     {
@@ -32,7 +33,7 @@ public class DescribeWriteFailureTests
         var written = 0;
 
         var message = CleanupViewModel.DescribeWriteFailure(
-            Dest, create(), () => { written++; return (LogPath, true); });
+            Dest, create(), () => { written++; return new CrashLogEntry(LogPath, true); });
 
         Assert.Equal(namesLog ? 1 : 0, written);
         Assert.Equal(namesLog, message.Contains(LogPath));

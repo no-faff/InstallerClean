@@ -4,9 +4,11 @@
 // dead weight every language still carries a translation for.
 //
 // This is the gate half of scripts/list-unused-resources.sh, which is a read-only
-// report: this guard reuses that script's exact detection rules and adds a
-// pass/fail with a small, explicit allowlist. The two are meant to agree on the
-// raw orphan set; if the way a key is consumed ever changes, update both.
+// report: this guard uses that script's two forms of a use and adds a pass/fail
+// with a small, explicit allowlist. It reads less than the report does: only the
+// projects that ship, so a test naming a key is not a use of it, and only their
+// code, so a comment naming a key is not one either. So it can name an orphan the
+// report does not, and never the other way round.
 //
 // A resx key is consumed in one of two forms, and both are searched:
 //   - C#:   the underscored accessor Strings.Key_Name. scripts/regenerate-
@@ -20,7 +22,10 @@
 //
 // Strings.Designer.cs is excluded from the corpus: it generates a property and a
 // Get("Foo.Bar") call for every key, so including it would make every key look
-// consumed. bin/ and obj/ are excluded because build output mirrors source.
+// consumed. bin/ and obj/ are excluded because build output mirrors source. The
+// test project is excluded, and every comment is blanked, C# through
+// csharp-source.mjs and XAML through xml-source.mjs; a string stays, since a key
+// can be passed by its name in one.
 //
 // A key built at runtime by string concatenation cannot be seen by a static
 // search. The one such mechanism is DisplayHelpers.Pluralise, which reads
@@ -34,7 +39,9 @@
 //
 // Run from the repo root: node scripts/check-dead-resx-keys.mjs
 import { readFileSync } from 'node:fs';
+import { readCSharp } from './csharp-source.mjs';
 import { sourceFiles } from './source-files.mjs';
+import { blankXmlComments } from './xml-source.mjs';
 
 const SRC = 'src';
 const RESX = `${SRC}/InstallerClean.Core/Resources/Strings.resx`;
@@ -56,12 +63,27 @@ const ALLOWLIST = new Set([
 // heading can wait for a new condition; a sentence about a condition cannot
 // outlive it.
 
-// Every .cs and .xaml under src/, minus the generated Designer, which defines an
-// accessor for every key.
-const csFiles = sourceFiles(SRC, '.cs').filter((f) => !f.endsWith('Strings.Designer.cs'));
-const xamlFiles = sourceFiles(SRC, '.xaml');
+// Every .cs and .xaml under src/ outside the test project, minus the generated
+// Designer, which defines an accessor for every key, each with its comments blanked.
+const TESTS = `${SRC}/InstallerClean.Tests/`;
+const shipped = (f) => !f.startsWith(TESTS);
+const csFiles = sourceFiles(SRC, '.cs').filter((f) => shipped(f) && !f.endsWith('Strings.Designer.cs'));
+const xamlFiles = sourceFiles(SRC, '.xaml').filter(shipped);
+if (csFiles.length === 0 || xamlFiles.length === 0) {
+  console.error(`check-dead-resx-keys: REFUSING: read ${csFiles.length} C# and ${xamlFiles.length} XAML file(s) outside the tests`);
+  process.exit(2);
+}
+const withoutComments = (f) => {
+  const text = readFileSync(f, 'utf8');
+  try {
+    return f.endsWith('.cs') ? readCSharp(text).code : blankXmlComments(text);
+  } catch (e) {
+    console.error(`check-dead-resx-keys: REFUSING: ${f} cannot be read to its end (${e.message})`);
+    process.exit(2);
+  }
+};
 // One corpus, joined by newline so a file boundary is also a token boundary.
-const corpus = [...csFiles, ...xamlFiles].map((f) => readFileSync(f, 'utf8')).join('\n');
+const corpus = [...csFiles, ...xamlFiles].map(withoutComments).join('\n');
 
 // PARSE CONTROL. About the READING and not about the content: a regex that has
 // stopped matching yields an empty set, and a silent zero over an empty set reads

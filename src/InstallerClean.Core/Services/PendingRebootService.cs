@@ -116,9 +116,9 @@ public sealed class PendingRebootService : IPendingRebootService
         if (installerInProgress is not RegistryKeyPresence.Absent)
             return PendingRebootResult.Block(PendingRebootReason.RegistryCheckUnreadable);
 
-        // Windows Installer's in-progress file. Windows Installer writes it a moment
-        // after an installation has taken the mutex above, which is read first and
-        // covers that moment, and across a transaction of several packages the file
+        // Windows Installer's in-progress file. Windows Installer writes it some time
+        // after an installation has taken the mutex above, after its working copy is
+        // already in the folder. The mutex is read first and covers that time, and across a transaction of several packages the file
         // stays until the transaction has finished, the stretches between packages
         // included, when the mutex is free. The two cover an installation together.
         // Absent is the only reading that carries on, on the rule the key above
@@ -164,7 +164,7 @@ public sealed class PendingRebootService : IPendingRebootService
 
         var windowsRoot = _windowsRootOverride
             ?? KnownFolders.GetPath(Environment.SpecialFolder.Windows);
-        var installerRoot = Path.Combine(windowsRoot, "Installer");
+        var installerRoot = PathText.Combine(windowsRoot, "Installer");
 
         // AN ENTRY NAMING THE CACHE WINS OVER ONE THAT COULD NOT BE PLACED, WHATEVER
         // ORDER THEY SIT IN. The first says what is queued and names the path; the
@@ -271,7 +271,7 @@ public sealed class PendingRebootService : IPendingRebootService
     /// TAKING A MARKER OFF CANNOT COST A BLOCK. An entry opening with one survives
     /// <see cref="InstallerCacheHelpers.StripLongPathPrefix"/> whole, matches no
     /// member of <see cref="NtPathPrefixes"/>, reaches <see cref="LocateOrdinaryPath"/>
-    /// and fails <see cref="Path.IsPathFullyQualified(string)"/>, so the value holding
+    /// and fails <see cref="PathText.IsPathFullyQualified(string)"/>, so the value holding
     /// it is already held. A value that comes back clean holds no such entry, and one
     /// that blocks by name blocks on an entry this does not touch.
     /// </summary>
@@ -289,7 +289,7 @@ public sealed class PendingRebootService : IPendingRebootService
     /// the UNC form. A UNC path is compared like any other and simply never matches,
     /// %SystemRoot%\Installer being local on any machine that can boot.
     ///
-    /// ANYTHING NOT FULLY QUALIFIED IS UNPLACEABLE RATHER THAN SKIPPED. Path.GetFullPath
+    /// ANYTHING NOT FULLY QUALIFIED IS UNPLACEABLE RATHER THAN SKIPPED. FullPaths.GetFullPath
     /// completes a value that is not rooted from the process's working directory, so
     /// reading one would answer about wherever the app was started from rather than
     /// about the entry. A bare "\Windows\Installer\9f05cba.msi" is the cache path
@@ -299,7 +299,7 @@ public sealed class PendingRebootService : IPendingRebootService
     private static EntryLocation LocateOrdinaryPath(string cleaned, string installerRoot, out string? canonical)
     {
         canonical = null;
-        if (!Path.IsPathFullyQualified(cleaned))
+        if (!PathText.IsPathFullyQualified(cleaned))
             return EntryLocation.Unplaceable;
 
         if (!TryCanonicalise(cleaned, out var resolved))
@@ -399,7 +399,7 @@ public sealed class PendingRebootService : IPendingRebootService
 
         foreach (var mount in mounts.Paths)
         {
-            if (!TryCanonicalise(Path.Combine(mount, remainder), out var resolved))
+            if (!TryCanonicalise(PathText.Combine(mount, remainder), out var resolved))
                 return EntryLocation.Unplaceable;
 
             if (Place(resolved, installerRoot, out canonical) == EntryLocation.InsideCache)
@@ -434,7 +434,7 @@ public sealed class PendingRebootService : IPendingRebootService
     {
         try
         {
-            resolved = Path.GetFullPath(path);
+            resolved = FullPaths.GetFullPath(path);
             return true;
         }
         catch (Exception ex) when (ex is ArgumentException

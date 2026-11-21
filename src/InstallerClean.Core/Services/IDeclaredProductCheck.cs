@@ -285,7 +285,8 @@ public interface IDeclaredProductCheck
     /// read, so nothing here waits on a drive or share. A check with no registry reader reads no
     /// list, and counts every such key.
     ///
-    /// IT COUNTS LISTS, NOT HOLDS. A key whose lists all read is not counted, though the screen
+    /// IT COUNTS KEYS BY THEIR LISTS, NOT BY HOLDS, each key once however many of its lists do not
+    /// read. A key whose lists all read is not counted, though the screen
     /// also keeps every installation package where the read of a package at a folder on one
     /// does not settle, and where the check has no way to read the packages a list names.
     /// </summary>
@@ -458,8 +459,8 @@ public enum DeclaredProductOutcome
     /// <c>InstallProperties</c> key holds that same text; it is covered for an installation of
     /// an account other than the one this check runs as, where the installation's package code
     /// does not read through the API and from the registry alike, where this file carries that
-    /// package code or its own does not read, and otherwise through the installation's sources,
-    /// below. An empty value is covered where the installation's <c>InstallProperties</c> key
+    /// package code or its own does not read, unless it has no Revision Number, and otherwise
+    /// through the installation's sources, below. An empty value is covered where the installation's <c>InstallProperties</c> key
     /// holds a cached package or will not read, and otherwise through its sources, below; it is
     /// not covered at all for an installation that has no source list and no
     /// <c>InstallProperties</c> key recording a cached package or a folder it was installed

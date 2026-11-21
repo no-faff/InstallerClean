@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
@@ -30,8 +31,63 @@ internal static class Program
     private const int ExitTransient = CliExitCode.Transient;
     private const int ExitCancelled = CliExitCode.Cancelled;
 
+    /// <remarks>
+    /// On a PC older than Windows 10 version 1607 the command line says which Windows it
+    /// needs, and on a PC without .NET Framework 4.8 it says what to install, and ends,
+    /// before it reads its arguments. The download carries no config naming the runtime, so
+    /// .NET Framework starts it on any 4.x. The runtime compiles a method whole the first
+    /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
+    /// names only the checks, their refusal in English where a check fails to load what it
+    /// needs, the crash log's write of what the module initializer kept and
+    /// <see cref="Start"/>, each in a method of its own that is never compiled into Main:
+    /// nothing the last two name is compiled before the checks have run.
+    /// </remarks>
     public static int Main(string[] args)
     {
+        // A check that fails to load what it needs is on a PC whose .NET Framework is older
+        // than 4.8, which ends the run with the message in English, the strings being
+        // unreadable there. A check that throws anything else lets the run go on, as the
+        // window's does, where the run's own handlers catch what follows.
+        int? refused;
+        try
+        {
+            refused = RefuseOnAPcThatCannotRunIt();
+        }
+        catch (Exception ex) when (StartChecks.IsLoadFailure(ex))
+        {
+            refused = RefuseWithoutRecording(NetFrameworkCheck.EnglishMessage(commandLine: true));
+        }
+        catch (Exception)
+        {
+            refused = null;
+        }
+        if (refused is { } code) return code;
+        InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
+        return Start(args);
+    }
+
+    /// <summary>
+    /// The exit code of the refusal where the PC runs Windows older than Windows 10 version
+    /// 1607, or does not have .NET Framework 4.8, having printed it, or null where it can run
+    /// the copy. The message is in the language Windows displays, as the whole command line is.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int? RefuseOnAPcThatCannotRunIt() =>
+        StartChecks.OfThisPc() is var refusal && refusal != StartRefusal.None
+            ? RefuseWithoutRecording(StartChecks.Message(refusal, commandLine: true))
+            : null;
+
+    /// <summary>The run, on a PC that has .NET Framework 4.8.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int Start(string[] args)
+    {
+        // A .exe.config beside the command line that says more than the build's own is a
+        // file somebody else wrote, which on .NET Framework the runtime would read. Refuse
+        // before anything else runs, printing the message and ending; a config beside the
+        // setup's copy is not refused. Read here, never in a module initializer.
+        if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
+            return Refuse(plantedConfig);
+
         // A newer version a copy downloaded, started to put itself at that copy's path once
         // the copy has ended, does that and nothing else, printing nothing: it runs with no
         // console of its own. Exit code 0 where the newer version is in place, 1 otherwise,
@@ -138,6 +194,62 @@ internal static class Program
     }
 
     /// <summary>
+    /// Prints <paramref name="message"/> on the error stream and gives the code for a run
+    /// that did nothing: a refusal at the start, ahead of the run's own output. The message
+    /// goes out in UTF-8, as the run's output does, and the console's code page is given
+    /// back after it. A write that fails loses its text and throws nothing.
+    /// </summary>
+    /// <param name="message">What the refusal says.</param>
+    /// <param name="error">
+    /// The error stream, or null for the console's, which is read once the code page is set:
+    /// setting it replaces the console's own writers.
+    /// </param>
+    internal static int Refuse(string message, TextWriter? error = null)
+    {
+        var previousOutputEncoding = TrySetUtf8Output();
+        try
+        {
+            new ConsoleGuard(error ?? Console.Error).WriteLine(message);
+        }
+        finally
+        {
+            RestoreOutputEncoding(previousOutputEncoding);
+        }
+        return ExitError;
+    }
+
+    /// <summary>
+    /// <see cref="Refuse"/> for the refusals on a PC older than Windows 10 version 1607 or
+    /// without .NET Framework 4.8, where a write that fails loses its text and is not recorded
+    /// in crash.log. Recording it asks the crash
+    /// log for its folder, which can move an earlier version's folder into place and runs
+    /// code needing more than the .NET Framework NetFrameworkCheck's remarks name, on a PC
+    /// that cannot run the app. The window records nothing where its message cannot be shown
+    /// either.
+    /// </summary>
+    /// <param name="message">What the refusal says.</param>
+    /// <param name="error">
+    /// The error stream, or null for the console's, which is read once the code page is set.
+    /// </param>
+    internal static int RefuseWithoutRecording(string message, TextWriter? error = null)
+    {
+        var previousOutputEncoding = TrySetUtf8Output();
+        try
+        {
+            (error ?? Console.Error).WriteLine(message);
+        }
+        catch (Exception)
+        {
+            // The text is lost, and the copy ends with the error code as it would have.
+        }
+        finally
+        {
+            RestoreOutputEncoding(previousOutputEncoding);
+        }
+        return ExitError;
+    }
+
+    /// <summary>
     /// The request this run stands for another copy under, where it runs a command for an
     /// older copy that downloaded it (<see cref="StagedRun"/>), and null on every other run.
     /// What the run decides from its own path it decides from the request's path instead.
@@ -163,8 +275,20 @@ internal static class Program
     /// ended (<see cref="StagedRun.StartReplace(ReplaceRequest, string)"/>), so a test of a run standing for a copy
     /// starts nothing.
     /// </summary>
-    internal static Action<ReplaceRequest> StartReplace { get; set; } =
-        request => StagedRun.StartReplace(request, Environment.ProcessPath ?? string.Empty);
+    /// <remarks>
+    /// Program's type initializer runs before Main's .NET Framework 4.8 check, so it holds no
+    /// delegate to the replace: the default is made where the property is read.
+    /// </remarks>
+    internal static Action<ReplaceRequest> StartReplace
+    {
+        get => s_startReplace ?? StartReplaceOfThisCopy;
+        set => s_startReplace = value;
+    }
+
+    private static Action<ReplaceRequest>? s_startReplace;
+
+    private static void StartReplaceOfThisCopy(ReplaceRequest request) =>
+        StagedRun.StartReplace(request, Environment.ProcessPath ?? string.Empty);
 
     /// <summary>
     /// Whether this run ends while the newer version it started may still be running in this
@@ -198,29 +322,102 @@ internal static class Program
     /// <see cref="RestoreOutputEncoding"/>, or null when nothing was changed.
     /// </summary>
     /// <remarks>
-    /// Failure is swallowed, and that asymmetry with the rest of the pre-flight is
-    /// the point: the setter calls SetConsoleOutputCP, which fails when the process
-    /// has no console at all (a DETACHED_PROCESS launcher, a session-0 service
-    /// wrapper), and the BCL surfaces that as an IOException. What is lost is
-    /// cosmetic, correct glyphs in non-ASCII stdout nobody is reading on a headless
-    /// run; what letting it escape would cost is the whole run, every run, with the
+    /// <para>
+    /// The setter calls SetConsoleOutputCP, which fails when the process has no
+    /// console at all (a DETACHED_PROCESS launcher, a session-0 service wrapper),
+    /// with ERROR_INVALID_HANDLE or ERROR_INVALID_ACCESS. .NET Framework's setter
+    /// throws that as an IOException carrying the error's HRESULT and leaves the
+    /// console's writers in the ANSI code page, so where the process has no console
+    /// the run puts UTF-8 writers over stdout and stderr itself
+    /// (<see cref="UseUtf8WritersWithoutAConsole"/>): output redirected to a file
+    /// by such a launcher is UTF-8 either way. Nothing was changed on a console, so
+    /// null comes back.
+    /// </para>
+    /// <para>
+    /// Any other failure is swallowed, and that asymmetry with the rest of the
+    /// pre-flight is the point: what is lost is correct glyphs in non-ASCII stdout,
+    /// and what letting it escape would cost is the whole run, every run, with the
     /// cache never cleaned.
+    /// </para>
     /// </remarks>
-    private static Encoding? TrySetUtf8Output()
+    private static Encoding? TrySetUtf8Output() =>
+        TrySetUtf8Output(
+            static () => Console.OutputEncoding,
+            static encoding => Console.OutputEncoding = encoding,
+            UseUtf8WritersWithoutAConsole);
+
+    /// <summary>
+    /// <see cref="TrySetUtf8Output()"/> with the console's code page read and set through
+    /// <paramref name="read"/> and <paramref name="set"/>, and <paramref name="noConsole"/>
+    /// run where the set fails because the process has no console.
+    /// </summary>
+    internal static Encoding? TrySetUtf8Output(Func<Encoding> read, Action<Encoding> set, Action noConsole)
     {
+        Encoding previous;
         try
         {
-            var previous = Console.OutputEncoding;
-            Console.OutputEncoding = Encoding.UTF8;
-            return previous;
+            previous = read();
         }
         catch (Exception)
         {
-            // Either the read or the write failed, so nothing was changed and
-            // there is nothing to give back. Carry on in the inherited code page.
+            // Nothing was changed, so there is nothing to give back. Carry on in the
+            // inherited code page.
+            return null;
+        }
+        try
+        {
+            set(Encoding.UTF8);
+            return previous;
+        }
+        catch (IOException ex) when (HasNoConsole(ex))
+        {
+            try
+            {
+                noConsole();
+            }
+            catch (Exception)
+            {
+                // The console's own writers stay, in the inherited code page.
+            }
+            return null;
+        }
+        catch (Exception)
+        {
             return null;
         }
     }
+
+    /// <summary>
+    /// Whether <paramref name="failure"/> is the console's answer to setting its code page
+    /// in a process with no console: ERROR_INVALID_HANDLE (6) or ERROR_INVALID_ACCESS (12),
+    /// as the HRESULT .NET Framework gives the IOException it throws for them. They are the
+    /// two errors .NET 10's setter ignores, writing UTF-8 anyway.
+    /// </summary>
+    internal static bool HasNoConsole(IOException failure) =>
+        failure.HResult is unchecked((int)0x80070006) or unchecked((int)0x8007000C);
+
+    /// <summary>
+    /// Puts a UTF-8 writer over standard output and standard error, each made as .NET 10
+    /// makes the console's writer for an encoding it has been set to: no byte-order mark, a
+    /// 256-character buffer flushed on every write, the stream left open, one write at a
+    /// time. Where the process has no standard handle for one, the runtime gives an empty
+    /// stream and that writer takes nothing, as the console's own would.
+    /// </summary>
+    private static void UseUtf8WritersWithoutAConsole()
+    {
+        Console.SetOut(Utf8ConsoleWriter(Console.OpenStandardOutput()));
+        Console.SetError(Utf8ConsoleWriter(Console.OpenStandardError()));
+    }
+
+    /// <summary>The writer <see cref="UseUtf8WritersWithoutAConsole"/> puts over one of the standard streams.</summary>
+    internal static TextWriter Utf8ConsoleWriter(Stream stream) =>
+        stream == Stream.Null
+            ? TextWriter.Null
+            : TextWriter.Synchronized(
+                new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), 256, leaveOpen: true)
+                {
+                    AutoFlush = true,
+                });
 
     /// <summary>
     /// Puts the console output code page back the way this process found it.
@@ -263,13 +460,17 @@ internal static class Program
         var invocation = CliContract.ParseArguments(args);
         switch (invocation.Command)
         {
-            // What help and version are asked for is their output, so a write to it that
-            // failed fails the run. Neither writes an Application-log entry either way.
+            // What help, version and the notices are asked for is their output, so a write to
+            // it that failed fails the run. None of them writes an Application-log entry either
+            // way.
             case CliCommand.Help:
                 PrintUsage();
                 return output.Failed ? ExitError : ExitOk;
             case CliCommand.Version:
                 PrintVersion();
+                return output.Failed ? ExitError : ExitOk;
+            case CliCommand.Notices:
+                PrintNotices();
                 return output.Failed ? ExitError : ExitOk;
             case CliCommand.NoArguments:
                 // An argless run is a misconfiguration, most often a scheduled
@@ -309,12 +510,12 @@ internal static class Program
         // other InstallerClean process. The manifest asks Windows for the rights,
         // and Windows can still start the tool without them, a compatibility setting
         // being one way, so the tool asks its own token; AdministratorRights says
-        // what the scan needs them for. Help and --version return above and need no
-        // rights.
+        // what the scan needs them for. Help, --version and --notices return above and
+        // need no rights.
         if (!AdministratorRights.Held())
             return RefuseWithoutAdministratorRights(arg);
 
-        using var cts = new CancellationTokenSource();
+        using var cts = new RunCancellation();
         var updateHost = NewUpdateHost(arg, invocation);
 
         // A Ctrl+C from here until the run returns cancels the run, before the update and the
@@ -322,12 +523,15 @@ internal static class Program
         // runs. The registration is released as the run returns.
         using var onCtrlC = CancelKey.Process.Answer(CancelRun);
 
-        // Runs once, on the console's own control-handler thread or, where Ctrl+C came
-        // before the registration, on this one. Nothing in here may throw: on the
-        // control-handler thread Main's try/catch does not cover it, so an escape is
-        // unhandled, a runtime abort and a stack trace on stderr in place of the
-        // documented exit code and the single Application-log entry, on a surface that
-        // deliberately keeps ex.Message out.
+        // Runs once, on the thread that brings the cancel: a thread-pool thread for Ctrl+C,
+        // which the runtime queues there while the console's control-handler thread waits;
+        // the handler thread Windows starts for a console being closed; the thread CancelKey.Watch
+        // starts for the event the version that started this one sets; or, where the cancel
+        // came before the registration, this one. Nothing in here may throw: on any of the
+        // first three, Main's try/catch does not cover it, so an escape is unhandled, a
+        // runtime abort and a stack trace on stderr in place of the documented exit code and
+        // the single Application-log entry, on a surface that deliberately keeps ex.Message
+        // out.
         void CancelRun()
         {
             // Once the newer version this run updated to is being started or running in this
@@ -423,7 +627,7 @@ internal static class Program
     }
 
     /// <summary>How long the PC's first-run check is waited for before a report is carried, as the window waits.</summary>
-    private static readonly TimeSpan ReportCheckBound = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan ReportCheckBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// The kind of copy this command-line tool is, as the report names it
@@ -465,7 +669,7 @@ internal static class Program
         if (!report.CanAsk || token.IsCancellationRequested) return;
         var offer = new ConsoleReportOffer(
             console, resultLog, settings,
-            Path.Combine(AppDataFolder.Location, "last-run.json"),
+            PathText.Combine(AppDataFolder.Location, "last-run.json"),
             ReadmeLinks.For("reports-stats", Localisation.UiCulture),
             () => CancelKey.Process.Closing,
             CommandLineUpdate.ControlCBound,
@@ -650,7 +854,8 @@ internal static class Program
 
     /// <summary>
     /// Prints a blank line and <paramref name="line"/>, the line saying the run is
-    /// cancelling. Never throws: it runs on the console's control-handler thread too.
+    /// cancelling. Never throws: it runs on the thread that brings the cancel too, which
+    /// Main's try/catch does not cover.
     /// </summary>
     internal static void SayCancelling(string line)
     {
@@ -1555,7 +1760,7 @@ internal static class Program
                     Console.WriteLine(MachineContract.English(
                         () => $"{result.Errors.Count} {Strings.Plural_Error_Plural}:"));
                     foreach (var err in result.Errors)
-                        Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+                        Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
 
                 // The service returns its partial result on a mid-batch cancel
@@ -1605,8 +1810,15 @@ internal static class Program
 
             // The /m destination was resolved and validated before the scan
             // (see ResolveAndValidateMoveDestination); moveDest is non-empty,
-            // fully qualified and outside the Installer and system folders.
+            // fully qualified, long enough to hold a file of one character, and
+            // outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
+
+            // Every file the scan offered, measured against the destination before the
+            // free-space check reads it: the window measures the same list, before its own
+            // re-check, so the two refuse the same Moves.
+            if (MoveDestinationLength.TooLong(moveDest, scanResult.RemovableFiles.Select(f => f.FullPath)))
+                return MoveDestinationTooLong(arg, moveDest);
 
             // Room at the destination, decided by the Core rule the window
             // applies, which refused a Move it had no room for while this ran it
@@ -1614,7 +1826,7 @@ internal static class Program
             // destination validation because only the surviving set's size says
             // how much room is needed, and asked before the folder is created so a
             // refusal leaves nothing behind.
-            if (MoveSpaceCheck.RefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
+            if (MoveSpaceCheck.MeasuredRefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveNotEnoughSpace,
                     moveDest, DisplayHelpers.FormatSize(totalBytes),
@@ -1727,7 +1939,7 @@ internal static class Program
                 Console.WriteLine(MachineContract.English(
                     () => $"{moveResult.Errors.Count} {Strings.Plural_Error_Plural}:"));
                 foreach (var err in moveResult.Errors)
-                    Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+                    Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
             // AFTER THE ERROR BLOCK RATHER THAN BETWEEN IT AND THE SUMMARY, so a
             // script scraping the "\d+ errors:" shape finds that block straight under
@@ -1821,10 +2033,10 @@ internal static class Program
         {
             // EventLog the cancellation so a Task Scheduler audit can see how far the run
             // got, and pick ExitPartial when work committed before the cancellation
-            // arrived. A run cancelled before any file was processed (a cancel during the
-            // scan, or before the first delete/move) still writes one entry so "each /s,
-            // /d or /m run writes one summary" holds for every run: TransientSkip, not
-            // Partial, since nothing committed and a re-run can succeed. Where the console
+            // arrived. A run cancelled with no file deleted or moved (a cancel during the
+            // scan or the re-check, or after every file it reached failed) still writes one
+            // entry so "each /s, /d or /m run writes one summary" holds for every run:
+            // TransientSkip, not Partial, since nothing committed and a re-run can succeed. Where the console
             // is being closed the entry goes before the lines, the run having only seconds
             // left and a console that may already be gone.
             void WriteEntry()
@@ -1836,7 +2048,9 @@ internal static class Program
                             DisplayHelpers.PluraliseFile(totalToProcess)));
                 else
                     MachineContract.WriteEventLog(CliEventClass.TransientSkip,
-                        () => string.Format(Strings.Cli_EventLogCancelledNoWork, arg));
+                        () => string.Format(arg == "/s"
+                            ? Strings.Cli_EventLogCancelledNoWork
+                            : Strings.Cli_EventLogCancelledNoFileRemoved, arg));
             }
             var closing = CancelKey.Process.Closing;
             if (closing) WriteEntry();
@@ -1885,7 +2099,7 @@ internal static class Program
     /// Ends a scan-only run once every line it has is printed, and returns its exit code.
     /// What a scan-only run is asked for is its output, so a write to it that failed, such
     /// as one to a redirect on a full disk, fails the run: the run reports the guard's first
-    /// failed write through <see cref="ReportUnexpectedError(string, Exception, ValueTuple{string, bool})"/>,
+    /// failed write through <see cref="ReportUnexpectedError(string, Exception, CrashLogEntry)"/>,
     /// whose HardError entry is its summary and whose line follows its output, and exits 1.
     /// Otherwise it writes the Ok entry <paramref name="summary"/> builds and exits 0. One
     /// summary either way, which is what an RMM counts runs by.
@@ -2271,7 +2485,7 @@ internal static class Program
     /// one. Safe to call after the console itself has failed (the stdout write is guarded,
     /// and <see cref="EventLogWriter"/> swallows its own IO).
     /// </summary>
-    private static int ReportUnexpectedError(string mode, Exception ex, (string Path, bool Written) crash)
+    private static int ReportUnexpectedError(string mode, Exception ex, CrashLogEntry crash)
     {
         var typeName = ex.GetType().Name;
         try
@@ -2389,7 +2603,7 @@ internal static class Program
             Console.WriteLine(MachineContract.English(
                 () => $"{partial.Errors.Count} {Strings.Plural_Error_Plural}:"));
             foreach (var err in partial.Errors)
-                Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+                Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
         }
         // The command line's wording of the guard's sentence rather than
         // ex.Message, which is the window's: that one closes on Re-scan, a button
@@ -2594,7 +2808,7 @@ internal static class Program
             PendingRebootReason.RegistryCheckUnreadable =>
                 Strings.Cli_PendingRebootBlocked_RegistryCheckUnreadable,
             // The in-progress file's own sentence is the one the fallback below
-            // prints: Windows Installer has something in progress, which is what
+            // prints: Windows Installer has something unfinished, which is what
             // the file records. A reason added later without a line of its own
             // falls through to the same text and meets the test's distinctness
             // check, which this arm keeps armed.
@@ -2775,7 +2989,9 @@ internal static class Program
     /// <summary>
     /// Resolves the /m destination (the command-line path, or the path saved
     /// in %LOCALAPPDATA% when none was given) and runs the fully-qualified,
-    /// not-inside-Installer and not-inside-System-folder gates. Returns null
+    /// length, not-inside-Installer and not-inside-System-folder gates. No file is
+    /// known yet, so the length gate here refuses a destination too long to hold
+    /// any file, and the files the scan finds are measured after it. Returns null
     /// when the destination is valid, setting <paramref name="dest"/>; or the
     /// exit code to return when it is not, after printing the stdout reason
     /// and writing the EventLog entry. Both sources have the same trust
@@ -2803,16 +3019,22 @@ internal static class Program
         // is assigned once above and only read after, so the two stay equal.
         var resolved = dest;
 
-        // Reject relative destinations: Path.GetFullPath would otherwise
+        // Reject relative destinations: FullPaths.GetFullPath would otherwise
         // resolve them against the process CWD, and the CLI host's CWD is
         // whatever the caller invoked it from.
-        if (!Path.IsPathFullyQualified(dest))
+        if (!PathText.IsPathFullyQualified(dest))
         {
             Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
             MachineContract.WriteEventLog(CliEventClass.HardError,
                 () => string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, resolved));
             return ExitError;
         }
+
+        // Before the scan no file is known, so this refuses a destination too long to hold
+        // any file. The files the scan finds are measured again after it, before anything
+        // reads the destination.
+        if (MoveDestinationLength.TooLong(dest))
+            return MoveDestinationTooLong(arg, resolved);
 
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
         {
@@ -2832,6 +3054,27 @@ internal static class Program
 
         return null;
     }
+
+    /// <summary>
+    /// Refuses a <c>/m</c> whose destination would put a moved file at a path of
+    /// MAX_PATH or more, naming the destination on stdout and in the Application log.
+    /// </summary>
+    private static int MoveDestinationTooLong(string arg, string destination)
+    {
+        Console.WriteLine(string.Format(Strings.Error_PathTooLong, destination));
+        MachineContract.WriteEventLog(CliEventClass.HardError,
+            () => MoveDestinationTooLongEventLogLine(arg, destination));
+        return ExitError;
+    }
+
+    /// <summary>
+    /// The Application-channel line for a <c>/m</c> whose destination is too long to
+    /// hold a moved file. Its own method so the wording can be read back without
+    /// driving a run, and built outside the en-GB scope, as
+    /// <see cref="MoveDestinationInsideInstallerEventLogLine"/> is.
+    /// </summary>
+    internal static string MoveDestinationTooLongEventLogLine(string arg, string destination) =>
+        string.Format(Strings.Cli_EventLogMoveDestinationTooLong, arg, destination);
 
     /// <summary>
     /// The Application-channel line for a <c>/m</c> whose destination resolves
@@ -2862,6 +3105,17 @@ internal static class Program
         Console.WriteLine($"{name.Name} {version}");
     }
 
+    /// <summary>
+    /// Prints THIRD-PARTY-NOTICES as the build embedded it, a console line per line of the
+    /// file, so every break is the host's newline as it is for the help. The text is in the
+    /// words its licences are written in and is never translated.
+    /// </summary>
+    private static void PrintNotices()
+    {
+        foreach (var line in ThirdPartyNotices.Read().TrimEnd('\n').Split('\n'))
+            Console.WriteLine(line);
+    }
+
     private static void PrintUsage()
     {
         WriteHelp(Strings.Cli_Help_Header);
@@ -2871,6 +3125,7 @@ internal static class Program
         WriteHelp(Strings.Cli_Help_Usage);
         WriteHelp(Strings.Cli_Help_Help);
         WriteHelp(Strings.Cli_Help_Version);
+        WriteHelp(Strings.Cli_Help_Notices);
         WriteHelp(Strings.Cli_Help_ScanOnly);
         WriteHelp(Strings.Cli_Help_Delete);
         WriteHelp(Strings.Cli_Help_MoveDefault);

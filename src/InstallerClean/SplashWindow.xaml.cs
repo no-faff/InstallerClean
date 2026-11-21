@@ -19,7 +19,7 @@ public partial class SplashWindow : Window
     // How long a step of the fill takes when the caller does not say. The closing
     // step does say, so that the last of the bar arrives as the window goes
     // rather than being cut off by it.
-    private static readonly TimeSpan StepEase = TimeSpan.FromMilliseconds(250);
+    private static readonly TimeSpan StepEase = Durations.FromMilliseconds(250);
 
     // Set when the user asks to stop. The scan observes cancellation at its next
     // checkpoint, so updates already in flight arrive after this and would

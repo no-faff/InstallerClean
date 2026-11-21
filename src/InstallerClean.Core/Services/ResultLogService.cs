@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 
@@ -17,9 +18,17 @@ namespace InstallerClean.Services;
 /// </summary>
 public sealed class ResultLogService : IResultLogService
 {
+    /// <summary>
+    /// Maximum size of <c>last-run.json</c> the service will read or
+    /// POST. The writer caps the JSON at this size by construction
+    /// (the schema's natural size is well under it); a file larger
+    /// than this came from outside the process and is rejected.
+    /// </summary>
+    public const long MaxLogBytes = 64 * 1024;
+
     private const string EndpointUrl = "https://nofaff.netlify.app/api/result-log";
 
-    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
+    private static readonly TimeSpan RequestTimeout = Durations.FromSeconds(8);
 
     private readonly string _logFile;
 
@@ -28,12 +37,34 @@ public sealed class ResultLogService : IResultLogService
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { InDeclarationOrder } },
     };
+
+    /// <summary>
+    /// Writes each object's properties in the order its type declares them, which is the
+    /// order .NET 10 writes them in. The serialiser otherwise takes its order from
+    /// Type.GetProperties, which returns properties in no particular order, and on .NET
+    /// Framework the order it gives can differ from one process to the next.
+    /// </summary>
+    private static void InDeclarationOrder(JsonTypeInfo info)
+    {
+        if (info.Kind != JsonTypeInfoKind.Object) return;
+        var declared = info.Properties
+            .OrderBy(p => (p.AttributeProvider as MemberInfo)?.MetadataToken ?? int.MaxValue)
+            .ToList();
+        for (var i = 0; i < declared.Count; i++) declared[i].Order = i;
+    }
+
+    /// <summary>The report as last-run.json holds it.</summary>
+    internal static string Serialize(ResultLogEntry entry) => JsonSerializer.Serialize(entry, JsonOptions);
 
     private static readonly string UserAgent =
         $"InstallerClean/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0"}";
 
-    private static readonly HttpClient HttpClient = new()
+    /// <summary>The report client's handler, carrying the proxy .NET 10 takes by default (<see cref="ProxyFromVariables"/>).</summary>
+    internal static HttpClientHandler CreateHandler() => ProxyFromVariables.Carrying(new HttpClientHandler());
+
+    private static readonly HttpClient HttpClient = new(CreateHandler())
     {
         Timeout = RequestTimeout,
         // Bounds the eager buffering only: MaxResponseContentBufferSize
@@ -48,7 +79,7 @@ public sealed class ResultLogService : IResultLogService
         MaxResponseContentBufferSize = 4 * 1024,
     };
 
-    public ResultLogService() : this(Path.Combine(AppDataFolder.Location, "last-run.json")) { }
+    public ResultLogService() : this(PathText.Combine(AppDataFolder.Location, "last-run.json")) { }
 
     /// <summary>
     /// Test seam, mirroring <see cref="SettingsService"/>'s next door: points
@@ -82,12 +113,13 @@ public sealed class ResultLogService : IResultLogService
         var tempFile = _logFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
-            // GetDirectoryName is null only for a root path, which the
-            // default never is and a test sandbox never should be.
-            var folder = Path.GetDirectoryName(_logFile);
-            if (folder is not null) Directory.CreateDirectory(folder);
+            // GetDirectoryName is null for a root, an empty path and one of spaces
+            // alone, and empty for a bare file name, which names the current folder:
+            // there is no folder to make for any of them.
+            var folder = PathText.GetDirectoryName(_logFile);
+            if (folder is { Length: > 0 }) FrameworkDirectory.CreateDirectory(folder);
 
-            var json = JsonSerializer.Serialize(entry, JsonOptions);
+            var json = Serialize(entry);
 
             // OpenAtomic + MoveFileEx(REPLACE_EXISTING) keeps the swap
             // race-free: the temp open refuses a symlink, and the
@@ -119,6 +151,25 @@ public sealed class ResultLogService : IResultLogService
         }
     }
 
+    /// <summary>
+    /// The POST carrying <paramref name="body"/> to <paramref name="url"/>: the app's user
+    /// agent, the body as UTF-8 JSON, and no <c>Expect: 100-continue</c>, so the body goes
+    /// with the headers as .NET 10 sends it. .NET Framework's handler asks the server's
+    /// leave before a body unless the request says otherwise, and holds the body until the
+    /// server answers or its wait runs out. It takes the request's word as the setting of
+    /// the service point for the endpoint's host, or for the proxy in front of it, which
+    /// every later request through that point shares; the app sends no other body.
+    /// </summary>
+    internal static HttpRequestMessage Request(string body, string url)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, url);
+        request.Headers.UserAgent.ParseAdd(UserAgent);
+        request.Headers.ExpectContinue = false;
+        request.Content = new StringContent(body, Encoding.UTF8);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        return request;
+    }
+
     public async Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(body))
@@ -127,15 +178,12 @@ public sealed class ResultLogService : IResultLogService
         // Defence in depth: a caller that builds the body in-memory
         // (rather than piping through ReadLastLogAsync, which enforces
         // MaxLogBytes on read) would otherwise bypass the byte cap.
-        if (Encoding.UTF8.GetByteCount(body) > IResultLogService.MaxLogBytes)
+        if (Encoding.UTF8.GetByteCount(body) > MaxLogBytes)
             return ResultLogSendOutcome.Unknown;
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, EndpointUrl);
-            request.Headers.UserAgent.ParseAdd(UserAgent);
-            request.Content = new StringContent(body, Encoding.UTF8);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            using var request = Request(body, EndpointUrl);
 
             // ResponseHeadersRead returns as soon as the status line and
             // headers are in. Only IsSuccessStatusCode is read and Content
@@ -185,11 +233,11 @@ public sealed class ResultLogService : IResultLogService
     /// File.Exists, which answers false rather than throwing where the folder cannot be
     /// read. Called from the window's start check on a thread-pool thread.
     /// </summary>
-    public bool LastLogExists() => File.Exists(_logFile);
+    public bool LastLogExists() => FrameworkFile.Exists(_logFile);
 
     private async Task<string?> ReadLastLogCoreAsync(CancellationToken cancellationToken)
     {
-        if (!File.Exists(_logFile))
+        if (!FrameworkFile.Exists(_logFile))
             return null;
 
         try
@@ -198,13 +246,13 @@ public sealed class ResultLogService : IResultLogService
                 _logFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null) return null;
             using var fs = new FileStream(handle, FileAccess.Read);
-            if (fs.Length > IResultLogService.MaxLogBytes)
+            if (fs.Length > MaxLogBytes)
             {
                 // Oversize is not a normal outcome (writer caps at the
                 // schema's natural size); record it so a report that never
                 // went has a breadcrumb to follow.
                 CrashLog.TryWrite(new InvalidDataException(
-                    $"last-run.json exceeds the {IResultLogService.MaxLogBytes}-byte cap and was not read."));
+                    $"last-run.json exceeds the {MaxLogBytes}-byte cap and was not read."));
                 return null;
             }
             using var reader = new StreamReader(fs, Encoding.UTF8);

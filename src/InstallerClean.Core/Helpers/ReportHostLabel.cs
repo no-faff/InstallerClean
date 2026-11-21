@@ -3,7 +3,7 @@ using InstallerClean.Models;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// The program that sent the opt-in report, as the report carries it.
+/// The program whose run the opt-in report describes, as the report carries it.
 /// </summary>
 public static class ReportHostLabel
 {

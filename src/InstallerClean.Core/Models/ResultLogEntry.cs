@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using InstallerClean.Compatibility;
 using InstallerClean.Helpers;
 using InstallerClean.Services;
 
@@ -15,17 +15,26 @@ namespace InstallerClean.Models;
 /// with its report box ticked.
 ///
 /// Schema is intentionally narrow. Every field is either categorical
-/// or a count; no file paths, no usernames, no machine identifiers,
-/// no time-of-day, nothing that could correlate two runs from the
-/// same machine.
+/// or a count, apart from <see cref="ReportId"/>; no file paths, no usernames,
+/// no machine identifiers, no time-of-day, nothing that could correlate two runs
+/// from the same machine.
 /// </summary>
+/// <param name="ReportId">
+/// A random GUID made when the report is made, so the receiver keeps one copy of a
+/// report sent more than once. The window and the command line send the report again
+/// from a later start whenever they did not see it accepted, and the server may have
+/// stored it already. Every send reads <c>last-run.json</c>, so every copy carries the
+/// same id. It is made from nothing on the PC and is written nowhere but the report.
+/// Last in the record, so it is the report's last key.
+/// </param>
 public sealed record ResultLogEntry(
     int SchemaVersion,
     AppInfo App,
     string Os,
     MachineInfo Machine,
     ScanInfo Scan,
-    OperationInfo Operation)
+    OperationInfo Operation,
+    Guid ReportId)
 {
     /// <summary>
     /// Schema 2 separates <see cref="ScanInfo.ObsoletedCount"/>
@@ -155,7 +164,7 @@ public sealed record ResultLogEntry(
     /// reached through a network path in the fourth.
     ///
     /// SCHEMA 10 ADDS TWO KEYS UNDER <c>app</c> AND TAKES NONE AWAY: <c>host</c>, the program
-    /// that sent the report (<see cref="AppInfo.Host"/>), and <c>copyKind</c>, the kind of copy
+    /// whose run the report describes (<see cref="AppInfo.Host"/>), and <c>copyKind</c>, the kind of copy
     /// of it that was running (<see cref="AppInfo.CopyKind"/>).
     ///
     /// SCHEMA 11 ADDS FIVE KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys no
@@ -165,8 +174,23 @@ public sealed record ResultLogEntry(
     /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
     ///
     /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys without an
-    /// <c>InstallProperties</c> key one of whose source lists did not read
+    /// <c>InstallProperties</c> key one of whose source lists did not read or holds a value in a
+    /// form the check does not compare
     /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
+    ///
+    /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL, TWO UNDER <c>machine</c> AND THREE UNDER
+    /// <c>scan</c>, AND TAKES NONE AWAY: <c>reportId</c>, last (<see cref="ReportId"/>); the
+    /// installations found by name whose patch set the scan left unestablished
+    /// (<see cref="MachineInfo.RecoveredPatchSetUnestablishedCount"/>); and, last under
+    /// <c>machine</c>, the failed reads of a program's own <c>Patches</c> key
+    /// (<see cref="MachineInfo.ProductPatchListReadFailureCount"/>). Last under <c>scan</c>,
+    /// the files kept by the package code an ordinary installation records whose cached package
+    /// does not say what it declares, those kept there because their own package code would not
+    /// read and they were not shown to have no Revision Number, and the installations of that
+    /// kind that kept every package
+    /// (<see cref="ScanInfo.DeclaredInstalledUndeclaredPackageCodeIsItCount"/> to
+    /// <see cref="ScanInfo.SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount"/>). A new
+    /// top-level key, so the receiver deploys before a release sends it.
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -176,11 +200,11 @@ public sealed record ResultLogEntry(
     /// <c>machine</c> arriving before the receiving end knows the name is a
     /// rejected report and a user told sending failed. The receiver ships first.
     /// </summary>
-    public const int CurrentSchemaVersion = 12;
+    public const int CurrentSchemaVersion = 13;
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it when the
     // report box was put on the card, so the report carries that reading. The host is the
-    // program sending the report and the copy is the kind of copy of it that is running.
+    // program whose run the report describes and the copy is the kind of copy that made it.
     public static ResultLogEntry ForScanOnly(
         ScanResult scan,
         long scanDurationMs,
@@ -193,7 +217,8 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.ScanOnly());
+            OperationInfo.ScanOnly(),
+            NewReportId());
 
     public static ResultLogEntry ForMove(
         ScanResult scan,
@@ -212,7 +237,8 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.FromMove(move, bytesFreed, operationDurationMs, moveDestinationKind, check));
+            OperationInfo.FromMove(move, bytesFreed, operationDurationMs, moveDestinationKind, check),
+            NewReportId());
 
     public static ResultLogEntry ForDelete(
         ScanResult scan,
@@ -230,7 +256,14 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.FromDelete(delete, bytesFreed, operationDurationMs, check));
+            OperationInfo.FromDelete(delete, bytesFreed, operationDurationMs, check),
+            NewReportId());
+
+    /// <summary>
+    /// A new random GUID. The serialiser writes a Guid in its 36-character form, lower
+    /// case, which is the form the receiver accepts.
+    /// </summary>
+    internal static Guid NewReportId() => Guid.NewGuid();
 
     private static string ResolveOs()
     {
@@ -255,13 +288,13 @@ public sealed record ResultLogEntry(
             > 0 => "Windows",
             _ => "Unknown",
         };
-        return $"{family} ({RuntimeInformation.OSArchitecture})";
+        return $"{family} ({FrameworkRuntimeInformation.OSArchitecture})";
     }
 }
 
 /// <summary>
-/// Which build produced the report, which program sent it and which kind of copy that
-/// was, which language its user was reading, which language Windows was showing them,
+/// Which build produced the report, which program made the run and which kind of copy
+/// that was, which language its user was reading, which language Windows was showing them,
 /// and the Country or region set in Windows.
 /// </summary>
 /// <param name="Language">
@@ -297,7 +330,7 @@ public sealed record ResultLogEntry(
 /// a UN M.49 number, or one of two fixed labels.
 /// </param>
 /// <param name="Host">
-/// The program that sent the report, as <see cref="ReportHostLabel.For"/> labels it: the
+/// The program whose run the report describes, as <see cref="ReportHostLabel.For"/> labels it: the
 /// window or the command-line tool.
 ///
 /// A COMMAND-LINE TOOL IN THE SETUP'S FOLDER AND THE WINDOW IN THE SAME FOLDER BOTH HAVE
@@ -305,9 +338,9 @@ public sealed record ResultLogEntry(
 /// </param>
 /// <param name="CopyKind">
 /// The kind of copy of the program that was running, as <see cref="AppCopyLabel.For"/>
-/// labels <see cref="AppCopyKind"/>: the setup's, the portable download, the slim
-/// download, the command line's own download, Scoop's, a build from source, or a copy on a
-/// PC whose setup record could not say. It names how the program came to be on the PC and
+/// labels <see cref="AppCopyKind"/>: the setup's, the portable download, the command
+/// line's own download, Scoop's, a build from source, or a copy on a PC whose setup record
+/// could not say. It names how the program came to be on the PC and
 /// nothing about the PC or its user.
 /// </param>
 public sealed record AppInfo(
@@ -321,7 +354,7 @@ public sealed record AppInfo(
     /// <summary>
     /// This build and this user's languages, with <paramref name="windowsRegion"/>, a value
     /// <see cref="IWindowsRegion.Read"/> returned, and the program and the kind of copy
-    /// that are sending it.
+    /// that made the run.
     /// </summary>
     public static AppInfo Current(string? windowsRegion, ReportHost host, AppCopyKind copy) =>
         new(Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0",
@@ -643,12 +676,28 @@ public sealed record AppInfo(
 /// <see cref="NonStringLocalPackageCount"/> is that last kind, so it is a part of this
 /// figure and the reads that threw are this less that.
 ///
-/// IT IS ONE OF THE TWO TERMS OF THE CHECK THAT REFUSES A SCAN OUTRIGHT, the other
+/// LESS THE FAILED READS OF A PROGRAM'S OWN <c>Patches</c> KEY, A KEY THAT RECORDS NO
+/// CACHED FILE, IT IS ONE OF THE TWO TERMS OF THE CHECK THAT REFUSES A SCAN OUTRIGHT, the other
 /// being the scan object's <c>unreadableProductCount</c>. With both above zero the scan
-/// stops before it produces a result, so no report carries both above zero. With the
+/// stops before it produces a result, so a report carrying this and
+/// <c>unreadableProductCount</c> above zero carries only such failed reads. With the
 /// product enumeration whole, that check passes whatever this says.
 ///
 /// Appended after the identity groups for the reason given above.
+/// </param>
+/// <param name="RecoveredPatchSetUnestablishedCount">
+/// Installations the recovery found by name whose patch set the scan left unestablished on
+/// Windows Installer's own answers, each holding its product's superseded patches back
+/// (<see cref="EnumerationCensus.RecoveredPatchSetUnestablishedCount"/>). Apart from
+/// <see cref="ProductsWithPatchSetUnestablishedCount"/>, which counts the registry's own
+/// reading. Appended after the registry's read failures.
+/// </param>
+/// <param name="ProductPatchListReadFailureCount">
+/// The part of <see cref="RegistryKeyReadFailureCount"/> that is a program's own
+/// <c>Patches</c> key failing to read, one per key
+/// (<see cref="EnumerationCensus.ProductPatchListReadFailures"/>). That key records no
+/// cached file, so these failures hold back every superseded patch and neither hold back
+/// the files no record names nor stop the scan. Appended last.
 /// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
@@ -691,7 +740,9 @@ public sealed record MachineInfo(
     int CandidateIdentityOpenRefusedCount,
     int CandidateIdentityUnavailableCount,
     int CandidateIdentityFaultedCount,
-    int RegistryKeyReadFailureCount)
+    int RegistryKeyReadFailureCount,
+    int RecoveredPatchSetUnestablishedCount,
+    int ProductPatchListReadFailureCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -739,7 +790,9 @@ public sealed record MachineInfo(
             scan.CandidateIdentityReads.OpenRefusedCount,
             scan.CandidateIdentityReads.IdentityUnavailableCount,
             scan.CandidateIdentityReads.FaultedCount,
-            scan.Census.RegistryKeyReadFailures);
+            scan.Census.RegistryKeyReadFailures,
+            scan.Census.RecoveredPatchSetUnestablishedCount,
+            scan.Census.ProductPatchListReadFailures);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
@@ -1303,7 +1356,9 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SecondCopyReleasedOrdinaryCount">
 /// Installations whose cached package did not say which product it declares and whose own
-/// record shows an ordinary installation, so they do not set the hold. One with no package
+/// record shows an ordinary installation, so they do not set the hold, except those counted in
+/// <paramref name="SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount"/>, which are in no other count
+/// of the installations setting it. One with no package
 /// for Windows Installer to open is counted in
 /// <paramref name="SecondCopyReleasedOpensNoPackageCount"/> instead, and its record is not
 /// read.
@@ -1514,7 +1569,7 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="DeclaredInstalledMissingSparePackageCodeUnreadCount">
 /// Those whose program has an installation whose cached package names nothing, where the file's
-/// own package code would not read
+/// own package code would not read and the file was not shown to have no Revision Number
 /// (<see cref="DeclaredProductInstalledCauses.MissingSparePackageCodeUnread"/>).
 /// </param>
 /// <param name="DeclaredInstalledMissingSpareIsItCount">
@@ -1620,11 +1675,28 @@ public sealed record MachineInfo(
 /// (<c>ScanResult.UnlistedKeysWithoutInstallPropertiesListUnread</c>). Asked of every such key from
 /// the registry alone, whatever the screen read. Keys, not files, and part of
 /// <paramref name="UnlistedKeysWithoutInstallPropertiesCount"/> and of no other count. IT
-/// COUNTS LISTS, NOT HOLDS: the screen keeps every installation package for each key counted here
+/// COUNTS KEYS BY THEIR LISTS, NOT BY HOLDS: the screen keeps every installation package for each key counted here
 /// once it reaches it, and also for a key whose lists all read where the read of a package at a
 /// folder on one does not settle, which is not counted here. A check with no registry reader
 /// counts every such key, its lists not read.
 /// <paramref name="FilesHeldForKeysWithoutInstallPropertiesCount"/> counts the files such keys kept.
+/// </param>
+/// <param name="DeclaredInstalledUndeclaredPackageCodeIsItCount">
+/// Of the files in <paramref name="WithheldDeclaredProductInstalledCount"/>, those carrying the
+/// package code recorded by an ordinary installation whose cached package does not say what product
+/// it declares, which can be one made from a copy in the Installer folder through a transform giving
+/// it a new product code (<see cref="DeclaredProductInstalledCauses.UndeclaredPackageCodeIsIt"/>).
+/// </param>
+/// <param name="DeclaredInstalledUndeclaredPackageCodeUnreadCount">
+/// Those kept where there is such an installation because their own package code would not read
+/// and they were not shown to have no Revision Number
+/// (<see cref="DeclaredProductInstalledCauses.UndeclaredPackageCodeUnread"/>).
+/// </param>
+/// <param name="SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount">
+/// Of the installations in <paramref name="SecondCopyReleasedOrdinaryCount"/>, those that kept every
+/// installation package all the same: the package code their record holds did not read as a GUID
+/// both through Windows Installer and from the registry, and their sources could not be ruled out
+/// (<see cref="CachedPackageCensus.KeptOrdinaryPackageCodeNotRuledOut"/>). Installations, not files.
 /// </param>
 public sealed record ScanInfo(
     long DurationMs,
@@ -1734,7 +1806,10 @@ public sealed record ScanInfo(
     int FilesHeldForKeysWithInstallPropertiesCount,
     int FilesHeldForKeysWithoutInstallPropertiesCount,
     int SupersededHeldForUnlistedKeyCount,
-    int UnlistedKeysWithoutInstallPropertiesListUnreadCount)
+    int UnlistedKeysWithoutInstallPropertiesListUnreadCount,
+    int DeclaredInstalledUndeclaredPackageCodeIsItCount,
+    int DeclaredInstalledUndeclaredPackageCodeUnreadCount,
+    int SecondCopyKeepOrdinaryPackageCodeNotRuledOutCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1898,7 +1973,12 @@ public sealed record ScanInfo(
             scan.UnlistedKeyHolds.WithInstallProperties,
             scan.UnlistedKeyHolds.WithoutInstallProperties,
             scan.SupersededHeldForUnlistedKeyCount,
-            scan.UnlistedKeysWithoutInstallPropertiesListUnread);
+            scan.UnlistedKeysWithoutInstallPropertiesListUnread,
+            // Schema 13: the files kept by the package code of an installation whose cached package
+            // does not say what it declares, and those installations that kept every package.
+            installedBy.UndeclaredPackageCodeIsIt,
+            installedBy.UndeclaredPackageCodeUnread,
+            cachedPackages.KeptOrdinaryPackageCodeNotRuledOut);
     }
 }
 

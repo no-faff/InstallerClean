@@ -52,11 +52,17 @@ public class AccessKeyTextTests
         var faults = new List<string>();
         using var scope = new LocalisationScope(culture);
 
+        // tryParents: false, so a label is checked as this language declares it and a
+        // language missing one fails here rather than passing on its parent's.
+        var own = Strings.ResourceManager.GetResourceSet(culture, createIfNotExists: true, tryParents: false);
+        Assert.NotNull(own);
+
         foreach (var key in new[] { "Action.DeletePermanently", "Action.Move" })
         {
             // Through Strings.Get, the door the confirmations' labels come through.
             var label = Strings.Get(key);
             Assert.False(string.IsNullOrEmpty(label), $"{cultureName}: {key} did not resolve");
+            Assert.True(own!.GetString(key) is { } declared && InstallerFolderToken.Resolve(declared) == label, $"{cultureName}: {key} is not this language's own label: \"{label}\"");
 
             // The label as shipped carries a key; a language without one would make
             // this test pass for the wrong reason.

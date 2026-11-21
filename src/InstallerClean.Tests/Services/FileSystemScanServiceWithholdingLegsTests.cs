@@ -85,6 +85,24 @@ public class FileSystemScanServiceWithholdingLegsTests
         Assert.Empty(result.RemovableFiles);
     }
 
+    [Theory]
+    [InlineData(1, 0, true)]
+    [InlineData(2, 1, true)]
+    [InlineData(1, 1, false)]
+    [InlineData(3, 3, false)]
+    public async Task A_failed_registry_read_holds_the_walk_offer_unless_every_failure_is_a_programs_own_patch_list(
+        int failures, int patchListFailures, bool withheld)
+    {
+        // A program's own Patches key records no cached file, so a failure there cannot be
+        // the only record keeping the unclaimed file.
+        var result = await Scan(new EnumerationCensus(
+            RegistryKeyReadFailures: failures, ProductPatchListReadFailures: patchListFailures));
+
+        Assert.Equal(withheld, result.WithheldBy.WholesaleCount > 0);
+        Assert.Equal(withheld ? new[] { WithholdingLeg.RegistryRecordsUnread } : Array.Empty<WithholdingLeg>(), Fired(result));
+        Assert.Equal(withheld ? 0 : 1, result.RemovableFiles.Count);
+    }
+
     // The legs the gate names for what the result carries: the two values it was computed from.
     private static IReadOnlyList<WithholdingLeg> Fired(ScanResult result) =>
         WithholdingLegs.Fired(result.Census, result.RegistrationIdentityReads);

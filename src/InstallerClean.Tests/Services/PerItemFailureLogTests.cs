@@ -14,13 +14,13 @@ namespace InstallerClean.Tests.Services;
 public class PerItemFailureLogTests
 {
     private const string MoveTrail = "The per-file list is on the completion screen.";
-    private const string ScanTrail = "The file behind each of them was kept rather than offered.";
+    private const string ScanTrail = "The file behind each of them was left alone.";
 
     /// <summary>
     /// An IOException with a chosen HRESULT, which is half the cause identity
     /// the budget de-duplicates on (the type is the other half).
     /// </summary>
-    private static IOException Io(int hresult) => new("boom") { HResult = hresult };
+    private static IOException Io(int hresult) => new("boom", hresult);
 
     [Fact]
     public void Logs_every_failure_in_full_while_within_the_budget()

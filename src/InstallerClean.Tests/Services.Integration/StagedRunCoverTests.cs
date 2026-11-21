@@ -1,11 +1,15 @@
+using System.Runtime.InteropServices;
 using InstallerClean.Cli;
 using InstallerClean.Services;
+using Microsoft.Win32.SafeHandles;
 
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// <see cref="StagedRunCover"/> against real named mutexes, with an event standing for the
-/// older copy's process: unsignalled while it runs, signalled once it has ended. Each test
+/// older copy's process: unsignalled while it runs, signalled once it has ended. Where the
+/// older copy ends holding the mutex, its stand-in is the holding thread's own handle instead
+/// (see <see cref="Holder.ThreadHandle"/>). Each test
 /// names a fresh <c>Local\</c> mutex, never <see cref="InstanceLock.Name"/>, so a copy of
 /// InstallerClean running on the machine neither fails a test nor is kept out by one.
 /// </summary>
@@ -32,14 +36,21 @@ public class StagedRunCoverTests
     [InlineData(true)]
     public void The_cover_takes_the_mutex_as_the_older_copy_lets_go_of_it_or_ends_holding_it(bool abandoned)
     {
-        using var olderCopy = new ManualResetEvent(false);
+        using var ended = new ManualResetEvent(false);
         var holder = new Holder(_name);
-        using var cover = new StagedRunCover(_name, olderCopy.SafeWaitHandle);
+        using var threadHandle = holder.ThreadHandle;
+        // Ending holding the mutex, the older copy is the holder's thread, whose handle Windows
+        // signals only once the thread has ended and the mutex is abandoned, as a process's handle
+        // is signalled only once its mutexes are. An event set after the thread is joined can be
+        // seen before the abandonment, and the cover then finds the mutex still held and is lost.
+        var olderCopy = abandoned ? threadHandle : ended.SafeWaitHandle;
+        using var cover = new StagedRunCover(_name, olderCopy);
 
         holder.End(release: !abandoned);
-        olderCopy.Set();
+        if (!abandoned) ended.Set();
 
-        Assert.True(SpinWait.SpinUntil(() => cover.Holds, Bound));
+        Assert.True(SpinWait.SpinUntil(() => cover.Holds, Bound),
+            $"The cover did not take the mutex within {Bound.TotalSeconds} s; Lost is {cover.Lost.IsCancellationRequested}.");
         Assert.True(cover.Covers());
         Assert.False(cover.Lost.IsCancellationRequested);
     }
@@ -111,12 +122,21 @@ public class StagedRunCoverTests
         private readonly ManualResetEventSlim _end = new();
         private readonly Thread _thread;
         private bool _release = true;
+        private int _openError;
+
+        /// <summary>
+        /// A handle to the holding thread, signalled once the thread has ended. Disposed with
+        /// the holder, or by a caller that keeps it past the holder.
+        /// </summary>
+        internal SafeWaitHandle ThreadHandle { get; private set; } = null!;
 
         internal Holder(string name)
         {
             using var holding = new ManualResetEventSlim();
             _thread = new Thread(() =>
             {
+                ThreadHandle = OpenThread(Synchronize, false, GetCurrentThreadId());
+                if (ThreadHandle.IsInvalid) _openError = Marshal.GetLastWin32Error();
                 var mutex = new Mutex(initiallyOwned: false, name);
                 mutex.WaitOne();
                 holding.Set();
@@ -129,7 +149,16 @@ public class StagedRunCoverTests
             }) { IsBackground = true };
             _thread.Start();
             Assert.True(holding.Wait(Bound));
+            Assert.False(ThreadHandle.IsInvalid, $"OpenThread failed with {_openError}.");
         }
+
+        private const uint Synchronize = 0x00100000;
+
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
+        private static extern SafeWaitHandle OpenThread(uint desiredAccess, bool inheritHandle, uint threadId);
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        private static extern uint GetCurrentThreadId();
 
         private static Mutex? s_abandoned;
 
@@ -143,6 +172,7 @@ public class StagedRunCoverTests
         public void Dispose()
         {
             if (_thread.IsAlive) End(release: true);
+            ThreadHandle.Dispose();
         }
     }
 

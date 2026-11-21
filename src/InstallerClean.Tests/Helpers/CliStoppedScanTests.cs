@@ -40,14 +40,16 @@ public class CliStoppedScanTests
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new LocalisedInvalidOperationException(
-                Strings.Error_ScanInstallerFolderListFailed, new UnauthorizedAccessException()));
+                Strings.Error_ScanInstallerFolderListFailed, Strings.Error_NothingOfferedNothingRemoved,
+                new UnauthorizedAccessException()));
         var delete = Substitute.For<IDeleteFilesService>();
         var move = Substitute.For<IMoveFilesService>();
 
         var (exitCode, stdout) = await Run(arg, Services(scan, delete, move));
 
         Assert.Equal(CliExitCode.Error, exitCode);
-        Assert.Contains(Strings.Error_ScanInstallerFolderListFailed, stdout);
+        Assert.Contains(
+            StopMessages.NothingOfferedNothingRemoved(Strings.Error_ScanInstallerFolderListFailed), stdout);
         // Beside the account, so the absence answers for the stop and not for a run
         // that printed nothing at all.
         Assert.DoesNotContain(Strings.Cli_FoundNoOrphans, stdout);
@@ -63,14 +65,14 @@ public class CliStoppedScanTests
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new LocalisedAccessException(Strings.Error_MsiAccessDenied));
+            .ThrowsAsync(new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved));
         var delete = Substitute.For<IDeleteFilesService>();
         var move = Substitute.For<IMoveFilesService>();
 
         var (exitCode, stdout) = await Run(arg, Services(scan, delete, move));
 
         Assert.Equal(CliExitCode.Error, exitCode);
-        Assert.Contains(Strings.Error_MsiAccessDenied, stdout);
+        Assert.Contains(StopMessages.NothingRemoved(Strings.Error_MsiAccessDenied), stdout);
         Assert.Empty(delete.ReceivedCalls());
         Assert.Empty(move.ReceivedCalls());
     }

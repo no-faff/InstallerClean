@@ -2,8 +2,14 @@
 // Checks every Strings.<code>.resx satellite against the neutral Strings.resx.
 //
 // For each satellite, fails (exit 1) if a required key is missing a translation,
-// if a key is stray (present in the satellite but not the neutral), or if a
-// translated key uses a {N} index the neutral does not provide.
+// if a key is stray (present in the satellite but not the neutral), if a
+// translated key uses a {N} index the neutral does not provide, or if a value is
+// empty. The neutral fails on an empty value too.
+//
+// AN EMPTY VALUE IS A BLANK CONTROL. The ResourceManager returns a satellite's
+// empty string as the value it found, and falls back to the neutral only for a
+// key that is absent, so an emptied value draws nothing in that language. A value
+// of spaces alone is empty in the same way, and so is <value />.
 //
 // THE PLACEHOLDER RULE IS ONE-WAY, BECAUSE THE RUNTIME IS. A satellite naming an
 // index the neutral does not provide is handed too few arguments and throws
@@ -85,10 +91,16 @@ const parseControl = (file, xml, parsed) => {
 const parse = (file) => {
   const xml = readFileSync(`${dir}/${file}`, 'utf8');
   const map = new Map();
-  const re = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g;
+  // A <value /> is read as an empty value, and a <data> with no <value> at all as
+  // one too: the ResourceManager reads both as the empty string.
+  const re = /<data\s+name="([^"]+)"[^>]*?(?:\/>|>([\s\S]*?)<\/data>)/g;
   let m;
   while ((m = re.exec(xml)) !== null) {
-    const placeholders = new Set([...m[2].matchAll(/\{(\d+)\}/g)].map((p) => p[1]));
+    const body = m[2] ?? '';
+    const value = /<value>([\s\S]*?)<\/value>/.exec(body)?.[1] ?? '';
+    const placeholders = new Set([...value.matchAll(/\{(\d+)\}/g)].map((p) => p[1]));
+    const text = value.replace(/&#x([0-9a-fA-F]+);|&#(\d+);/g, (_, hex, dec) => String.fromCodePoint(parseInt(hex ?? dec, hex ? 16 : 10)));
+    if (/^\s*$/.test(text)) empties.set(`${file}\u0000${m[1]}`, true);
     map.set(m[1], placeholders);
   }
   // The RETAINED size rather than a match counter, and the difference is real: two
@@ -100,7 +112,11 @@ const parse = (file) => {
   return map;
 };
 
+const empties = new Map(); // file \0 key -> true, for every empty value read
 const neutral = parse('Strings.resx');
+const isEmpty = (file, key) => empties.has(`${file}\u0000${key}`);
+const neutralEmpty = [...neutral.keys()].filter((k) => isEmpty('Strings.resx', k));
+for (const k of neutralEmpty) console.error(`resx parity FAILED for Strings.resx: EMPTY: ${k}`);
 
 const isCliKey = (key) => key.startsWith('Cli.');
 // Machine-read CLI lines are forced English at the emit site, so a satellite may
@@ -132,7 +148,7 @@ if (satellites.length === 0) {
   process.exit(0);
 }
 
-let failed = false;
+let failed = neutralEmpty.length > 0;
 const nonCli = [...neutral.keys()].filter((k) => !isCliKey(k)).length;
 const humanCli = [...neutral.keys()].filter(isHumanCliKey).length;
 
@@ -144,7 +160,7 @@ const humanCli = [...neutral.keys()].filter(isHumanCliKey).length;
 //
 // ADDITIVE ONLY. This changes nothing about what passes or fails. The exit code is
 // still decided by `failed`, set exactly where it always was.
-const tally = { files: 0, missing: 0, placeholder: 0, stray: 0, override: 0 };
+const tally = { files: 0, missing: 0, placeholder: 0, stray: 0, override: 0, empty: neutralEmpty.length };
 
 // NAMED, NOT COUNTED. This half is reported rather than failed, so the list is its
 // whole trace, and a number on its own is compatible with the check having answered
@@ -173,6 +189,7 @@ for (const file of satellites) {
   }
 
   for (const key of sat.keys()) {
+    if (isEmpty(file, key)) errors.push(`EMPTY: ${key}`);
     if (neutral.has(key)) continue;
     // Tying an override to a form the neutral really holds is what tells one from
     // a stray, and what still catches a key whose prefix is a typo.
@@ -206,6 +223,7 @@ for (const file of satellites) {
     tally.files += 1;
     for (const e of errors) {
       const kind = e.startsWith('MISSING') ? 'missing'
+        : e.startsWith('EMPTY') ? 'empty'
         : e.startsWith('STRAY') ? 'stray'
         : e.startsWith('PLACEHOLDER override') ? 'override'
         : 'placeholder';
@@ -231,7 +249,7 @@ if (neutralOnly.length) {
 console.log(
   `TOTALS: ${satellites.length} satellite(s) checked, ${tally.files} failed, `
   + `${tally.missing} missing, ${tally.placeholder} unprovided placeholder(s), `
-  + `${tally.stray} stray, ${tally.override} placeholder override(s), `
+  + `${tally.stray} stray, ${tally.override} placeholder override(s), ${tally.empty} empty, `
   + `${neutralOnly.length} neutral-only placeholder(s) reported.`);
 
 process.exit(failed ? 1 : 0);

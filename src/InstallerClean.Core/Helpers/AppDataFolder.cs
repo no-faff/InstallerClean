@@ -23,8 +23,8 @@ namespace InstallerClean.Helpers;
 /// </remarks>
 internal static class AppDataFolder
 {
-    private const string FolderName = "InstallerClean";
-    private const string EarlierParentName = "NoFaff";
+    internal const string FolderName = "InstallerClean";
+    internal const string EarlierParentName = "NoFaff";
 
     // Twice CrashLog.MaxBytes, the size at which a write first moves the log aside to its
     // archive. An earlier log past this is not added to the kept one.
@@ -95,7 +95,7 @@ internal static class AppDataFolder
     /// </remarks>
     internal static Settled Settle(string localAppData)
     {
-        var current = Path.Combine(localAppData, FolderName);
+        var current = PathText.Combine(localAppData, FolderName);
 
         // No profile folder to answer from, which KnownFolders reports as an empty
         // string. The relative path is returned as the callers would build it, and
@@ -103,16 +103,16 @@ internal static class AppDataFolder
         if (string.IsNullOrEmpty(localAppData))
             return new Settled(current, null);
 
-        var parent = Path.Combine(localAppData, EarlierParentName);
-        var earlier = Path.Combine(parent, FolderName);
+        var parent = PathText.Combine(localAppData, EarlierParentName);
+        var earlier = PathText.Combine(parent, FolderName);
         var failures = new List<Exception>();
 
         try
         {
             if (!IsPlainFolder(parent, failures))
-                return Answer(Directory.Exists(earlier) ? earlier : current, failures);
+                return Answer(FrameworkDirectory.Exists(earlier) ? earlier : current, failures);
 
-            if (!Directory.Exists(earlier))
+            if (!FrameworkDirectory.Exists(earlier))
             {
                 RemoveIfEmpty(parent);
                 return Answer(current, failures);
@@ -121,11 +121,11 @@ internal static class AppDataFolder
             if (!IsPlainFolder(earlier, failures) || !IsPlainFolder(current, failures))
                 return Answer(earlier, failures);
 
-            if (!Directory.Exists(current))
+            if (!FrameworkDirectory.Exists(current))
             {
                 try
                 {
-                    Directory.Move(earlier, current);
+                    FrameworkDirectory.Move(earlier, current);
                     RemoveIfEmpty(parent);
                     return Answer(current, failures);
                 }
@@ -135,9 +135,9 @@ internal static class AppDataFolder
                     // in between. Where neither happened the rename was refused, by a
                     // file held open inside the folder for one, and every file is still
                     // where it was.
-                    if (!Directory.Exists(earlier))
+                    if (!FrameworkDirectory.Exists(earlier))
                         return Answer(current, failures);
-                    if (!Directory.Exists(current))
+                    if (!FrameworkDirectory.Exists(current))
                     {
                         failures.Add(ex);
                         return Answer(earlier, failures);
@@ -157,7 +157,7 @@ internal static class AppDataFolder
             // Whatever this was, the answer is the folder the files are in now.
             failures.Add(ex);
             string folder;
-            try { folder = Directory.Exists(current) || !Directory.Exists(earlier) ? current : earlier; }
+            try { folder = FrameworkDirectory.Exists(current) || !FrameworkDirectory.Exists(earlier) ? current : earlier; }
             catch { folder = earlier; }
             return Answer(folder, failures);
         }
@@ -187,18 +187,18 @@ internal static class AppDataFolder
 
     private static void Merge(string earlier, string current, List<Exception> failures)
     {
-        foreach (var entry in Directory.EnumerateFileSystemEntries(earlier))
+        foreach (var entry in FrameworkDirectory.EnumerateFileSystemEntries(earlier))
         {
-            var name = Path.GetFileName(entry);
+            var name = PathText.GetFileName(entry);
             if (StorageHelpers.CheckReparsePoint(entry, out var error) != StorageHelpers.ReparseCheck.No)
             {
                 if (error is not null) failures.Add(error);
                 continue;
             }
-            if (Directory.Exists(entry))
+            if (FrameworkDirectory.Exists(entry))
                 continue;
 
-            var target = Path.Combine(current, name);
+            var target = PathText.Combine(current, name);
             try
             {
                 File.Move(entry, target, overwrite: false);
@@ -208,9 +208,9 @@ internal static class AppDataFolder
             {
                 // A file of this name already in the new folder is the clash handled
                 // below; anything else leaves this one where it is for the next start.
-                if (!File.Exists(target))
+                if (!FrameworkFile.Exists(target))
                 {
-                    if (File.Exists(entry)) failures.Add(ex);
+                    if (FrameworkFile.Exists(entry)) failures.Add(ex);
                     continue;
                 }
             }
@@ -220,7 +220,7 @@ internal static class AppDataFolder
                 if (name.Equals(CrashLog.FileName, StringComparison.OrdinalIgnoreCase))
                     AppendEarlierLog(entry, target, failures);
                 else
-                    File.Delete(entry);
+                    FrameworkFile.Delete(entry);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -247,7 +247,7 @@ internal static class AppDataFolder
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // Another process claimed it, or it went; either way it is not this one's.
-            if (File.Exists(earlierLog)) failures.Add(ex);
+            if (FrameworkFile.Exists(earlierLog)) failures.Add(ex);
             return;
         }
 
@@ -277,7 +277,7 @@ internal static class AppDataFolder
                 failures.Add(new IOException("The kept crash log could not be opened to add the earlier one's entries."));
                 return;
             }
-            using var fs = new FileStream(write, FileAccess.Write, bufferSize: 0);
+            using var fs = StorageHelpers.UnbufferedWriter(write);
 
             // An empty kept log takes the earlier one whole, header and mark included,
             // as its own first write would have.
@@ -287,7 +287,7 @@ internal static class AppDataFolder
             fs.Write(payload, 0, payload.Length);
         }
 
-        File.Delete(claimed);
+        FrameworkFile.Delete(claimed);
     }
 
     /// <summary>
@@ -320,8 +320,8 @@ internal static class AppDataFolder
         {
             if (StorageHelpers.CheckReparsePoint(folder, out _) != StorageHelpers.ReparseCheck.No)
                 return;
-            if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
-                Directory.Delete(folder, recursive: false);
+            if (FrameworkDirectory.Exists(folder) && !FrameworkDirectory.EnumerateFileSystemEntries(folder).Any())
+                FrameworkDirectory.Delete(folder);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

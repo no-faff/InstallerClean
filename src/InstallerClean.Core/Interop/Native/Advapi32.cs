@@ -1,13 +1,11 @@
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for advapi32.dll, through the same source-generated
-/// <see cref="LibraryImportAttribute"/> stubs as <see cref="Kernel32"/>.
+/// P/Invoke surface for advapi32.dll, declared as <see cref="Kernel32"/>'s are.
 /// </summary>
-internal static partial class Advapi32
+internal static class Advapi32
 {
     private const string Library = "advapi32.dll";
 
@@ -16,10 +14,9 @@ internal static partial class Advapi32
     /// is allocated with LocalAlloc and the caller frees it with
     /// <see cref="Kernel32.LocalFree"/>.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW",
-                   SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool ConvertStringSecurityDescriptorToSecurityDescriptor(
+    public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor(
         string stringSecurityDescriptor,
         uint stringSdRevision,
         out IntPtr securityDescriptor,
@@ -39,8 +36,8 @@ internal static partial class Advapi32
     /// the handle already names, so a folder put in its place under the same name
     /// afterwards does not change what comes back.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetSecurityInfo")]
-    public static partial uint GetSecurityInfo(
+    [DllImport(Library, EntryPoint = "GetSecurityInfo", ExactSpelling = true)]
+    public static extern uint GetSecurityInfo(
         Microsoft.Win32.SafeHandles.SafeFileHandle handle,
         int ObjectType,
         uint SecurityInfo,
@@ -51,9 +48,9 @@ internal static partial class Advapi32
         out IntPtr ppSecurityDescriptor);
 
     /// <summary>Reads a descriptor's control flags, for the protected-list bit.</summary>
-    [LibraryImport(Library, EntryPoint = "GetSecurityDescriptorControl", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetSecurityDescriptorControl", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetSecurityDescriptorControl(
+    public static extern bool GetSecurityDescriptorControl(
         IntPtr pSecurityDescriptor,
         out ushort pControl,
         out uint lpdwRevision);
@@ -63,19 +60,104 @@ internal static partial class Advapi32
     /// a list, into the list's own memory. The entry is read before the descriptor it
     /// belongs to is freed.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetAce", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetAce", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetAce(IntPtr pAcl, uint dwAceIndex, out IntPtr pAce);
+    public static extern bool GetAce(IntPtr pAcl, uint dwAceIndex, out IntPtr pAce);
 
     /// <summary>
     /// Writes a SID as its canonical string form (S-1-...), into memory the caller
     /// frees with <see cref="Kernel32.LocalFree"/>. The string is a stable name for a
     /// SID, which is why two SIDs are compared through it here rather than byte by byte.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "ConvertSidToStringSidW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "ConvertSidToStringSidW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool ConvertSidToStringSid(IntPtr Sid, out IntPtr StringSid);
+    public static extern bool ConvertSidToStringSid(IntPtr Sid, out IntPtr StringSid);
+
+    /// <summary>
+    /// Opens the subkey <paramref name="lpSubKey"/> names under <paramref name="hKey"/> with
+    /// the access <paramref name="samDesired"/> asks for, writing its handle into
+    /// <paramref name="phkResult"/>, which the caller closes. Answers ERROR_SUCCESS,
+    /// ERROR_FILE_NOT_FOUND where there is no such key, or another Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegOpenKeyExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegOpenKeyEx(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        string lpSubKey,
+        int ulOptions,
+        int samDesired,
+        out IntPtr phkResult);
+
+    /// <summary>
+    /// Reads how many subkeys and values an open key holds. Every other count, length
+    /// and time it can answer is passed as null and not read. Answers ERROR_SUCCESS or
+    /// a Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegQueryInfoKeyW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegQueryInfoKey(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        IntPtr lpClass,
+        IntPtr lpcchClass,
+        IntPtr lpReserved,
+        out uint lpcSubKeys,
+        IntPtr lpcbMaxSubKeyLen,
+        IntPtr lpcbMaxClassLen,
+        out uint lpcValues,
+        IntPtr lpcbMaxValueNameLen,
+        IntPtr lpcbMaxValueLen,
+        IntPtr lpcbSecurityDescriptor,
+        IntPtr lpftLastWriteTime);
+
+    /// <summary>
+    /// Writes the name of the subkey at <paramref name="dwIndex"/> into
+    /// <paramref name="lpName"/>, and its length in characters, without the terminator,
+    /// into <paramref name="lpcchName"/>, which goes in as the buffer's size. Answers
+    /// ERROR_SUCCESS, ERROR_NO_MORE_ITEMS past the last subkey, ERROR_MORE_DATA where the
+    /// name does not fit, or another Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegEnumKeyExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegEnumKeyEx(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        uint dwIndex,
+        [Out] char[] lpName,
+        ref uint lpcchName,
+        IntPtr lpReserved,
+        IntPtr lpClass,
+        IntPtr lpcchClass,
+        IntPtr lpftLastWriteTime);
+
+    /// <summary>
+    /// Writes the name of the value at <paramref name="dwIndex"/> into
+    /// <paramref name="lpValueName"/>, as <see cref="RegEnumKeyEx"/> writes a subkey's,
+    /// with the value's type and data passed as null and not read. Answers as
+    /// <see cref="RegEnumKeyEx"/> does.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegEnumValueW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegEnumValue(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        uint dwIndex,
+        [Out] char[] lpValueName,
+        ref uint lpcchValueName,
+        IntPtr lpReserved,
+        IntPtr lpType,
+        IntPtr lpData,
+        IntPtr lpcbData);
+
+    /// <summary>
+    /// Writes the type and the data of the value <paramref name="lpValueName"/> names,
+    /// the default value where it is null, into <paramref name="lpType"/> and
+    /// <paramref name="lpData"/>, and the data's length in bytes into
+    /// <paramref name="lpcbData"/>, which goes in as the buffer's size. Answers
+    /// ERROR_SUCCESS, ERROR_MORE_DATA where the data does not fit, with the length it
+    /// needs, ERROR_FILE_NOT_FOUND where there is no such value, or another Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegQueryValueExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegQueryValueEx(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        string? lpValueName,
+        IntPtr lpReserved,
+        out int lpType,
+        [Out] byte[] lpData,
+        ref int lpcbData);
 
     /// <summary>OWNER_SECURITY_INFORMATION: ask for the owner.</summary>
     public const uint OWNER_SECURITY_INFORMATION = 0x00000001;

@@ -1,23 +1,32 @@
-# Builds the four release downloads on a trusted build system and has SignPath
-# sign them.
+# Builds the four release downloads on GitHub's Windows runner, unsigned, or
+# signed by SignPath when the signing_policy input asks for it.
 #
 # WHY THIS EXISTS AT ALL, because it looks like a duplicate of ci.yml and is not.
-# SignPath's release policy verifies the ORIGIN of what it signs: it will only
-# put a signature on a binary that a named CI run produced from a named commit in
-# this repository. A binary built anywhere else cannot be signed under that
-# policy however good it is. So the release build moves here, and the signature
-# is what pays for the move.
+# It is the one build of the release: the merged net48 exes CI builds on every
+# push, the setup compiled around them, and build-provenance.txt recording the
+# commit, the SDK, the shape and the hash of each download. SignPath's release
+# policy also verifies the ORIGIN of what it signs: it will only put a signature
+# on a binary that a named CI run produced from a named commit in this
+# repository, so a signed release can only be built here.
+#
+# UNSIGNED IS THE DEFAULT. signing_policy=unsigned skips both signing rounds and
+# compiles the setup as CI does, with an unsigned uninstaller. release-signing
+# needs a release certificate in SignPath; test-signing proves the signing
+# plumbing and what it produces is never published. The release script accepts
+# release-signing and unsigned, and reads each download's signature against the
+# policy recorded here.
 #
 # WHAT IT DELIBERATELY DOES NOT DO. It publishes nothing: no tag, no release, no
 # upload to any channel. It leaves a `publish/` folder as a workflow artifact,
-# laid out exactly as a local Stage-1 build leaves one, including
-# build-provenance.txt. The release is still cut by hand from that folder, so
+# the four downloads and build-provenance.txt, laid out as the release script
+# reads it. The release is still cut by hand from that folder, so
 # every gate that sits between building and publishing stays where it is and
 # still has to be passed. The one that matters most is the malware scan, which
-# has to run on the SIGNED bytes: a signature changes the file, and a scan of the
-# unsigned build says nothing about what people will download.
+# runs on the files in this artifact. A signed release is scanned on its SIGNED
+# bytes: a signature changes the file, and a scan of the unsigned build says
+# nothing about what people will download.
 #
-# THE TWO SIGNING ROUNDS ARE NOT AN ACCIDENT OF LAYOUT. The setup carries the
+# WHEN IT SIGNS, THE TWO SIGNING ROUNDS ARE NOT AN ACCIDENT OF LAYOUT. The setup carries the
 # portable GUI, the command-line tool and Inno Setup's own uninstaller inside it,
 # so those three are signed first, the setup is compiled around the signed
 # copies, and the setup is then signed in its own right. Signing only the setup
@@ -35,20 +44,13 @@ on:
   workflow_dispatch:
     inputs:
       signing_policy:
-        description: 'Signing policy. release-signing is the real one; test-signing proves the plumbing and must never be published.'
+        description: 'Signing policy. unsigned builds the downloads with no signature; release-signing has SignPath sign them with the release certificate; test-signing proves the plumbing and must never be published.'
         type: choice
         options:
+          - unsigned
           - release-signing
           - test-signing
-        default: release-signing
-      gui_compression:
-        description: 'Compress the single-file GUI builds'
-        type: boolean
-        default: true
-      cli_compression:
-        description: 'Compress the single-file command-line build'
-        type: boolean
-        default: true
+        default: unsigned
 
 # actions: read is what lets SignPath's connector fetch the uploaded artifact
 # through the workflow token. contents: read is the default and is kept explicit
@@ -150,31 +152,37 @@ jobs:
       - name: Test
         run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true
 
-      # The three publishes below are the shapes that ship, flags and all. They
-      # are the release script's own, and CI smoke-publishes the same shapes on
-      # every push; if any of the three lines drift apart, the README's promise
-      # that a reader can rebuild a tag and compare hashes stops being true.
+      # The two merges below are the shapes that ship. They are the release
+      # script's own, and CI builds the same shapes on every push; if the lines
+      # drift apart, the README's promise that a reader can rebuild a tag and
+      # compare hashes stops being true, which rests on ILRepack being
+      # reproducible across runs.
       #
-      # Compression is on by default because it roughly halves a download whose
-      # whole audience is wary of what they are running. It is an input rather
-      # than a constant for one reason: where a scan flags the compressed build
-      # and the uncompressed build of the same source comes back clean, the
-      # uncompressed shape ships that release. It does not carry forward.
-      - name: Publish the command-line tool
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=${{ inputs.cli_compression }} --nologo -o publish/cli
+      # .NET Framework has no single-file publish, so each copy is one exe the
+      # OneFile merge makes (Directory.Build.targets): a Release build with every
+      # assembly it references folded in by ILRepack. There is one window exe; the
+      # portable and the slim download are that same file under two names, so no
+      # separate slim build. The merge has no compression knob, and a plain net48
+      # exe is not the self-extracting shape a scan might flag, so the compression
+      # inputs are gone.
+      - name: Merge the command-line tool into one file
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
 
-      - name: Publish the portable GUI
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=${{ inputs.gui_compression }} --nologo -o publish/self-contained
+      - name: Merge the window into one file
+        run: dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
 
-      # PublishSelfContained=false is the property that actually disables the
-      # "PublishSingleFile implies SelfContained" rule; --self-contained false
-      # sets a different one and .NET 10 no longer takes it, which packs the
-      # whole WPF runtime into a build meant to be a small launcher.
-      # SelfContained is written into the app (InstallerClean.csproj), false here
-      # and true on the portable, and the app reads it to know which of the two it
-      # is when it updates itself.
-      - name: Publish the slim GUI
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true --nologo -o publish/framework-dependent
+      # A copy updates by replacing its own exe only where it is the whole app, which it
+      # decides from AppCopy being in the exe's own assembly. Read from what ships, before
+      # the signing rounds, as the step below is.
+      - name: Check each merged exe is the whole app
+        shell: pwsh
+        run: ./scripts/check-one-file.ps1
+
+      # Each merged exe as it ships: AMD64, PE32+, IL only, and no request or preference for a
+      # 32-bit process.
+      - name: Check each merged exe is a 64-bit x64 image
+        shell: pwsh
+        run: ./scripts/check-architecture.ps1
 
       # THE GUARDS ABOVE READ SOURCES AND THIS ONE READS WHAT WAS JUST BUILT, so
       # it runs here rather than in the glob, which is why it is invoked by name.
@@ -193,15 +201,34 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup --version=6.7.1 --no-progress -y
 
+      # Unsigned, the setup is compiled once around the merged exes, with
+      # UninstallerSignatureDir left undefined, so it embeds an unsigned
+      # uninstaller: the compile CI runs on every push.
+      - name: Compile the installer around the unsigned executables
+        if: inputs.signing_policy == 'unsigned'
+        run: |
+          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
+                  Select-Object -First 1 -ExpandProperty FullName
+          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
+                     Where-Object { $_ } | Select-Object -First 1
+          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
+          & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
+
       # THE FIRST SIGNING ROUND. The three exes go up under distinct names
       # because two of them are called InstallerClean.exe, and they come back
-      # into the folders the compile step reads from.
+      # into the folders the compile step reads from. The portable and the slim
+      # are the same merged window exe under two names, staged and signed both,
+      # so 3.5.0+ copies updating from either download get a signed exe; two
+      # signatures of the same bytes differ only by timestamp.
       - name: Stage the executables for signing
+        if: inputs.signing_policy != 'unsigned'
         run: |
           New-Item -ItemType Directory -Force -Path signing/executables | Out-Null
-          Copy-Item publish/self-contained/InstallerClean.exe      signing/executables/InstallerClean-portable.exe
-          Copy-Item publish/framework-dependent/InstallerClean.exe signing/executables/InstallerClean-slim.exe
-          Copy-Item publish/cli/installerclean-cli.exe             signing/executables/installerclean-cli.exe
+          Copy-Item publish/window/InstallerClean.exe  signing/executables/InstallerClean-portable.exe
+          Copy-Item publish/window/InstallerClean.exe  signing/executables/InstallerClean-slim.exe
+          Copy-Item publish/cli/installerclean-cli.exe signing/executables/installerclean-cli.exe
 
       # THE UNINSTALLER GOES UP IN THE SAME ROUND. Defining
       # UninstallerSignatureDir tells the script to embed a signed uninstaller,
@@ -215,6 +242,7 @@ jobs:
       # configuration in SignPath lists; renaming it here without changing the
       # configuration fails the signing request.
       - name: Write out the uninstaller for signing
+        if: inputs.signing_policy != 'unsigned'
         run: |
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
@@ -236,6 +264,7 @@ jobs:
           exit 0
 
       - name: Upload the executables for signing
+        if: inputs.signing_policy != 'unsigned'
         id: upload-executables
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -256,6 +285,7 @@ jobs:
       # The job runs on a GitHub-hosted runner, which their open-source tier
       # requires of every job leading up to a signing request.
       - name: Sign the executables
+        if: inputs.signing_policy != 'unsigned'
         id: sign-executables
         uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
         with:
@@ -281,6 +311,7 @@ jobs:
       # only if it is that file with a signature appended and nothing else
       # changed, so a request that altered it stops the compile below.
       - name: Put the signed executables back
+        if: inputs.signing_policy != 'unsigned'
         run: |
           $expected = @(
             'signing/signed-executables/InstallerClean-portable.exe',
@@ -297,12 +328,12 @@ jobs:
           }
           $unsigned = @(Get-ChildItem signing/uninstaller -Filter 'uninst-*.e32')
           if ($unsigned.Count -ne 1) { throw "Expected one uninst-*.e32 in signing/uninstaller and found $($unsigned.Count)." }
-          Copy-Item signing/signed-executables/InstallerClean-portable.exe    publish/self-contained/InstallerClean.exe      -Force
-          Copy-Item signing/signed-executables/InstallerClean-slim.exe        publish/framework-dependent/InstallerClean.exe -Force
-          Copy-Item signing/signed-executables/installerclean-cli.exe         publish/cli/installerclean-cli.exe             -Force
-          Copy-Item signing/signed-executables/InstallerClean-uninstaller.exe $unsigned[0].FullName                          -Force
+          Copy-Item signing/signed-executables/InstallerClean-portable.exe    publish/window/InstallerClean.exe  -Force
+          Copy-Item signing/signed-executables/installerclean-cli.exe         publish/cli/installerclean-cli.exe -Force
+          Copy-Item signing/signed-executables/InstallerClean-uninstaller.exe $unsigned[0].FullName              -Force
 
       - name: Compile the installer around the signed executables and uninstaller
+        if: inputs.signing_policy != 'unsigned'
         run: |
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
@@ -316,6 +347,7 @@ jobs:
 
       # THE SECOND SIGNING ROUND, the setup on its own.
       - name: Stage the setup for signing
+        if: inputs.signing_policy != 'unsigned'
         run: |
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
                      Where-Object { $_ } | Select-Object -First 1
@@ -323,6 +355,7 @@ jobs:
           Copy-Item "publish/InstallerClean-$version-setup.exe" signing/setup/
 
       - name: Upload the setup for signing
+        if: inputs.signing_policy != 'unsigned'
         id: upload-setup
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -332,6 +365,7 @@ jobs:
           retention-days: 1
 
       - name: Sign the setup
+        if: inputs.signing_policy != 'unsigned'
         id: sign-setup
         uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
         with:
@@ -372,25 +406,37 @@ jobs:
       # under the tag v<version> (AppCopy in InstallerClean.Core), so a change to
       # any of them leaves them unable to.
       # scripts/check-download-names.mjs holds this step to AppCopy.
+      #
+      # Signed, the portable is the signed window exe, the slim the same exe
+      # signed under its own name (still in the signing folder), the command line
+      # the signed command line and the setup the signed setup. Unsigned, the
+      # portable and the slim are the merged window exe itself, the same bytes
+      # under two names, and the setup is where the compile wrote it.
       - name: Collect the four downloads
         run: |
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
                      Where-Object { $_ } | Select-Object -First 1
-          Copy-Item "signing/signed-setup/InstallerClean-$version-setup.exe" "publish/InstallerClean-$version-setup.exe" -Force
-          Copy-Item publish/self-contained/InstallerClean.exe      publish/InstallerClean-portable.exe
-          Copy-Item publish/framework-dependent/InstallerClean.exe publish/InstallerClean-slim.exe
-          Copy-Item publish/cli/installerclean-cli.exe             publish/installerclean-cli.exe
+          $signed = '${{ inputs.signing_policy }}' -ne 'unsigned'
+          if ($signed) {
+            Copy-Item "signing/signed-setup/InstallerClean-$version-setup.exe" "publish/InstallerClean-$version-setup.exe" -Force
+          }
+          $slim = if ($signed) { 'signing/signed-executables/InstallerClean-slim.exe' } else { 'publish/window/InstallerClean.exe' }
+          Copy-Item publish/window/InstallerClean.exe  publish/InstallerClean-portable.exe
+          Copy-Item $slim                              publish/InstallerClean-slim.exe
+          Copy-Item publish/cli/installerclean-cli.exe publish/installerclean-cli.exe
           # The same question asked of what will actually be published, after
           # the copies rather than before them, so a mis-copy is caught here as
-          # well as a missing signature.
+          # well as a signature that does not match the policy.
           foreach ($f in @(
             "publish/InstallerClean-$version-setup.exe",
             'publish/InstallerClean-portable.exe',
             'publish/InstallerClean-slim.exe',
             'publish/installerclean-cli.exe')) {
+            if (-not (Test-Path $f)) { throw "Missing $f" }
             $sig = Get-AuthenticodeSignature $f
-            if (-not $sig.SignerCertificate) { throw "$f is not signed." }
-            Write-Host "  $(Split-Path $f -Leaf): $($sig.SignerCertificate.Subject)"
+            if ($signed -and -not $sig.SignerCertificate) { throw "$f is not signed." }
+            if (-not $signed -and $sig.SignerCertificate) { throw "$f carries a signature from $($sig.SignerCertificate.Subject) in an unsigned build." }
+            Write-Host "  $(Split-Path $f -Leaf): $(if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { 'unsigned' })"
           }
 
       # AN INSTALLED UNINSTALLER ONLY EXISTS ONCE THE SETUP HAS RUN, so the
@@ -398,7 +444,8 @@ jobs:
       # folder of the runner's own, and the uninstaller it leaves is asked for
       # its signer. The compiler refuses a signed file that is not the
       # uninstaller it built; this checks the other end, that what lands on a
-      # machine carries the same certificate as the setup that put it there.
+      # machine carries the same certificate as the setup that put it there,
+      # and, unsigned, that the setup installs and its uninstaller carries none.
       - name: Install the setup and ask the installed uninstaller for its signer
         run: |
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
@@ -415,6 +462,11 @@ jobs:
           if ($uninstallers.Count -ne 1) { throw "Expected one uninstaller in $dir and found $($uninstallers.Count)." }
           $setupSig = Get-AuthenticodeSignature $setup
           $uninstallerSig = Get-AuthenticodeSignature $uninstallers[0].FullName
+          if ('${{ inputs.signing_policy }}' -eq 'unsigned') {
+            if ($uninstallerSig.SignerCertificate) { throw "The installed $($uninstallers[0].Name) is signed by $($uninstallerSig.SignerCertificate.Subject) in an unsigned build." }
+            Write-Host "  $($uninstallers[0].Name): unsigned"
+            exit 0
+          }
           if (-not $uninstallerSig.SignerCertificate) { throw "The installed $($uninstallers[0].Name) is not signed." }
           if ($uninstallerSig.SignerCertificate.Thumbprint -ne $setupSig.SignerCertificate.Thumbprint) {
             throw "The installed $($uninstallers[0].Name) is signed by $($uninstallerSig.SignerCertificate.Subject), not by the setup's certificate."
@@ -424,20 +476,19 @@ jobs:
       # build-provenance.txt is what the release script reads before it tags: it
       # refuses to tag when the recorded commit is not in the repository, when a
       # build input has moved since, or when a published file's hash disagrees
-      # with the one recorded here. Written in the same shape a local build
-      # writes it, with LF endings and no BOM, because it is parsed on Linux and
-      # a stray carriage return turns a good commit into an unknown one.
-      #
-      # A CI build has no dirty line to write. It builds a commit rather than a
-      # working tree, which is the whole reason the check exists.
+      # with the one recorded here, and it reads signing_policy against each
+      # file's signature. Written with LF endings and no BOM, because it is
+      # parsed on Linux and a stray carriage return turns a good commit into an
+      # unknown one. There is no dirty line to write: the build is of a commit,
+      # never a working tree.
       - name: Record what was built
         run: |
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
                      Where-Object { $_ } | Select-Object -First 1
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
-          $guiShape = 'self-contained, single-file, ' + $(if ('${{ inputs.gui_compression }}' -eq 'true') { 'compression on' } else { 'compression off' })
-          $cliShape = 'self-contained, single-file, ' + $(if ('${{ inputs.cli_compression }}' -eq 'true') { 'compression on' } else { 'compression off' })
+          $guiShape = 'net48, one file (ILRepack)'
+          $cliShape = 'net48, one file (ILRepack)'
           $artefacts = [ordered]@{
             setup    = "InstallerClean-$version-setup.exe"
             portable = 'InstallerClean-portable.exe'
@@ -450,7 +501,7 @@ jobs:
             "dotnet_sdk=$((& dotnet --version).Trim())",
             "publish_portable=$guiShape",
             "publish_cli=$cliShape",
-            "publish_slim=framework-dependent, single-file",
+            "publish_slim=net48, one file (ILRepack), the portable exe under the slim name",
             "signing_policy=${{ inputs.signing_policy }}",
             "build_run=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           )
@@ -468,7 +519,12 @@ jobs:
       - name: Summarise the build
         run: |
           $policy = '${{ inputs.signing_policy }}'
-          if ($policy -ne 'release-signing') {
+          if ($policy -eq 'unsigned') {
+            Add-Content $env:GITHUB_STEP_SUMMARY "## Unsigned"
+            Add-Content $env:GITHUB_STEP_SUMMARY ""
+            Add-Content $env:GITHUB_STEP_SUMMARY "These files carry no signature."
+            Add-Content $env:GITHUB_STEP_SUMMARY ""
+          } elseif ($policy -ne 'release-signing') {
             Add-Content $env:GITHUB_STEP_SUMMARY "## Signed with **$policy**, not for publication"
             Add-Content $env:GITHUB_STEP_SUMMARY ""
             Add-Content $env:GITHUB_STEP_SUMMARY "These files carry a test signature. They prove the pipeline runs. Do not publish them."

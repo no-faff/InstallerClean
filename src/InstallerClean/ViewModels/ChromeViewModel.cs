@@ -40,20 +40,20 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// non-executable for the duration, so the pill's disabled paint
     /// doubles as the feedback.
     /// </summary>
-    private static readonly TimeSpan CheckForUpdatesCooldown = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan CheckForUpdatesCooldown = Durations.FromSeconds(5);
 
     /// <summary>
     /// How long the Copy button beside Scoop's update command reads "Copied" once the
     /// command is on the clipboard, before it reads Copy again.
     /// </summary>
-    private static readonly TimeSpan ScoopUpdateCopiedFor = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan ScoopUpdateCopiedFor = Durations.FromSeconds(2);
 
     /// <summary>
     /// How long a check that has found a newer version waits for that release's
     /// update.json before it shows the notice. Past it, the notice offers Update now,
     /// whose own read decides.
     /// </summary>
-    private static readonly TimeSpan RequirementsBound = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan RequirementsBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// How long from its start the automatic check has to show what it found, read
@@ -484,7 +484,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
                 // bound unless that is no limit.
                 var remaining = _automaticCheckWindow - sinceStart.Elapsed;
                 var left = remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
-                var within = IAppUpdater.IsNoLimit(_requirementsBound) || left < _requirementsBound
+                var within = AppUpdater.IsNoLimit(_requirementsBound) || left < _requirementsBound
                     ? left
                     : _requirementsBound;
                 var requirements = await RequirementsAsync(available.LatestVersion, within, token);
@@ -558,7 +558,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
         try
         {
-            await Task.Delay(_checkCooldown, token);
+            await FrameworkTask.Delay(_checkCooldown, token);
         }
         catch (OperationCanceledException)
         {
@@ -775,7 +775,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
         try
         {
-            await Task.Delay(_scoopUpdateCopiedFor, token);
+            await FrameworkTask.Delay(_scoopUpdateCopiedFor, token);
         }
         catch (OperationCanceledException)
         {

@@ -29,11 +29,10 @@ internal static class HandOverContract
     /// How long the copy that started the newer version waits for it to set the event
     /// before it ends the newer version and puts itself back. The wait ends at once where
     /// the newer version ends, so only a newer version that hangs reaches it. A first start
-    /// is the slowest: a self-contained build writes out its native libraries the first
-    /// time it runs, and an antivirus looks at a program it has not seen before. A bound
-    /// a healthy start can reach fails the update on every attempt on that PC.
+    /// is the slowest, because an antivirus looks at a program it has not seen before. A
+    /// bound a healthy start can reach fails the update on every attempt on that PC.
     /// </summary>
-    internal static readonly TimeSpan StartBound = TimeSpan.FromSeconds(60);
+    internal static readonly TimeSpan StartBound = Durations.FromSeconds(60);
 
     /// <summary>
     /// The name of the event <paramref name="id"/> stands for, in the session's own
@@ -191,7 +190,7 @@ internal static class HandOverContract
                 command.Add(arg);
             if (twice) return ReplaceRead.Refused;
         }
-        if (exePath is null || !Path.IsPathFullyQualified(exePath)
+        if (exePath is null || !PathText.IsPathFullyQualified(exePath)
             || !int.TryParse(processId, System.Globalization.NumberStyles.None,
                 System.Globalization.CultureInfo.InvariantCulture, out var id) || id <= 0
             || !Guid.TryParseExact(startedEvent, "N", out _))

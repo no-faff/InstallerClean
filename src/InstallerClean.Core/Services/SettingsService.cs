@@ -12,7 +12,7 @@ public sealed class SettingsService : ISettingsService
     // and could OOM the elevated WPF process before MainWindow opens;
     // the cap turns oversize into a clean InvalidDataException that
     // the catch block routes to the .bad-rename recovery path.
-    private const int MaxReadBytes = 64 * 1024;
+    internal const int MaxReadBytes = 64 * 1024;
 
     // Internal for the config-pin test in SettingsServiceConfigTests.
     internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -35,7 +35,7 @@ public sealed class SettingsService : ISettingsService
     // the update-check opt-out on the dispatcher.
     private readonly object _ioGate = new();
 
-    public SettingsService() : this(Path.Combine(AppDataFolder.Location, "settings.json")) { }
+    public SettingsService() : this(PathText.Combine(AppDataFolder.Location, "settings.json")) { }
 
     internal SettingsService(string settingsFile)
     {
@@ -127,7 +127,7 @@ public sealed class SettingsService : ISettingsService
     /// having no better answer than the cautious one.
     /// </summary>
     private static bool RefusedRatherThanAbsent(string path) =>
-        File.Exists(path)
+        FrameworkFile.Exists(path)
         && StorageHelpers.CheckReparsePoint(path, out _) != StorageHelpers.ReparseCheck.Yes;
 
     /// <summary>Persists settings via write-temp-then-rename. Returns true on
@@ -140,9 +140,9 @@ public sealed class SettingsService : ISettingsService
         var tempFile = _settingsFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
-            var folder = Path.GetDirectoryName(_settingsFile);
-            if (!string.IsNullOrEmpty(folder))
-                Directory.CreateDirectory(folder);
+            var folder = PathText.GetDirectoryName(_settingsFile);
+            if (folder is { Length: > 0 })
+                FrameworkDirectory.CreateDirectory(folder);
 
             // OpenAtomic + MoveFileEx(MOVEFILE_REPLACE_EXISTING) gives a
             // race-free save: atomic open at the temp file (refuses

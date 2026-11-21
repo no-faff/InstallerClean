@@ -5,6 +5,8 @@ using NSubstitute;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Services;
+using InstallerClean.Helpers;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -15,7 +17,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     // another path. Where the host keeps its temporary folder is then no part of any
     // test here.
     private readonly string _fakeInstallerDir = Path.Combine(
-        InstallerCacheHelpers.ResolveFinalPath(Path.GetTempPath()), "ic-tests-" + Guid.NewGuid());
+        InstallerCacheHelpers.ResolveFinalPath(TestTemp.Run), "ic-tests-" + Guid.NewGuid());
 
     public FileSystemScanServiceIntegrationTests()
     {
@@ -55,7 +57,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
             new FileSystemScanService(query, null, Path.Combine(_fakeInstallerDir, "absent")).ScanAsync());
 
-        Assert.Equal(Strings.Error_ScanInstallerFolderNotFound, ex.Message);
+        Assert.Equal(StopMessages.NothingOfferedNothingRemoved(Strings.Error_ScanInstallerFolderNotFound), ex.Message);
         Assert.IsAssignableFrom<DirectoryNotFoundException>(ex.InnerException);
         await query.DidNotReceive().GetRegisteredPackagesAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -87,7 +89,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
                 new FileSystemScanService(query, null, refused).ScanAsync());
 
-            Assert.Equal(Strings.Error_ScanInstallerFolderListFailed, ex.Message);
+            Assert.Equal(StopMessages.NothingOfferedNothingRemoved(Strings.Error_ScanInstallerFolderListFailed), ex.Message);
             Assert.IsType<UnauthorizedAccessException>(ex.InnerException);
             await query.DidNotReceive().GetRegisteredPackagesAsync(
                 Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -493,9 +495,12 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     {
         // The walk is one pass over the folder filtered on the extension rather
         // than a "*.msi" pass concatenated with a "*.msp" one. This is the
-        // equivalence the single pass rests on, asserted against the real matcher rather than
-        // argued: the names below are the ones where a pattern and an extension
-        // test could plausibly disagree.
+        // equivalence the single pass rests on, asserted against .NET 10's pattern
+        // matcher (FrameworkDirectory's port of it) rather than argued: the names
+        // below are the ones where a pattern and an extension test could plausibly
+        // disagree. The port and the walk list through the same enumerator, so the
+        // names both must find are also written out: a fault in that enumerator
+        // drops a name from both sides alike.
         var names = new[]
         {
             "a.msi", "b.msp", "UPPER.MSI", "MiXeD.MsP", ".msi",
@@ -504,14 +509,8 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         for (int i = 0; i < names.Length; i++)
             File.WriteAllBytes(Path.Combine(_fakeInstallerDir, names[i]), new byte[i + 1]);
 
-        var options = new EnumerationOptions
-        {
-            RecurseSubdirectories = false,
-            AttributesToSkip = FileAttributes.ReparsePoint,
-            IgnoreInaccessible = true,
-        };
-        var byPattern = Directory.EnumerateFiles(_fakeInstallerDir, "*.msi", options)
-            .Concat(Directory.EnumerateFiles(_fakeInstallerDir, "*.msp", options))
+        var byPattern = FrameworkDirectory.EnumerateFiles(_fakeInstallerDir, "*.msi")
+            .Concat(FrameworkDirectory.EnumerateFiles(_fakeInstallerDir, "*.msp"))
             .OrderBy(p => p, StringComparer.Ordinal)
             .ToList();
 
@@ -526,6 +525,9 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             .ToList();
 
         Assert.Equal(byPattern, walked);
+        Assert.Equal(
+            new[] { ".msi", "MiXeD.MsP", "UPPER.MSI", "a.msi", "b.msp" },
+            walked.Select(Path.GetFileName).OrderBy(n => n, StringComparer.Ordinal).ToArray());
 
         // And the size on each row is the file's own, now that it is carried
         // through from the directory entry instead of being read again.
@@ -607,7 +609,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
                 new FileSystemScanService(query, null, link).ScanAsync());
 
-            Assert.Equal(string.Format(Strings.Error_ScanInstallerFolderElsewhere, root.Resolved), ex.Message);
+            Assert.Equal(StopMessages.NothingOfferedNothingRemoved(string.Format(Strings.Error_ScanInstallerFolderElsewhere, root.Resolved)), ex.Message);
             await query.DidNotReceiveWithAnyArgs().GetRegisteredPackagesAsync(default, default);
         }
         finally
@@ -672,8 +674,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        foreach (var arg in new[] { "/d", "/c", "mklink", "/J", link, target })
-            start.ArgumentList.Add(arg);
+        start.Arguments = CommandLineArguments.Join(new[] { "/d", "/c", "mklink", "/J", link, target });
 
         using var cmd = Process.Start(start)
             ?? throw new InvalidOperationException("cmd.exe did not start.");
@@ -685,7 +686,6 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
 
     public void Dispose()
     {
-        try { if (Directory.Exists(_fakeInstallerDir)) Directory.Delete(_fakeInstallerDir, recursive: true); }
-        catch { }
+        TestTemp.Delete(_fakeInstallerDir);
     }
 }

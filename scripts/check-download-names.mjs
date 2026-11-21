@@ -15,15 +15,22 @@
 // reads it. In an upload path the setup's InstallerClean-*-setup.exe is the setup of any
 // version, and any other * is read as the character, so a looser pattern is a difference.
 //
-// The copies are also held to the folder each is copied from: the portable from the
-// self-contained publish, the slim from the framework-dependent one, the command line
-// from its own and the setup from the signed setup, so two names swapped between files
-// are a difference too.
+// THE EARLIER COPIES. Copies of earlier versions also update from InstallerClean-slim.exe,
+// the slim download, which this app does not ask for: the slim is the portable's file
+// under that name. EARLIER lists it, and the release has to publish it as it does the
+// app's own names.
 //
-// Each of the four places has to name exactly the files the app downloads. A copy
-// installed on somebody's PC asks for one of these names under the tag of the version it
-// is updating to, so a name on either side that the other does not have leaves every
-// installed copy of that kind unable to update.
+// The copies are also held to the folder each is copied from: the portable from the
+// merged window exe, the slim from that same exe, signed under its own name in the
+// signing folder or unsigned from the window publish, the command line from its own
+// publish and the setup from the signed setup, so two names swapped between files are a
+// difference too. A copy whose source is a variable is held to every path the variable's
+// `$name = if (...) { 'a' } else { 'b' }` assignment in the step can give it.
+//
+// Each of the four places has to name exactly the files the app downloads and the ones
+// in EARLIER. A copy installed on somebody's PC asks for one of these names under the
+// tag of the version it is updating to, so a name on either side that the other does
+// not have leaves every installed copy of that kind unable to update.
 //
 // THE CHECK. The comparison is run on the real files, then on copies with one thing
 // changed each, and has to refuse every one. A comparison that accepted those would pass
@@ -40,7 +47,11 @@ const name = 'check-download-names';
 const APP = 'src/InstallerClean.Core/Services/AppCopy.cs';
 const RELEASE = '.github/workflows/release.yml';
 // The kinds that update themselves from a download, as AppCopyKind names them.
-const KINDS = ['Setup', 'Portable', 'Slim', 'CommandLineDownload'];
+const KINDS = ['Setup', 'Portable', 'CommandLineDownload'];
+// The downloads copies of earlier versions update from that the app does not ask for,
+// each by the name of its kind in those versions. Do not take one out: every copy of
+// that kind already installed asks for it by this name.
+const EARLIER = new Map([['Slim', 'InstallerClean-slim.exe']]);
 
 // Read with LF line ends whatever the file was written with.
 const read = (path) => {
@@ -117,8 +128,16 @@ function releaseNames(workflow) {
     return { name: path.replace(/^["']|["']$/g, '').replace(/^publish\//, ''), quote };
   };
   const named = ({ name, quote }) => powershellName(name, quote);
+  // The paths a source can be: itself, or for a $variable every branch of its if/else.
+  const sourcesOf = (source) => {
+    if (!source.startsWith('$')) return [source];
+    const escaped = source.replace(/[$]/g, '\\$');
+    const choice = code.match(new RegExp(`^\\s*${escaped}\\s*=\\s*if\\s*\\([^)]*\\)\\s*\\{\\s*(\\S+)\\s*\\}\\s*else\\s*\\{\\s*(\\S+)\\s*\\}\\s*$`, 'm'));
+    return choice ? [choice[1], choice[2]].map((p) => p.replace(/^["']|["']$/g, '')) : [];
+  };
   const copies = [...code.matchAll(/Copy-Item\s+(\S+)\s+(\S+)(?:\s+-Force)?\s*$/gm)].map((m) => ({
     source: m[1],
+    sources: sourcesOf(m[1]),
     name: named(unquote(m[2])),
   }));
   places.set('the copies made into publish/', copies.map((c) => c.name));
@@ -147,12 +166,14 @@ function releaseNames(workflow) {
   return { places, copies };
 }
 
-// The folder each kind's copy is made from, as a part of the source path.
+// The folders each kind's copy may be made from, as a part of the source path. The
+// portable is the merged window exe; the slim is that same exe, signed under its own
+// name in the signing folder, or unsigned from the window publish.
 const SOURCES = new Map([
-  ['Setup', 'signed-setup'],
-  ['Portable', 'self-contained'],
-  ['Slim', 'framework-dependent'],
-  ['CommandLineDownload', 'cli'],
+  ['Setup', ['signed-setup']],
+  ['Portable', ['window']],
+  ['Slim', ['signed-executables', 'window']],
+  ['CommandLineDownload', ['cli']],
 ]);
 
 // What the app downloads, what the release names and every problem between them.
@@ -161,21 +182,26 @@ function compare(appSource, workflow) {
   if (app.error) return { problems: [app.error] };
   const release = releaseNames(workflow);
   if (release.error) return { problems: [release.error], app };
-  const wanted = [...app.names.values()].sort();
+  const wanted = [...app.names.values(), ...EARLIER.values()].sort();
   const problems = [];
   for (const [place, names] of release.places) {
     const absent = wanted.filter((n) => !names.includes(n));
     const unknown = names.filter((n) => !wanted.includes(n));
     const repeated = names.filter((n, i) => names.indexOf(n) !== i);
     if (names.length === 0) problems.push(`${RELEASE}: ${place} names no download.`);
-    if (absent.length) problems.push(`${RELEASE}: ${place} does not name ${absent.join(', ')}, which the app downloads.`);
-    if (unknown.length) problems.push(`${RELEASE}: ${place} names ${unknown.join(', ')}, which the app does not download.`);
+    if (absent.length) problems.push(`${RELEASE}: ${place} does not name ${absent.join(', ')}, which the app or earlier copies download.`);
+    if (unknown.length) problems.push(`${RELEASE}: ${place} names ${unknown.join(', ')}, which neither the app nor earlier copies download.`);
     if (repeated.length) problems.push(`${RELEASE}: ${place} names ${[...new Set(repeated)].join(', ')} more than once.`);
   }
-  for (const [kind, file] of app.names) {
+  for (const [kind, file] of [...app.names, ...EARLIER]) {
     const copy = release.copies.find((c) => c.name === file);
-    if (copy && !copy.source.includes(SOURCES.get(kind)))
-      problems.push(`${RELEASE}: ${file} is copied from ${copy.source}, not from the ${SOURCES.get(kind)} publish.`);
+    if (!copy) continue;
+    const allowed = SOURCES.get(kind);
+    if (copy.sources.length === 0)
+      problems.push(`${RELEASE}: ${file} is copied from ${copy.source}, and the step has no if/else assignment that says which paths it can be.`);
+    for (const source of copy.sources)
+      if (!allowed.some((folder) => source.includes(folder)))
+        problems.push(`${RELEASE}: ${file} can be copied from ${source}, not from the ${allowed.join(' or the ')} publish.`);
   }
   return { problems, app, release };
 }
@@ -186,6 +212,7 @@ const { problems, app, release } = compare(appSource, workflow);
 
 if (app?.names) {
   for (const [kind, file] of app.names) console.log(`  the app downloads ${file} for ${kind}`);
+  for (const [kind, file] of EARLIER) console.log(`  earlier copies download ${file} for ${kind}`);
 }
 if (release?.places) {
   for (const [place, names] of release.places) console.log(`  ${place}: ${names.join(' ')}`);
@@ -199,7 +226,7 @@ const controls = [
   [
     'the portable copied under a versioned name',
     appSource,
-    reline(/(Copy-Item\s+publish\/self-contained\/InstallerClean\.exe\s+)publish\/InstallerClean-portable\.exe/, '$1"publish/InstallerClean-$$version-portable.exe"'),
+    reline(/(Copy-Item\s+publish\/window\/InstallerClean\.exe\s+)publish\/InstallerClean-portable\.exe/, '$1"publish/InstallerClean-$$version-portable.exe"'),
   ],
   [
     'the portable versioned in the signature check',
@@ -223,9 +250,14 @@ const controls = [
     reline(/"publish\/InstallerClean-\$version-setup\.exe",\n/, "'publish/InstallerClean-$$version-setup.exe',\n"),
   ],
   [
-    'the portable and the slim copied from each other\'s folders',
+    'the portable copied from the slim\'s folder',
     appSource,
-    reline(/Copy-Item\s+publish\/self-contained\/InstallerClean\.exe(\s+)publish\/InstallerClean-portable\.exe/, 'Copy-Item publish/framework-dependent/InstallerClean.exe$1publish/InstallerClean-portable.exe'),
+    reline(/Copy-Item\s+publish\/window\/InstallerClean\.exe(\s+)publish\/InstallerClean-portable\.exe/, 'Copy-Item signing/signed-executables/InstallerClean-slim.exe$1publish/InstallerClean-portable.exe'),
+  ],
+  [
+    'the slim\'s unsigned copy made from the command line\'s publish',
+    appSource,
+    reline(/(\$slim\s*=\s*if\s*\([^)]*\)\s*\{[^}]*\}\s*else\s*\{\s*)'publish\/window\/InstallerClean\.exe'/, "$1'publish/cli/installerclean-cli.exe'"),
   ],
   [
     'the app asking for a versioned portable',
@@ -253,4 +285,4 @@ if (problems.length) {
   for (const p of problems) console.error(`${name}: ${p}`);
   process.exit(1);
 }
-console.log(`${name}: release.yml names the files the app downloads, in all four places.`);
+console.log(`${name}: release.yml names the files the app and earlier copies download, in all four places.`);

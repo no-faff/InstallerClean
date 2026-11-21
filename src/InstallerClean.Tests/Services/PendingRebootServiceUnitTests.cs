@@ -130,7 +130,7 @@ public class PendingRebootServiceUnitTests
     public void A_refused_read_of_the_in_progress_file_blocks_with_its_own_reason()
     {
         // Never as the file being there: nothing has been seen, and the file's own
-        // sentence says Windows Installer has something in progress.
+        // sentence says Windows Installer has something unfinished.
         _marker.Read().Returns(InstallerInProgressMarkerReading.AccessRefused);
 
         var result = Build().Check();
@@ -140,11 +140,11 @@ public class PendingRebootServiceUnitTests
     }
 
     [Fact]
-    public void An_in_progress_file_reading_nobody_set_blocks()
+    public void An_in_progress_file_reading_nobody_handles_blocks()
     {
-        // The enum's zero, which is what a reading added later without a rule, or a
-        // fake nobody scripted, arrives as.
-        _marker.Read().Returns(default(InstallerInProgressMarkerReading));
+        // A value the enum does not name, which is what a reading added later without a
+        // rule of its own arrives as.
+        _marker.Read().Returns((InstallerInProgressMarkerReading)99);
 
         var result = Build().Check();
 

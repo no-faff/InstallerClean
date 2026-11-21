@@ -69,11 +69,10 @@ internal static class DetachedStandIn
 
     private static readonly Lazy<string> Compiled = new(() =>
     {
-        var folder = Directory.CreateTempSubdirectory("ic-detached-stand-in-").FullName;
+        var folder = TestTemp.NewFolder("ic-detached-stand-in-");
         var source = Path.Combine(folder, "StandIn.cs");
         var exe = Path.Combine(folder, "stand-in.exe");
         File.WriteAllText(source, Source);
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => { try { Directory.Delete(folder, recursive: true); } catch { } };
 
         var info = new ProcessStartInfo(PowerShell)
         {
@@ -82,14 +81,13 @@ internal static class DetachedStandIn
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
-        foreach (var argument in new[]
+        info.Arguments = CommandLineArguments.Join(new[]
         {
             // -Command takes the rest of the line as the command, so the paths go inside it,
             // each in single quotes with any quote in it doubled.
             "-NoProfile", "-NonInteractive", "-Command",
             $"$ErrorActionPreference = 'Stop'; Add-Type -OutputType ConsoleApplication -OutputAssembly {Quoted(exe)} -TypeDefinition ([IO.File]::ReadAllText({Quoted(source)}))",
-        })
-            info.ArgumentList.Add(argument);
+        });
         using var compiler = Process.Start(info)!;
         var output = compiler.StandardOutput.ReadToEndAsync();
         var error = compiler.StandardError.ReadToEndAsync();

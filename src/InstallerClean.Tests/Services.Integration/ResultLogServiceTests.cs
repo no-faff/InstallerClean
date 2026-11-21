@@ -1,18 +1,20 @@
 using System.Text;
 using InstallerClean.Models;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// The write-and-read half of <see cref="ResultLogService"/>, driven against a
-/// %TEMP% sandbox through the internal path-taking constructor. That seam is
+/// sandbox in the test run's temp folder through the internal path-taking constructor. That seam is
 /// what makes the byte cap, the atomic write and the temp-file cleanup testable
 /// at all: with the paths fixed to %LOCALAPPDATA%, exercising them would mean
 /// writing over the real last-run.json in whichever profile ran the suite.
 ///
-/// SendAsync's network path is deliberately not covered: it posts to a live No
-/// Faff endpoint. Its two pre-network guards (an empty body, and a body over
+/// SendAsync's network path is not covered here: it posts to a live No Faff
+/// endpoint. The request it sends is, on a loopback server, in
+/// <see cref="ResultLogRequestTests"/>. Its two pre-network guards (an empty body, and a body over
 /// the byte cap) are covered below, which is possible precisely because both
 /// return before the request is built.
 /// </summary>
@@ -25,14 +27,13 @@ public class ResultLogServiceTests : IDisposable
     {
         // Its own folder per test class run, because WriteAsync creates the
         // parent and the temp files are siblings of the log.
-        _folder = Path.Combine(Path.GetTempPath(), $"ic-resultlog-{Guid.NewGuid()}");
+        _folder = Path.Combine(TestTemp.Run, $"ic-resultlog-{Guid.NewGuid():N}");
         _logFile = Path.Combine(_folder, "last-run.json");
     }
 
     public void Dispose()
     {
-        if (Directory.Exists(_folder))
-            Directory.Delete(_folder, recursive: true);
+        TestTemp.Delete(_folder);
     }
 
     private static ResultLogEntry SampleEntry() =>
@@ -99,6 +100,19 @@ public class ResultLogServiceTests : IDisposable
         Assert.Contains($"\"schemaVersion\": {ResultLogEntry.CurrentSchemaVersion}", body);
     }
 
+    // Every send reads last-run.json, so the id written here is the id every copy carries.
+    [Fact]
+    public async Task The_written_log_carries_the_reports_id()
+    {
+        var svc = new ResultLogService(_logFile);
+        var entry = SampleEntry();
+        await svc.WriteAsync(entry);
+
+        var body = await svc.ReadLastLogAsync();
+
+        Assert.Contains($"\"reportId\": \"{entry.ReportId:D}\"", body);
+    }
+
     [Fact]
     public async Task ReadLastLogAsync_returns_null_when_there_is_no_log()
     {
@@ -114,7 +128,7 @@ public class ResultLogServiceTests : IDisposable
         // One byte past the cap, so the test pins the boundary rather than
         // some arbitrary large size.
         await File.WriteAllBytesAsync(
-            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)IResultLogService.MaxLogBytes + 1)));
+            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)ResultLogService.MaxLogBytes + 1)));
         var svc = new ResultLogService(_logFile);
 
         // Refused rather than truncated: the body is posted to an endpoint, so
@@ -127,7 +141,7 @@ public class ResultLogServiceTests : IDisposable
     {
         Directory.CreateDirectory(_folder);
         await File.WriteAllBytesAsync(
-            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)IResultLogService.MaxLogBytes)));
+            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)ResultLogService.MaxLogBytes)));
         var svc = new ResultLogService(_logFile);
 
         var body = await svc.ReadLastLogAsync();
@@ -135,7 +149,7 @@ public class ResultLogServiceTests : IDisposable
         // The cap is a maximum, not an exclusive bound; a test only on the
         // over-cap side would pass with an off-by-one in either direction.
         Assert.NotNull(body);
-        Assert.Equal((int)IResultLogService.MaxLogBytes, body.Length);
+        Assert.Equal((int)ResultLogService.MaxLogBytes, body.Length);
     }
 
     [Fact]
@@ -147,7 +161,7 @@ public class ResultLogServiceTests : IDisposable
         // rather than piping it through ReadLastLogAsync would otherwise carry
         // an unbounded payload to the endpoint. Returning before the request is
         // built is what makes this runnable with no network at all.
-        var outcome = await svc.SendAsync(new string('x', (int)IResultLogService.MaxLogBytes + 1));
+        var outcome = await svc.SendAsync(new string('x', (int)ResultLogService.MaxLogBytes + 1));
 
         Assert.Equal(ResultLogSendOutcome.Unknown, outcome);
     }

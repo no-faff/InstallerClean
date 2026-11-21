@@ -1,7 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>14</LangVersion>
+    <!-- FrameworkStreamsTests reads through memory that is not over a managed
+         array, which only a pointer can make. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -49,6 +53,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- HttpClient and the types around it, for the update tests. A .NET
+         Framework project references this framework assembly, and
+         ImplicitUsings imports it, only when asked. -->
+    <Reference Include="System.Net.Http" />
+    <Using Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The WPF assemblies, for the tests of the window's view models,
+         converters and controls. On .NET Framework they are framework
+         assemblies referenced by name; UseWPF is left off so the XAML
+         below stays plain embedded bytes. -->
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Raw XAML sources for the tests under Themes\, which assert the
          theme's cross-file ties: numeric ones XAML cannot express and a
          build cannot check (scrollbar end insets against the card radius,
@@ -56,8 +81,9 @@
          of a token against the surfaces it is drawn on, the order of two
          control-template triggers, where the wrong order is valid XAML that
          simply looks wrong on screen, the main window's overlay cards
-         against the width of their window, and the dialogs' cards, whose
-         widths code-behind sets. Embedded as plain bytes, not
+         against the width of their window, the dialogs' cards, whose
+         widths code-behind sets, and the focus ring every focusable element
+         names. Embedded as plain bytes, not
          compiled: this project has no UseWPF, so no Page processing
          applies. -->
     <EmbeddedResource Include="..\InstallerClean\Themes\Primitives.xaml" LogicalName="ThemeXaml.Primitives.xaml" />
@@ -70,6 +96,16 @@
     <EmbeddedResource Include="..\InstallerClean\ConfirmMoveWindow.xaml" LogicalName="ThemeXaml.ConfirmMoveWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\MessageWindow.xaml" LogicalName="ThemeXaml.MessageWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\ReportWindow.xaml" LogicalName="ThemeXaml.ReportWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\AboutWindow.xaml" LogicalName="ThemeXaml.AboutWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\NoticesWindow.xaml" LogicalName="ThemeXaml.NoticesWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\Controls\ScoopCommandBox.xaml" LogicalName="ThemeXaml.ScoopCommandBox.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\SplashWindow.xaml" LogicalName="ThemeXaml.SplashWindow.xaml" />
+    <!-- The report FixedReport builds, as .NET 10 writes it (Models/FixedReportBytesTests). -->
+    <EmbeddedResource Include="Models\FixedReport.net10.json" LogicalName="FixedReport.net10.json" />
+    <!-- THIRD-PARTY-NOTICES and LICENSE as plain bytes, for Resources/ThirdPartyNoticesTests:
+         the app's copy is read against the first, and its Apache terms against the second. -->
+    <EmbeddedResource Include="..\..\THIRD-PARTY-NOTICES" LogicalName="Repository.THIRD-PARTY-NOTICES" />
+    <EmbeddedResource Include="..\..\LICENSE" LogicalName="Repository.LICENSE" />
   </ItemGroup>
 
   <ItemGroup>

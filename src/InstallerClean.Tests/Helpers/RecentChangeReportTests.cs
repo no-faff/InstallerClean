@@ -68,9 +68,8 @@ public class RecentChangeReportTests
         var line = RecentChangeReport.Line(Holding(3, Bytes));
 
         Assert.Equal(
-            $"3 files ({DisplayHelpers.FormatSize(Bytes)}) were held back because Windows shows they were "
-            + "changed after InstallerClean started scanning. If a program was installing or updating, "
-            + "scan again once it has finished and InstallerClean will check them again.",
+            $"3 files ({DisplayHelpers.FormatSize(Bytes)}) were left alone because Windows shows they changed after the "
+            + "scan started. If something was installing or updating, scan again once it has finished.",
             line);
     }
 
@@ -82,9 +81,8 @@ public class RecentChangeReportTests
         var line = RecentChangeReport.Line(Holding(1, Bytes));
 
         Assert.Equal(
-            $"One file ({DisplayHelpers.FormatSize(Bytes)}) was held back because Windows shows it was "
-            + "changed after InstallerClean started scanning. If a program was installing or updating, "
-            + "scan again once it has finished and InstallerClean will check it again.",
+            $"One file ({DisplayHelpers.FormatSize(Bytes)}) was left alone because Windows shows it changed after the "
+            + "scan started. If something was installing or updating, scan again once it has finished.",
             line);
     }
 

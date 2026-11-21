@@ -263,6 +263,10 @@ public class InstallerQueryServicePatchTruncationTests
                     return kv.Value;
             return new PackageIdentity(string.Empty, isPatch, Array.Empty<string>());
         }
+
+        public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoRevisionNumber(string filePath) => false;
     }
 
     /// <summary>

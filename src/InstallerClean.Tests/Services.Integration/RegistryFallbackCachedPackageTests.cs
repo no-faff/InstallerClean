@@ -1,6 +1,8 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using Microsoft.Win32;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -63,17 +65,28 @@ public class RegistryFallbackCachedPackageTests
             using (var props = ProductValues(f))
                 props.SetValue("LocalPackage", f.Files.Create("msi"), RegistryValueKind.String);
             if (patchesKey)
-                f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+            {
+                using var patch = f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!;
+                patch.SetValue("Uninstallable", 0, RegistryValueKind.DWord);
+            }
 
             var (read, _) = Read(f);
 
             var product = InstallerQueryService.UnpackRegistryProductCode(PackedProduct)!;
             Assert.NotNull(read.PatchListings);
+            Assert.NotNull(read.PatchesReadAsZero);
             if (patchesKey)
+            {
                 Assert.Equal(new[] { PatchCode },
                     read.PatchListings[new InstallerQueryService.AccountCode(Sid, product)]);
+                Assert.Equal(new[] { PatchCode },
+                    read.PatchesReadAsZero[new InstallerQueryService.AccountCode(Sid, product)]);
+            }
             else
+            {
                 Assert.Empty(read.PatchListings);
+                Assert.Empty(read.PatchesReadAsZero);
+            }
             // The product's package record carries the account it was read under.
             Assert.Equal(Sid, Assert.Single(read.PackageRecords!, r => !r.IsPatch).Account);
         });
@@ -111,6 +124,132 @@ public class RegistryFallbackCachedPackageTests
 
             Assert.Null(Assert.Single(read.ProductEntries!).PatchCodes);
         });
+    }
+
+    [Theory]
+    [InlineData("the product's patch list")]
+    [InlineData("the product's entry")]
+    [InlineData("a patch's entry")]
+    public void A_scan_cancelled_during_the_read_stops_it_as_a_cancel_and_logs_no_failure(string listing)
+    {
+        // A cancel that arrives while a listing inside one of the walk's own tries pauses
+        // between two readings that disagree leaves the read as the cancel, never as a
+        // failure counted or written to the failure log. Each row's listing is the one
+        // read inside that try: the product's Patches key, its InstallProperties and the
+        // patch's own key. The token is cancelled from inside that listing, after the
+        // walk's loop has checked it, so the try's own catch is what meets the cancel.
+        WithSubtree(f =>
+        {
+            using (var values = listing == "a patch's entry" ? PatchValues(f) : ProductValues(f))
+                values.SetValue("LocalPackage", f.Files.Create(listing == "a patch's entry" ? "msp" : "msi"),
+                    RegistryValueKind.String);
+            f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+            var keyEnd = listing switch
+            {
+                "the product's patch list" => $@"\{Sid}\Products\{PackedProduct}\Patches",
+                "the product's entry" => $@"\{Sid}\Products\{PackedProduct}\InstallProperties",
+                _ => $@"\{Sid}\Patches\{PackedPatch}",
+            };
+            using var cts = new CancellationTokenSource();
+            var disagreed = 0;
+            var logged = new List<Exception>();
+
+            RegistryNames.CallsForTests = (key, calls) =>
+            {
+                if (!key.Name.EndsWith(keyEnd, StringComparison.OrdinalIgnoreCase))
+                    return calls;
+                disagreed++;
+                return new DisagreeingCalls(calls, cts);
+            };
+            try
+            {
+                Assert.ThrowsAny<OperationCanceledException>(() => InstallerQueryService.ReadFallbackSid(
+                    f.UserData, Sid, new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase),
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase), cts.Token,
+                    new PerItemFailureLog("Registry fallback", "Test run.", logged.Add)));
+            }
+            finally
+            {
+                RegistryNames.CallsForTests = null;
+            }
+
+            Assert.Equal(1, disagreed);
+            Assert.Empty(logged);
+        });
+    }
+
+    [Theory]
+    [InlineData("the product's patch list", 1)]
+    [InlineData("the product's entry", 0)]
+    [InlineData("a patch's entry", 0)]
+    public void A_failed_read_is_counted_and_only_a_products_own_patch_list_is_counted_apart(
+        string listing, int patchListFailures)
+    {
+        // A product's Patches key records no cached file, so its failure is counted apart
+        // from the failures that can hide one. The product's InstallProperties and the
+        // patch's own key each record a cached package.
+        WithSubtree(f =>
+        {
+            using (var values = ProductValues(f))
+                values.SetValue("LocalPackage", f.Files.Create("msi"), RegistryValueKind.String);
+            using (var values = PatchValues(f))
+                values.SetValue("LocalPackage", f.Files.Create("msp"), RegistryValueKind.String);
+            f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+            var keyEnd = listing switch
+            {
+                "the product's patch list" => $@"\{Sid}\Products\{PackedProduct}\Patches",
+                "the product's entry" => $@"\{Sid}\Products\{PackedProduct}\InstallProperties",
+                _ => $@"\{Sid}\Patches\{PackedPatch}",
+            };
+            var disagreed = 0;
+
+            RegistryNames.CallsForTests = (key, calls) =>
+            {
+                if (!key.Name.EndsWith(keyEnd, StringComparison.OrdinalIgnoreCase))
+                    return calls;
+                disagreed++;
+                return new DisagreeingCalls(calls, cts: null);
+            };
+            InstallerQueryService.FallbackRead read;
+            try
+            {
+                (read, _) = Read(f);
+            }
+            finally
+            {
+                RegistryNames.CallsForTests = null;
+            }
+
+            Assert.Equal(1, disagreed);
+            Assert.Equal(1, read.Failures);
+            Assert.Equal(patchListFailures, read.PatchListFailures);
+        });
+    }
+
+    /// <summary>
+    /// A key's real calls with a count one higher at every reading, so no two readings
+    /// agree, and the token, where there is one, cancelled at the first.
+    /// </summary>
+    private sealed class DisagreeingCalls(RegistryNames.IKeyCalls calls, CancellationTokenSource? cts)
+        : RegistryNames.IKeyCalls
+    {
+        private int _readings;
+
+        public int QueryCounts(out int subKeys, out int values)
+        {
+            cts?.Cancel();
+            var result = calls.QueryCounts(out subKeys, out values);
+            _readings++;
+            subKeys += _readings;
+            values += _readings;
+            return result;
+        }
+
+        public int EnumKey(int index, char[] name, ref int nameLength) => calls.EnumKey(index, name, ref nameLength);
+
+        public int EnumValue(int index, char[] name, ref int nameLength) => calls.EnumValue(index, name, ref nameLength);
+
+        public void MarkHandleInvalid() => calls.MarkHandleInvalid();
     }
 
     [Fact]
@@ -330,16 +469,16 @@ public class RegistryFallbackCachedPackageTests
     private static void WithSubtree(Action<Fixture> body)
     {
         var keyPath = $@"Software\InstallerCleanTests\{Guid.NewGuid():N}";
-        var folder = Path.Combine(Path.GetTempPath(), $"ictest-{Guid.NewGuid():N}");
+        var folder = TestTemp.NewFolder("ictest-");
         try
         {
-            Directory.CreateDirectory(folder);
             using var userData = Registry.CurrentUser.CreateSubKey(keyPath, writable: true);
             Assert.NotNull(userData);
             using var account = userData.CreateSubKey(Sid, writable: true);
             Assert.NotNull(account);
             body(new Fixture(userData, account, new TempFiles(folder)));
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(folder)) { }
         finally
         {
             try { Registry.CurrentUser.DeleteSubKeyTree(keyPath, throwOnMissingSubKey: false); }
@@ -356,8 +495,7 @@ public class RegistryFallbackCachedPackageTests
             }
             catch (Exception) { /* as above */ }
 
-            try { Directory.Delete(folder, recursive: true); }
-            catch (Exception) { /* as above */ }
+            TestTemp.Delete(folder);
         }
     }
 }

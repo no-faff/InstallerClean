@@ -17,7 +17,9 @@ namespace InstallerClean.Models;
 /// rather than being rolled upwards. A product row takes its own missing state
 /// from its own cached package, so a product whose package is present and whose
 /// patch has gone is correctly not missing. Marking that row would put "missing"
-/// where its own size goes, which is false of it.
+/// where its own size goes, which is false of it. The patch's absence reaches the
+/// product row through <see cref="ProductRow.HasMissingFile"/> instead, which puts
+/// the warning triangle on it and leaves its size alone.
 /// </param>
 public sealed record PatchRow(
     string FileName,

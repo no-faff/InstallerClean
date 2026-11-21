@@ -1,0 +1,79 @@
+<Window x:Class="InstallerClean.NoticesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
+        WindowStyle="None" AllowsTransparency="True"
+        FontFamily="{DynamicResource Type.FontFamily}"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <WindowChrome.WindowChrome>
+        <!-- CaptionHeight=0: a centred-on-owner modal with no title-bar
+             buttons, so no drag region is needed and the Border below claims
+             the full window. -->
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <!-- The card's widths are scaled with the OS text size and set in
+         code-behind, held to the work area there. -->
+    <Border x:Name="Card"
+            Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.ModalCard}" Padding="{StaticResource Padding.ModalCard}"
+            BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+        <!-- The notices sit in a star row rather than a StackPanel: a vertical
+             StackPanel measures its children at infinite height, so the box
+             would never scroll and the Close button would clip once the
+             window's work-area MaxHeight binds. -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock x:Name="Heading" Grid.Row="0" Text="{loc:Translate Window.Notices.Title}"
+                       Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+                       TextWrapping="Wrap"
+                       Margin="{StaticResource GapBottom.Md}"/>
+
+            <!-- THIRD-PARTY-NOTICES as the build embedded it, read-only so it can
+                 be selected and copied but not changed. A fixed-width font, because
+                 the file lays its tables and indented licences out in columns, and
+                 the card is wide enough for its 79-column lines. Longer lines, some
+                 licences being a paragraph to a line, wrap rather than scroll
+                 sideways. MaxHeight keeps the window a dialog rather than a
+                 screen-high sheet, and the box scrolls for the rest; under a small
+                 work area the star row gives way first and the box scrolls in less.
+                 The box scrolls itself, so there is no outer ScrollViewer to take the
+                 mouse wheel, and moving the caret scrolls it from the keyboard.
+                 Labelled by the heading and named with its key, so a screen reader
+                 says what the text is rather than a bare "edit, read-only". -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource Surface.Sidebar}" CornerRadius="{StaticResource Radius.Panel}"
+                    BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
+                    Padding="12,10"
+                    Margin="{StaticResource GapBottom.Lg}">
+                <TextBox x:Name="NoticesText"
+                         Style="{StaticResource SelectableText}"
+                         Foreground="{StaticResource Text.Body}"
+                         FontFamily="Consolas, Cascadia Mono, Lucida Console"
+                         FontSize="{DynamicResource Type.Body}"
+                         TextWrapping="Wrap"
+                         MaxHeight="{a11y:TextScaled 440}"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Disabled"
+                         AutomationProperties.LabeledBy="{Binding ElementName=Heading}"
+                         AutomationProperties.Name="{loc:Translate Window.Notices.Title}"/>
+            </Border>
+
+            <Button x:Name="CloseButton" Grid.Row="2" Style="{StaticResource StandardPill}"
+                    Content="{loc:Translate Action.Close}" Click="OnClose"
+                    IsDefault="True" IsCancel="True"
+                    HorizontalAlignment="Right"/>
+        </Grid>
+    </Border>
+</Window>

@@ -32,8 +32,8 @@ public interface IAppUpdater
     /// (<see cref="UpdateManifest"/>) and answers why this copy does not install it, or
     /// null where it may. The read of the release's file is given up after
     /// <paramref name="within"/>: null, <see cref="Timeout.InfiniteTimeSpan"/> or a time
-    /// longer than a timer can be set for is no limit (<see cref="IsNoLimit"/>), and less
-    /// than a millisecond fetches nothing and fails as a read that could not be made. A
+    /// longer than a timer can be set for is no limit (<see cref="AppUpdater.IsNoLimit"/>),
+    /// and less than a millisecond fetches nothing and fails as a read that could not be made. A
     /// file already kept for the version is answered from without a read, whatever the
     /// limit, and the rest of the check runs to its answer. Throws
     /// <see cref="UpdateFailedException"/> at the Download stage where the release's file
@@ -43,15 +43,6 @@ public interface IAppUpdater
     /// is cancelled at any point before the answer is returned.
     /// </summary>
     Task<UpdateRefusal?> CheckRequirementsAsync(string version, TimeSpan? within, CancellationToken cancellationToken);
-
-    /// <summary>The longest time <see cref="CancellationTokenSource.CancelAfter(TimeSpan)"/> takes.</summary>
-    private static readonly TimeSpan MaxTimerLimit = TimeSpan.FromMilliseconds(uint.MaxValue - 1);
-
-    /// <summary>
-    /// Whether a time limit given to <see cref="CheckRequirementsAsync"/> is no limit:
-    /// <see cref="Timeout.InfiniteTimeSpan"/>, or longer than a timer can be set for.
-    /// </summary>
-    public static bool IsNoLimit(TimeSpan within) => within == Timeout.InfiniteTimeSpan || within > MaxTimerLimit;
 
     /// <summary>
     /// Downloads <paramref name="version"/> as the same kind of copy, where its release
@@ -151,8 +142,8 @@ public sealed class PreparedUpdate
 
 /// <summary>
 /// The update from inside the app. The setup's copy downloads the newer setup and runs
-/// it; the portable, the slim and the command line's own download download the newer
-/// version of the same file. The window starts it to put itself at the running exe's path;
+/// it; the portable and the command line's own download download the newer version of
+/// the same file. The window starts it to put itself at the running exe's path;
 /// the command line runs its command with the newer command line from the staging folder
 /// (<see cref="PrepareStagedRunAsync"/>).
 /// Each download is saved in a staging folder only Administrators and SYSTEM can write to,
@@ -162,6 +153,19 @@ public sealed class PreparedUpdate
 /// </summary>
 public sealed class AppUpdater : IAppUpdater
 {
+    /// <summary>
+    /// The longest time in whole milliseconds that
+    /// <see cref="CancellationTokenSource.CancelAfter(TimeSpan)"/> takes,
+    /// <see cref="int.MaxValue"/>. It throws from one millisecond more.
+    /// </summary>
+    private static readonly TimeSpan MaxTimerLimit = TimeSpan.FromTicks(int.MaxValue * TimeSpan.TicksPerMillisecond);
+
+    /// <summary>
+    /// Whether a time limit given to <see cref="IAppUpdater.CheckRequirementsAsync"/> is no
+    /// limit: <see cref="Timeout.InfiniteTimeSpan"/>, or longer than a timer can be set for.
+    /// </summary>
+    public static bool IsNoLimit(TimeSpan within) => within == Timeout.InfiniteTimeSpan || within > MaxTimerLimit;
+
     /// <summary>
     /// What the window starts the newer setup with. /SILENT shows Setup's progress and
     /// asks nothing, /SP- leaves out the page asking whether to install, and /NORESTART
@@ -249,10 +253,12 @@ public sealed class AppUpdater : IAppUpdater
 
     private static string? ReadScoopConfig(string path)
     {
-        var file = new FileInfo(path);
-        if (!file.Exists) return null;
-        if (file.Length > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
-        return File.ReadAllText(path);
+        // One read of the file's attributes and size, as .NET 10's FileInfo makes it: the
+        // full path, with a separator at the end taken off.
+        var fullPath = FullPaths.GetFullPath(path);
+        if (!FrameworkFileSystem.FileExists(fullPath, out var data)) return null;
+        if (FrameworkFileSystem.LengthOf(fullPath, data) > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
+        return FrameworkFileStream.ReadAllText(fullPath);
     }
 
     private ScoopUpdate? ReadScoopUpdate()
@@ -261,7 +267,7 @@ public sealed class AppUpdater : IAppUpdater
         try
         {
             return AppCopy.ReadScoopUpdate(
-                Path.GetDirectoryName(_exePath) ?? string.Empty,
+                PathText.GetDirectoryName(_exePath) ?? string.Empty,
                 ScoopVariable,
                 ReadScoopConfig,
                 KnownFolders.GetPath(Environment.SpecialFolder.CommonApplicationData));
@@ -377,12 +383,12 @@ public sealed class AppUpdater : IAppUpdater
     /// </summary>
     private async Task<byte[]?> ReadWithinAsync(string version, TimeSpan? within, CancellationToken cancellationToken)
     {
-        if (within is not { } limit || IAppUpdater.IsNoLimit(limit))
+        if (within is not { } limit || IsNoLimit(limit))
             return await _downloader.ReadAsync(UpdateManifest.Address(version), UpdateManifest.MaxBytes, cancellationToken)
                 .ConfigureAwait(false);
         // Less than a millisecond is a timer set to fire at once, so it fetches nothing. A
         // cancel is still answered as the cancel.
-        if (limit < TimeSpan.FromMilliseconds(1))
+        if (limit < Durations.FromMilliseconds(1))
         {
             cancellationToken.ThrowIfCancellationRequested();
             throw new UpdateFailedException(UpdateFailureStage.Download,
@@ -520,7 +526,7 @@ public sealed class AppUpdater : IAppUpdater
     /// How long the hold on a download is tried for while another process has it open. An
     /// antivirus can take several seconds over a program it has just seen written.
     /// </summary>
-    internal static readonly TimeSpan HoldRetryBound = TimeSpan.FromSeconds(30);
+    internal static readonly TimeSpan HoldRetryBound = Durations.FromSeconds(30);
 
     /// <summary>
     /// Opens <paramref name="path"/> to hold it (<see cref="Helpers.StorageHelpers.OpenHeldToRead"/>).
@@ -557,7 +563,7 @@ public sealed class AppUpdater : IAppUpdater
                         "The downloaded file could not be opened to hold it.",
                         new System.ComponentModel.Win32Exception(error));
             }
-            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
+            await FrameworkTask.Delay(250, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -611,7 +617,7 @@ public sealed class AppUpdater : IAppUpdater
                 foreach (var file in _holds) file.Dispose();
                 _holds.Clear();
                 lock (HeldForTheProcess) HeldForTheProcess.Remove(folder.Handle);
-                folder.TryRemove(_staged.Select(Path.GetFileName)!);
+                folder.TryRemove(_staged.Select(PathText.GetFileName)!);
             }
         }
     }
@@ -632,7 +638,7 @@ public sealed class AppUpdater : IAppUpdater
         CancellationToken cancellationToken)
     {
         var fractions = progress is null ? null : new Fractions(progress);
-        var path = Path.Combine(staging.FolderPath, AppCopy.DownloadFileName(kind, version)!);
+        var path = PathText.Combine(staging.FolderPath, AppCopy.DownloadFileName(kind, version)!);
         var address = AppCopy.DownloadAddress(kind, version)!;
         staging.AddStaged(path);
 #if DEBUG
@@ -706,7 +712,7 @@ public sealed class AppUpdater : IAppUpdater
 
     /// <summary>
     /// Set to the full path of a newer copy of the kind this one replaces itself with (the
-    /// portable, the slim or the command line), a Debug build that replaces itself takes
+    /// portable or the command line), a Debug build that replaces itself takes
     /// that file as the body of its download, and then stages and swaps it in as it would
     /// any download, so an update to a build from this tree can be tried offline. A run from
     /// the staging folder takes it as the newer command line, the setup's copy included, which
@@ -777,8 +783,8 @@ public sealed class AppUpdater : IAppUpdater
     {
         try
         {
-            if (!Path.IsPathFullyQualified(path)) throw new IOException($"The local file {path} is not a full path.");
-            var bytes = File.ReadAllBytes(path);
+            if (!PathText.IsPathFullyQualified(path)) throw new IOException($"The local file {path} is not a full path.");
+            var bytes = FrameworkFileStream.ReadAllBytes(path);
             if (bytes.Length > UpdateManifest.MaxBytes) throw new IOException($"The local file {path} is over the cap.");
             return bytes;
         }
@@ -812,12 +818,12 @@ public sealed class AppUpdater : IAppUpdater
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (!Path.IsPathFullyQualified(path))
+            if (!PathText.IsPathFullyQualified(path))
                 throw new HttpRequestException($"The local file {path} is not a full path.");
             FileStream file;
             try
             {
-                file = File.OpenRead(path);
+                file = FrameworkFileStream.OpenRead(path);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -827,9 +833,9 @@ public sealed class AppUpdater : IAppUpdater
             {
                 try
                 {
-                    if (!Path.IsPathFullyQualified(gate)) throw new IOException($"The gate {gate} is not a full path.");
-                    File.Delete(gate);
-                    File.Delete(gate + GateReachedSuffix);
+                    if (!PathText.IsPathFullyQualified(gate)) throw new IOException($"The gate {gate} is not a full path.");
+                    FrameworkFile.Delete(gate);
+                    FrameworkFile.Delete(gate + GateReachedSuffix);
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {
@@ -861,24 +867,21 @@ public sealed class AppUpdater : IAppUpdater
         public override long Length => throw new NotSupportedException();
         public override long Position { get => _passed; set => throw new NotSupportedException(); }
 
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!_open && _passed >= _gateAt)
             {
                 using (StorageHelpers.OpenAtomic(gate + GateReachedSuffix, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways)
                     ?? throw new IOException($"The file {gate}{GateReachedSuffix} could not be written.")) { }
-                while (!File.Exists(gate))
-                    await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                while (!FrameworkFile.Exists(gate))
+                    await FrameworkTask.Delay(100, cancellationToken).ConfigureAwait(false);
                 _open = true;
             }
-            var room = _open ? buffer.Length : (int)Math.Min(buffer.Length, _gateAt - _passed);
-            var read = await inner.ReadAsync(buffer[..room], cancellationToken).ConfigureAwait(false);
+            var room = _open ? count : (int)Math.Min(count, _gateAt - _passed);
+            var read = await inner.ReadAsync(buffer, offset, room, cancellationToken).ConfigureAwait(false);
             _passed += read;
             return read;
         }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) =>
-            ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
 
         // A wait at the gate ends only on a token, which a read with none cannot give it.
         public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();

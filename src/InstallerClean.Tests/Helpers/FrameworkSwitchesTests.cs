@@ -1,0 +1,152 @@
+using System.Reflection;
+using System.Runtime.Versioning;
+using System.Windows.Threading;
+
+namespace InstallerClean.Tests.Helpers;
+
+/// <summary>
+/// The AppContext switches the window pins, read as .NET Framework reads them in a domain
+/// targeting 4.8: each test runs in an AppDomain of its own, since a switch is read once per
+/// domain. The read without the window's switches goes through a probe that names none of the
+/// window's code, so the domain holds none of it. That an exe's own domain reports 4.8 to WPF
+/// rests on the exe's TargetFramework attribute, checked here, and is read in the started
+/// window on Windows. Where the window pins them, App's type initializer, is checked in
+/// InitializerReachTests.
+/// </summary>
+public class FrameworkSwitchesTests
+{
+    [Fact]
+    public void A_4_8_target_reads_all_four_as_net_framework_sets_them_until_the_window_sets_them()
+    {
+        Assert.Equal(new[] { true, true, true, true }, InDomain((DefaultsProbe probe) => probe.Read()));
+    }
+
+    [Fact]
+    public void The_window_s_switches_are_set_as_net_10_has_them()
+    {
+        Assert.Equal(new[] { false, false, false, false }, InDomain((WindowProbe probe) => probe.Read()));
+    }
+
+    [Fact]
+    public void A_dispatcher_starts_without_an_error_once_the_window_s_switches_are_set()
+    {
+        Assert.Null(InDomain((WindowProbe probe) => probe.DispatcherError()));
+    }
+
+    [Theory]
+    [InlineData(typeof(InstallerClean.ProcessDefaults))]
+    [InlineData(typeof(InstallerClean.Cli.LibrarySearch))]
+    public void Each_exe_targets_net_framework_4_8(Type inExe)
+    {
+        Assert.Equal(FrameworkSwitch.NetFramework48, inExe.Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName);
+    }
+
+    internal static T InDomain<TProbe, T>(Func<TProbe, T> run) where TProbe : MarshalByRefObject
+    {
+        var setup = new AppDomainSetup
+        {
+            ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
+            TargetFrameworkName = FrameworkSwitch.NetFramework48,
+            // The configuration file of the domain running the tests, for its binding redirects;
+            // it sets no switch.
+            ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
+        };
+        var domain = AppDomain.CreateDomain("switches", null, setup);
+        try
+        {
+            var probe = (TProbe)domain.CreateInstanceAndUnwrap(
+                typeof(TProbe).Assembly.FullName!, typeof(TProbe).FullName!);
+            return run(probe);
+        }
+        finally
+        {
+            // A thread stuck in native code keeps the domain from unloading; the result above
+            // still reaches the assertion.
+            try
+            {
+                AppDomain.Unload(domain);
+            }
+            catch (CannotUnloadAppDomainException)
+            {
+            }
+        }
+    }
+
+    /// <summary>
+    /// Runs inside the test's own AppDomain and reads the four switches through WPF's own
+    /// properties. Nothing here names the window's code, so the window's assembly is never
+    /// loaded into the domain.
+    /// </summary>
+    public sealed class DefaultsProbe : MarshalByRefObject
+    {
+        public bool[] Read()
+        {
+            RefuseTheWindow();
+            var values = SwitchValues.Read();
+            RefuseTheWindow();
+            return values;
+        }
+
+        private static void RefuseTheWindow()
+        {
+            if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "InstallerClean"))
+                throw new InvalidOperationException(
+                    "The window's assembly is loaded in the domain read for .NET Framework's own switches.");
+        }
+    }
+
+    /// <summary>
+    /// Sets the window's switches inside the test's own AppDomain, then reads or runs.
+    /// </summary>
+    public sealed class WindowProbe : MarshalByRefObject
+    {
+        public bool[] Read()
+        {
+            InstallerClean.FrameworkSwitches.Pin();
+            return SwitchValues.Read();
+        }
+
+        /// <summary>
+        /// Sets the window's switches, starts a Dispatcher on a thread of its own and runs it past
+        /// Loaded, where .NET Framework raises a failed accessibility check. The name of what was
+        /// raised, or null.
+        /// </summary>
+        public string? DispatcherError()
+        {
+            InstallerClean.FrameworkSwitches.Pin();
+
+            string? raised = null;
+            var thread = new Thread(() =>
+            {
+                var dispatcher = Dispatcher.CurrentDispatcher;
+                dispatcher.UnhandledException += (_, e) =>
+                {
+                    raised ??= e.Exception.GetType().Name;
+                    e.Handled = true;
+                };
+                var frame = new DispatcherFrame();
+                dispatcher.BeginInvoke(DispatcherPriority.SystemIdle, new Action(() => frame.Continue = false));
+                Dispatcher.PushFrame(frame);
+                dispatcher.InvokeShutdown();
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            if (!thread.Join(TimeSpan.FromSeconds(30)))
+                return "the dispatcher did not stop";
+            return raised;
+        }
+
+    }
+
+    /// <summary>The four switches, in the order the tests expect, through WPF's own properties.</summary>
+    private static class SwitchValues
+    {
+        internal static bool[] Read() =>
+        [
+            FrameworkSwitch.Read(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48CompatibleAccessibilityFeatures"),
+            FrameworkSwitch.Read(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48aCompatibleAccessibilityFeatures"),
+            FrameworkSwitch.Read(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "OptOutOfGridColumnResizeUsingKeyboard"),
+            FrameworkSwitch.Read(typeof(System.Windows.FrameworkElement).Assembly, "MS.Internal.FrameworkAppContextSwitches", "SelectorUpdatesSelectionPropertiesWhenDisconnected"),
+        ];
+    }
+}

@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 
 namespace InstallerClean.Tests.Services;
@@ -67,7 +68,7 @@ public class InstallerCacheHelpersPathPrefixTests
     {
         var stripped = InstallerCacheHelpers.StripLongPathPrefix(value);
 
-        Assert.True(stripped == value || Path.IsPathFullyQualified(stripped),
+        Assert.True(stripped == value || PathText.IsPathFullyQualified(stripped),
             $"'{value}' came back as '{stripped}', which names a different file per working directory.");
     }
 }

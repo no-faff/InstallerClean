@@ -8,7 +8,7 @@ namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// Real-filesystem integration tests: the service deletes throwaway files
-/// under %TEMP% through a real <c>FileSystem</c>, so the parts a
+/// in the test run's temp folder through a real <c>FileSystem</c>, so the parts a
 /// MockFileSystem cannot reach are exercised. Those are the two safety gates,
 /// which read the real filesystem whatever is injected: the reparse-point
 /// refusal needs a real symlink, and the containment guard needs a real path
@@ -20,15 +20,11 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public class DeleteFilesServiceTests : IDisposable
 {
-    private readonly string _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly string _tempDir = TestTemp.NewFolder("ic-delete-");
 
-    public DeleteFilesServiceTests()
-    {
-        Directory.CreateDirectory(_tempDir);
-    }
 
     // The source-containment guard requires sources to resolve inside the cache
-    // root; point that root at the %TEMP% sandbox so the real files these tests
+    // root; point that root at the test run's sandbox folder so the real files these tests
     // delete are not refused as out-of-bounds, without touching the real cache.
     private DeleteFilesService NewService() =>
         new(new System.IO.Abstractions.FileSystem(), NullMutexProbe.Instance, _tempDir);
@@ -217,6 +213,32 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task DeleteFilesAsync_deletes_a_read_only_file_where_the_host_answers_yes_before_the_retry()
+    {
+        // The host is asked before the first delete, before the attribute is cleared and
+        // before the retried delete, and a yes to each lets the clear and the retry happen.
+        var file = Path.Combine(_tempDir, "readonly-allowed.msi");
+        await File.WriteAllTextAsync(file, "content");
+        File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.ReadOnly);
+        try
+        {
+            var asks = 0;
+            var result = await NewService().DeleteFilesAsync(
+                new[] { file }, UnderLeaseClaims.None, mayAct: _ => { asks++; return true; });
+
+            Assert.False(result.Cancelled);
+            Assert.Equal(1, result.DeletedCount);
+            Assert.Empty(result.Errors);
+            Assert.True(asks >= 3);
+            Assert.False(File.Exists(file));
+        }
+        finally
+        {
+            if (File.Exists(file)) File.SetAttributes(file, FileAttributes.Normal);
+        }
+    }
+
+    [Fact]
     public async Task DeleteFilesAsync_counts_a_cancellation_from_elsewhere_as_that_files_error_and_goes_on()
     {
         var files = new List<string>();
@@ -309,7 +331,6 @@ public class DeleteFilesServiceTests : IDisposable
 
     public void Dispose()
     {
-        if (Directory.Exists(_tempDir))
-            Directory.Delete(_tempDir, recursive: true);
+        TestTemp.Delete(_tempDir);
     }
 }

@@ -118,8 +118,11 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
         // size. Absent means the slider was never moved, i.e. 100%.
         try
         {
+            // A key that will not open reads as the setting left at its default.
+#pragma warning disable RS0030
             using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Accessibility");
-            if (key?.GetValue("TextScaleFactor") is int percent && percent > 0)
+#pragma warning restore RS0030
+            if (key is not null && RegistryData.ValueOf(key, "TextScaleFactor") is int percent && percent > 0)
                 return percent / 100.0;
         }
         catch (Exception)

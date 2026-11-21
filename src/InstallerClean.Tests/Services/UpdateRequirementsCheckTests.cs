@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using System.Net;
 using InstallerClean.Services;
 using NSubstitute;
@@ -73,9 +74,11 @@ public sealed class UpdateRequirementsCheckTests
             await updater.CheckRequirementsAsync("9.9.9", TimeSpan.FromSeconds(2), CancellationToken.None));
     }
 
+    // A timer is set for at most int.MaxValue milliseconds; CancelAfter throws for longer.
     public static TheoryData<TimeSpan> NoLimits =>
     [
         Timeout.InfiniteTimeSpan,
+        TimeSpan.FromMilliseconds(int.MaxValue + 1L),
         TimeSpan.FromMilliseconds(uint.MaxValue - 1),
         TimeSpan.FromMilliseconds(uint.MaxValue),
         TimeSpan.MaxValue,
@@ -83,7 +86,7 @@ public sealed class UpdateRequirementsCheckTests
 
     [Theory]
     [MemberData(nameof(NoLimits))]
-    public async Task An_infinite_limit_or_one_a_timer_takes_at_its_longest_or_beyond_reads_the_file(TimeSpan within)
+    public async Task An_infinite_limit_or_one_longer_than_a_timer_takes_reads_the_file(TimeSpan within)
     {
         // The answer takes a moment, so a limit taken as zero would give the read up first.
         var updater = Updater(new Answers(HttpStatusCode.OK, RefusesEveryDownload, delay: TimeSpan.FromMilliseconds(100)));
@@ -93,12 +96,22 @@ public sealed class UpdateRequirementsCheckTests
     }
 
     [Fact]
-    public async Task A_long_limit_short_of_the_timers_longest_reads_the_file()
+    public async Task The_longest_limit_a_timer_takes_reads_the_file()
     {
         var updater = Updater(new Answers(HttpStatusCode.OK, RefusesEveryDownload, delay: TimeSpan.FromMilliseconds(100)));
 
         Assert.Equal(UpdateRefusal.CannotInstallFromThisCopy, await updater.CheckRequirementsAsync(
-            "9.9.9", TimeSpan.FromMilliseconds(int.MaxValue + 1L), CancellationToken.None));
+            "9.9.9", TimeSpan.FromMilliseconds(int.MaxValue), CancellationToken.None));
+    }
+
+    [Fact]
+    public void The_longest_limit_a_timer_takes_is_a_limit_and_anything_longer_is_none()
+    {
+        Assert.False(AppUpdater.IsNoLimit(TimeSpan.FromMilliseconds(int.MaxValue)));
+        Assert.True(AppUpdater.IsNoLimit(TimeSpan.FromMilliseconds(int.MaxValue) + TimeSpan.FromTicks(1)));
+
+        using var timer = new CancellationTokenSource();
+        timer.CancelAfter(TimeSpan.FromMilliseconds(int.MaxValue));
     }
 
     [Fact]
@@ -126,7 +139,7 @@ public sealed class UpdateRequirementsCheckTests
         var updater = Updater(network);
 
         var failed = await Assert.ThrowsAsync<UpdateFailedException>(() => updater.CheckRequirementsAsync(
-            "9.9.9", TimeSpan.FromMilliseconds(milliseconds), CancellationToken.None));
+            "9.9.9", Durations.FromMilliseconds(milliseconds), CancellationToken.None));
 
         Assert.Equal(UpdateFailureStage.Download, failed.Stage);
         Assert.Equal(0, network.Requests);
@@ -213,7 +226,7 @@ public sealed class UpdateRequirementsCheckTests
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Requests++;
-            if (delay is { } wait) await Task.Delay(wait, cancellationToken);
+            if (delay is { } wait) await FrameworkTask.Delay(wait, cancellationToken);
             cancelAsItAnswers?.Cancel();
             var bytes = System.Text.Encoding.UTF8.GetBytes(body ?? string.Empty);
             return new HttpResponseMessage(status)
@@ -231,7 +244,7 @@ public sealed class UpdateRequirementsCheckTests
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            await FrameworkTask.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             throw new InvalidOperationException("A delay without end ended.");
         }
     }
@@ -239,9 +252,9 @@ public sealed class UpdateRequirementsCheckTests
     /// <summary>A body that cancels <paramref name="cts"/> when a read finds nothing left.</summary>
     private sealed class CancelsAtEnd(byte[] bytes, CancellationTokenSource cts) : MemoryStream(bytes)
     {
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            var read = await base.ReadAsync(buffer, cancellationToken);
+            var read = await base.ReadAsync(buffer, offset, count, cancellationToken);
             if (read == 0) cts.Cancel();
             return read;
         }

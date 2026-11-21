@@ -94,6 +94,10 @@
     <value>InstallerClean couldn't read the report.</value>
     <comment>Shown in the window headed Window.Report.Title, in place of the report, where the file holding it cannot be read when the window opens.</comment>
   </data>
+  <data name="Window.Notices.Title" xml:space="preserve">
+    <value>Third-party notices</value>
+    <comment>The heading of the window About.Link.Notices opens, which shows the notices and licences of the other people's work inside InstallerClean: fonts, icons and code libraries. Also the window's spoken title and the screen-reader name of the box holding the text. The text itself is not translated: licences are kept in the words they were written in.</comment>
+  </data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
@@ -233,6 +237,10 @@
     <value>Report a problem</value>
     <comment>About-window link to the GitHub issue tracker.</comment>
   </data>
+  <data name="About.Link.Notices" xml:space="preserve">
+    <value>Third-party notices</value>
+    <comment>About-window link that opens a window showing the notices and licences of the other people's work inside InstallerClean (Window.Notices.Title).</comment>
+  </data>
   <data name="About.AutoUpdateCheck" xml:space="preserve">
     <value>Check for updates automatically</value>
     <comment>Checkbox label in the About window.</comment>
@@ -321,6 +329,10 @@
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>Opens the issue tracker on github.com in your browser.</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.About.Notices.HelpText" xml:space="preserve">
+    <value>Shows the licences of the fonts, icons and code InstallerClean includes.</value>
+    <comment>Screen-reader help on the About window's "Third-party notices" link, which opens a window inside the app rather than a page in the browser.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
     <value>If ticked, InstallerClean checks github for a newer version when you run it.</value>
@@ -491,8 +503,8 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. This is the screen's strongest safety claim, so the wording in this language has to carry it as plainly as the English does.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).</value>
-    <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
+    <value>They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed as safe to delete when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE A FILE LISTED AS SAFE TO DELETE CAN HAVE: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and its file is never listed as safe to delete, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is listed as safe to delete because no registration claims its file, and a superseded patch is listed as safe to delete BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is listed as safe to delete at all. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid. "Listed as safe to delete" is one phrase: a translation keeps it whole, in the words the language uses for it elsewhere in the app.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
     <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.</value>
@@ -527,7 +539,7 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as Windows Update or a program being installed or removed. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} until it has finished. Then Re-scan and they come back.</value></data>
   <!-- The banner for a Windows Installer lock InstallerClean was refused permission
        to open. Names the folder with the {InstallerFolder} token like the rest of the
        family. It says only what the app knows: Windows refused it the check, so nothing
@@ -551,16 +563,16 @@
        decimal. Cli.PendingRebootBlocked.MsiExecuteMutexUnreadable has the same pair. -->
   <data name="Body.PendingReboot.MsiExecuteMutexUnreadable" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer is busy, so Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Restart Windows and Re-scan. If it still can't check, this isn't a machine InstallerClean can clean.</value></data>
   <data name="Body.PendingReboot.MsiExecuteMutexUnreadableWindowsError" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer is busy, because Windows gave an error: {0} (error {1}). Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Restart Windows and Re-scan. If it still can't check, this isn't a machine InstallerClean can clean.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>An earlier Windows Installer job has been started but not finished, so Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Finish or undo it, or restart Windows, then Re-scan.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a change to {InstallerFolder} waiting for the next restart, so Move and Delete are paused. Restart Windows, then Re-scan.</value></data>
   <!-- The banner for an entry the gate cannot place. Names the folder with the
        {InstallerFolder} token like the rest of the family. It states what the machine
-       holds, a queued file operation, and stops there: nothing here has shown that
-       Windows Installer is running or that an install is suspended, so the two banners
-       that say so would both be untrue, and Body.PendingReboot.Other says something is
-       in progress and would be untrue as well. The restart is the instruction because
+       holds, a file change waiting for the next restart, and stops there: nothing here
+       has shown that Windows Installer is running or that an install is unfinished, so
+       the two banners that say so would both be untrue, and Body.PendingReboot.Other says
+       something is unfinished and would be untrue as well. The restart is the instruction because
        these operations are carried out at the next boot and not before. -->
-  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>Windows has a file change waiting for the next restart, and InstallerClean can't tell which files it affects, so it can't rule out that they're in {InstallerFolder}. Move and Delete are paused. Restart Windows, then Re-scan.</value></data>
   <!-- The banner for a registry read that did not answer. Names the folder with the
        {InstallerFolder} token like the rest of the family. It names neither of the two
        reads, because one sentence has to be true whichever of them it was, and it claims
@@ -569,16 +581,16 @@
        because it clears a transient fault, and the last sentence says plainly what it
        means if it does not, rather than leaving somebody re-scanning at a machine whose
        permissions will refuse the read again tomorrow. -->
-  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.</value></data>
+  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether Windows Installer is busy or has work waiting for a restart. Move and Delete are paused. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
        property throwing produces: WPF swallows it as a binding error and paints
        nothing. It says what is true of every reason in that family, that
-       something is in progress and the buttons come back afterwards, and says
+       something is unfinished and the buttons come back afterwards, and says
        nothing it cannot know. Names the folder with the token like the rest of
        the family. -->
-  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.</value></data>
+  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something unfinished, so Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Once it has cleared, Re-scan and they come back.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
@@ -662,9 +674,9 @@ To put it back, you need the installer for the version you already have. Get it 
   <!-- The line under Action.StopWaiting's button, shown while the button is: what
        giving up on the drive or share costs. A file already checked against it keeps
        its answer; every file still to be checked against it is left alone rather than
-       offered. "It" is the drive or share the waiting line names, and "left alone" is
+       listed as safe to delete. "It" is the drive or share the waiting line names, and "left alone" is
        worded as in Window.Registered.Title. -->
-  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Any file still to be checked against it will be left alone.</value></data>
+  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Any file InstallerClean still needs it to check will be left alone.</value></data>
   <!-- What a screen reader says for the waiting line while Action.StopWaiting's
        button shows; nothing on screen changes. 0 = the waiting line as drawn
        (Status.WaitingForDrive or Status.WaitingForPath), 1 = the access key of
@@ -742,20 +754,20 @@ To put it back, you need the installer for the version you already have. Get it 
        summary + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
-  <!-- THE HEADING FOR A RUN THAT OFFERED NOTHING AND HELD BACK FILES IT COULD NOT
-       ESTABLISH ARE UNNEEDED, or carried on without a drive or share and left a file alone
-       because of it. That is a different finding from a folder with nothing in it to
-       remove and must not share a screen with one: Completion.AllClean over
+  <!-- THE HEADING FOR A RUN THAT LISTED NO FILE AS SAFE TO DELETE AND LEFT ALONE FILES IT
+       COULD NOT ESTABLISH ARE UNNEEDED, or stopped waiting for a drive or share and left a
+       file alone because of it. That is a different finding from a folder with nothing in it
+       to remove and must not share a screen with one: Completion.AllClean over
        Completion.NothingToCleanUp says the folder is clear, and this heading says only that
-       nothing was offered. Under it the card carries the receipt,
+       no file can be deleted this time, the lines under it saying why. Under it the card carries the receipt,
        Completion.NothingToCleanUpReceipt, and above that each line saying what to do that
        applies: Completion.RecentChange, Summary.ScanSignal.* and Summary.SourceGivenUp.*
        or Summary.SourcesGivenUp. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
-  <!-- Files the scan held back because the latest of their times, as Windows records
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>No files can be deleted</value></data>
+  <!-- Files the scan left alone because the latest of their times, as Windows records
        them, is at or after the moment the scan began. The window's finished cards, its
-       "Nothing offered on this PC" screen and the command line all print it, from
-       RecentChangeReport.Line, and only where at least one file was held back for that
+       "No files can be deleted" screen and the command line all print it, from
+       RecentChangeReport.Line, and only where at least one file was left alone for that
        reason on a scan that found Windows Installer's in-progress signals clear. A file
        the scan held because one of those signals was set is spoken of through that
        signal's own line instead (Summary.ScanSignal.* on the window, Cli.ScanSignal.* on
@@ -768,8 +780,8 @@ To put it back, you need the installer for the version you already have. Get it 
        0 = files held back for their times, 1 = pluralised "file"/"files", 2 = their size.
        THE ONE-FORM NAMES THE SIZE AND NOT THE NUMERAL, so it spends 2 and leaves 0
        and 1 unused. -->
-  <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>One file ({2}) was held back because Windows shows it was changed after InstallerClean started scanning. If a program was installing or updating, scan again once it has finished and InstallerClean will check it again.</value></data>
-  <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>{0} {1} ({2}) were held back because Windows shows they were changed after InstallerClean started scanning. If a program was installing or updating, scan again once it has finished and InstallerClean will check them again.</value></data>
+  <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>One file ({2}) was left alone because Windows shows it changed after the scan started. If something was installing or updating, scan again once it has finished.</value></data>
+  <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>{0} {1} ({2}) were left alone because Windows shows they changed after the scan started. If something was installing or updating, scan again once it has finished.</value></data>
   <!-- The line under the post-Move summary, in its two forms: the backup folder
        is on another drive, or on the drive the files came from. Delete has no
        counterpart, and deliberately: nothing is left in a folder after a delete,
@@ -853,11 +865,11 @@ To put it back, you need the installer for the version you already have. Get it 
        as a repeat once they did not. A second print in one run is the fault rather
        than the wording.
 
-       0 = files held back. A PAIR RATHER THAN A FLAT STRING because the second
+       0 = files left alone. A PAIR RATHER THAN A FLAT STRING because the second
        sentence inflects with the count as well as the noun does ("it was"
        against "these were"), which one string cannot carry. Grammatical rather
        than Cardinality (DisplayHelpers.QuestionFor): the one-form spends {0} and
-       reads "1 file held back", a numeral governing a noun. A language may add a
+       reads "1 file left alone", a numeral governing a noun. A language may add a
        satellite-only Completion.HeldBack.One/.Few/.Many override for its own
        count grammar.
 
@@ -875,8 +887,8 @@ To put it back, you need the installer for the version you already have. Get it 
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file held back. The scan said it was unneeded. The final check couldn't confirm that.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files held back. The scan said these were unneeded. The final check couldn't confirm that.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file left alone. The scan listed it as safe to delete, but the last check before moving or deleting couldn't confirm it.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files left alone. The scan listed them as safe to delete, but the last check before moving or deleting couldn't confirm it.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -927,51 +939,55 @@ To put it back, you need the installer for the version you already have. Get it 
   </data>
   <data name="Completion.ReportPanel.Freed" xml:space="preserve">
     <value>How much space was freed, and how many files were moved or deleted</value>
-    <comment>Bullet 1 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 1 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Destination" xml:space="preserve">
     <value>Whether a Move went to the same drive, another drive, a removable drive or a network share</value>
-    <comment>Bullet 2 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 2 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Durations" xml:space="preserve">
     <value>How long the scan and the Move or Delete took</value>
-    <comment>Bullet 3 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 3 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.InstallerFiles" xml:space="preserve">
     <value>How many installer files there are of each kind, and how much space they take</value>
-    <comment>Bullet 4 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 4 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.LeftAlone" xml:space="preserve">
     <value>How many files were left alone, and why</value>
-    <comment>Bullet 5 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 5 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Waits" xml:space="preserve">
     <value>How often InstallerClean waited for a slow drive or network share, and how many it stopped waiting for</value>
-    <comment>Bullet 6 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 6 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Records" xml:space="preserve">
     <value>How many programs and patches Windows has a record of</value>
-    <comment>Bullet 7 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 7 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.ShortNames" xml:space="preserve">
     <value>Whether Windows still makes old-style short file names</value>
-    <comment>Bullet 8 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 8 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Windows" xml:space="preserve">
     <value>Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to</value>
-    <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 9 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>InstallerClean's version, how you got it (setup, portable, slim, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing</value>
-    <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <value>InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing</value>
+    <comment>Bullet 10 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
     <value>Counts of anything that went wrong</value>
-    <comment>Bullet 11 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 11 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+  </data>
+  <data name="Completion.ReportPanel.ReportId" xml:space="preserve">
+    <value>A random code made for this report, so that it's only counted once if it's sent more than once</value>
+    <comment>Bullet 12 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list. The code is made at random when the report is made, and every copy of the report sent again carries the same code, so the receiver keeps one copy.</comment>
   </data>
   <data name="Completion.ReportPanel.Closing" xml:space="preserve">
-    <value>Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address.</value>
-    <comment>The closing line of the panel opened from the small &quot;i&quot; beside Completion.SendReport, under the eleven bullets. &quot;I&quot; is the app's author.</comment>
+    <value>Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address.</value>
+    <comment>The closing line of the panel opened from the small &quot;i&quot; beside Completion.SendReport, under the twelve bullets. &quot;That code&quot; is the random code Completion.ReportPanel.ReportId names. &quot;I&quot; is the app's author.</comment>
   </data>
   <data name="Completion.ReportPanel.SeeReport" xml:space="preserve">
     <value>See exactly what's sent</value>
@@ -1043,16 +1059,16 @@ To put it back, you need the installer for the version you already have. Get it 
        the main window's left-alone line, as the body of the finished card where a scan
        offered nothing, and under the held-back line on the card after a Move or Delete.
        The app gives a drive up when somebody presses Action.StopWaiting, when it does
-       not answer, or when its reads take too long, and "carried on without" is true of
+       not answer, or when its reads take too long, and "stopped waiting for" is true of
        each. The drive is named inside the sentence, so a language that declines the noun
-       after "without" declines it here. "Left alone" is worded as in
+       after "for" declines it here. "Left alone" is worded as in
        Window.Registered.Title, and "Re-scan" is Action.Rescan's label without its
        access-key marker. 0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean carried on without drive {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan.</value></data>
+  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone the files it needed that drive to check. Re-scan once it's responding normally.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, for a folder that is not on a drive letter, named
        as it is spelled. 0 = a network share such as "\\fileserver\apps", or another
        path -->
-  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean carried on without {0} and left alone any file still to be checked against it. Once it's responding normally, Re-scan.</value></data>
+  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone the files it needed that location to check. Re-scan once it's responding normally.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
@@ -1060,32 +1076,32 @@ To put it back, you need the installer for the version you already have. Get it 
        brackets, so its separators cannot be read as the sentence's own punctuation, and
        it carries no "and", which a list joined in code cannot place in every
        language. -->
-  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean carried on without more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, Re-scan.</value></data>
+  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone the files it needed them to check. Re-scan once they're responding normally.</value></data>
   <!-- The window's line under the left-alone count, where the scan found one of the
        signals the Body.PendingReboot.* banners name set when it read them just after its
-       clock, and so held back every file in the folder no record names. One line per
+       clock, and so left alone every file in the folder no record names. One line per
        reason, as Cli.ScanSignal.* has them and with the same placeholders, ending with
-       the Re-scan button's label rather than with running a command again. The "Nothing
-       offered on this PC" card carries the same line.
+       the Re-scan button's label rather than with running a command again. The "No files
+       can be deleted" card carries the same line.
 
        IN THE PAST TENSE, AND IT IS SHOWN WHETHER OR NOT THE SIGNAL IS STILL SET. Where it
        is, the warning banner above says so in the present, and both are true. -->
-  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>Something was using Windows Installer when the scan started, such as a Windows Update or a program installing, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Re-scan once that has finished.</value></data>
-  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>A Windows Installer transaction was suspended on this machine when the scan started, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Resume or roll back that install, or restart Windows, then Re-scan.</value></data>
-  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>When the scan started, Windows had a file rename queued for the next restart that affects {InstallerFolder}, so InstallerClean held back the files there that no installed program's records name, rather than offering them. Restart Windows, then Re-scan.</value></data>
-  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>When the scan started, a file operation was queued for the next restart and InstallerClean couldn't tell which files it names, so it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows, then Re-scan.</value></data>
-  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>When the scan started, Windows refused InstallerClean permission to check whether Windows Installer was busy, so it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and Re-scan.</value></data>
-  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>When the scan started, InstallerClean couldn't read one of the Windows settings it checks, so it couldn't tell whether an installer operation was running or waiting for a restart, and it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and Re-scan.</value></data>
-  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>When the scan started, InstallerClean couldn't check whether Windows Installer was busy, so it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and Re-scan.</value></data>
-  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>When the scan started, InstallerClean couldn't check whether Windows Installer was busy, because Windows gave an error: {0} (error {1}). So it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and Re-scan.</value></data>
-  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>Windows Installer had something in progress or waiting when the scan started, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Re-scan once that has cleared.</value></data>
+  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>Something was using Windows Installer when the scan started, such as Windows Update or a program being installed or removed. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Re-scan once it has finished.</value></data>
+  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>Windows Installer had an earlier job paused, not finished, when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Finish or undo it, or restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows had a change to {InstallerFolder} waiting for the next restart. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows had a file change waiting for the next restart, and InstallerClean couldn't tell which files it affects. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>InstallerClean couldn't read a Windows setting it checks, so it couldn't tell whether Windows Installer was busy or had work waiting for a restart when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan.</value></data>
+  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>Windows Installer had something unfinished when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Re-scan once it has cleared.</value></data>
   <!-- The window's line in the same place, where the system clock went back while the
        scan read the files' times (the wall clock advanced less than a monotonic timer by
        more than a small allowance), so the scan held back every file in the folder no
        record names. "Went back or lost time" covers a clock set back and one slowed
        beyond the allowance. Never shown beside a Summary.ScanSignal.* line above: where a
        signal was set, no file's times are read. -->
-  <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Re-scan.</value></data>
+  <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1211,8 +1227,18 @@ InstallerClean was already running as administrator, so starting it again that w
        heading names none and has to stay true of all of them. -->
   <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean stopped</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan failed</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <!-- The closing sentence after the message of a stop at a scan or at the check made
+       before a Move or Delete, joined to it as two sentences. Error.NothingRemoved follows
+       Error.InstallerDbEmpty, Error.MsiAccessDenied, Error.MsiNonSuccess,
+       Error.MsiEnumerationNeverEnded, Error.MsiPatchEnumerationNeverEnded,
+       Error.ScanRecordsUnreadable and Error.ScanCacheRootUnresolved. crash.log leaves it out. -->
+  <data name="Error.NothingRemoved" xml:space="preserve"><value>Nothing has been removed.</value></data>
+  <!-- As Error.NothingRemoved, after Error.ScanCorrelationFailed,
+       Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
+       Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
+  <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>No file has been listed as safe to delete and nothing has been removed.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped.</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1225,7 +1251,7 @@ InstallerClean was already running as administrator, so starting it again that w
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {1} {2}, then an entry came back unreadable (error code {0}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {1} {2}, then an entry came back unreadable (error code {0}). Rather than work from a part-read list, InstallerClean stopped.</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1237,7 +1263,7 @@ InstallerClean was already running as administrator, so starting it again that w
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1245,7 +1271,7 @@ InstallerClean was already running as administrator, so starting it again that w
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1260,7 +1286,7 @@ InstallerClean was already running as administrator, so starting it again that w
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1272,7 +1298,7 @@ InstallerClean was already running as administrator, so starting it again that w
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded.</value></data>
   <!-- Shown when the scan stops before its walk because Windows reports the
        Installer folder at a path other than its own, ignoring case: the folder,
        or a folder above it, is a junction or a directory symbolic link, and a
@@ -1280,13 +1306,13 @@ InstallerClean was already running as administrator, so starting it again that w
        reports and no cause for it, because more than one condition produces it.
        {0} is that path, a full folder path such as D:\Cache\Installer. Names the
        folder the app asked about through the {InstallerFolder} token. -->
-  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path.</value></data>
   <!-- Shown when the scan stops at its walk because Windows answered that the
        cache folder cannot be found when the app went to list it. Only that answer
        reaches this message; every other failure to list the folder gets
        Error.ScanInstallerFolderListFailed below. Names the folder through the
        {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows reports that {InstallerFolder} doesn't exist on this PC, so InstallerClean stopped. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows reports that {InstallerFolder} doesn't exist on this PC, so InstallerClean stopped.</value></data>
   <!-- Shown when the scan stops at its walk because Windows returned an error while
        the app was listing the cache folder, whether when the folder was opened or
        part-way through it: a refusal or any other failed read. Windows answering
@@ -1294,7 +1320,7 @@ InstallerClean was already running as administrator, so starting it again that w
        instead. States no cause beyond that, because more than one condition
        produces it and naming one would be false of the others. Names the folder
        through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows reported an error when InstallerClean tried to list the files in {InstallerFolder}, so it couldn't get a complete list and stopped. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows reported an error when InstallerClean tried to list the files in {InstallerFolder}, so it couldn't get a complete list and stopped.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1303,14 +1329,14 @@ InstallerClean was already running as administrator, so starting it again that w
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was listed as safe to delete. This scan found nothing because that check failed, not because the folder is clean.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1537,8 +1563,8 @@ Details in {1}.</value></data>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Couldn't reach GitHub. Check your internet connection and try again.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub returned an error response. Try again in a few minutes.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>The check timed out. Your connection to GitHub may be slow; try again.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -1619,6 +1645,35 @@ Details written to:
 
 The crash log could not be written.</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>Startup error</value></data>
+  <!-- 0 = the config file's name (the exe's name followed by .config); 1 = its full
+       path, on its own line below the sentence. Shown by the window under
+       Startup.ErrorTitle and printed by the command line, both verbatim, when a
+       .exe.config beside a copy says more than the config InstallerClean's build
+       writes. The portable and the command line are downloaded with no config, so
+       such a file is one the copy did not come with (PlantedConfig). InstallerClean
+       is the app name and is not translated. -->
+  <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.
+
+{1}</value></data>
+  <!-- Shown by the window in a message box and printed by the command line, which
+       then exits 1, on a PC running Windows older than Windows 10 version 1607:
+       Windows 7, 8.1, and Windows 10 versions 1507 and 1511. Checked before
+       Startup.NeedsNetFramework48. "InstallerClean", "Windows 10" and "Windows 11"
+       are names and are not translated; "version 1607" is how Microsoft names
+       that release of Windows 10. -->
+  <data name="Startup.NeedsWindows10Version1607" xml:space="preserve"><value>InstallerClean needs Windows 10 version 1607 or later, or Windows 11.</value></data>
+  <!-- Shown by the window in a plain message box titled Window.Main.Title, then the
+       window closes, where the PC does not have .NET Framework 4.8 (NetFrameworkCheck).
+       Below it, after a blank line, Cli.UpdateDownloadLink with
+       UpdateNotice.DownloadNetFramework48 and Microsoft's installer. "Open InstallerClean
+       again" means start the app again, after the restart. ".NET Framework 4.8" and
+       "Microsoft" are names and are not translated. -->
+  <data name="Startup.NeedsNetFramework48" xml:space="preserve"><value>InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again.</value></data>
+  <!-- Startup.NeedsNetFramework48 for the command line, which prints it and then
+       Cli.UpdateDownloadLink on the next line, and exits 1. "Run InstallerClean again"
+       means run the command again, after the restart. ".NET Framework 4.8" and
+       "Microsoft" are names and are not translated. -->
+  <data name="Cli.NeedsNetFramework48" xml:space="preserve"><value>InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then run InstallerClean again.</value></data>
   <!-- 0 = exception type name (see Startup.UnhandledBody for why this
        is the type name and not the message), 1 = crash log path. -->
   <data name="Startup.FailedToStart" xml:space="preserve"><value>Failed to start ({0}). Details written to:
@@ -1745,21 +1800,21 @@ Run InstallerClean again as administrator.</value></data>
        already ends that way, so a filter watching this channel meets one phrase
        and not two.
 
-       IT HAS HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
+       IT LEFT {1} {2} ALONE RATHER THAN "{1} {2} were left alone", AND THE WORD ORDER
        IS THE PLURALISATION. This line is machine-read and forced English at the
        emit site, so it takes no .Singular/.Plural pair and the passive form read
-       "so 1 file were held back" at a count of one. Putting the app back in as the
+       "so 1 file were left alone" at a count of one. Putting the app back in as the
        subject makes one shape correct at every count, which is what a matched
        surface needs. -->
-  <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not be certain which cached files belong to the programs installed here, so it has held back {1} {2}. No action taken.</value></data>
+  <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be listed as safe to delete. InstallerClean could not be certain which cached files belong to the programs installed here, so it left {1} {2} alone. No action taken.</value></data>
   <!-- The per-file twin of the entry above, for the machine whose candidates were
        each judged and kept rather than emptied wholesale, so the Application channel
        tells those two apart. It shares Event ID 1000 with its
        sibling for the reason recorded above, and it takes the same three arguments in
        the same order. Machine-read and forced English at the emit site, as that entry
        is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
-       "it has held back {1} {2}" is correct at every count where the passive is not. -->
-  <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it has held back {1} {2}. No action taken.</value></data>
+       "it left {1} {2} alone" is correct at every count where the passive is not. -->
+  <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be listed as safe to delete. InstallerClean could not establish that any of the cached files it found are unneeded, so it left {1} {2} alone. No action taken.</value></data>
   <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
        outcome band cannot carry the distinction. The entry above sits at 1000 with
        the clean-machine line, since the run did its job either way, so a filter
@@ -1789,7 +1844,7 @@ Run InstallerClean again as administrator.</value></data>
        notices, so it also reaches a machine whose walk offer was emptied while a
        superseded registration was still offered beside it. Naming no cause matters
        more here for that reason, not less. -->
-  <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain which cached files belong to the programs installed here, so it has held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
+  <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain which cached files belong to the programs installed here, so it left {1} {2} alone, and no file it found by looking in the folder was listed as safe to delete.</value></data>
   <!-- The per-file twin of the notice above, at the same Event ID 3002 and for the
        same reason: the outcome band cannot separate a machine nothing could be judged
        on from one that is genuinely clean. IT NAMES NO SHARE OF THE FILES IT WAS
@@ -1800,7 +1855,7 @@ Run InstallerClean again as administrator.</value></data>
        the same log a band apart, so a word here naming a share of them would describe
        one machine two ways. Same three arguments, same order, and it names no folder,
        which is the rule on this channel and is stated above. -->
-  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that particular cached files it found are unneeded, so it has held back {1} {2}.</value></data>
+  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that particular cached files it found are unneeded, so it left {1} {2} alone.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unneeded {2} found, {3}. No action taken.</value></data>
   <!-- 0 = how many files, 1 = the programs they belong to
@@ -1849,8 +1904,8 @@ Run InstallerClean again as administrator.</value></data>
        run whose console nobody reads still records that superseded files were held
        back. It names no cause: several separate findings reach the count, and no
        sentence naming one of them is true of the files the others contribute. -->
-  <data name="Cli.EventLogSupersededHeldBack.Singular" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that {1} superseded file is no longer needed, so it has held it back.</value></data>
-  <data name="Cli.EventLogSupersededHeldBack.Plural" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that {1} superseded files are no longer needed, so it has held them back.</value></data>
+  <data name="Cli.EventLogSupersededHeldBack.Singular" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that {1} superseded file is no longer needed, so it left it alone.</value></data>
+  <data name="Cli.EventLogSupersededHeldBack.Plural" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that {1} superseded files are no longer needed, so it left them alone.</value></data>
   <!-- The command line's line naming a drive that the scan, or the check made before a
        Move or Delete, stopped waiting for while files still had to be checked against
        it. The scan's is printed among its notices, after the count of files left alone,
@@ -1863,16 +1918,16 @@ Run InstallerClean again as administrator.</value></data>
        named inside the sentence, so a language that declines the noun after "for"
        declines it here. "Left alone" is worded as in Summary.SourceGivenUp.Drive.
        0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again.</value></data>
+  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone the files it needed that drive to check. Once it's responding normally, run the command again.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, for a folder that is not on a drive letter, named as
        it is spelled. 0 = a network share such as "\\fileserver\apps", or another path -->
-  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again.</value></data>
+  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone the files it needed that location to check. Once it's responding normally, run the command again.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
        Display.ListSeparator, e.g. "drive D:, \\nas\installers". The list stands in
        brackets and carries no "and", as in Summary.SourcesGivenUp. -->
-  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again.</value></data>
+  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone the files it needed them to check. Once they're responding normally, run the command again.</value></data>
   <!-- The outcome entry, Event ID 1000, for a scan that offered nothing, has no other
        withholding to report, and stopped waiting for a drive or share while files still
        had to be checked against it. It is written in place of Cli.EventLogScanNoOrphans,
@@ -1886,8 +1941,8 @@ Run InstallerClean again as administrator.</value></data>
        3 = pluralised "file"/"files". "No action taken" ends it as it ends
        Cli.EventLogScanFound and Cli.EventLogNothingOffered, so a filter watching this
        channel meets one phrase. Machine-read and forced English at the emit site. -->
-  <data name="Cli.EventLogSourcesGivenUp.Singular" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean stopped waiting for {1} drive or share and left alone the {2} {3} it still had to check against it. No action taken.</value></data>
-  <data name="Cli.EventLogSourcesGivenUp.Plural" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean stopped waiting for {1} drives or shares and left alone the {2} {3} it still had to check against them. No action taken.</value></data>
+  <data name="Cli.EventLogSourcesGivenUp.Singular" xml:space="preserve"><value>{0} mode: nothing could be listed as safe to delete. InstallerClean stopped waiting for {1} drive or share and left alone the {2} {3} it still had to check against it. No action taken.</value></data>
+  <data name="Cli.EventLogSourcesGivenUp.Plural" xml:space="preserve"><value>{0} mode: nothing could be listed as safe to delete. InstallerClean stopped waiting for {1} drives or shares and left alone the {2} {3} it still had to check against them. No action taken.</value></data>
   <!-- Event ID 3004, a notice beside the run's summary, written wherever the scan
        stopped waiting for a drive or share while files still had to be checked against
        it, whatever else the run did. Cli.EventLogSourcesGivenUpCheckNotice is the same
@@ -1921,14 +1976,14 @@ Run InstallerClean again as administrator.</value></data>
        Cli.EventLogSupersededHeldBack IS NOT THIS FIGURE IN OTHER WORDS: it counts files held
        back, which is a different quantity reached by several routes, of which the
        condition here is one. The window does not show this figure. -->
-  <data name="Cli.EventLogScanWithheld.Singular" xml:space="preserve"><value>{0} mode: {1} program entry in Windows Installer's records could not be checked, so no superseded patch was offered.</value></data>
-  <data name="Cli.EventLogScanWithheld.Plural" xml:space="preserve"><value>{0} mode: {1} program entries in Windows Installer's records could not be checked, so no superseded patch was offered.</value></data>
+  <data name="Cli.EventLogScanWithheld.Singular" xml:space="preserve"><value>{0} mode: {1} program entry in Windows Installer's records could not be checked, so no superseded patch was listed as safe to delete.</value></data>
+  <data name="Cli.EventLogScanWithheld.Plural" xml:space="preserve"><value>{0} mode: {1} program entries in Windows Installer's records could not be checked, so no superseded patch was listed as safe to delete.</value></data>
   <!-- 0 = mode arg, 1 = cached patch files the scan could not match to any program it
        asks about (EnumerationCensus.UnattributedPatchFileCount). The same Event ID 3000,
        written in place of Cli.EventLogScanWithheld where every program entry was checked
        and these files are what held every superseded patch back. -->
-  <data name="Cli.EventLogScanWithheldPatchFiles.Singular" xml:space="preserve"><value>{0} mode: {1} cached patch file could not be matched to any program this scan could ask about, so no superseded patch was offered.</value></data>
-  <data name="Cli.EventLogScanWithheldPatchFiles.Plural" xml:space="preserve"><value>{0} mode: {1} cached patch files could not be matched to any program this scan could ask about, so no superseded patch was offered.</value></data>
+  <data name="Cli.EventLogScanWithheldPatchFiles.Singular" xml:space="preserve"><value>{0} mode: {1} cached patch file could not be matched to any program this scan could ask about, so no superseded patch was listed as safe to delete.</value></data>
+  <data name="Cli.EventLogScanWithheldPatchFiles.Plural" xml:space="preserve"><value>{0} mode: {1} cached patch files could not be matched to any program this scan could ask about, so no superseded patch was listed as safe to delete.</value></data>
   <!-- 0 = mode arg, 1 = registrations naming a file that is not in the cache. The
        second notice (Event ID 3001), and the actionable one. A pair, because the
        numeral governs a noun and a verb: one entry NAMES a file and affects one
@@ -1980,28 +2035,29 @@ Run InstallerClean again as administrator.</value></data>
     <comment>Application event log, machine-read: MachineContract forces en-GB at the emit site, so the line reads the same whatever language the machine is in. It names the installer folder in words and spells no path, so it needs neither a literal nor the {InstallerFolder} token; the operator-facing lines that name the folder carry the token. 1 is the destination as the run was given it, and this line is the only record of that path: the sentence printed to stdout beside it names none.</comment>
   </data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
+  <data name="Cli.EventLogMoveDestinationTooLong" xml:space="preserve"><value>{0} mode aborted: destination {1} is too long, as a moved file's path would reach 260 characters.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>
   <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
   <data name="Cli.EventLogMoveNotEnoughSpace" xml:space="preserve"><value>{0} mode aborted: destination {1} has {2} free and the move needs {3}.</value></data>
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, such as Windows Update or a program being installed or removed. /m and /d are blocked while that runs. Try again once it has finished.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: an earlier Windows Installer job has been started but not finished. /m and /d are blocked, so InstallerClean won't touch {InstallerFolder}. Finish or undo it, or restart Windows, then try again.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: Windows has a change to {InstallerFolder} waiting for the next restart ({0}). /m and /d are blocked. Restart Windows, then try again.</value></data>
   <!-- The command-line twin of Body.PendingReboot.PendingRenameUnresolved, adapted the
        way the rest of this family is: opens "Error: " and goes lower case after it. No
        placeholder, because the {0} in the PendingRenameInCache line above names a
        resolved cache path and this arm has none to name. -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Error: Windows has a file change waiting for the next restart, and InstallerClean can't tell which files it affects, so it can't rule out that they're in {InstallerFolder}. /m and /d are blocked. Restart Windows, then try again.</value></data>
   <!-- The command-line twin of Body.PendingReboot.RegistryCheckUnreadable, adapted the
        way the rest of this family is: opens "Error: ", names the flags rather than the
        window's buttons, and drops Re-scan, there being nothing to re-scan on a command
        line. It says "registry values" where the banner says "Windows settings", the
        reader here being the person who typed the switch. Names neither read, for the
        reason the banner does not. No placeholder. -->
-  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.</value></data>
+  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't tell whether Windows Installer is busy or has work waiting for a restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.</value></data>
   <!-- The command line's sentence for a sample of the Windows Installer lock that failed
        in a way that is neither a refusal nor a finding, the twin of
        Body.PendingReboot.MsiExecuteMutexUnreadable. Shaped like
@@ -2014,7 +2070,7 @@ Run InstallerClean again as administrator.</value></data>
        adapted the way the rest of the family is: the flags rather than the window's
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
-  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
+  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something unfinished, so /m and /d are blocked and InstallerClean won't touch {InstallerFolder}. Try again once it has cleared.</value></data>
   <!-- What the command line prints, on every mode, where the scan found one of the
        signals the Cli.PendingRebootBlocked.* lines name set when it read them just
        after its clock, and so held back every file in the folder no record names. They report and
@@ -2035,23 +2091,23 @@ Run InstallerClean again as administrator.</value></data>
        number, in decimal.
 
        Every line speaks of the moment the scan started, in the past tense: the signal
-       may have cleared by the time it is read. "The files ... that no installed
-       program's records name" is what the scan holds back, every one of them, and it
-       leaves out the superseded patches still listed, which a record names.
+       may have cleared by the time it is read. "Every file that could have just been added" is every file
+       in the folder no record names, which is what the scan leaves alone, and it leaves out
+       the superseded patches still listed as safe to delete, which a record names.
        Other: Windows Installer's in-progress file was there, or a reason with no line of
        its own, which reads true of the whole family. -->
-  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>Something was using Windows Installer when the scan started, such as a Windows Update or a program installing, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Run it again once that has finished.</value></data>
-  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>A Windows Installer transaction was suspended on this machine when the scan started, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Resume or roll back that install, or restart Windows, then run it again.</value></data>
-  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>When the scan started, Windows had a file rename queued for the next restart that affects {InstallerFolder}, so InstallerClean held back the files there that no installed program's records name, rather than offering them. Restart Windows, then run it again.</value></data>
-  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>When the scan started, a file operation was queued for the next restart and InstallerClean couldn't tell which files it names, so it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows, then run it again.</value></data>
-  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>When the scan started, Windows refused InstallerClean permission to check whether Windows Installer was busy, so it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and run it again.</value></data>
-  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>When the scan started, InstallerClean couldn't read one of the Windows settings it checks, so it couldn't tell whether an installer operation was running or waiting for a restart, and it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and run it again.</value></data>
-  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>When the scan started, InstallerClean couldn't check whether Windows Installer was busy, so it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and run it again.</value></data>
-  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>When the scan started, InstallerClean couldn't check whether Windows Installer was busy, because Windows gave an error: {0} (error {1}). So it held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Restart Windows and run it again.</value></data>
-  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>Windows Installer had something in progress or waiting when the scan started, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Run it again once that has cleared.</value></data>
+  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>Something was using Windows Installer when the scan started, such as Windows Update or a program being installed or removed. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Run it again once it has finished.</value></data>
+  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>Windows Installer had an earlier job paused, not finished, when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Finish or undo it, or restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows had a change to {InstallerFolder} waiting for the next restart. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows had a file change waiting for the next restart, and InstallerClean couldn't tell which files it affects. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>InstallerClean couldn't read a Windows setting it checks, so it couldn't tell whether Windows Installer was busy or had work waiting for a restart when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then run it again.</value></data>
+  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>Windows Installer had something unfinished when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Run it again once it has cleared.</value></data>
   <!-- The command line's form of Summary.ScanSignal.ClockSetBack, printed where a
        Cli.ScanSignal.* line would be, ending with running it again. -->
-  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Run it again.</value></data>
+  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Run it again.</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
        string rather than a shared one because this whole family is: all five
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
@@ -2193,15 +2249,18 @@ Run InstallerClean again as administrator.</value></data>
   <data name="Cli.ReportInFull" xml:space="preserve"><value>The full report is printed below.</value></data>
   <!-- After the report was sent and the server accepted it. -->
   <data name="Cli.ReportSent" xml:space="preserve"><value>Report sent. Thank you.</value></data>
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <data name="Cli.ReportNotSent" xml:space="preserve"><value>Report not sent.</value></data>
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>No answer after a minute.</value></data>
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>Cancelled while sending the report. It may have arrived anyway.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>The report could not be sent. It is kept in {0}.</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>Sending a report left waiting by an earlier run.</value></data>
@@ -2281,11 +2340,14 @@ Run InstallerClean again as administrator.</value></data>
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
   <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode cancelled: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
   <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0} mode cancelled before any work was done. No action taken.</value></data>
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
+  <data name="Cli.EventLogCancelledNoFileRemoved" xml:space="preserve"><value>{0} mode cancelled before any file was deleted or moved. No action taken.</value></data>
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2312,22 +2374,22 @@ Run InstallerClean again as administrator.</value></data>
   <data name="Cli.EventLogUpdateNothingAtPath" xml:space="preserve"><value>An update to InstallerClean {0} was not installed: once the copy being updated had closed, nothing was left at its path. InstallerClean can be downloaded again from {1}.</value></data>
   <!-- 0 = the version that was not installed. Event ID 3007, written by that version where the
        command line's copy at the path was not replaced and is as it was. -->
-  <data name="Cli.EventLogUpdateNotInstalled" xml:space="preserve"><value>An update to InstallerClean {0} was not installed, and the copy it was to replace was left as it was. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean. crash.log says what stopped it.</value></data>
+  <data name="Cli.EventLogUpdateNotInstalled" xml:space="preserve"><value>An update to InstallerClean {0} was not installed, and the copy it was to replace was left as it was. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as. crash.log says what stopped it.</value></data>
   <!-- 0 = the version being installed. Event ID 3007, written by that version where its replace
        of the command line's copy stopped after the move over that copy had begun. -->
   <data name="Cli.EventLogUpdateStoppedPartWay" xml:space="preserve"><value>An update to InstallerClean {0} stopped after it had begun to replace the copy at its path. crash.log says what happened.</value></data>
   <!-- 0 = the version the setup was downloaded as. Event ID 3007, written by the command line of
        that version where the setup beside it carries another version, so it was not run. -->
-  <data name="Cli.EventLogUpdateSetupNotThisVersion" xml:space="preserve"><value>The setup downloaded to update InstallerClean to {0} is not version {0}, so it was not run. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateSetupNotThisVersion" xml:space="preserve"><value>The setup downloaded to update InstallerClean to {0} is not version {0}, so it was not run. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = the version that was not installed. Event ID 3007, written by that version where
        InstallerClean was still in use after the setup's wait for it, so the setup was not run. -->
-  <data name="Cli.EventLogUpdateInUseAfterWait" xml:space="preserve"><value>An update to InstallerClean {0} was not installed because InstallerClean was in use. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateInUseAfterWait" xml:space="preserve"><value>An update to InstallerClean {0} was not installed because InstallerClean was in use. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = the setup's version, 1 = its exit code. Event ID 3007, written by the command line of
        that version where the setup it ran ended with an exit code other than 0. -->
-  <data name="Cli.EventLogUpdateSetupExitCode" xml:space="preserve"><value>The InstallerClean {0} setup ended with exit code {1}. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateSetupExitCode" xml:space="preserve"><value>The InstallerClean {0} setup ended with exit code {1}. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = the setup's version. Event ID 3007, written by the command line of that version where
        the setup ended with exit code 0 and the command line at the path does not carry it. -->
-  <data name="Cli.EventLogUpdateSetupNotInPlace" xml:space="preserve"><value>The InstallerClean {0} setup finished without putting version {0} of the command line in place. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean.</value></data>
+  <data name="Cli.EventLogUpdateSetupNotInPlace" xml:space="preserve"><value>The InstallerClean {0} setup finished without putting version {0} of the command line in place. The command-line tool tries again the next time it is run, unless it is run with /noupdate or "Check for updates automatically" is turned off in InstallerClean for the account it runs as.</value></data>
   <!-- 0 = mode arg, 1 = the version that ran, 2 = the newer version it did not run. Event ID
        3006, the run's only entry, where Ctrl+C came after the run said it goes on with the
        version it is, so nothing ran. One for each reason, in the order of
@@ -2453,6 +2515,7 @@ Run InstallerClean again as administrator.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Show this help (also accepts /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Print the version (also accepts -v)</value></data>
+  <data name="Cli.Help.Notices" xml:space="preserve"><value>  installerclean-cli --notices  Print the third-party notices</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
@@ -2463,11 +2526,11 @@ Run InstallerClean again as administrator.</value></data>
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Before it scans, it checks for a newer version of InstallerClean.&#10;When you run it yourself, it asks before updating, and updates if nobody&#10;answers within a minute. When it runs on its own, in a scheduled task or&#10;a script, it updates without asking.&#10;Add /noupdate to skip the check.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Before it scans, it checks for a newer version of InstallerClean, unless&#10;"Check for updates automatically" is turned off for the account it runs&#10;as. Where its window is on screen and nothing is piped into or out of it,&#10;it asks before updating, and updates if nobody answers within a minute.&#10;Anywhere else, such as a scheduled task set to run whether or not anyone&#10;is logged on, it updates without asking.&#10;Add /noupdate to skip the check.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Exit codes:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

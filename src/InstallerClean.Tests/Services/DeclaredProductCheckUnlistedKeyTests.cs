@@ -130,8 +130,9 @@ public class DeclaredProductCheckUnlistedKeyTests
             ScreeningOf(keys, files).Outcomes.ToArray();
 
         public DeclaredProductScreening ScreeningOf(
-            IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null) =>
-            Check().Screen(files, [], keys, default, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
+            IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null,
+            CancellationToken cancellationToken = default) =>
+            Check().Screen(files, [], keys, cancellationToken, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
 
         public DeclaredProductCheck Check() =>
             new(Msi, Packages, Files, Disk, Registry, null)
@@ -308,7 +309,7 @@ public class DeclaredProductCheckUnlistedKeyTests
             check.Outcomes);
         var entry = Assert.Single(recorded);
         Assert.Equal("the cached package is not a file that is there", ReasonIn(entry.Detail));
-        Assert.Contains("every installation package is kept rather than offered", entry.Error.Message);
+        Assert.Contains("every installation package is left alone", entry.Error.Message);
         Assert.DoesNotContain(Cached, entry.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -356,6 +357,59 @@ public class DeclaredProductCheckUnlistedKeyTests
             (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the cached package declares no product code"], recorded);
+    }
+
+    /// <summary>
+    /// A key's reads, each listed once and then made the read a cancel ends: the screen stops
+    /// as that same exception, with nothing in the refusal record or the crash log, at every
+    /// one of them, the key's InstallProperties and source list reads among them.
+    /// </summary>
+    [Fact]
+    public void A_scan_cancelled_at_any_of_a_keys_registry_reads_stops_as_a_cancel_and_records_nothing()
+    {
+        var scenarios = new (string Name, Action<Pc> Script)[]
+        {
+            ("with nothing recorded", _ => { }),
+            ("installed from a folder", pc => pc.InstalledFrom(Setup)),
+            ("with a source list", pc =>
+            {
+                pc.HasList(MachineList(KeyCode), SetupName, Setup);
+                pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+                pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+            }),
+        };
+        var reached = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var (name, script) in scenarios)
+        {
+            var dry = new Pc();
+            script(dry);
+            dry.Registry.TracksCallers();
+            _ = dry.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, _) => { });
+            Assert.True(dry.Registry.Reads.Count > 0, $"{name}: the screen read no key.");
+            reached.UnionWith(dry.Registry.Callers);
+
+            for (var read = 0; read < dry.Registry.Reads.Count; read++)
+            {
+                var pc = new Pc();
+                script(pc);
+                using var cts = new CancellationTokenSource();
+                pc.Registry.CancelsAtRead(read, cts);
+                var refusals = new List<string>();
+                using var crashLog = TestCrashLog.OwnFolder();
+
+                var thrown = Record.Exception(() => pc.ScreeningOf(
+                    [Installed()], [Package(First), Package(Second)], (_, what) => refusals.Add(what), cts.Token));
+
+                var at = $"{name}, read {read} ({pc.Registry.Reads[read]} by {pc.Registry.Callers[read]})";
+                Assert.True(thrown is not null && ReferenceEquals(thrown, pc.Registry.Thrown),
+                    $"{at}: not the read's own cancel: {thrown?.ToString() ?? "nothing thrown"}");
+                Assert.True(refusals.Count == 0, $"{at}: refusals recorded: {string.Join(", ", refusals)}");
+                Assert.True(TestCrashLog.Text().Length == 0, $"{at}: the crash log was written: {TestCrashLog.Text()}");
+            }
+        }
+
+        Assert.Equal(["InstallPropertiesOf", "ValuesOf"], reached.Where(m => m != "(not the check)").ToArray());
     }
 
     [Fact]
@@ -554,7 +608,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.ScreeningOf([Installed(System, KeyCode, Cached)], [Package(First), Package(Second)], log.Record);
 
         Assert.Equal(21, written.Count);
-        Assert.Contains("every installation package is kept rather than offered", written[20].Message);
+        Assert.Contains("every installation package is left alone", written[20].Message);
     }
 
     [Fact]
@@ -608,6 +662,60 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal(
             [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
             check.Outcomes);
+    }
+
+    [Fact]
+    public void A_key_recording_a_cached_package_with_no_list_installed_from_another_folder_keeps_nothing()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(Setup);
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_recording_a_cached_package_whose_InstallProperties_hold_no_InstallSource_keeps_nothing()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.Registry.Holds(
+            Properties(System, KeyCode),
+            new RegistryValue("DisplayName", RegistryValueKind.String, "Example"));
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData("http://example.com/setup/")]
+    [InlineData("HTTPS://example.com/setup/")]
+    public void A_key_recording_a_cached_package_installed_from_a_web_address_keeps_nothing(string address)
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(address);
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData(Setup)]
+    [InlineData(Share)]
+    public void A_key_recording_a_cached_package_installed_from_a_drive_or_share_beside_a_list_that_reads_keeps_nothing(
+        string installSource)
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(installSource);
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
     }
 
     // ---------------------------------------------------------------- recording no cached package
@@ -1107,9 +1215,12 @@ public class DeclaredProductCheckUnlistedKeyTests
     [Fact]
     public void A_key_with_no_InstallProperties_keeps_the_package_at_a_local_folder_on_its_list_by_identity()
     {
+        // The package's name opens nothing in the Installer folder, so the identity read
+        // of the package on the list is the only thing that can keep First.
         var pc = new Pc();
-        pc.HasList(HiveList(System, KeyCode), SetupName, Folder);
-        pc.Files.Opens(Folder + SetupName, 1);
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
 
         Assert.Equal(
             [DeclaredProductOutcome.Unestablished, LetThrough],
@@ -1309,6 +1420,69 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.HasList(MachineList(KeyCode), SetupName, Setup);
         pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
         pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_has_a_media_package_path_keeps_nothing_while_Windows_follows_no_such_link()
+    {
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Registry.Holds(
+            HiveList(System, KeyCode) + @"\Media",
+            new RegistryValue("MediaPackage", RegistryValueKind.String, @"\sub\"));
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_was_last_used_at_a_web_address_keeps_nothing()
+    {
+        var list = HiveList(System, KeyCode);
+        var pc = new Pc();
+        pc.HasList(list, SetupName, Setup);
+        pc.Registry.Holds(
+            list,
+            new RegistryValue("PackageName", RegistryValueKind.String, SetupName),
+            new RegistryValue("LastUsedSource", RegistryValueKind.ExpandString, "u;1;http://example.com/setup/"));
+        pc.Registry.Holds(list + @"\URL", new RegistryValue("1", RegistryValueKind.ExpandString, "http://example.com/setup/"));
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_was_last_used_at_a_media_source_reads_that_folder_and_keeps_nothing()
+    {
+        const string mediaFolder = @"E:\Media\";
+        var list = HiveList(System, KeyCode);
+        var pc = new Pc();
+        pc.HasList(list, SetupName, Setup);
+        pc.Registry.Holds(
+            list,
+            new RegistryValue("PackageName", RegistryValueKind.String, SetupName),
+            new RegistryValue("LastUsedSource", RegistryValueKind.ExpandString, "m;1;" + mediaFolder));
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(mediaFolder + SetupName, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+        Assert.Contains(mediaFolder + SetupName, pc.Files.Reads);
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_has_no_Net_key_names_no_folder_and_keeps_nothing()
+    {
+        var list = HiveList(System, KeyCode);
+        var pc = new Pc();
+        pc.Registry.Holds(list, new RegistryValue("PackageName", RegistryValueKind.String, SetupName));
+        pc.Registry.Answers(list + @"\Net", RegistryKeyPresence.Absent);
+        pc.Registry.Answers(list + @"\URL", RegistryKeyPresence.Absent);
+        pc.Registry.Answers(list + @"\Media", RegistryKeyPresence.Absent);
 
         Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
     }

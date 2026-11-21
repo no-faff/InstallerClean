@@ -63,7 +63,7 @@ public class CleanupPreFlightTests : IDisposable
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
             .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
         // MockFileSystem's Path is a working implementation; a bare substitute
-        // returns an empty string from Combine and GetRandomFileName.
+        // returns an empty string from GetFullPath and GetRandomFileName.
         _fileSystem.Path.Returns(new MockFileSystem().Path);
         _fileSystem.Directory.Returns(_directory);
         _fileSystem.File.Returns(_file);
@@ -256,6 +256,7 @@ public class CleanupPreFlightTests : IDisposable
     {
         var probeEntered = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ =>
         {
             probeEntered.Set();
@@ -290,6 +291,7 @@ public class CleanupPreFlightTests : IDisposable
         Assert.False(vm.Cleanup.IsCancellationRequested);
 
         var releaseMove = new ManualResetEventSlim();
+        using var releaseMoveOnExit = new SetOnExit(releaseMove);
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
@@ -316,6 +318,7 @@ public class CleanupPreFlightTests : IDisposable
         // move must not proceed, and the user must not be asked to confirm one.
         var probeFinishing = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _file.When(f => f.Delete(Arg.Any<string>())).Do(_ =>
         {
             probeFinishing.Set();
@@ -411,6 +414,68 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
+    public async Task A_destination_where_a_found_file_would_reach_260_characters_is_refused_before_anything_reads_it()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        // 254 characters, a separator and "a.msi" make 260.
+        var destination = @"D:\" + new string('d', 254 - 3);
+        vm.Cleanup.MoveDestination = destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        // Not asked whether a folder is there, made, written or removed.
+        Assert.Empty(_directory.ReceivedCalls());
+        Assert.Empty(_file.ReceivedCalls());
+        _confirmationService.DidNotReceive().ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_destination_too_long_is_refused_before_where_it_leads_is_read()
+    {
+        // Inside the installer cache as well, so the message says which check answered first.
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        var destination = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer", new string('d', 260));
+        vm.Cleanup.MoveDestination = destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        _dialogService.DidNotReceive().ShowWarning(
+            InstallerClean.Resources.Strings.Error_DestinationInsideInstaller, Arg.Any<string>());
+        _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task A_destination_where_every_found_file_stays_under_260_characters_goes_on_to_be_made()
+    {
+        // 253 characters, a separator and "a.msi" make 259.
+        var destination = @"D:\" + new string('d', 253 - 3);
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(false);
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.DidNotReceive().ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination), Arg.Any<string>());
+        _directory.Received(1).CreateDirectory(destination);
+    }
+
+    [Fact]
     public async Task A_refused_pre_flight_leaves_the_commands_usable()
     {
         var vm = CreateViewModel();
@@ -433,6 +498,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Move_and_Delete_are_blocked_while_a_pre_flight_runs()
     {
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
 
         var vm = CreateViewModel();
@@ -460,6 +526,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task The_Details_buttons_are_out_of_use_while_a_pre_flight_runs()
     {
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
 
         var vm = CreateViewModel();
@@ -486,6 +553,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_language_switch_is_refused_while_a_move_pre_flight_is_in_flight()
     {
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
 
         var vm = CreateViewModel();
@@ -531,19 +599,72 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
+    public async Task Move_Delete_and_Scan_wait_while_Browse_works_out_its_start_folder()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+        var answer = new TaskCompletionSource<string?>();
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>())
+            .Returns(answer.Task);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+
+        var browse = vm.Cleanup.BrowseDestinationCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Cleanup.IsChoosingDestination);
+        Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.False(vm.Scan.ScanCommand.CanExecute(null));
+
+        answer.SetResult(null);
+        await browse;
+
+        Assert.False(vm.Cleanup.IsChoosingDestination);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.True(vm.Scan.ScanCommand.CanExecute(null));
+        Assert.Equal(_destination, vm.Cleanup.MoveDestination);
+    }
+
+    [Fact]
+    public async Task Text_typed_while_Browse_works_out_its_start_folder_keeps_the_picker_shut()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = "  " + _destination;
+        Func<bool>? stillWanted = null;
+        var answer = new TaskCompletionSource<string?>();
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Do<Func<bool>?>(f => stillWanted = f))
+            .Returns(answer.Task);
+
+        var browse = vm.Cleanup.BrowseDestinationCommand.ExecuteAsync(null);
+
+        Assert.NotNull(stillWanted);
+        // The box is compared trimmed, so spaces round the same text still want the picker.
+        vm.Cleanup.MoveDestination = _destination + " ";
+        Assert.True(stillWanted!());
+        vm.Cleanup.MoveDestination = @"D:\Typed";
+        Assert.False(stillWanted());
+
+        answer.SetResult(null);
+        await browse;
+        Assert.Equal(@"D:\Typed", vm.Cleanup.MoveDestination);
+    }
+
+    [Fact]
     public async Task Browse_starts_at_the_folder_the_box_already_names()
     {
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = _destination;
 
-        vm.Cleanup.BrowseDestinationCommand.Execute(null);
+        await vm.Cleanup.BrowseDestinationCommand.ExecuteAsync(null);
 
         // Browse is pressed to CHANGE a destination more often than to set the
         // first one, so the browser opens where the box points rather than
         // making the user navigate back to a path already on screen. Whether
         // that path still exists is the service's call, not the view-model's.
-        _confirmationService.Received(1).AskForMoveDestination(_destination);
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(_destination, Arg.Any<Func<bool>?>());
     }
 
     [Fact]
@@ -1304,7 +1425,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Move_with_no_destination_asks_for_one_and_moves_there()
     {
         var chosen = Path.Combine(Path.GetTempPath(), "ic-test-picked");
-        _confirmationService.AskForMoveDestination().Returns(chosen);
+        _confirmationService.AskForMoveDestinationAsync(null, null).Returns(chosen);
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1313,7 +1434,7 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _confirmationService.Received(1).AskForMoveDestination();
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), chosen, Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -1325,13 +1446,14 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Backing_out_of_the_destination_browser_moves_nothing()
     {
         // Null is the cancelled answer.
-        _confirmationService.AskForMoveDestination().Returns((string?)null);
+        _confirmationService.AskForMoveDestinationAsync(null, null).Returns((string?)null);
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -1356,7 +1478,7 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _confirmationService.DidNotReceive().AskForMoveDestination();
+        _ = _confirmationService.DidNotReceive().AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>());
     }
 
     [Fact]
@@ -1398,8 +1520,10 @@ public class CleanupPreFlightTests : IDisposable
     {
         var probeEntered = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         var removalEntered = new ManualResetEventSlim();
         var releaseRemoval = new ManualResetEventSlim();
+        using var releaseRemovalOnExit = new SetOnExit(releaseRemoval);
         var removalFinished = 0;
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ =>
         {
@@ -1516,7 +1640,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_close_while_the_destination_browser_is_up_starts_no_Move()
     {
         var vm = CreateViewModel();
-        _confirmationService.AskForMoveDestination().Returns(_ =>
+        _confirmationService.AskForMoveDestinationAsync(null, null).Returns(_ =>
         {
             vm.Cleanup.RequestClose();
             return _destination;
@@ -1525,6 +1649,8 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
+        // The picker was asked as a Move with no destination asks it, so the close came from inside it.
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
         AssertNoFolderRemoved();
         _confirmationService.DidNotReceive().ConfirmMove(

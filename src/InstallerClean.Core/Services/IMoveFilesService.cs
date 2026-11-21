@@ -17,7 +17,8 @@ public interface IMoveFilesService
     /// Move every path in <paramref name="filePaths"/> into
     /// <paramref name="destinationFolder"/> (created if missing).
     /// Throws <see cref="InvalidOperationException"/> if the destination
-    /// is not fully qualified, resolves inside the Installer folder,
+    /// is not fully qualified, would put a file of the batch at a path of 260
+    /// characters or more, resolves inside the Installer folder,
     /// resolves under a Windows system folder, or is swapped for another
     /// folder part-way through the batch, and
     /// <see cref="UnauthorizedAccessException"/> if the destination is

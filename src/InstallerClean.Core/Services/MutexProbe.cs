@@ -1,18 +1,19 @@
 using InstallerClean.Helpers;
+using InstallerClean.Interop.Native;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace InstallerClean.Services;
 
 /// <summary>
-/// Production IMutexProbe: a zero-timeout acquire-and-release.
-/// Existence alone is the wrong signal for Global\_MSIExecute: a named
-/// mutex exists for as long as any process holds a handle to it, owned
-/// or not, so an existence check reads "installer busy" whenever
-/// something merely has the object open. Acquiring with a zero wait
-/// measures ownership itself; on success the mutex is released
-/// immediately on the same thread (the instant of ownership briefly
-/// serialises a starting msiexec, which is the object's documented
-/// purpose).
+/// Production IMutexProbe. Existence alone is the wrong signal for
+/// Global\_MSIExecute: a named mutex exists for as long as any process holds a
+/// handle to it, owned or not, so an existence check reads "installer busy"
+/// whenever something merely has the object open. <see cref="Sample"/> reads
+/// ownership itself, and reads it without waiting on the mutex, so a sample never
+/// owns the object and a Windows Installer client that asks for it at the same
+/// moment finds it as it would with no sample running. <see cref="TryAcquire"/>
+/// takes the mutex with a zero wait and holds it.
 /// </summary>
 internal sealed class MutexProbe : IMutexProbe
 {
@@ -25,21 +26,24 @@ internal sealed class MutexProbe : IMutexProbe
 
             using (mutex)
             {
-                bool acquired = false;
-                try
-                {
-                    // Abandoned: the previous owner died while holding it;
-                    // ownership transferred to this thread, so nothing is
-                    // installing. The wait dispatches nothing (HandleWait).
-                    acquired = HandleWait.One(mutex.SafeWaitHandle, TimeSpan.Zero) is not HandleWaitResult.TimedOut;
-                    return acquired ? MutexSample.NotHeld : MutexSample.Held;
-                }
-                finally
-                {
-                    // Release on the acquiring thread, inside the same
-                    // call; Win32 requires the owning thread to release.
-                    if (acquired) mutex.ReleaseMutex();
-                }
+                // The state is read off the handle and nothing waits on it, so this
+                // thread never owns the mutex. Do not turn this into a zero wait:
+                // a wait that succeeds owns Windows Installer's mutex until it is
+                // released, and a Windows Installer client that asks for it in that
+                // time finds it taken.
+                var status = Ntdll.NtQueryMutant(
+                    mutex.SafeWaitHandle, Ntdll.MutantBasicInformation, out var state,
+                    (uint)Marshal.SizeOf<Ntdll.MUTANT_BASIC_INFORMATION>(), IntPtr.Zero);
+                if (status < Ntdll.STATUS_SUCCESS)
+                    return new MutexSampling(
+                        MutexSample.Unestablished, unchecked((int)Ntdll.RtlNtStatusToDosError(status)));
+
+                // Owned by a thread other than this one. An abandoned mutex has no
+                // owner, the one that held it having ended, so nothing is installing.
+                // One this thread owns is one a zero wait would take again.
+                return state.CurrentCount <= 0 && state.OwnedByCaller == 0
+                    ? MutexSample.Held
+                    : MutexSample.NotHeld;
             }
         }
         catch (UnauthorizedAccessException)

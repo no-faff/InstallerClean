@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Checks the test inventory of counted strings against the switch that classifies
-// them.
+// them, and both against the prefixes the app's Pluralise calls pass.
 //
 // A counted string is one whose wording changes with a number. Every one of them
 // reaches DisplayHelpers.Pluralise with a keyPrefix, and DisplayHelpers.QuestionFor
@@ -21,12 +21,22 @@
 // An inventory entry with no arm reaches the switch's default and throws in the
 // tests; the second direction names it at the source.
 //
+// AND BOTH ARE HELD TO WHAT THE APP PASSES. Every call to Pluralise in the projects
+// that ship is read for its last argument, the key prefix: a prefix a call passes and
+// the switch does not classify throws from QuestionFor's default on the screen that
+// shows it, in every language, and one the inventory lacks is rendered by no test. A
+// literal is read as it stands. A local is read from the key-shaped literals in its
+// method above the call, as in a deconstruction choosing between two; where none is
+// found the call fails as unread. Pluralise's own declarations, and the overload
+// handing its keyPrefix on, are not calls with a prefix of their own.
+//
 // Exit 1 on a difference, a duplicate or a parse that finds nothing; exit 2 where
 // either file cannot be read to its end.
 //
 // Run from the repo root: node scripts/check-counted-string-inventory.mjs
 import { readFileSync } from 'node:fs';
-import { readCSharp } from './csharp-source.mjs';
+import { argumentSpan, readCSharp } from './csharp-source.mjs';
+import { lineIndex, sourceFiles } from './source-files.mjs';
 
 const switchPath = 'src/InstallerClean.Core/Helpers/DisplayHelpers.cs';
 const inventoryPath = 'src/InstallerClean.Tests/Helpers/CountedStringTests.cs';
@@ -85,6 +95,54 @@ function fail(message) {
 const classified = classifiedPrefixes(read(switchPath));
 const inventory = inventoryPrefixes(read(inventoryPath));
 
+// The prefix each Pluralise call in the shipped projects passes, with where it is.
+const KEY_SHAPE = /^[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)+$/;
+const calls = [];
+const unread = [];
+for (const file of sourceFiles('src', '.cs').filter((f) => !f.startsWith('src/InstallerClean.Tests/'))) {
+  const source = read(file);
+  const { code, bare } = source;
+  const lineAt = lineIndex(code);
+  for (const m of bare.matchAll(/(?<![\w.])(?:DisplayHelpers\s*\.\s*)?Pluralise\s*\(/g)) {
+    const open = bare.indexOf('(', m.index);
+    const span = argumentSpan(bare, open);
+    const where = `${file}:${lineAt(m.index)}`;
+    if (span === null) { unread.push(`${where}: a call whose argument list does not close`); continue; }
+    let depth = 0;
+    let last = span[0];
+    for (let i = span[0]; i < span[1]; i++) {
+      const c = bare[i];
+      if ('([{'.includes(c)) depth++;
+      else if (')]}'.includes(c)) depth--;
+      else if (c === ',' && depth === 0) last = i + 1;
+    }
+    const arg = code.slice(last, span[1]).trim();
+    const argBare = bare.slice(last, span[1]).trim();
+    if (/^string\s+\w+$/.test(arg)) continue;                          // a declaration
+    if (file === switchPath && arg === 'keyPrefix') continue;             // the overload handing it on
+    if (/^"\s*"$/.test(argBare) && /^"[^"\\]*"$/.test(arg)) {
+      calls.push({ prefix: arg.slice(1, -1), where });
+      continue;
+    }
+    if (/^@?\w+$/.test(arg)) {
+      // The method around the call: from the nearest member header above it.
+      const before = code.slice(0, m.index);
+      const header = Math.max(...[...before.matchAll(/\n\s*(?:(?:public|private|internal|protected|static|async|override|virtual)\s+)+[^;{}=]*\)\s*(?:=>|\{)/g)].map((h) => h.index), 0);
+      const found = literals(source, header, m.index).filter((t) => KEY_SHAPE.test(t));
+      if (found.length === 0) unread.push(`${where}: the prefix ${arg} is set from no key-shaped literal in its method`);
+      for (const prefix of found) calls.push({ prefix, where: `${where} (through ${arg})` });
+      continue;
+    }
+    unread.push(`${where}: the prefix ${arg.replace(/\s+/g, ' ')} is neither a literal nor a local`);
+  }
+}
+if (calls.length === 0) fail('no Pluralise call was read in the shipped projects, so this run establishes nothing.');
+if (!calls.some((c) => c.prefix === 'Plural.File')) fail('the call sites read do not include Plural.File, so the call sweep is not reading DisplayHelpers.');
+const passedPrefixes = [...new Set(calls.map((c) => c.prefix))].sort();
+console.log(`Pluralise calls in the shipped projects: ${calls.length}, passing ${passedPrefixes.length} prefix(es).`);
+const passedUnclassified = calls.filter((c) => !classified.includes(c.prefix));
+const passedUntested = calls.filter((c) => !inventory.includes(c.prefix));
+
 // PARSE CONTROL, about the READING rather than about the content. A regex that has
 // stopped matching yields an empty set, and two empty sets agree with each other,
 // so the comparison below would report a clean result over nothing at all. Neither
@@ -107,6 +165,23 @@ const classifiedTwice = duplicates(classified);
 const listedTwice = duplicates(inventory);
 
 let bad = false;
+
+for (const u of unread) {
+  bad = true;
+  console.error(`UNREAD CALL: ${u}`);
+}
+if (passedUnclassified.length > 0) {
+  bad = true;
+  console.error(`PASSED AND NOT CLASSIFIED (${passedUnclassified.length}), so QuestionFor throws where each is shown:`);
+  for (const c of passedUnclassified) console.error(`  ${c.prefix}  at ${c.where}`);
+  console.error(`Add an arm for each to QuestionFor in ${switchPath}.\n`);
+}
+if (passedUntested.length > 0) {
+  bad = true;
+  console.error(`PASSED AND NOT IN THE TEST INVENTORY (${passedUntested.length}), so no test renders them:`);
+  for (const c of passedUntested) console.error(`  ${c.prefix}  at ${c.where}`);
+  console.error(`Add each to CountedPrefixes in ${inventoryPath}.\n`);
+}
 
 if (missingFromInventory.length > 0) {
   bad = true;

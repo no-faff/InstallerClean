@@ -11,17 +11,21 @@
 // consumers, installer to SupportedLanguages, translation tables); this closes
 // the last one.
 //
-// Checked both ways, plus the naming rule the generator applies:
+// Checked both ways, plus the naming rule the generator applies, each named by key:
 //   - every resx key has an accessor
 //   - every accessor names a key the resx defines
 //   - the property name is the key with dots replaced by underscores
 //
-// This compares the two files rather than re-running the generator, so CI needs
-// neither a shell nor the generator's assumptions about its own environment, and
-// it fails on the drift that actually bites rather than on formatting.
+// AND THEN THE WHOLE FILE. Get, Find and the manager above the accessors are as much
+// the Designer as the accessors are: Get is the door every string reaches a user
+// through, and it is where the installer-folder token is spent. So the committed
+// file is compared, line for line, with what scripts/strings-designer.mjs builds from
+// the resx, the module regenerate-strings-designer.sh writes it with. A hand edit
+// anywhere in the file fails, and so does a change to the generator nobody ran.
 //
 // Run from the repo root: node scripts/check-designer-parity.mjs
 import { readFileSync } from 'node:fs';
+import { designerFor } from './strings-designer.mjs';
 
 const resxPath = 'src/InstallerClean.Core/Resources/Strings.resx';
 const designerPath = 'src/InstallerClean.Core/Resources/Strings.Designer.cs';
@@ -105,6 +109,58 @@ else if (accessors.length !== declared)
         'shape has changed and everything below is a report on a partial read.',
     );
 
+// Strings.FrameworkCheck, the third door, which serves the strings of a copy's start checks
+// without the installer-folder token. Its members are internal so the count
+// above stays one of the Get accessors. Each names a key the resx defines, carries the
+// key's name, and falls back to the key as Get does:
+//     internal static string Window_Main_Title => StartCheckResources.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
+// Every 'internal static string' in the file is one of these or one of the doors Get and
+// Find, so a door added beside them is reported here.
+const checkAccessors = [...designer.matchAll(
+    /internal\s+static\s+string\s+(\w+)\s*=>\s*StartCheckResources\.GetString\("([^"]+)",\s*Localisation\.UiCulture\)\s*\?\?\s*"([^"]+)"\s*;/g,
+)].map((m) => ({ property: m[1], key: m[2], fallback: m[3] }));
+
+for (const { property, key, fallback } of checkAccessors) {
+    if (!resxKeys.has(key)) {
+        problems.push(`FrameworkCheck.${property}: reads "${key}", which Strings.resx does not define`);
+        continue;
+    }
+    const expected = key.replaceAll('.', '_');
+    if (property !== expected)
+        problems.push(`FrameworkCheck: ${key} is read by ${property}, expected ${expected}`);
+    if (fallback !== key)
+        problems.push(`FrameworkCheck.${property}: falls back to "${fallback}" rather than its key`);
+}
+
+const doors = [...designer.matchAll(/internal\s+static\s+string\??\s+(Get|Find)\s*\(/g)].length;
+const declaredInternal = (designer.match(/internal\s+static\s+string\b/g) || []).length;
+if (checkAccessors.length === 0)
+    problems.push(
+        'No Strings.FrameworkCheck members matched in Strings.Designer.cs. The generated ' +
+        'shape changed, or the door went, and a copy\'s start checks read through it.',
+    );
+else if (doors !== 2 || checkAccessors.length + doors !== declaredInternal)
+    problems.push(
+        `PARSE CONTROL: Strings.Designer.cs declares ${declaredInternal} 'internal static string' ` +
+        `member(s); this guard matched the doors Get and Find (${doors} of 2) and ` +
+        `${checkAccessors.length} FrameworkCheck member(s). A door has been added, or the shape changed.`,
+    );
+
+// The whole file, once every accessor is accounted for. Line endings are compared
+// as LF, which is what git checks the file out with.
+if (problems.length === 0) {
+    const committed = designer.replace(/\r\n/g, '\n').split('\n');
+    const built = designerFor(resx).split('\n');
+    const at = committed.findIndex((line, i) => line !== built[i]);
+    const differs = at !== -1 ? at : committed.length !== built.length ? Math.min(committed.length, built.length) : -1;
+    if (differs !== -1)
+        problems.push(
+            `Strings.Designer.cs differs from what scripts/strings-designer.mjs builds, first at line ${differs + 1}:\n` +
+            `      committed: ${JSON.stringify(committed[differs] ?? '(end of file)')}\n` +
+            `      built:     ${JSON.stringify(built[differs] ?? '(end of file)')}`,
+        );
+}
+
 if (problems.length > 0) {
     console.error(
         `Strings.Designer.cs is out of step with Strings.resx (${problems.length} problem(s)):\n`,
@@ -113,11 +169,13 @@ if (problems.length > 0) {
     console.error(
         '\nRegenerate with: bash scripts/regenerate-strings-designer.sh' +
         '\nIt finishes in well under a second and says so, printing "Wrote ... (N lines)".' +
-        '\nA run that ends any other way leaves a truncated file that breaks the build.',
+        '\nA change meant for Get, Find or anything else in the file goes in' +
+        '\nscripts/strings-designer.mjs, and the file is regenerated from it.',
     );
     process.exit(1);
 }
 
 console.log(
-    `Strings.Designer.cs matches Strings.resx (${resxKeys.size} keys, ${accessors.length} accessors).`,
+    `Strings.Designer.cs matches Strings.resx (${resxKeys.size} keys, ${accessors.length} accessors, ` +
+    `${checkAccessors.length} through FrameworkCheck), and every line is what scripts/strings-designer.mjs builds.`,
 );

@@ -436,7 +436,7 @@ public class FileSystemScanServiceAgeCheckTests
         var times = new ScriptedFileTimes();
         times.Reads($@"{Folder}\old.msi", Old, Old, Old);
         times.Reads($@"{Folder}\new.msi", Late, Late, Late);
-        var clock = new SteppingClock(Now, TimeSpan.FromMicroseconds(999_500), TimeSpan.FromSeconds(1));
+        var clock = new SteppingClock(Now, TimeSpan.FromTicks(9_995_000), TimeSpan.FromSeconds(1));
 
         var result = await Scan(new[] { $@"{Folder}\old.msi", $@"{Folder}\new.msi" }, times, clock: clock);
 

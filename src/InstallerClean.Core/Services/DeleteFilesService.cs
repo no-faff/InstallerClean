@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 
 namespace InstallerClean.Services;
@@ -193,7 +194,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     // leaves the loop altogether, and the files already deleted are
                     // never reported, the result and the failure log's closing entry
                     // both being built past the loop.
-                    progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(filePath)));
+                    progress?.Report(new OperationProgress(i + 1, total, PathText.GetFileName(filePath)));
                     // Asked again after the report, which can block on the console: a cancel
                     // that came meanwhile leaves this file alone. The catch-all below lets the
                     // batch's own cancellation through (BatchStop.EndsBatch).
