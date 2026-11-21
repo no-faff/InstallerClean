@@ -301,8 +301,7 @@ internal static class SetupReplacement
     /// </summary>
     internal static bool HasEnded(int processId)
     {
-        using var process = Kernel32.OpenProcess(Ntdll.SYNCHRONIZE, bInheritHandle: false, (uint)processId);
-        return !process.IsInvalid && HandleWait.One(process, 0, out _) == Kernel32.WAIT_OBJECT_0;
+        return false;
     }
 
     /// <summary>The longest path Windows gives for a process's image, in characters.</summary>
