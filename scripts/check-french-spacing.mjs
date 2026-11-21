@@ -49,6 +49,7 @@
 import { readFileSync } from 'node:fs';
 
 const FILE = 'src/InstallerClean.Core/Resources/Strings.fr.resx';
+const NEUTRAL = 'src/InstallerClean.Core/Resources/Strings.resx';
 
 const xml = readFileSync(FILE, 'utf8');
 const dataRe = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g;
@@ -120,6 +121,18 @@ const parseControl = (file, xml, parsed) => {
   process.exit(2);
 };
 
+// A VALUE THAT IS STILL THE ENGLISH IS NOT FRENCH, so French typography is not asked
+// of it. A key whose English has moved holds the neutral's value in every satellite
+// until it is translated again, and check-still-english is what names it; held to
+// this rule, the English colon in "Error: " would fail here as well, for a reason the
+// translation removes. Read through the same regex and the same parse control as the
+// French file, so a neutral this check could not read stops it rather than leaving
+// every value measured.
+const neutralXml = readFileSync(NEUTRAL, 'utf8');
+const english = new Map();
+for (const n of neutralXml.matchAll(dataRe)) english.set(n[1], n[2]);
+const stillEnglish = [];
+
 const problems = [];
 const missing = [];
 const guillemetProblems = [];
@@ -133,6 +146,10 @@ let m;
 while ((m = dataRe.exec(xml)) !== null) {
   const [, key, value] = m;
   parsed.add(key);
+  if (english.get(key) === value) {
+    stillEnglish.push(key);
+    continue;
+  }
   let h;
   while ((h = badSpaceRe.exec(value)) !== null) {
     const around = value.slice(Math.max(0, h.index - 20), h.index + 2).replace(/\n/g, ' ');
@@ -156,6 +173,7 @@ while ((m = dataRe.exec(xml)) !== null) {
 }
 
 parseControl(FILE, xml, parsed.size);
+parseControl(NEUTRAL, neutralXml, english.size);
 
 // The two rules are reported separately and both are printed before the exit, so a
 // run that broke both says so once rather than sending somebody back for a second
@@ -187,3 +205,5 @@ if (guillemetProblems.length) {
 if (problems.length || missing.length || guillemetProblems.length) process.exit(1);
 
 console.log(`French spacing OK: ${parsed.size} value(s) read from ${FILE.split('/').pop()}, no plain ASCII space and no missing space before ! ? : ;, and a no-break space inside each of the ${guillemets} guillemet mark(s) found.`);
+if (stillEnglish.length)
+  console.log(`Not read, being the English until translated: ${stillEnglish.join(', ')}.`);
