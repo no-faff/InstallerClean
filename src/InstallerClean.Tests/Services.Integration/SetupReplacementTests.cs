@@ -313,7 +313,42 @@ public sealed class SetupReplacementTests : IDisposable
             Assert.False(SetupReplacement.AnotherProcessMayRunFrom(elsewhere));
         }
 
-        Assert.False(SetupReplacement.AnotherProcessMayRunFrom(running));
+        if (SetupReplacement.AnotherProcessMayRunFrom(running))
+            Assert.Fail("A process was still found running from the file after it had ended. " + WhatIsListedFor(running));
+    }
+
+    /// <summary>
+    /// What Windows lists under the file name of <paramref name="path"/>, each process by its id
+    /// and image path or the error that refused it, and what the crash log holds. Taken after
+    /// the check answered, so a process that had gone by then is not in it.
+    /// </summary>
+    private static string WhatIsListedFor(string path)
+    {
+        var lines = new List<string>();
+        var listed = System.Diagnostics.Process.GetProcessesByName(Path.GetFileNameWithoutExtension(path));
+        try
+        {
+            foreach (var process in listed)
+            {
+                using var handle = Kernel32.OpenProcess(
+                    Kernel32.PROCESS_QUERY_LIMITED_INFORMATION, bInheritHandle: false, (uint)process.Id);
+                if (handle.IsInvalid)
+                {
+                    lines.Add($"{process.Id}: OpenProcess error {Marshal.GetLastWin32Error()}");
+                    continue;
+                }
+                var buffer = new char[32768];
+                var length = (uint)buffer.Length;
+                lines.Add(Kernel32.QueryFullProcessImageName(handle, 0, buffer, ref length)
+                    ? $"{process.Id}: {new string(buffer, 0, (int)length)}"
+                    : $"{process.Id}: QueryFullProcessImageName error {Marshal.GetLastWin32Error()}");
+            }
+        }
+        finally
+        {
+            foreach (var process in listed) process.Dispose();
+        }
+        return $"Listed now ({lines.Count}): {(lines.Count == 0 ? "none" : string.Join("; ", lines))}. Crash log: {TestCrashLog.Text()}";
     }
 
     /// <summary>
