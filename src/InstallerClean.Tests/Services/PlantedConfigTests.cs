@@ -46,7 +46,7 @@ public class PlantedConfigTests
     private const string Redirects =
         "    <assemblyBinding xmlns=\"urn:schemas-microsoft-com:asm.v1\">\n      <dependentAssembly>\n"
         + "        <assemblyIdentity name=\"Microsoft.Bcl.AsyncInterfaces\" publicKeyToken=\"cc7b13ffcd2ddd51\" culture=\"neutral\" />\n"
-        + "        <bindingRedirect oldVersion=\"0.0.0.0-10.0.0.7\" newVersion=\"10.0.0.7\" />\n"
+        + "        <bindingRedirect oldVersion=\"0.0.0.0-11.0.0.0\" newVersion=\"11.0.0.0\" />\n"
         + "      </dependentAssembly>\n    </assemblyBinding>\n"
         + "    <assemblyBinding xmlns=\"urn:schemas-microsoft-com:asm.v1\">\n      <dependentAssembly>\n"
         + "        <assemblyIdentity name=\"System.Runtime.CompilerServices.Unsafe\" publicKeyToken=\"b03f5f7f11d50a3a\" culture=\"neutral\" />\n"
