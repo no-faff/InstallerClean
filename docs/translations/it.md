@@ -13,7 +13,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | English | Italiano |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| About | Informazioni |
+| About | Info programma |
 | Files left alone | File non toccati |
 | Unneeded files that are safe to delete | File non necessari, sicuri da eliminare |
 | The anonymous report | Il rapporto anonimo |
@@ -26,14 +26,14 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | --- | --- |
 | PATCHES | PATCH |
 | PRODUCT DETAILS | DETTAGLI PRODOTTO |
-| BACKUP FOLDER | CARTELLA DI BACKUP |
+| BACKUP FOLDER | CARTELLA BACKUP |
 | SAY THANKS | PER RINGRAZIARMI |
 
 ## Buttons and actions
 
 | English | Italiano |
 | --- | --- |
-| _About | _Informazioni |
+| _About | _Info programma |
 | Copy | Copia |
 | Cut | Taglia |
 | Paste | Incolla |
@@ -422,10 +422,10 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Copy the command | Copia il comando |
 | Scoop's update command | Comando di aggiornamento di Scoop |
 | Opens the licence file on github.com in your browser. | Apre file licenza in github.com nel browser. |
-| Backup folder | Cartella di backup |
+| Backup folder | Cartella backup |
 | Patches | Patch |
 | Product details | Dettagli prodotto |
-| Backup folder | Cartella di backup |
+| Backup folder | Cartella backup |
 | Operation progress | Avanzamento operazione |
 | Scan {InstallerFolder} again | Nuova scansione di {InstallerFolder} |
 | Scanning progress | Avanzamento scansione |

@@ -90,7 +90,7 @@ const OVERRIDES = {
 
 const MAP = {
   'Window.Main.Title': `InstallerClean`,
-  'Window.About.Title': `Informazioni`,
+  'Window.About.Title': `Info programma`,
   'Window.Registered.Title': `File non toccati`,
   'Window.Orphaned.Title': `File non necessari, sicuri da eliminare`,
   // Section.Registered.Products and Automation.Section.Products are deliberately
@@ -99,7 +99,7 @@ const MAP = {
   // regenerated into a key the app cannot use.
   'Section.Registered.Patches': `PATCH`,
   'Section.Registered.Details': `DETTAGLI PRODOTTO`,
-  'Section.Backup.Folder': `CARTELLA DI BACKUP`,
+  'Section.Backup.Folder': `CARTELLA BACKUP`,
   'Section.SayThanks': `PER RINGRAZIARMI`,
   'Field.Reason': `Motivo`,
   'Field.Author': `Autore`,
@@ -117,7 +117,7 @@ const MAP = {
   'Field.UnknownProductName': `(sconosciuto)`,
   'Field.PatchesOnly': `(solo patch)`,
   'Field.Missing': `mancante`,
-  'Action.About': `_Informazioni`,
+  'Action.About': `_Info programma`,
   'Action.Copy': `Copia`,
   'Action.Cut': `Taglia`,
   'Action.Paste': `Incolla`,
@@ -154,10 +154,10 @@ const MAP = {
   'Automation.CheckForUpdates': `Controlla aggiornamenti`,
   'Automation.CheckForUpdates.HelpText': `Verifica sulla pagina release di github se esiste una versione più recente.`,
   'Automation.Licence.HelpText': `Apre file licenza in github.com nel browser.`,
-  'Automation.Section.BackupFolder': `Cartella di backup`,
+  'Automation.Section.BackupFolder': `Cartella backup`,
   'Automation.Section.Patches': `Patch`,
   'Automation.Section.ProductDetails': `Dettagli prodotto`,
-  'Automation.BackupFolder': `Cartella di backup`,
+  'Automation.BackupFolder': `Cartella backup`,
   'Automation.OperationProgress': `Avanzamento operazione`,
   'Automation.RescanInstaller': `Nuova scansione di {InstallerFolder}`,
   'Automation.ScanningProgress': `Avanzamento scansione`,
