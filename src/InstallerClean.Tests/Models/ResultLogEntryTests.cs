@@ -244,8 +244,8 @@ public class ResultLogEntryTests
         // release sends to its exact set of keys, every count in it required; a version it
         // does not know goes to its lenient v<n>-unknown/ path. So a key added to or taken
         // from what a version carries moves the version once a release sends it, and this
-        // pin makes that move a deliberate, reviewed act. Schema 13 is schema 12 with reportId
-        // appended at the top level.
+        // pin makes that move a deliberate, reviewed act. Schema 13 adds reportId at the top
+        // level, two keys under machine and three under scan.
         Assert.Equal(13, ResultLogEntry.CurrentSchemaVersion);
     }
 

@@ -261,7 +261,7 @@ namespace InstallerClean.Models;
 /// <see cref="WithholdingSplit.ContainmentUnestablishedCount"/>); or the scan could not
 /// establish which cached files belong to which programs, which withholds the whole
 /// walk-derived set at once (<see cref="WithholdingSplit.WholesaleCount"/>, and
-/// <see cref="WithholdingLeg"/> for the three findings behind it); or this one
+/// <see cref="WithholdingLeg"/> for the findings behind it); or this one
 /// candidate's own
 /// identity could not be read, so nothing could compare it against the
 /// registrations and it is kept back while the rest stand
@@ -287,17 +287,20 @@ namespace InstallerClean.Models;
 /// lookup of a program that might have used the file. Both are true of every row
 /// whichever cause put it there, and there is no per-file record of which did.
 ///
-/// WHY THE FIRST CAUSE TAKES A WHOLE SET AND NOT ONE FILE, and the answer is the same
-/// shape for all three findings behind it: the app knows a needed file may be sitting in
-/// the candidate list and cannot say WHICH. For an unspellable claim, the claim is kept
-/// in the raw spelling Windows gave, so it matches nothing the walk produces, and the
-/// identity match cannot help either, because a value the path API refuses is a value
-/// CreateFile refuses too and there is nothing to open and compare. For a product the
-/// registry names that this scan could not ask about, nothing shows it is not a second
-/// copy of a program, whose original package declares the base product code and can be a
-/// file in the folder that the copy's source list names; and no file in the folder is
-/// compared with a product nothing asked, whether as a package it opens or as a patch it
-/// holds. Every unclaimed file of the set is therefore one that could have been meant,
+/// WHY THE WHOLESALE CAUSE TAKES A WHOLE SET AND NOT ONE FILE, and the answer is the same
+/// shape for every finding behind it: the app knows a needed file may be sitting in the
+/// candidate list and cannot say WHICH. For an unspellable claim, the claim is kept in the
+/// raw spelling Windows gave, so it matches nothing the walk produces, and the identity
+/// match cannot help either, because a value the path API refuses is a value CreateFile
+/// refuses too and there is nothing to open and compare. For a product the registry names
+/// that this scan could not ask about, nothing shows it is not a second copy of a program,
+/// whose original package declares the base product code and can be a file in the folder
+/// that the copy's source list names; and no file in the folder is compared with a product
+/// nothing asked, whether as a package it opens or as a patch it holds. For a registration
+/// whose file would not identify, its claim is matched by identity to no walked file, so
+/// any of them can be the file it names. For a registry key that would not read, the claim
+/// it records is not among the claims the scan holds, so the file it names reads as
+/// unclaimed. Every unclaimed file of the set is therefore one that could have been meant,
 /// and the app cannot say of any of them that nothing needs it.
 ///
 /// THE SUPERSEDED HALF OF THE OFFER IS NEVER PUT HERE. Those rows are judged on
@@ -1090,7 +1093,10 @@ public static class ShortNameCreationLabels
 /// not rule out as a second copy of a program opens packages that could not all be
 /// seen, or because an installation's cached package did not say which product it
 /// declares, its own record did not show it to be an ordinary installation, and it is not
-/// shown to have no package for Windows Installer to open, or because a product key no
+/// shown to have no package for Windows Installer to open, or because an ordinary
+/// installation's cached package did not say which product it declares, the package code
+/// its record holds did not read as a GUID both through Windows Installer and from the
+/// registry, and its sources could not be ruled out, or because a product key no
 /// installation accounts for left a second copy not ruled out. See
 /// <see cref="Services.DeclaredProductOutcome.SecondCopyUnestablished"/>.
 ///

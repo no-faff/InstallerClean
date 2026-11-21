@@ -1,7 +1,7 @@
 namespace InstallerClean.Models;
 
 /// <summary>
-/// What one pass of the declared-product check found about the two conditions under which it
+/// What one pass of the declared-product check found about the conditions under which it
 /// holds back every installation package it would otherwise let through, as
 /// <see cref="Services.DeclaredProductOutcome.SecondCopyUnestablished"/>. Counts of listed
 /// installations, and of files, and nothing naming either.
@@ -24,6 +24,13 @@ namespace InstallerClean.Models;
 /// the two groups add up to the same figure. One recording no cached package is also counted
 /// once among the three saying what kept it, from <see cref="KeptNoneRecordedOtherAnswer"/>,
 /// which add up to <see cref="KeptNoneRecorded"/>.
+///
+/// AN ORDINARY INSTALLATION SETS THE HOLD TOO where its cached package does not say which product
+/// it declares, the package code its record holds did not read as a GUID both through Windows
+/// Installer and from the registry, and its sources could not be ruled out. It is counted in
+/// <see cref="KeptOrdinaryPackageCodeNotRuledOut"/>, among those its record released
+/// (<see cref="ReleasedOrdinary"/>) and in <see cref="ListedChecked"/>, and in none of the groups
+/// above that set the hold.
 ///
 /// THE SECOND CONDITION IS READ ONLY WHERE NO INSTALLATION SETS THE HOLD: an installation the
 /// caller could not rule out as a second copy of a program whose packages cannot all be seen.

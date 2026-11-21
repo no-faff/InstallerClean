@@ -330,16 +330,17 @@ public record InstallerQueryResult(
 /// Products whose registry <c>Patches</c> key opened, from the per-product patch
 /// listing the superseded-patch condition rests on.
 ///
-/// THESE FOUR ARE READ AND THEY ARE SENT.
-/// <see cref="ResultLogEntry"/> takes all four off this census, declares them as
-/// parameters of its scan record, and that record is the file the Send-result button
-/// POSTs.
+/// THIS ONE, <see cref="ProductPatchRegistrationCount"/>,
+/// <see cref="ProductsWithRemovablePatchCount"/> AND
+/// <see cref="ProductsWithPatchSetUnestablishedCount"/> ARE READ AND THEY ARE SENT.
+/// <see cref="ResultLogEntry"/> takes them off this census and declares them as
+/// parameters of its machine record (<see cref="MachineInfo"/>), which the file the
+/// Send-result button POSTs carries.
 ///
 /// DO NOT DROP, RENAME OR QUIETLY REDEFINE THEM. An unread counter is ordinarily fair
-/// game for all three, and these four are the only instrument this project has for
-/// sizing what the per-product condition withholds on any machine but the one it was
-/// written on. Something is receiving them, so a change of meaning here is a schema
-/// decision and not a tidy-up.
+/// game for all three, and these are what the report carries to size, across machines,
+/// what the per-product condition withholds. Something is receiving them, so a change
+/// of meaning here is a schema decision and not a tidy-up.
 ///
 /// Against <see cref="ProductCount"/> it says how usual it is for a product to carry a
 /// Patches key at all, a product holding no registered patch having no reason to.
@@ -502,9 +503,10 @@ public readonly record struct EnumerationCensus(
     // It counts a different thing from UnreadableProducts, which is what the
     // enumeration said about ITSELF: products it returned whose records came
     // back short inside the loop. This one is the fallback failing to read a key
-    // at all. The refusal that weighs both needs each to be above zero, so a
-    // machine whose enumeration answers cleanly while the registry side fails
-    // reads leaves that refusal unarmed, and the count is how the opt-in report
+    // at all. The refusal that weighs both needs the enumeration's count above
+    // zero and this one above ProductPatchListReadFailures, so a machine whose
+    // enumeration answers cleanly while the registry side fails reads leaves that
+    // refusal unarmed, and the count is how the opt-in report
     // records that the reads failed, as registryKeyReadFailureCount. The crash log
     // writes the first twenty in full, then each cause not yet seen, and counts
     // the rest in a closing entry. Above zero it withholds every superseded patch, and
@@ -518,12 +520,11 @@ public readonly record struct EnumerationCensus(
     // InstallerQueryResult.UnaccountedProductCount adds. A code with an installation
     // whose records came back short where the registry does not hold what the failed
     // read would have returned under that installation's own account, a code whose own
-    // keyed answer would not come or
-    // left out an installation the enumeration listed and whose registry entry names a
-    // cached file the enumeration never claimed that is on the disk, and any product row
-    // the walk passed without reading. With UnansweredProductCount and
-    // UnparseableProductKeyNames it is the whole of that figure, so the report carries
-    // the three and never the sum.
+    // keyed answer would not come or left out an installation the enumeration listed
+    // and whose registry entry names a cached file the enumeration never claimed that
+    // is on the disk, and any product row the walk passed without reading. With
+    // UnansweredProductCount and UnparseableProductKeyNames it is the whole of that
+    // figure, so the report carries the three and never the sum.
     int UnsettledEnumeratedProductCount = 0,
     // RecoveredEnumeratedInstallationCount: installations of a code the enumeration
     // returned, listed by the keyed ask for that code under an account or context the

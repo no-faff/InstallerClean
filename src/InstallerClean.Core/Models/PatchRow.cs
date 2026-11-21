@@ -10,8 +10,8 @@ namespace InstallerClean.Models;
 ///
 /// IT IS CARRIED BECAUSE THE ROW OTHERWISE STATES A SIZE FOR A FILE THAT IS NOT
 /// THERE. A missing row's byte count is zero, and zero renders as an ordinary
-/// size, so the list showed a plausible nought bytes and the spoken line said the
-/// same. Neither was a gap a reader could notice.
+/// size, so without the flag the list and the spoken line would both give a
+/// plausible nought bytes.
 ///
 /// AND THE PRODUCT ROW CANNOT ANSWER FOR IT, which is why the flag belongs here
 /// rather than being rolled upwards. A product row takes its own missing state
