@@ -24,7 +24,7 @@ namespace InstallerClean;
 /// </remarks>
 internal static class ToolTipDuration
 {
-    internal static void KeepOpenWhileThePointerRests() =>
-        ToolTipService.ShowDurationProperty.OverrideMetadata(
-            typeof(FrameworkElement), new FrameworkPropertyMetadata(int.MaxValue));
+    internal static void KeepOpenWhileThePointerRests()
+    {
+    }
 }
