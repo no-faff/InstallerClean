@@ -539,7 +539,7 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Etwas nutzt gerade Windows Installer, etwa ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean {InstallerFolder} nicht anfasst, während sich der Ordner ändert. Danach einmal neu scannen, und sie sind wieder da.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Etwas nutzt gerade Windows Installer, etwa Windows Update oder ein Programm, das installiert oder entfernt wird. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean {InstallerFolder} erst anfasst, wenn das fertig ist. Danach wähle Neu scannen, und sie sind wieder da.</value></data>
   <!-- The banner for a Windows Installer lock InstallerClean was refused permission
        to open. Names the folder with the {InstallerFolder} token like the rest of the
        family. It says only what the app knows: Windows refused it the check, so nothing
@@ -563,16 +563,16 @@
        decimal. Cli.PendingRebootBlocked.MsiExecuteMutexUnreadable has the same pair. -->
   <data name="Body.PendingReboot.MsiExecuteMutexUnreadable" xml:space="preserve"><value>InstallerClean konnte nicht prüfen, ob Windows Installer beschäftigt ist, deshalb pausieren Verschieben und Löschen, und InstallerClean fasst {InstallerFolder} nicht an. Starte Windows neu und wähle Neu scannen. Kann es dann immer noch nicht prüfen, ist das kein Rechner, den InstallerClean aufräumen kann.</value></data>
   <data name="Body.PendingReboot.MsiExecuteMutexUnreadableWindowsError" xml:space="preserve"><value>InstallerClean konnte nicht prüfen, ob Windows Installer beschäftigt ist, weil Windows einen Fehler gemeldet hat: {0} (Fehler {1}). Verschieben und Löschen pausieren, und InstallerClean fasst {InstallerFolder} nicht an. Starte Windows neu und wähle Neu scannen. Kann es dann immer noch nicht prüfen, ist das kein Rechner, den InstallerClean aufräumen kann.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Auf diesem Rechner ist eine frühere Windows-Installer-Transaktion angehalten. Setze diese Installation fort oder mache sie rückgängig (oder starte Windows neu), bevor du {InstallerFolder} aufräumst.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows hat für den nächsten Neustart eine Dateiumbenennung eingeplant, die {InstallerFolder} betrifft. Starte Windows neu, bevor du aufräumst.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Bei Windows Installer wurde ein früherer Vorgang gestartet und nicht abgeschlossen, deshalb pausieren Verschieben und Löschen, und InstallerClean fasst {InstallerFolder} nicht an. Schließe ihn ab, mache ihn rückgängig oder starte Windows neu und wähle dann Neu scannen.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>In Windows wartet eine Änderung an {InstallerFolder} auf den nächsten Neustart, deshalb pausieren Verschieben und Löschen. Starte Windows neu und wähle dann Neu scannen.</value></data>
   <!-- The banner for an entry the gate cannot place. Names the folder with the
        {InstallerFolder} token like the rest of the family. It states what the machine
-       holds, a queued file operation, and stops there: nothing here has shown that
-       Windows Installer is running or that an install is suspended, so the two banners
-       that say so would both be untrue, and Body.PendingReboot.Other says something is
-       in progress and would be untrue as well. The restart is the instruction because
+       holds, a file change waiting for the next restart, and stops there: nothing here
+       has shown that Windows Installer is running or that an install is unfinished, so
+       the two banners that say so would both be untrue, and Body.PendingReboot.Other says
+       something is unfinished and would be untrue as well. The restart is the instruction because
        these operations are carried out at the next boot and not before. -->
-  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>Für den nächsten Neustart ist ein Dateivorgang vorgemerkt, und InstallerClean kann nicht erkennen, welche Dateien darin genannt werden. Damit lässt sich nicht ausschließen, dass sie in {InstallerFolder} liegen. Starte Windows neu, bevor du aufräumst.</value></data>
+  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>In Windows wartet eine Dateiänderung auf den nächsten Neustart, und InstallerClean kann nicht erkennen, welche Dateien sie betrifft. Damit lässt sich nicht ausschließen, dass sie in {InstallerFolder} liegen. Verschieben und Löschen pausieren. Starte Windows neu und wähle dann Neu scannen.</value></data>
   <!-- The banner for a registry read that did not answer. Names the folder with the
        {InstallerFolder} token like the rest of the family. It names neither of the two
        reads, because one sentence has to be true whichever of them it was, and it claims
@@ -581,16 +581,16 @@
        because it clears a transient fault, and the last sentence says plainly what it
        means if it does not, rather than leaving somebody re-scanning at a machine whose
        permissions will refuse the read again tomorrow. -->
-  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean konnte eine der Windows-Einstellungen nicht lesen, die es prüft, bevor es {InstallerFolder} anfasst, und kann deshalb nicht erkennen, ob gerade ein Installationsvorgang läuft oder auf einen Neustart wartet. Starte Windows neu und wähle Neu scannen. Lässt sich die Einstellung dann immer noch nicht lesen, ist das kein Rechner, den InstallerClean aufräumen kann.</value></data>
+  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean konnte eine der Windows-Einstellungen nicht lesen, die es prüft, bevor es {InstallerFolder} anfasst, und kann deshalb nicht erkennen, ob Windows Installer beschäftigt ist oder noch Arbeit hat, die auf einen Neustart wartet. Verschieben und Löschen pausieren. Starte Windows neu und wähle Neu scannen. Lässt sich die Einstellung dann immer noch nicht lesen, ist das kein Rechner, den InstallerClean aufräumen kann.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
        property throwing produces: WPF swallows it as a binding error and paints
        nothing. It says what is true of every reason in that family, that
-       something is in progress and the buttons come back afterwards, and says
+       something is unfinished and the buttons come back afterwards, and says
        nothing it cannot know. Names the folder with the token like the rest of
        the family. -->
-  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer hat etwas in Arbeit, deshalb pausieren Verschieben und Löschen. InstallerClean fasst {InstallerFolder} nicht an, während sich der Ordner ändert. Danach einmal neu scannen, und sie sind wieder da.</value></data>
+  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer hat noch etwas Unerledigtes, deshalb pausieren Verschieben und Löschen, und InstallerClean fasst {InstallerFolder} nicht an. Sobald das erledigt ist, wähle Neu scannen, und sie sind wieder da.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Wähle eine Datei, um Details anzuzeigen.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Wähle ein Produkt, um Details anzuzeigen.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Keine Metadaten verfügbar.</value></data>
@@ -2012,22 +2012,22 @@ Führe InstallerClean erneut als Administrator aus.</value></data>
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Fehler: etwas nutzt gerade Windows Installer, etwa ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. /m und /d sind blockiert, solange das läuft. Versuche es erneut, sobald es fertig ist.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Fehler: auf diesem Rechner ist eine frühere Windows-Installer-Transaktion angehalten. Setze diese Installation fort oder mache sie rückgängig (oder starte Windows neu), bevor du {InstallerFolder} aufräumst.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Fehler: etwas nutzt gerade Windows Installer, etwa Windows Update oder ein Programm, das installiert oder entfernt wird. /m und /d sind blockiert, solange das läuft. Versuche es erneut, sobald es fertig ist.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Fehler: bei Windows Installer wurde ein früherer Vorgang gestartet und nicht abgeschlossen. /m und /d sind blockiert, deshalb fasst InstallerClean {InstallerFolder} nicht an. Schließe ihn ab, mache ihn rückgängig oder starte Windows neu und versuch es dann erneut.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Fehler: ein für den Neustart eingeplanter Dateivorgang betrifft {InstallerFolder} ({0}). Starte Windows neu, damit dieser Vorgang abgeschlossen wird, bevor du aufräumst.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Fehler: in Windows wartet eine Änderung an {InstallerFolder} auf den nächsten Neustart ({0}). /m und /d sind blockiert. Starte Windows neu und versuch es dann erneut.</value></data>
   <!-- The command-line twin of Body.PendingReboot.PendingRenameUnresolved, adapted the
        way the rest of this family is: opens "Error: " and goes lower case after it. No
        placeholder, because the {0} in the PendingRenameInCache line above names a
        resolved cache path and this arm has none to name. -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Fehler: Für den nächsten Neustart ist ein Dateivorgang vorgemerkt, und InstallerClean kann nicht erkennen, welche Dateien darin genannt werden. Damit lässt sich {InstallerFolder} nicht ausschließen. Starte Windows neu, bevor du aufräumst.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Fehler: in Windows wartet eine Dateiänderung auf den nächsten Neustart, und InstallerClean kann nicht erkennen, welche Dateien sie betrifft. Damit lässt sich nicht ausschließen, dass sie in {InstallerFolder} liegen. /m und /d sind blockiert. Starte Windows neu und versuch es dann erneut.</value></data>
   <!-- The command-line twin of Body.PendingReboot.RegistryCheckUnreadable, adapted the
        way the rest of this family is: opens "Error: ", names the flags rather than the
        window's buttons, and drops Re-scan, there being nothing to re-scan on a command
        line. It says "registry values" where the banner says "Windows settings", the
        reader here being the person who typed the switch. Names neither read, for the
        reason the banner does not. No placeholder. -->
-  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Fehler: InstallerClean konnte einen der Registrierungswerte nicht lesen, die es prüft, bevor es {InstallerFolder} anfasst, und kann deshalb einen laufenden oder für den nächsten Neustart vorgemerkten Windows-Installer-Vorgang nicht ausschließen. /m und /d sind blockiert. Starte Windows neu und versuch es erneut. Schlägt das Lesen weiterhin fehl, ist das kein Rechner, den InstallerClean aufräumen kann.</value></data>
+  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Fehler: InstallerClean konnte einen der Registrierungswerte nicht lesen, die es prüft, bevor es {InstallerFolder} anfasst, und kann deshalb nicht erkennen, ob Windows Installer beschäftigt ist oder noch Arbeit hat, die auf einen Neustart wartet. /m und /d sind blockiert. Starte Windows neu und versuch es erneut. Schlägt das Lesen weiterhin fehl, ist das kein Rechner, den InstallerClean aufräumen kann.</value></data>
   <!-- The command line's sentence for a sample of the Windows Installer lock that failed
        in a way that is neither a refusal nor a finding, the twin of
        Body.PendingReboot.MsiExecuteMutexUnreadable. Shaped like
@@ -2040,7 +2040,7 @@ Führe InstallerClean erneut als Administrator aus.</value></data>
        adapted the way the rest of the family is: the flags rather than the window's
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
-  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Fehler: Windows Installer hat etwas in Arbeit, deshalb sind /m und /d blockiert. InstallerClean fasst {InstallerFolder} nicht an, während sich der Ordner ändert. Versuche es erneut, sobald es fertig ist.</value></data>
+  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Fehler: Windows Installer hat noch etwas Unerledigtes, deshalb sind /m und /d blockiert, und InstallerClean fasst {InstallerFolder} nicht an. Versuche es erneut, sobald das erledigt ist.</value></data>
   <!-- What the command line prints, on every mode, where the scan found one of the
        signals the Cli.PendingRebootBlocked.* lines name set when it read them just
        after its clock, and so held back every file in the folder no record names. They report and

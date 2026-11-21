@@ -2808,7 +2808,7 @@ internal static class Program
             PendingRebootReason.RegistryCheckUnreadable =>
                 Strings.Cli_PendingRebootBlocked_RegistryCheckUnreadable,
             // The in-progress file's own sentence is the one the fallback below
-            // prints: Windows Installer has something in progress, which is what
+            // prints: Windows Installer has something unfinished, which is what
             // the file records. A reason added later without a line of its own
             // falls through to the same text and meets the test's distinctness
             // check, which this arm keeps armed.

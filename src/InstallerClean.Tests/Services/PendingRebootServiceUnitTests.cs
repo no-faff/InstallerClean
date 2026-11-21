@@ -130,7 +130,7 @@ public class PendingRebootServiceUnitTests
     public void A_refused_read_of_the_in_progress_file_blocks_with_its_own_reason()
     {
         // Never as the file being there: nothing has been seen, and the file's own
-        // sentence says Windows Installer has something in progress.
+        // sentence says Windows Installer has something unfinished.
         _marker.Read().Returns(InstallerInProgressMarkerReading.AccessRefused);
 
         var result = Build().Check();

@@ -181,7 +181,7 @@ public partial class ScanViewModel : ObservableObject
     /// arm (ScanViewModelPendingRebootTests).
     ///
     /// THE SAME SENTENCE IS ALSO THE IN-PROGRESS FILE'S OWN, named in its arm
-    /// above: it says Windows Installer has something in progress, which is what
+    /// above: it says Windows Installer has something unfinished, which is what
     /// that file records. A member added later without a banner falls through to
     /// the same text and meets the test's distinctness check, which the file's arm
     /// keeps armed.
