@@ -47,6 +47,9 @@ public class NeutralTextTests
         new MissingMethodException(),
         new MissingFieldException(),
         new TypeInitializationException("InstallerClean.Resources.Strings", new TypeLoadException()),
+        new TypeInitializationException("InstallerClean.Resources.Strings", new FileNotFoundException()),
+        new TypeInitializationException("InstallerClean.Services.UpdateManifest",
+            new TypeInitializationException("InstallerClean.Services.RegistryReader", new MissingMethodException())),
         new FileLoadException(),
         new FileNotFoundException(),
     };
@@ -58,6 +61,9 @@ public class NeutralTextTests
         new UnauthorizedAccessException(),
         new FormatException(),
         new NullReferenceException(),
+        new TypeInitializationException("InstallerClean.Services.UpdateManifest", new InvalidOperationException()),
+        new TypeInitializationException("InstallerClean.Services.RegistryReader", new UnauthorizedAccessException()),
+        new TypeInitializationException("InstallerClean.Services.UpdateManifest", null),
     };
 
     [Theory]

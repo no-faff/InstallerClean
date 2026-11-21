@@ -37,11 +37,21 @@ internal static class StartChecks
     /// need. A copy built for .NET Framework 4.8 meets none of them on 4.8, so the start ends
     /// on one with the .NET Framework 4.8 message in English (NetFrameworkCheck.EnglishMessage),
     /// and goes on after any other exception, so that a fault in a check never stops a PC
-    /// that can run the copy.
+    /// that can run the copy. A <see cref="TypeInitializationException"/> is read by the
+    /// exception it carries, through any number of them: a type initializer that could not
+    /// load what it needs is a load failure, and one that threw anything else, or carries
+    /// nothing, is not, so a type initializer failing for another reason on a PC with 4.8 lets
+    /// the start go on.
     /// </summary>
-    internal static bool IsLoadFailure(Exception exception) =>
-        exception is TypeLoadException or MissingMethodException or MissingFieldException
-            or TypeInitializationException or FileLoadException or FileNotFoundException;
+    internal static bool IsLoadFailure(Exception exception)
+    {
+        Exception? carried = exception;
+        while (carried is TypeInitializationException initializer)
+            carried = initializer.InnerException;
+
+        return carried is TypeLoadException or MissingMethodException or MissingFieldException
+            or FileLoadException or FileNotFoundException;
+    }
 
     /// <summary>
     /// The message for <paramref name="refusal"/>, which is not <see cref="StartRefusal.None"/>,
