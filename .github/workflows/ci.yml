@@ -2311,9 +2311,20 @@ jobs:
 
           function Expect-ExitCode($update) {
             if ($null -eq $update.Run.ExitCode) { "  the exit code is not compared, since the run was ended"; return }
+            $logLength = CrashLogLength
             $again = Run $update.Exe @('/s', '/noupdate') @{} 240
             "  a second run of the file at the path, with /s /noupdate, exited with $($again.ExitCode)"
-            if ($update.Run.ExitCode -ne $again.ExitCode) { Fail "$($update.Label): the run exited with $($update.Run.ExitCode), the file at the path with $($again.ExitCode)." }
+            if ($update.Run.ExitCode -ne $again.ExitCode) {
+              # What the second run printed, and what it wrote to crash.log, are the evidence of
+              # why the file at the path ended differently.
+              Write-Host "::group::$($update.Label), the second run's output"
+              Write-Host $again.Output
+              Write-Host "::endgroup::"
+              $logged = CrashLogSince $logLength
+              if ($logged) { Write-Host "  crash.log gained in the second run:"; $logged -split "`r?`n" | Where-Object { $_ } | ForEach-Object { Write-Host "    $_" } }
+              else { Write-Host "  crash.log gained nothing in the second run" }
+              Fail "$($update.Label): the run exited with $($update.Run.ExitCode), the file at the path with $($again.ExitCode)."
+            }
           }
 
           $available = (Line 'UpdateNotice.Available') -f $latest
