@@ -41,7 +41,7 @@ public class FrameworkSwitchesTests
         Assert.Equal(FrameworkSwitch.NetFramework48, inExe.Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName);
     }
 
-    private static T InDomain<TProbe, T>(Func<TProbe, T> run) where TProbe : MarshalByRefObject
+    internal static T InDomain<TProbe, T>(Func<TProbe, T> run) where TProbe : MarshalByRefObject
     {
         var setup = new AppDomainSetup
         {

@@ -429,6 +429,9 @@ public partial class App : Application
             // paint, and tracks the slider if it moves at runtime.
             ApplyTextScaling();
 
+            // Before any window exists: what it sets and why is on ToolTipDuration.
+            ToolTipDuration.KeepOpenWhileThePointerRests();
+
             // Before any window is shown, so no element can take focus without
             // being tracked. What it is for is on FocusRing itself.
             FocusRing.Track();
