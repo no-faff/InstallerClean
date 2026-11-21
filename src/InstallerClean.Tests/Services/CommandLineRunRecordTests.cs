@@ -56,6 +56,7 @@ public class CommandLineRunRecordTests
     [InlineData("/s mode: no unneeded files identified.")]
     [InlineData("/d mode: no unneeded files identified.")]
     [InlineData("/d mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it has held back 12 files. No action taken.")]
+    [InlineData("/d mode: nothing could be listed as safe to delete. InstallerClean could not establish that any of the cached files it found are unneeded, so it left 12 files alone. No action taken.")]
     [InlineData("/d mode cancelled at the console before any work was done. No action taken.")]
     [InlineData("/d mode cancelled before any work was done. No action taken.")]
     [InlineData(@"/m mode aborted: destination D:\Full has 1.0 GB free and the move needs 3.0 GB.")]

@@ -50,7 +50,7 @@
   </p>
   </details>
   <!-- reports-scaled-end -->
-- **Is it safe:** Yes. All it touches is files in `C:\Windows\Installer`. It asks Windows Installer what's still needed, and reads the same records out of the registry as well. It offers a file only when nothing installed on the machine claims it, or a newer patch has replaced it and no program here could go back to the old one. Anything it can't get a straight answer about, it holds back. [More below](#how-it-works).
+- **Is it safe:** Yes. All it touches is files in `C:\Windows\Installer`. It asks Windows Installer what's still needed, and reads the same records out of the registry as well. It lists a file as safe to delete only when nothing installed on the machine claims it, or a newer patch has replaced it and no program here could go back to the old one. Anything it can't get a straight answer about, it leaves alone. [More below](#how-it-works).
 - **Nothing about you:** Open source (Apache 2.0). No account, no ads, no tracking, nothing running in the background. It checks GitHub for a newer version when you run it, which you can turn off, and the first time it finishes on a PC it sends one anonymous report of how the run went, unless you untick the box on the result screen.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [any warning Windows shows](#unknown-publisher) and [the admin prompt](#admin). Move or delete what it finds. Done.
 
@@ -108,7 +108,7 @@ The standard advice confuses two different things. Deleting files at random stop
 
 1. **Scans** `C:\Windows\Installer` for `.msi` and `.msp` files
 2. **Asks** Windows Installer what's still needed, and reads the same records out of the registry as well
-3. **Holds back** anything the two readings can't settle between them
+3. **Leaves alone** every file a program still needs, and anything the two readings can't settle between them
 4. **Tells you how much you can free**, and how much it's leaving alone, with optional detail windows listing every file
 5. **Removes the unneeded files**: move them to a backup folder you choose, or delete them permanently
 
@@ -167,7 +167,7 @@ The standard advice confuses two different things. Deleting files at random stop
 
 When Windows Installer installs a program it keeps a copy of the installer in `C:\Windows\Installer`, and when a patch is registered against a program it keeps a copy of that too. Those copies are what it works from when it repairs, updates or uninstalls the software later, which is why they stay there long after the installation has finished. Both kinds of copy end up in the folder: `.msi` installers; and `.msp` patches, which update a program you already have rather than replacing it.
 
-InstallerClean offers a file for one of two reasons.
+InstallerClean lists a file as safe to delete for one of two reasons.
 
 **Orphaned** means nothing on the machine claims the file. No installed product and no registered patch names it.
 
@@ -181,13 +181,13 @@ InstallerClean works the two out in opposite directions, and only the first invo
 
 **Matching a record to its file.** A record names its cached file as a path, and the same folder does not always get spelt the same way in them. So rather than trust the spelling, InstallerClean asks Windows where each recorded path really points, and compares that against the files it listed in the folder. Anything still unclaimed gets a second comparison that does not go through names at all: it opens the file and asks Windows to identify it, so that two different names for the same file are recognised as one file.
 
-**Records that cannot be matched.** If Windows will not say where a recorded path points, or the file at the end of one cannot be identified, InstallerClean does not know which file that record was about, and any of the files it listed could be the one. The same follows if a program may have been installed more than once, because then it cannot tell which cached file belongs to which copy. In any of those cases it offers nothing it found by listing the folder that time. A record pointing at a file that has already gone is different: there is nothing left for it to have meant, so it cannot be about any of the files still in the folder.
+**Records that cannot be matched.** If Windows will not say where a recorded path points, or the file at the end of one cannot be identified, InstallerClean does not know which file that record was about, and any of the files it listed could be the one. The same follows if a program may have been installed more than once, because then it cannot tell which cached file belongs to which copy. In any of those cases, no file it found by listing the folder is listed as safe to delete that time. A record pointing at a file that has already gone is different: there is nothing left for it to have meant, so it cannot be about any of the files still in the folder.
 
-**Asking from the other end.** An orphan is decided by an absence, and an absence can also mean the app failed to find the record. So before offering an `.msi` installer, InstallerClean opens the file, reads the product code the file itself carries, and asks Windows whether that product is installed. If it is, the file stays, whatever the rest of the scan found. That check can only take a file off the list. Nothing it can answer puts one on.
+**Asking from the other end.** An orphan is decided by an absence, and an absence can also mean the app failed to find the record. So before listing an `.msi` installer as safe to delete, InstallerClean opens the file, reads the product code the file itself carries, and asks Windows whether that product is installed. If it is, the file stays, whatever the rest of the scan found. That check can only take a file off the list. Nothing it can answer puts one on.
 
-**What decides an `.msp` patch.** A patch is not opened and asked which program it belongs to. What settles it instead is that a patch registration names its cached file in two places: the patches registered against each product; and a single registry list of every patch registration on the machine. A patch is offered as an orphan only when neither of those names it.
+**What decides an `.msp` patch.** A patch is not opened and asked which program it belongs to. What settles it instead is that a patch registration names its cached file in two places: the patches registered against each product; and a single registry list of every patch registration on the machine. A patch is listed as safe to delete only when neither of those names it.
 
-**Where a superseded patch differs.** It goes through none of the above, because it is not an unclaimed file. Windows has a record of it, and that record is what says it has been replaced. The risk is a different one: a patch can be registered against several programs, and only one of them has finished with it. So a superseded patch is offered only when Windows records that it cannot be uninstalled, every program it is registered against has been asked, none of them still has it applied, and none of them holds any patch that Windows says can be uninstalled. The last of those is there because undoing a patch on a program can reach back for the older file. If any of that cannot be answered, the file stays.
+**Where a superseded patch differs.** It goes through none of the above, because it is not an unclaimed file. Windows has a record of it, and that record is what says it has been replaced. The risk is a different one: a patch can be registered against several programs, and only one of them has finished with it. So a superseded patch is listed as safe to delete only when Windows records that it cannot be uninstalled, every program it is registered against has been asked, none of them still has it applied, and none of them holds any patch that Windows says can be uninstalled. The last of those is there because undoing a patch on a program can reach back for the older file. If any of that cannot be answered, the file stays.
 
 <details>
 <summary>The Windows Installer calls this uses</summary>
@@ -299,7 +299,7 @@ Every run writes an outcome entry to the Application log, and may add one or mor
 | `4000` | Hard failure |
 | `3000` | Notice: the scan couldn't account for every installed product |
 | `3001` | Notice: files Windows expects are missing from the folder |
-| `3002` | Notice: files were held back rather than offered |
+| `3002` | Notice: files InstallerClean couldn't be certain about were left alone |
 
 The `3000` band is a notice rather than an outcome, and doesn't count as a run result. Entry type is Information where nothing went wrong with the run and Warning where it did. **The event log is always in English**, whatever the machine's display language, so a grep on a known phrase has a stable target. The console is the translated surface: it follows the machine's own language, and sizes and dates its region.
 
@@ -367,7 +367,7 @@ Once it's issued, releases will carry the line SignPath ask for: free code signi
 
 ## Privacy
 
-The first time InstallerClean finishes on a PC, the result screen has a "Send anonymous report" box, and the report goes when you close that screen unless you untick it. There's only ever one report per PC. The box starts unticked if Windows is set to a country in the European Union, Iceland, Liechtenstein or Norway, or if InstallerClean can't read that setting. The report says what the scan found, what it held back and why, whether you moved or deleted, how much that freed, how long it took, and anything that failed, along with the app's version, the language you read it in, the language Windows is set to, your Windows version and a random code made for the report, so that it's only counted once if it's sent more than once. No file names, no folder names, no account name, nothing that identifies your machine and nothing that could tie two reports together. The small "i" beside the box lists what it holds, and "See exactly what's sent" shows you the report itself. The reports are what the chart at the top of this page is drawn from, so anyone can see how much space people are actually reclaiming. They also tell me whether the app is working, and what it's holding back, on machines other than my own.
+The first time InstallerClean finishes on a PC, the result screen has a "Send anonymous report" box, and the report goes when you close that screen unless you untick it. There's only ever one report per PC. The report says what the scan found, what it left alone and why, whether you moved or deleted, how much that freed, how long it took, and anything that failed, along with the app's version, the language you read it in, the language Windows is set to, your Windows version and a random code made for the report, so that it's only counted once if it's sent more than once. No file names, no folder names, no account name, nothing that identifies your machine and nothing that could tie two reports together. The small "i" beside the box lists what it holds, and "See exactly what's sent" shows you the report itself. The reports are what the chart at the top of this page is drawn from, so anyone can see how much space people are actually reclaiming. They also tell me whether the app is working, and what it's leaving alone, on machines other than my own.
 
 No ads. The only other connections are a version check when the app starts (one request to GitHub which you can turn off in the About window) and buttons linking to GitHub and a page where you can donate if you're feeling generous. Full [privacy policy](PRIVACY.md).
 
@@ -415,7 +415,7 @@ Disk Cleanup, Storage Sense, CCleaner and BleachBit don't clean `C:\Windows\Inst
 
 If you do have a file missing from that folder, the program it belonged to still runs normally. But when you try to update or uninstall that program it will probably fail. Windows goes looking for the file, doesn't find it, and the step stops.
 
-InstallerClean's whole purpose is to only offer to move or delete files that are *not* needed, but it does know when a file is missing, so it flags any it finds with a warning triangle and a link pointing here. This is what to do to try and repair the program:
+InstallerClean lists a file as safe to delete only when it is not needed, but it does know when a file is missing, so it flags any it finds with a warning triangle and a link pointing here. This is what to do to try and repair the program:
 
 - Find out your installed program's version number (Settings, Apps, Installed apps)
 - Download the installer **for that version** from its maker. A newer one won't work, and neither will uninstalling first: both have to remove what's installed before they can go on, and removing it is the step that needs the missing file.

@@ -929,7 +929,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // losing it behind a storm of the ordinary one.
         var unreadPatchFileLog = new PerItemFailureLog("Patch file read",
             "How many patch files would not read, and which of the two ways, is recorded "
-            + "nowhere else. None of those files is offered. Nothing the user sees says that a "
+            + "nowhere else. None of those files is listed as safe to delete. Nothing the user sees says that a "
             + "file would not read, and nor does the opt-in report.",
             _crashLogSink);
 
@@ -2915,8 +2915,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // made here; a test calling this pass directly has no run and writes nothing.
             failureLog?.Record(
                 new InvalidOperationException(
-                    "A registered patch file did not yield the products it declares, so its "
-                    + "own removable verdict is withheld and the file is kept. Reader detail: "
+                    "A registered patch file did not yield the products it declares, so the file is left "
+                    + "alone. Reader detail: "
                     + (detail.Length == 0 ? "none given" : detail) + "."),
                 cause: detail);
 

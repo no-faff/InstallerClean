@@ -309,7 +309,7 @@ public class DeclaredProductCheckUnlistedKeyTests
             check.Outcomes);
         var entry = Assert.Single(recorded);
         Assert.Equal("the cached package is not a file that is there", ReasonIn(entry.Detail));
-        Assert.Contains("every installation package is kept rather than offered", entry.Error.Message);
+        Assert.Contains("every installation package is left alone", entry.Error.Message);
         Assert.DoesNotContain(Cached, entry.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -608,7 +608,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.ScreeningOf([Installed(System, KeyCode, Cached)], [Package(First), Package(Second)], log.Record);
 
         Assert.Equal(21, written.Count);
-        Assert.Contains("every installation package is kept rather than offered", written[20].Message);
+        Assert.Contains("every installation package is left alone", written[20].Message);
     }
 
     [Fact]

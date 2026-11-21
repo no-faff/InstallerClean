@@ -5398,7 +5398,7 @@ public class DeclaredProductCheckTests
         ScreenBesideTheSecondCopy(f, [.. unreadable, Package(Candidate)], log.Record, SomebodyElse);
 
         Assert.Equal(21, written.Count);
-        Assert.Contains("every installation package is kept rather than offered", written[20].Message);
+        Assert.Contains("every installation package is left alone", written[20].Message);
     }
 
     [Fact]

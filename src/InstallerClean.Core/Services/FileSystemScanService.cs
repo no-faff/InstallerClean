@@ -327,7 +327,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // type and HRESULT, so without them the budget's novel-cause escape
         // hatch would fire once and swallow the other three.
         var refusalLog = new PerItemFailureLog("Scan",
-            "The file behind each of them was kept rather than offered.");
+            "The file behind each of them was left alone.");
 
         long stillUsedBytes = 0;
         // Registrations Windows reports superseded (2) and obsoleted (4), counted off
@@ -469,7 +469,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 refusalLog.Record(new InvalidOperationException(
                     walkSafety == CandidateGuard.RemovalSafety.Refused
                         ? $"Removal candidate refused (not directly in the Installer cache, or a reparse point): {filePath}"
-                        : $"Removal candidate not offered (its symlink status or location could not be read): {filePath}"),
+                        : $"Removal candidate left alone (its symlink status or location could not be read): {filePath}"),
                     cause: $"walk/{walkSafety}");
                 withheld.Add(file);
                 withheldBy.Contained(walkSafety);
@@ -804,7 +804,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 refusalLog.Record(new InvalidOperationException(
                     safety == CandidateGuard.RemovalSafety.Refused
                         ? $"Registered removal candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
-                        : $"Registered removal candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
+                        : $"Registered removal candidate left alone (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
                     cause: $"registered/{safety}");
                 supersededContained.Record(safety);
             }

@@ -245,8 +245,8 @@ public class CliHeldBackTests
     }
 
     [Theory]
-    [InlineData(1, "/s mode: 1 program entry in Windows Installer's records could not be checked, so no superseded patch was offered.")]
-    [InlineData(3, "/s mode: 3 program entries in Windows Installer's records could not be checked, so no superseded patch was offered.")]
+    [InlineData(1, "/s mode: 1 program entry in Windows Installer's records could not be checked, so no superseded patch was listed as safe to delete.")]
+    [InlineData(3, "/s mode: 3 program entries in Windows Installer's records could not be checked, so no superseded patch was listed as safe to delete.")]
     public void The_withheld_notice_counts_entries_that_could_not_be_checked(int entries, string expected)
     {
         // Three kinds reach this figure and never overlap: a code the enumeration
@@ -265,8 +265,8 @@ public class CliHeldBackTests
     }
 
     [Theory]
-    [InlineData(1, "/s mode: 1 cached patch file could not be matched to any program this scan could ask about, so no superseded patch was offered.")]
-    [InlineData(4, "/s mode: 4 cached patch files could not be matched to any program this scan could ask about, so no superseded patch was offered.")]
+    [InlineData(1, "/s mode: 1 cached patch file could not be matched to any program this scan could ask about, so no superseded patch was listed as safe to delete.")]
+    [InlineData(4, "/s mode: 4 cached patch files could not be matched to any program this scan could ask about, so no superseded patch was listed as safe to delete.")]
     public void The_withheld_notice_counts_patch_files_where_they_are_the_only_reason(int files, string expected)
     {
         var line = MachineContract.English(() => string.Format(
@@ -280,8 +280,8 @@ public class CliHeldBackTests
     }
 
     [Theory]
-    [InlineData(1, "/d mode: InstallerClean could not be certain that 1 superseded file is no longer needed, so it has held it back.")]
-    [InlineData(5, "/d mode: InstallerClean could not be certain that 5 superseded files are no longer needed, so it has held them back.")]
+    [InlineData(1, "/d mode: InstallerClean could not be certain that 1 superseded file is no longer needed, so it left it alone.")]
+    [InlineData(5, "/d mode: InstallerClean could not be certain that 5 superseded files are no longer needed, so it left them alone.")]
     public void The_superseded_notice_carries_the_count_of_superseded_files_held_back(int held, string expected)
     {
         // Event ID 3003, written wherever ScanResult.SupersededHeldBackCount is above nought
@@ -363,8 +363,8 @@ public class CliHeldBackTests
         var perFile = MachineContract.English(() => string.Format(
             Strings.Cli_EventLogNothingOfferedPerFileNotice, "/s", 3, DisplayHelpers.PluraliseFile(3)));
 
-        Assert.Contains("offered nothing it found", wholesale, StringComparison.Ordinal);
-        Assert.DoesNotContain("offered nothing it found", perFile, StringComparison.Ordinal);
+        Assert.Contains("no file it found by looking in the folder is listed as safe to delete", wholesale, StringComparison.Ordinal);
+        Assert.DoesNotContain("no file it found by looking in the folder is listed as safe to delete", perFile, StringComparison.Ordinal);
     }
 
     /// <summary>

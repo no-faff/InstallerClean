@@ -210,7 +210,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     recordRefusal?.Invoke(
                         new InvalidOperationException(
                             "A cached package did not yield the product code it declares, so it is "
-                            + "kept rather than offered. Reader detail: "
+                            + "left alone. Reader detail: "
                             + (detail.Length == 0 ? "none given" : detail) + "."),
                         CandidateCause + detail);
 
@@ -947,7 +947,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 new InvalidOperationException(
                     "A program's cached package did not yield the product code it declares, and its own "
                     + "record did not show it to be an ordinary installation, so every installation package "
-                    + "is kept rather than offered. Detail: " + unread + "."),
+                    + "is left alone. Detail: " + unread + "."),
                 LinksCause + unread);
 
         if (ordinaryUnread is not null)
@@ -955,8 +955,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 new InvalidOperationException(
                     "A program's cached package did not yield the product code it declares, and the package "
                     + "code its record holds did not read as a GUID both through Windows Installer and from the "
-                    + "registry, nor could its sources be ruled out, so every installation package is kept "
-                    + "rather than offered. Detail: " + ordinaryUnread + "."),
+                    + "registry, nor could its sources be ruled out, so every installation package is left "
+                    + "alone. Detail: " + ordinaryUnread + "."),
                 OrdinaryLinksCause + ordinaryUnread);
 
         var keepsEvery = unread is not null || ordinaryUnread is not null;
@@ -3689,7 +3689,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 recordRefusal?.Invoke(
                     new InvalidOperationException(
                         "A cached patch did not yield the patch code and target products it "
-                        + "declares, so it is kept rather than offered. Reader detail: "
+                        + "declares, so it is left alone. Reader detail: "
                         + (detail.Length == 0 ? "none given" : detail) + "."),
                     PatchCause + detail);
 
@@ -3954,7 +3954,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             recordRefusal?.Invoke(
                 new InvalidOperationException(
                     "A product key no installation Windows lists accounts for did not show which package it "
-                    + "opens, so every installation package is kept rather than offered. Detail: " + why + "."),
+                    + "opens, so every installation package is left alone. Detail: " + why + "."),
                 UnlistedKeyCause + why);
 
         return new UnlistedKeysRead(

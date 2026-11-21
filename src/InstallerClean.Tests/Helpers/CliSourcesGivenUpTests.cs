@@ -72,7 +72,7 @@ public class CliSourcesGivenUpTests
                 "/s mode: InstallerClean stopped waiting for 1 drive or share (drive D:) during the scan "
                 + "and left alone the 1 file it still had to check against it."),
             summary => AssertEntry(summary, CliEventClass.Ok,
-                "/s mode: nothing could be offered. InstallerClean stopped waiting for 1 drive or share "
+                "/s mode: nothing could be listed as safe to delete. InstallerClean stopped waiting for 1 drive or share "
                 + "and left alone the 1 file it still had to check against it. No action taken."));
     }
 
@@ -88,7 +88,7 @@ public class CliSourcesGivenUpTests
                 @"/s mode: InstallerClean stopped waiting for 2 drives or shares (drive D:, \\nas\installers) "
                 + "during the scan and left alone the 5 files it still had to check against them."),
             summary => AssertEntry(summary, CliEventClass.Ok,
-                "/s mode: nothing could be offered. InstallerClean stopped waiting for 2 drives or shares "
+                "/s mode: nothing could be listed as safe to delete. InstallerClean stopped waiting for 2 drives or shares "
                 + "and left alone the 5 files it still had to check against them. No action taken."));
         Assert.Contains(
             SourcesGivenUpReport.CommandLine([Given("d:", 2), Given(Share, 3)]),
@@ -107,7 +107,7 @@ public class CliSourcesGivenUpTests
                 "/s mode: InstallerClean stopped waiting for 1 drive or share (drive D:) during the scan "
                 + "and left alone the 3 files it still had to check against it."),
             summary => AssertEntry(summary, CliEventClass.Ok,
-                "/s mode: nothing could be offered. InstallerClean stopped waiting for 1 drive or share "
+                "/s mode: nothing could be listed as safe to delete. InstallerClean stopped waiting for 1 drive or share "
                 + "and left alone the 3 files it still had to check against it. No action taken."));
     }
 
@@ -123,7 +123,7 @@ public class CliSourcesGivenUpTests
         Assert.Equal(CliExitCode.Ok, run.ExitCode);
         var summary = Assert.Single(run.Entries, entry => entry.Class == CliEventClass.Ok);
         Assert.Equal(
-            $"{arg} mode: nothing could be offered. InstallerClean stopped waiting for 1 drive or share "
+            $"{arg} mode: nothing could be listed as safe to delete. InstallerClean stopped waiting for 1 drive or share "
             + "and left alone the 1 file it still had to check against it. No action taken.",
             summary.Text);
     }
@@ -166,7 +166,7 @@ public class CliSourcesGivenUpTests
         // The outcome counts the files held back, as it does on any such machine, and the
         // notice beside it names the share.
         var summary = Assert.Single(run.Entries, entry => entry.Class == CliEventClass.Ok);
-        Assert.StartsWith("/s mode: nothing could be offered. InstallerClean could not establish",
+        Assert.StartsWith("/s mode: nothing could be listed as safe to delete. InstallerClean could not establish",
             summary.Text, StringComparison.Ordinal);
         Assert.Single(run.Entries, entry => entry.Class == CliEventClass.SourcesGivenUpNotice);
     }
