@@ -38,8 +38,8 @@ namespace InstallerClean.Services;
 /// <c>InstallProperties</c> key records no cached package either and they can all be seen. An
 /// installation whose recorded cached package names nothing is judged by its sources as well, and a
 /// candidate carrying the package code it records, read through the API and from the registry
-/// alike, is kept as that missing package, as is one whose own package code does not read and which
-/// holds some summary information. For each
+/// alike, is kept as that missing package, as is one whose own package code does not read, unless
+/// its summary information opens and holds no Revision Number. For each
 /// candidate patch it reads the patch's own code and the products its Template names, finds the
 /// registrations of that patch through the machine-wide patch enumeration and the keyed patch read,
 /// and reads the <c>LocalPackage</c> each registration records. A product's source list in another
@@ -357,7 +357,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// A CANDIDATE THAT IS, OR COULD BE, A MISSING PACKAGE IS KEPT FIRST. Where an
     /// installation of its own product records a package that names nothing, a candidate
     /// carrying the package code that installation records, or whose own package code does
-    /// not read, is <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>
+    /// not read, unless it has no Revision Number, is
+    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>
     /// (<see cref="AsAMissingPackage"/>), its cause being the package of its own product it
     /// opens as where it opens as one. Every other candidate goes on to the comparisons
     /// below.
@@ -391,8 +392,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// LAST, A CANDIDATE THE COMPARISONS WOULD LET THROUGH is put to the package codes recorded
     /// by ordinary installations whose cached package does not say what it declares, and is
-    /// kept where it carries one or where its own package code does not read and it holds some
-    /// summary information (<see cref="AsAnUndeclaredPackage"/>).
+    /// kept where it carries one or where its own package code does not read, unless it has no
+    /// Revision Number (<see cref="AsAnUndeclaredPackage"/>).
     /// </summary>
     private DeclaredProductOutcome Settle(
         string candidatePath,
@@ -556,7 +557,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Where there is such an installation:
     /// <see cref="DeclaredProductInstalledCause.MissingSparePackageCodeUnread"/> where the
     /// candidate's own package code (<see cref="IPackageIdentityReader.PackageCodeOf"/>) does not
-    /// read and it holds some summary information, and
+    /// read, unless it has no Revision Number, and
     /// <see cref="DeclaredProductInstalledCause.MissingSpareIsIt"/> where it is one such
     /// an installation records. <see cref="DeclaredProductInstalledCause.None"/> otherwise, and the
     /// candidate is not kept here. The candidate's package code is read only where there is such
@@ -581,7 +582,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="KeptByItsPackageCode"/>), and the cause it is kept for if so:
     /// <see cref="DeclaredProductInstalledCause.UndeclaredPackageCodeIsIt"/> where it carries one,
     /// <see cref="DeclaredProductInstalledCause.UndeclaredPackageCodeUnread"/> where its own package
-    /// code does not read and it holds some summary information, and
+    /// code does not read, unless it has no Revision Number, and
     /// <see cref="DeclaredProductInstalledCause.None"/> otherwise. The
     /// candidate's package code is read only where there is such an installation.
     /// </summary>
@@ -595,7 +596,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// <paramref name="isIt"/> where the candidate's own package code
     /// (<see cref="IPackageIdentityReader.PackageCodeOf"/>) is one of <paramref name="packageCodes"/>,
-    /// <paramref name="unread"/> where there are any and it does not read unless it has no summary information at all (<see cref="IPackageIdentityReader.HoldsNoSummaryInformation"/>), and
+    /// <paramref name="unread"/> where there are any and it does not read, unless the candidate has
+    /// no Revision Number (<see cref="IPackageIdentityReader.HoldsNoRevisionNumber"/>), and
     /// <see cref="DeclaredProductInstalledCause.None"/> otherwise, the candidate's package code
     /// not being read where there are none.
     /// </summary>
@@ -608,10 +610,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (packageCodes is not { Count: > 0 }) return DeclaredProductInstalledCause.None;
 
         // A file whose own package code does not read could carry the one recorded, and is kept,
-        // unless it has no summary information at all, which Windows Installer will not take as
-        // any installation's source (IPackageIdentityReader.HoldsNoSummaryInformation).
+        // unless it has no Revision Number, the summary property a package carries its package
+        // code in. Such a file carries no package code, so it is not the package any installation
+        // records (IPackageIdentityReader.HoldsNoRevisionNumber). It goes on to the comparisons
+        // every other candidate is put to, and is kept where it opens as a package an
+        // installation has at its sources.
         if (_identityReader.PackageCodeOf(candidatePath) is not { } candidatePackageCode)
-            return _identityReader.HoldsNoSummaryInformation(candidatePath) ? DeclaredProductInstalledCause.None : unread;
+            return _identityReader.HoldsNoRevisionNumber(candidatePath) ? DeclaredProductInstalledCause.None : unread;
         return packageCodes.Contains(candidatePackageCode, StringComparer.Ordinal)
             ? isIt
             : DeclaredProductInstalledCause.None;
@@ -1825,7 +1830,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// AN INSTALLATION WHOSE RECORDED PACKAGE NAMES NOTHING ADDS THE PACKAGES ITS SOURCES NAME
     /// TOO, Windows Installer having no cached package to open for it, and its package code
     /// goes into <see cref="OpenedPackages.MissingPackageCodes"/>: a candidate is kept where it
-    /// carries that code or its own does not read (<see cref="AsAMissingPackage"/>).
+    /// carries that code or its own does not read, unless it has no Revision Number
+    /// (<see cref="AsAMissingPackage"/>).
     /// The value has to be shown to name nothing (<see cref="NamesNothing"/>), the package code
     /// has to read (<see cref="RecordedPackageCode"/>), and the installation must not be in
     /// another account's per-user-unmanaged context.

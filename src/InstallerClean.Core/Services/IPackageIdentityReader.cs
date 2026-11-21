@@ -68,15 +68,17 @@ public interface IPackageIdentityReader
     string? PackageCodeOf(string filePath);
 
     /// <summary>
-    /// Whether the installation package at <paramref name="filePath"/> has no summary information
-    /// at all: its summary information opens and holds no property, its Revision Number, the
-    /// package code, among them (VT_EMPTY). Windows Installer will not take such a file as an
-    /// installation's source, answering that the package is missing or cannot be opened, so it is
-    /// no installation's source. False for every other answer: a summary that will not open, one
-    /// holding any property, a Revision Number that is not empty and a read that fails, and from a
-    /// reader that does not read package codes.
+    /// Whether the installation package at <paramref name="filePath"/> has no Revision Number: its
+    /// summary information opens and the property is not set (VT_EMPTY), whatever else the summary
+    /// holds, a file with no summary information at all among them. The Revision Number is where a
+    /// package carries its package code, and Windows Installer, looking for an installation's
+    /// package among its sources, takes one only where it carries the package code that
+    /// installation records, so a file with no Revision Number is not that package. False for
+    /// every other answer: a summary that will not open, a Revision Number the read gives a type
+    /// for, text with no characters included, and a read that fails, and from a reader that does
+    /// not read package codes.
     /// </summary>
-    bool HoldsNoSummaryInformation(string filePath);
+    bool HoldsNoRevisionNumber(string filePath);
 }
 
 /// <summary>Reads made through <see cref="IPackageIdentityReader"/>'s own members.</summary>

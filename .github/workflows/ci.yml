@@ -276,21 +276,16 @@ jobs:
       # the window's scan carries no report.
       #
       # The window opens its main window only once its startup scan has finished, behind a
-      # splash that WPF gives a hidden owner (ShowInTaskbar is off, in 3.7.0 as here), so
+      # splash that WPF gives a hidden owner (ShowInTaskbar is off), so
       # Process.MainWindowHandle, which takes only a visible window with no owner, finds
-      # nothing until the main window. The step prints, for 3.7.0's release and for this
-      # build, how long a command-line scan takes on this runner, and how long each window
-      # takes to show its first window and its main window, so the time a user waits for the
-      # window reads beside the scan's own cost and beside 3.7.0's. A scan by this build runs
-      # first and is not timed, so every timed run reads the Installer folder from the same
-      # warm cache. The step fails where this build's main window is not up within 120 s, or
-      # comes up more than half as late again as 3.7.0's and more than 5 s after it. Where
-      # 3.7.0's release does not download, the comparison is left out and said so.
+      # nothing until the main window. The step fails where the window's main window is not
+      # up within 120 s. The seconds it prints are one start of the Debug build, loaded from
+      # its own folder of separate assemblies, the first start of files just built; they are
+      # not the time a user waits. That is timed against 3.7.0's release, on the merged exes,
+      # in "Time the merged exes' start beside 3.7.0's".
       - name: Check each exe starts with nothing in the crash log about its library search
         if: success() || failure()
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
           New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
@@ -324,21 +319,6 @@ jobs:
               }
           }
           '@
-
-          # A command-line scan, /s /noupdate, timed from start to exit.
-          function Time-Scan([string]$label, [string]$exe) {
-            $clock = [Diagnostics.Stopwatch]::StartNew()
-            $p = Start-Process -FilePath $exe -ArgumentList '/s', '/noupdate' -NoNewWindow -PassThru `
-              -RedirectStandardOutput (Join-Path $env:RUNNER_TEMP "$label-scan-out.txt") `
-              -RedirectStandardError (Join-Path $env:RUNNER_TEMP "$label-scan-err.txt")
-            $null = $p.Handle
-            if (-not $p.WaitForExit(120000)) {
-              Stop-Process -Id $p.Id -Force; $p.WaitForExit()
-              "${label}: the command-line scan was still running after 120 s."
-              return
-            }
-            "${label}: the command-line scan ended with $($p.ExitCode) after $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s."
-          }
 
           # The window started, timed to its first visible window and to its main window,
           # then closed. Returns the seconds to the main window, or null where it did not
@@ -374,25 +354,12 @@ jobs:
           $window = 'src/InstallerClean/bin/Debug/net48/InstallerClean.exe'
           if (-not (Test-Path $window)) { throw "There is no $window to start." }
 
-          $null = Time-Scan 'warm-up' $cli
-          $released = Join-Path $env:RUNNER_TEMP 'release-3.7.0'
-          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern installerclean-cli.exe --pattern InstallerClean-portable.exe --dir $released
-          $haveRelease = $LASTEXITCODE -eq 0
-          if (-not $haveRelease) { "3.7.0's release did not download, so nothing below is compared with it." }
-          if ($haveRelease) { Time-Scan '3.7.0' (Join-Path $released 'installerclean-cli.exe') }
-          Time-Scan 'this build' $cli
-          $releasedUp = if ($haveRelease) { Time-Window '3.7.0' (Join-Path $released 'InstallerClean-portable.exe') } else { $null }
-
           $before = (Entries).Count
           $out = & $cli --version 2>&1
           "installerclean-cli --version exited $LASTEXITCODE and printed: $out"
           if ($LASTEXITCODE -ne 0) { $failed = $true }
-          $up = Time-Window 'this build' $window
+          $up = Time-Window 'the Debug window' $window
           if ($null -eq $up) { $failed = $true }
-          elseif ($null -ne $releasedUp -and $up -gt 1.5 * $releasedUp -and $up -gt $releasedUp + 5) {
-            "This build's main window came up $([math]::Round($up, 1)) s after its start, against 3.7.0's $([math]::Round($releasedUp, 1)) s."
-            $failed = $true
-          }
 
           $new = @(Entries | Select-Object -Skip $before)
           foreach ($line in $new) { "crash.log: $line" }
@@ -412,14 +379,80 @@ jobs:
           "Culture:    $(if ($culture.Name) { $culture.Name } else { 'invariant' })"
           "UI culture: $(if ($ui.Name) { $ui.Name } else { 'invariant' })"
 
+      # The Move's volume tests (MoveSpaceCheckMountPointTests) ask Windows about a
+      # second volume mounted into a folder on the drive that holds the installer
+      # cache, beside an ordinary folder on that drive. This makes one: a 64 MB fixed
+      # VHDX, created by diskpart, attached with no drive letter, given one NTFS
+      # partition and mounted at C:\ic-mounted-volume\mount, with C:\ic-mounted-volume\beside
+      # next to it and a folder "exists" inside the mount. It hands the tests the two
+      # folders and the volume's free space through the variables
+      # MountedVolumeFactAttribute reads. Any part that does not take fails the step,
+      # because the tests read a missing variable as a reason to skip.
+      - name: Mount a second volume into a folder for the Move's volume tests
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          $root = 'C:\ic-mounted-volume'
+          $mount = Join-Path $root 'mount'
+          $beside = Join-Path $root 'beside'
+          $vhd = Join-Path $env:RUNNER_TEMP 'ic-mounted-volume.vhdx'
+          if ([IO.Path]::GetPathRoot($env:windir) -ne 'C:\') { throw "Windows is on $env:windir, not on C:, so C: is not the installer cache's drive." }
+          New-Item -ItemType Directory -Force -Path $mount, $beside | Out-Null
+          $script = Join-Path $env:RUNNER_TEMP 'ic-mounted-volume.diskpart'
+          Set-Content -Path $script -Value "create vdisk file=`"$vhd`" maximum=64 type=fixed"
+          diskpart /s $script | Out-Host
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $vhd)) { throw "diskpart did not create $vhd." }
+          $disk = Mount-DiskImage -ImagePath $vhd -NoDriveLetter -PassThru | Get-Disk
+          Initialize-Disk -Number $disk.Number -PartitionStyle MBR
+          $partition = New-Partition -DiskNumber $disk.Number -UseMaximumSize
+          Format-Volume -Partition $partition -FileSystem NTFS -NewFileSystemLabel 'ICMOUNT' -Confirm:$false | Out-Null
+          Add-PartitionAccessPath -DiskNumber $disk.Number -PartitionNumber $partition.PartitionNumber -AccessPath "$mount\"
+          $paths = @((Get-Partition -DiskNumber $disk.Number -PartitionNumber $partition.PartitionNumber).AccessPaths)
+          if ($paths -notcontains "$mount\") { throw "The volume is not mounted at $mount; its access paths are: $($paths -join ', ')" }
+          New-Item -ItemType Directory -Force -Path (Join-Path $mount 'exists') | Out-Null
+          $free = (Get-Volume -Partition (Get-Partition -DiskNumber $disk.Number -PartitionNumber $partition.PartitionNumber)).SizeRemaining
+          if (-not ($free -gt 0)) { throw "The mounted volume reports $free bytes free." }
+          "  $vhd is disk $($disk.Number), mounted at $mount with $free bytes free; $beside is beside it on C:."
+          "IC_TEST_MOUNTED_VOLUME_FOLDER=$mount" | Add-Content $env:GITHUB_ENV
+          "IC_TEST_MOUNTED_VOLUME_BESIDE=$beside" | Add-Content $env:GITHUB_ENV
+          "IC_TEST_MOUNTED_VOLUME_FREE_BYTES=$free" | Add-Content $env:GITHUB_ENV
+          "IC_MOUNTED_VOLUME_VHD=$vhd" | Add-Content $env:GITHUB_ENV
+
       # The normal console verbosity prints each test with its outcome, and each
       # skipped test with the reason it gives, which the default leaves out. A test
       # still running after five minutes, where the slowest takes seconds, ends the
       # run and is named as the test that was running, so a hang fails the step
-      # rather than holding it; no dump is taken, the name being what is wanted.
+      # rather than holding it; no dump is taken, the name being what is wanted. The
+      # TRX file is what the step after this reads.
       - name: Test
         if: success() || failure()
-        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal" --blame-hang-timeout 5m --blame-hang-dump-type none
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal" --logger "trx;LogFileName=tests.trx" --results-directory "${{ runner.temp }}/test-results" --blame-hang-timeout 5m --blame-hang-dump-type none
+
+      # Reads the test run's TRX file and fails unless all twenty of the Move's volume
+      # tests ran and passed. A skip is a failure here: each skips by itself wherever
+      # the mount step's variables are missing, and a run that skipped them all would
+      # otherwise read as green. The count is the number of facts the class declares,
+      # read from its source.
+      - name: Check the Move's volume tests ran and passed
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          $source = Get-Content -Raw 'src/InstallerClean.Tests/Helpers.Integration/MoveSpaceCheckMountPointTests.cs'
+          $declared = ([regex]::Matches($source, '\[MountedVolumeFact\]')).Count
+          if ($declared -eq 0) { throw 'MoveSpaceCheckMountPointTests.cs declares no [MountedVolumeFact].' }
+          $trx = Join-Path $env:RUNNER_TEMP 'test-results/tests.trx'
+          if (-not (Test-Path $trx)) { throw "There is no $trx to read." }
+          [xml]$x = Get-Content -Raw $trx
+          $results = @($x.TestRun.Results.UnitTestResult | Where-Object { $_.testName -like '*MoveSpaceCheckMountPointTests.*' })
+          foreach ($r in $results | Sort-Object testName) { "  $($r.outcome)  $($r.testName -replace '^.*\.', '')" }
+          $passed = @($results | Where-Object { $_.outcome -eq 'Passed' }).Count
+          "$passed of $declared passed; $($results.Count) ran."
+          if ($results.Count -ne $declared -or $passed -ne $declared) { throw "Expected all $declared of the Move's volume tests to run and pass." }
+
+      - name: Detach the second volume
+        if: always() && env.IC_MOUNTED_VOLUME_VHD != ''
+        shell: pwsh
+        run: Dismount-DiskImage -ImagePath $env:IC_MOUNTED_VOLUME_VHD | Out-Null
 
       # A build reports a broken reference in a documentation comment only when
       # it writes the documentation file, which no project here asks for. This
@@ -648,13 +681,14 @@ jobs:
           if ($failed) { throw "A merged exe started beside a config the merge did not write, or refused one it did." }
           "Each merged exe starts alone and beside the config the merge wrote, and refuses beside any other."
 
-      # How long the merged window takes to show its main window, beside 3.7.0's released
-      # portable, on this runner: each started six times, the two alternating, after one
-      # start of each that is not counted, so both read the Installer folder from the same
-      # warm cache. Each time runs from the start to the main window, which comes up once the
-      # startup scan has finished. The step prints every time and each copy's median and
-      # fails only where a copy does not start.
-      - name: Time the merged window's start beside 3.7.0's portable
+      # How long each merged exe takes on this runner, beside the same exe from 3.7.0's
+      # release: the window to its main window, which comes up once its startup scan has
+      # finished, and the command line to the end of a scan, /s /noupdate. Each pair is
+      # started six times, the two alternating, after one start of each that is printed as
+      # the warm-up and not counted, so both read the Installer folder from the same warm
+      # cache. The step prints every time and each copy's median and fails only where a copy
+      # does not start, or a scan does not end with 0.
+      - name: Time the merged exes' start beside 3.7.0's
         if: success() || failure()
         shell: pwsh
         env:
@@ -663,15 +697,11 @@ jobs:
           New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
           New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
           $released = Join-Path $env:RUNNER_TEMP 'start-time-3.7.0'
-          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern InstallerClean-portable.exe --dir $released --clobber
-          if ($LASTEXITCODE -ne 0) { throw "3.7.0's portable did not download." }
-          $copies = [ordered]@{
-            '3.7.0 portable' = (Join-Path $released 'InstallerClean-portable.exe')
-            'this merged window' = (Resolve-Path 'publish/window/InstallerClean.exe').Path
-          }
+          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern InstallerClean-portable.exe --pattern installerclean-cli.exe --dir $released --clobber
+          if ($LASTEXITCODE -ne 0) { throw "3.7.0's release did not download." }
 
           # Seconds from the start to the main window, or null where it is not up in 120 s.
-          function Time-Start([string]$exe) {
+          function Time-Window([string]$exe) {
             $clock = [Diagnostics.Stopwatch]::StartNew()
             $p = Start-Process -FilePath $exe -PassThru
             $null = $p.Handle
@@ -685,25 +715,55 @@ jobs:
             return $up
           }
 
-          $times = @{}
-          foreach ($label in $copies.Keys) { $times[$label] = New-Object System.Collections.Generic.List[double] }
+          # Seconds from the start to the end of a scan, or null where it does not end with 0
+          # within 120 s.
+          function Time-Scan([string]$exe) {
+            $out = Join-Path $env:RUNNER_TEMP 'start-time-scan-out.txt'
+            $err = Join-Path $env:RUNNER_TEMP 'start-time-scan-err.txt'
+            $clock = [Diagnostics.Stopwatch]::StartNew()
+            $p = Start-Process -FilePath $exe -ArgumentList '/s', '/noupdate' -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
+            $null = $p.Handle
+            if (-not $p.WaitForExit(120000)) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(); return $null }
+            $took = $clock.Elapsed.TotalSeconds
+            if ($p.ExitCode -ne 0) { Write-Host "  the scan ended with $($p.ExitCode): $(Get-Content -Raw $err)"; return $null }
+            return $took
+          }
+
+          $pairs = @(
+            @{ What = 'main window'; Timer = ${function:Time-Window}; Copies = [ordered]@{
+                '3.7.0 portable' = (Join-Path $released 'InstallerClean-portable.exe')
+                'this merged window' = (Resolve-Path 'publish/window/InstallerClean.exe').Path } },
+            @{ What = 'end of a scan'; Timer = ${function:Time-Scan}; Copies = [ordered]@{
+                '3.7.0 command line' = (Join-Path $released 'installerclean-cli.exe')
+                'this merged command line' = (Resolve-Path 'publish/cli/installerclean-cli.exe').Path } }
+          )
           $failed = $false
-          foreach ($label in $copies.Keys) { $null = Time-Start $copies[$label] }
-          foreach ($round in 1..6) {
-            foreach ($label in $copies.Keys) {
-              $t = Time-Start $copies[$label]
-              if ($null -eq $t) { "${label}, start $round`: no main window within 120 s."; $failed = $true; continue }
-              $times[$label].Add($t)
-              "${label}, start $round`: main window after $([math]::Round($t, 2)) s"
+          foreach ($pair in $pairs) {
+            $times = @{}
+            foreach ($label in $pair.Copies.Keys) {
+              $times[$label] = New-Object System.Collections.Generic.List[double]
+              $exe = $pair.Copies[$label]
+              $t = & $pair.Timer $exe
+              $shown = if ($null -eq $t) { 'none' } else { "$([math]::Round($t, 2)) s" }
+              "${label}, warm-up, not counted: $($pair.What) after $shown"
+            }
+            foreach ($round in 1..6) {
+              foreach ($label in $pair.Copies.Keys) {
+                $exe = $pair.Copies[$label]
+                $t = & $pair.Timer $exe
+                if ($null -eq $t) { "${label}, start $round`: no $($pair.What) within 120 s."; $failed = $true; continue }
+                $times[$label].Add($t)
+                "${label}, start $round`: $($pair.What) after $([math]::Round($t, 2)) s"
+              }
+            }
+            foreach ($label in $pair.Copies.Keys) {
+              $sorted = @($times[$label] | Sort-Object)
+              if ($sorted.Count -eq 0) { continue }
+              $median = if ($sorted.Count % 2) { $sorted[[int][math]::Floor($sorted.Count / 2)] } else { ($sorted[$sorted.Count / 2 - 1] + $sorted[$sorted.Count / 2]) / 2 }
+              "${label}: median $([math]::Round($median, 2)) s over $($sorted.Count) starts ($(($sorted | ForEach-Object { [math]::Round($_, 2) }) -join ', '))"
             }
           }
-          foreach ($label in $copies.Keys) {
-            $sorted = @($times[$label] | Sort-Object)
-            if ($sorted.Count -eq 0) { continue }
-            $median = if ($sorted.Count % 2) { $sorted[[int][math]::Floor($sorted.Count / 2)] } else { ($sorted[$sorted.Count / 2 - 1] + $sorted[$sorted.Count / 2]) / 2 }
-            "${label}: median $([math]::Round($median, 2)) s over $($sorted.Count) starts ($(($sorted | ForEach-Object { [math]::Round($_, 2) }) -join ', '))"
-          }
-          if ($failed) { throw "A copy's main window did not come up." }
+          if ($failed) { throw "A copy did not start, or a scan did not end with 0." }
 
       # .NET Framework reads a portable PDB beside an assembly for the file and line
       # in a stack trace. Whether it reads an EMBEDDED portable PDB, which is what a

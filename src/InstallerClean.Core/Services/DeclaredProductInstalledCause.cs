@@ -166,7 +166,8 @@ public enum DeclaredProductInstalledCause
 
     /// <summary>
     /// An installation of the file's own program records a cached package that names nothing, and
-    /// the file's own package code would not read, so the file could be that package.
+    /// the file's own package code would not read, its Revision Number being set or not shown to
+    /// be unset, so the file could be that package.
     /// </summary>
     MissingSparePackageCodeUnread,
 
@@ -196,8 +197,8 @@ public enum DeclaredProductInstalledCause
 
     /// <summary>
     /// There is an ordinary installation whose cached package does not say what product it
-    /// declares, and the file's own package code would not read, so the file could be the package
-    /// it records.
+    /// declares, and the file's own package code would not read, its Revision Number being set
+    /// or not shown to be unset, so the file could be the package it records.
     /// </summary>
     UndeclaredPackageCodeUnread,
 }

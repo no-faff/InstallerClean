@@ -173,7 +173,7 @@ public partial class CompletionViewModel : ObservableObject
     /// </summary>
     public AppCopyKind ReportCopy { get; }
 
-    /// <summary>The program that sends the reports this window writes: the window.</summary>
+    /// <summary>The program named in the reports this window writes: the window.</summary>
     public ReportHost ReportHost => ReportHost.Window;
 
     /// <summary>
