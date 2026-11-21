@@ -38,19 +38,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Abstractions" Version="22.3.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="23.0.1" />
     <!-- Abstractions only: callers register Core's services into their
          own IServiceCollection. The Core library itself doesn't pick
          a container implementation. -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0" />
     <!-- Span, Memory and ReadOnlySpan, which .NET Framework 4.8 does not
          carry. -->
     <PackageReference Include="System.Memory" Version="4.6.3" />
     <!-- The JSON reader and writer for the report, the settings and
          update.json. -->
-    <PackageReference Include="System.Text.Json" Version="10.0.7" />
+    <PackageReference Include="System.Text.Json" Version="11.0.0" />
     <!-- TimeProvider, which .NET Framework 4.8 does not carry. -->
-    <PackageReference Include="Microsoft.Bcl.TimeProvider" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Bcl.TimeProvider" Version="11.0.0" />
     <!-- System.HashCode, for HashCode.Combine. -->
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
   </ItemGroup>
