@@ -676,7 +676,7 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        its answer; every file still to be checked against it is left alone rather than
        listed as safe to delete. "It" is the drive or share the waiting line names, and "left alone" is
        worded as in Window.Registered.Title. -->
-  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>InstallerClean'in denetlemek için hâlâ ona ihtiyaç duyduğu her dosya olduğu gibi bırakılacak.</value></data>
+  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Any file InstallerClean can't check without it will be left alone.</value></data>
   <!-- What a screen reader says for the waiting line while Action.StopWaiting's
        button shows; nothing on screen changes. 0 = the waiting line as drawn
        (Status.WaitingForDrive or Status.WaitingForPath), 1 = the access key of
@@ -887,8 +887,8 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} dosya olduğu gibi bırakıldı. Tarama onu silinmesi güvenli dosyalar arasında listeledi, ancak taşıma ya da silme öncesindeki son denetim bunu doğrulayamadı.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} dosya olduğu gibi bırakıldı. Tarama bunları silinmesi güvenli dosyalar arasında listeledi, ancak taşıma ya da silme öncesindeki son denetim bunu doğrulayamadı.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file left alone. The scan listed it as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files left alone. The scan listed them as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -1064,11 +1064,11 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        after "for" declines it here. "Left alone" is worded as in
        Window.Registered.Title, and "Re-scan" is Action.Rescan's label without its
        access-key marker. 0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean {0} sürücüsünü beklemeyi kesti, bu yüzden denetlemek için o sürücüye ihtiyaç duyduğu dosyaları olduğu gibi bıraktı. Yeniden normal yanıt vermeye başladığında Yeniden tara'ya basın.</value></data>
+  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, for a folder that is not on a drive letter, named
        as it is spelled. 0 = a network share such as "\\fileserver\apps", or another
        path -->
-  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean {0} konumunu beklemeyi kesti, bu yüzden denetlemek için o konuma ihtiyaç duyduğu dosyaları olduğu gibi bıraktı. Yeniden normal yanıt vermeye başladığında Yeniden tara'ya basın.</value></data>
+  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
@@ -1076,7 +1076,7 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        brackets, so its separators cannot be read as the sentence's own punctuation, and
        it carries no "and", which a list joined in code cannot place in every
        language. -->
-  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean birden fazla sürücüyü veya paylaşımı ({0}) beklemeyi kesti, bu yüzden denetlemek için bunlara ihtiyaç duyduğu dosyaları olduğu gibi bıraktı. Yeniden normal yanıt vermeye başladıklarında Yeniden tara'ya basın.</value></data>
+  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Re-scan once they're responding normally.</value></data>
   <!-- The window's line under the left-alone count, where the scan found one of the
        signals the Body.PendingReboot.* banners name set when it read them just after its
        clock, and so left alone every file in the folder no record names. One line per
@@ -1567,8 +1567,8 @@ Ayrıntılar {1} içinde.</value></data>
        [ ] becomes a link to the releases page (MessageWindow
        .ShowLinkedMessage), so a translator can place it anywhere in the
        sentence; a string with no [ ] pair is shown as plain text. -->
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Denetim zaman aşımına uğradı. GitHub bağlantınız yavaş olabilir; yeniden deneyin.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -1914,16 +1914,16 @@ InstallerClean'i yönetici olarak yeniden çalıştırın.</value></data>
        named inside the sentence, so a language that declines the noun after "for"
        declines it here. "Left alone" is worded as in Summary.SourceGivenUp.Drive.
        0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean {0} sürücüsünü beklemeyi kesti, bu yüzden denetlemek için o sürücüye ihtiyaç duyduğu dosyaları olduğu gibi bıraktı. Tekrar normal yanıt vermeye başladığında komutu yeniden çalıştırın.</value></data>
+  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, for a folder that is not on a drive letter, named as
        it is spelled. 0 = a network share such as "\\fileserver\apps", or another path -->
-  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean {0} konumunu beklemeyi kesti, bu yüzden denetlemek için o konuma ihtiyaç duyduğu dosyaları olduğu gibi bıraktı. Tekrar normal yanıt vermeye başladığında komutu yeniden çalıştırın.</value></data>
+  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
        Display.ListSeparator, e.g. "drive D:, \\nas\installers". The list stands in
        brackets and carries no "and", as in Summary.SourcesGivenUp. -->
-  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean birden fazla sürücüyü veya paylaşımı ({0}) beklemeyi kesti, bu yüzden denetlemek için bunlara ihtiyaç duyduğu dosyaları olduğu gibi bıraktı. Tekrar normal yanıt vermeye başladıklarında komutu yeniden çalıştırın.</value></data>
+  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Once they're responding normally, run the command again.</value></data>
   <!-- The outcome entry, Event ID 1000, for a scan that offered nothing, has no other
        withholding to report, and stopped waiting for a drive or share while files still
        had to be checked against it. It is written in place of Cli.EventLogScanNoOrphans,

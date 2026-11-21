@@ -447,7 +447,7 @@ public class MainViewModelTests : IDisposable
     }
 
     private const string DriveDLine =
-        "InstallerClean stopped waiting for drive D:, so it left alone the files it needed that drive to check. "
+        "InstallerClean stopped waiting for drive D:, so it left alone any file it couldn't check without it. "
         + "Re-scan once it's responding normally.";
 
     [Fact]
@@ -539,7 +539,7 @@ public class MainViewModelTests : IDisposable
 
         Assert.False(vm.Completion.IsComplete);
         Assert.Equal(
-            @"InstallerClean stopped waiting for \\nas\installers, so it left alone the files it needed that location to check. "
+            @"InstallerClean stopped waiting for \\nas\installers, so it left alone any file it couldn't check without it. "
             + "Re-scan once it's responding normally.",
             vm.Scan.SourcesGivenUpText);
 

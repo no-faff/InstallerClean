@@ -203,10 +203,13 @@ public sealed class UpdateCheckService : IUpdateCheckService
                 // and the sentence on screen differs accordingly. A 4xx or
                 // 5xx is an error, from GitHub or from a proxy or filter on
                 // the way, and the status does not say which. A 2xx is
-                // something answering in GitHub's place, a captive portal or
-                // a filtering proxy serving its own page, because the
+                // something answering in GitHub's place, because the
                 // releases page itself does not answer this request with a
-                // body.
+                // body. Over HTTPS that takes a filtering proxy holding a
+                // root certificate the PC trusts, as a work or school network
+                // can; a captive portal cannot answer for github.com without
+                // the certificate check failing first, which is a connection
+                // error and not this branch.
                 //
                 // Either way the status alone is useless for diagnosis
                 // after the fact, and nothing in the breadcrumb names a

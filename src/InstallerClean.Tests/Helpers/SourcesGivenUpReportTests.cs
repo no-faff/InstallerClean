@@ -13,16 +13,16 @@ namespace InstallerClean.Tests.Helpers;
 public class SourcesGivenUpReportTests
 {
     private const string Tail =
-        ", so it left alone the files it needed that drive to check. Re-scan once it's responding normally.";
+        ", so it left alone any file it couldn't check without it. Re-scan once it's responding normally.";
 
     private const string PathTail =
-        ", so it left alone the files it needed that location to check. Re-scan once it's responding normally.";
+        ", so it left alone any file it couldn't check without it. Re-scan once it's responding normally.";
 
     private const string CommandLineTail =
-        ", so it left alone the files it needed that drive to check. Once it's responding normally, run the command again.";
+        ", so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.";
 
     private const string CommandLinePathTail =
-        ", so it left alone the files it needed that location to check. Once it's responding normally, run the command again.";
+        ", so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.";
 
     private static SourceRootGivenUp Root(string root) => new(root, SourceRootGiveUpRoute.NoAnswer, 1);
 
@@ -68,7 +68,7 @@ public class SourcesGivenUpReportTests
 
         Assert.Equal(
             @"InstallerClean stopped waiting for more than one drive or share (drive D:, \\nas\installers, drive E:), "
-            + "so it left alone the files it needed them to check. "
+            + "so it left alone any file it couldn't check without them. "
             + "Re-scan once they're responding normally.",
             SourcesGivenUpReport.WindowLine([Root("d:"), Root(@"\\nas\installers"), Root("E:")]));
     }
@@ -136,7 +136,7 @@ public class SourcesGivenUpReportTests
 
         Assert.Equal(
             @"InstallerClean stopped waiting for more than one drive or share (drive D:, \\nas\installers, drive E:), "
-            + "so it left alone the files it needed them to check. "
+            + "so it left alone any file it couldn't check without them. "
             + "Once they're responding normally, run the command again.",
             SourcesGivenUpReport.CommandLine([Root("d:"), Root(@"\\nas\installers"), Root("E:")]));
     }

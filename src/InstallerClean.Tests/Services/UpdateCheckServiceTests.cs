@@ -44,10 +44,10 @@ public class UpdateCheckServiceTests
         return response;
     }
 
-    // A captive portal's login page: 200 and a body, where the releases page
+    // A filtering proxy's own page: 200 and a body, where the releases page
     // would have redirected.
-    private static HttpResponseMessage CaptivePortal() =>
-        new(HttpStatusCode.OK) { Content = new StringContent("<html><body>Sign in</body></html>") };
+    private static HttpResponseMessage ProxyPage() =>
+        new(HttpStatusCode.OK) { Content = new StringContent("<html><body>Blocked by policy</body></html>") };
 
     /// <summary>
     /// The answer the check is built to read: GitHub's 302 off
@@ -425,7 +425,7 @@ public class UpdateCheckServiceTests
     [Fact]
     public async Task Automatic_check_writes_nothing_when_the_answer_is_not_a_redirect()
     {
-        var (service, logged) = Build(CaptivePortal);
+        var (service, logged) = Build(ProxyPage);
 
         var result = await service.CheckAsync(UpdateCheckOrigin.Automatic);
 
@@ -436,7 +436,7 @@ public class UpdateCheckServiceTests
     [Fact]
     public async Task Manual_check_records_an_answer_that_is_not_a_redirect()
     {
-        var (service, logged) = Build(CaptivePortal);
+        var (service, logged) = Build(ProxyPage);
 
         var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
 

@@ -676,7 +676,7 @@
        its answer; every file still to be checked against it is left alone rather than
        listed as safe to delete. "It" is the drive or share the waiting line names, and "left alone" is
        worded as in Window.Registered.Title. -->
-  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Любой файл, который InstallerClean ещё нужно проверить с его помощью, будет оставлен без изменений.</value></data>
+  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Any file InstallerClean can't check without it will be left alone.</value></data>
   <!-- What a screen reader says for the waiting line while Action.StopWaiting's
        button shows; nothing on screen changes. 0 = the waiting line as drawn
        (Status.WaitingForDrive or Status.WaitingForPath), 1 = the access key of
@@ -887,8 +887,8 @@
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>Оставлен без изменений {0} файл. Сканирование включило его в список файлов, которые можно безопасно удалить, но последняя проверка перед перемещением или удалением не смогла это подтвердить.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>Оставлено без изменений {0} файлов. Сканирование включило их в список файлов, которые можно безопасно удалить, но последняя проверка перед перемещением или удалением не смогла это подтвердить.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file left alone. The scan listed it as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files left alone. The scan listed them as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -1064,11 +1064,11 @@
        after "for" declines it here. "Left alone" is worded as in
        Window.Registered.Title, and "Re-scan" is Action.Rescan's label without its
        access-key marker. 0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean перестал ждать диск {0}, поэтому оставил без изменений файлы, для проверки которых ему был нужен этот диск. Когда он снова будет отвечать нормально, нажмите «Повторить сканирование».</value></data>
+  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, for a folder that is not on a drive letter, named
        as it is spelled. 0 = a network share such as "\\fileserver\apps", or another
        path -->
-  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean перестал ждать {0}, поэтому оставил без изменений файлы, для проверки которых ему было нужно это расположение. Когда доступ снова станет нормальным, нажмите «Повторить сканирование».</value></data>
+  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
@@ -1076,7 +1076,7 @@
        brackets, so its separators cannot be read as the sentence's own punctuation, and
        it carries no "and", which a list joined in code cannot place in every
        language. -->
-  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean перестал ждать несколько дисков или сетевых ресурсов ({0}), поэтому оставил без изменений файлы, для проверки которых они были ему нужны. Когда они снова будут отвечать нормально, нажмите «Повторить сканирование».</value></data>
+  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Re-scan once they're responding normally.</value></data>
   <!-- The window's line under the left-alone count, where the scan found one of the
        signals the Body.PendingReboot.* banners name set when it read them just after its
        clock, and so left alone every file in the folder no record names. One line per
@@ -1567,8 +1567,8 @@ InstallerClean уже был запущен от имени администра
        [ ] becomes a link to the releases page (MessageWindow
        .ShowLinkedMessage), so a translator can place it anywhere in the
        sentence; a string with no [ ] pair is shown as plain text. -->
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Время ожидания проверки истекло. Возможно, соединение с GitHub медленное; повторите попытку.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2408,7 +2408,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Безвозвратно удалён {0} ненужный {1}.</value></data>
   <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Идёт перемещение в {2}: {0} ненужный {1}...</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Перемещён {0} ненужный {1}.</value></data>
-  <data name="Completion.HeldBack.Few" xml:space="preserve"><value>Оставлено без изменений {0} файла. Сканирование включило их в список файлов, которые можно безопасно удалить, но последняя проверка перед перемещением или удалением не смогла это подтвердить.</value></data>
+  <data name="Completion.HeldBack.Few" xml:space="preserve"><value>{0} files left alone. The scan listed them as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
 
   <!-- Human-facing CLI keys; the machine Cli.EventLog* keys are forced English at the emit site and omitted -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Ошибка: неизвестный аргумент «{0}»</value></data>
@@ -2478,9 +2478,9 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutexUnreadable" xml:space="preserve"><value>Ошибка: InstallerClean не смог проверить, занят ли Windows Installer, поэтому не может исключить идущую установку. /m и /d заблокированы. Перезагрузите Windows и попробуйте снова. Если проверка по-прежнему не удаётся, это не та машина, которую InstallerClean может очистить.</value></data>
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutexUnreadableWindowsError" xml:space="preserve"><value>Ошибка: InstallerClean не смог проверить, занят ли Windows Installer, потому что Windows выдал ошибку: {0} (ошибка {1}), поэтому не может исключить идущую установку. /m и /d заблокированы. Перезагрузите Windows и попробуйте снова. Если проверка по-прежнему не удаётся, это не та машина, которую InstallerClean может очистить.</value></data>
   <data name="Cli.AdminRightsNeeded" xml:space="preserve"><value>InstallerClean нужны права администратора, чтобы видеть все программы, установленные на этом ПК, а он запущен не от имени администратора, поэтому сканировать не будет. Ничего не изменено. Запустите его снова из командной строки администратора.</value></data>
-  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean перестал ждать диск {0}, поэтому оставил без изменений файлы, для проверки которых ему был нужен этот диск. Когда он начнёт отвечать нормально, запустите команду снова.</value></data>
-  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean перестал ждать {0}, поэтому оставил без изменений файлы, для проверки которых ему было нужно это расположение. Когда доступ станет нормальным, запустите команду снова.</value></data>
-  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean перестал ждать несколько дисков или сетевых ресурсов ({0}), поэтому оставил без изменений файлы, для проверки которых они были ему нужны. Когда они начнут отвечать нормально, запустите команду снова.</value></data>
+  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.</value></data>
+  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.</value></data>
+  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Once they're responding normally, run the command again.</value></data>
   <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean бесплатен. Если он помог, чаевые будут очень кстати: {0}</value></data>
   <data name="Cli.UpdatePrompt" xml:space="preserve"><value>Обновить сейчас? Настоятельно рекомендуется использовать последнюю версию. [{0}/{1}]</value></data>
   <data name="Cli.UpdateAnswerYes" xml:space="preserve"><value>Д</value></data>

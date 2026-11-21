@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking remaining files... | 正在检查其余文件… |
 | Waiting for drive {0} to respond... | 正在等待驱动器 {0} 响应… |
 | Waiting for {0} to respond... | 正在等待 {0} 响应… |
-| Any file InstallerClean still needs it to check will be left alone. | InstallerClean 仍需要它才能核对的文件都将原样保留。 |
+| Any file InstallerClean can't check without it will be left alone. | Any file InstallerClean can't check without it will be left alone. |
 | Scan complete ({0}) | 扫描完成（{0}） |
 | Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可安全删除。 |
 | Preparing destination folder... | 正在准备目标文件夹… |
@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files could not be deleted. | {0} 个文件无法删除。 |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
-| {0} file left alone. The scan listed it as safe to delete, but the last check before moving or deleting couldn't confirm it. | 已原样保留 {0} 个文件。扫描已将它列为可安全删除，但移动或删除前的最后检查无法确认这一点。 |
-| {0} files left alone. The scan listed them as safe to delete, but the last check before moving or deleting couldn't confirm it. | 已原样保留 {0} 个文件。扫描已将它们列为可安全删除，但移动或删除前的最后检查无法确认这一点。 |
+| {0} file left alone. The scan listed it as safe to delete, but the final check before moving or deleting couldn't confirm it. | {0} file left alone. The scan listed it as safe to delete, but the final check before moving or deleting couldn't confirm it. |
+| {0} files left alone. The scan listed them as safe to delete, but the final check before moving or deleting couldn't confirm it. | {0} files left alone. The scan listed them as safe to delete, but the final check before moving or deleting couldn't confirm it. |
 | Moved {0} of {1} {2} to {3} before you cancelled. | 在您取消前，已将 {1} 个{2}中的 {0} 个移动到 {3}。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 撤销很简单。把它们移回 {InstallerFolder}，一切就会恢复原样。 |
@@ -217,9 +217,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 另外 {0} 个程序 |
 | {0} file with no program named in the records | {0} 个在记录中没有标明程序的文件 |
 | {0} files with no program named in the records | {0} 个在记录中没有标明程序的文件 |
-| InstallerClean stopped waiting for drive {0}, so it left alone the files it needed that drive to check. Re-scan once it's responding normally. | InstallerClean 已停止等待驱动器 {0}，因此把需要该驱动器才能核对的文件原样保留了下来。待它恢复正常响应后，请点击“重新扫描”。 |
-| InstallerClean stopped waiting for {0}, so it left alone the files it needed that location to check. Re-scan once it's responding normally. | InstallerClean 已停止等待 {0}，因此把需要该位置才能核对的文件原样保留了下来。待它恢复正常响应后，请点击“重新扫描”。 |
-| InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone the files it needed them to check. Re-scan once they're responding normally. | InstallerClean 已停止等待多个驱动器或共享（{0}），因此把需要它们才能核对的文件原样保留了下来。待它们恢复正常响应后，请点击“重新扫描”。 |
+| InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally. | InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally. |
+| InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally. | InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally. |
+| InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Re-scan once they're responding normally. | InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Re-scan once they're responding normally. |
 | Something was using Windows Installer when the scan started, such as Windows Update or a program being installed or removed. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Re-scan once it has finished. | 扫描开始时，有程序正在使用 Windows Installer，比如 Windows 更新，或者某个正在安装或卸载的程序。安装刚刚添加的文件看起来像不需要的文件，因此 InstallerClean 把所有可能是刚添加的文件都原样保留了下来。等它结束后，请点击“重新扫描”。 |
 | Windows Installer had an earlier job paused, not finished, when the scan started. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Finish or undo it, or restart Windows, then Re-scan. | 扫描开始时，Windows Installer 有一项先前的任务已暂停，尚未完成。安装刚刚添加的文件看起来像不需要的文件，因此 InstallerClean 把所有可能是刚添加的文件都原样保留了下来。请完成或撤销那次安装，或重启 Windows，然后点击“重新扫描”。 |
 | Windows had a change to {InstallerFolder} waiting for the next restart. A file an installation has just added looks like an unneeded one, so InstallerClean left alone every file that could have just been added. Restart Windows, then Re-scan. | Windows 有一项对 {InstallerFolder} 的更改在等待下次重启。安装刚刚添加的文件看起来像不需要的文件，因此 InstallerClean 把所有可能是刚添加的文件都原样保留了下来。请重启 Windows，然后点击“重新扫描”。 |
@@ -339,8 +339,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 无法下载更新。 |
 | The update couldn't be installed. | 无法安装更新。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 无法连接到 GitHub。请检查您的网络连接后重试。 |
-| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser. | The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser. |
-| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser. | The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser. |
+| The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. |
+| The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. |
 | The check timed out. Your connection to GitHub may be slow; try again. | 检查超时。您与 GitHub 的连接可能较慢；请重试。 |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 检查因未知原因失败。如果您需要报告此问题，详情在 {0} 中。 |
 | The check failed for an unknown reason. The crash log could not be written. | 检查因未知原因失败。无法写入崩溃日志。 |
@@ -510,9 +510,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | No unneeded files identified. | 未识别出不需要的文件。 |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有问题，但该程序的更新或卸载可能会失败。要把该文件放回去，您需要您当前所用版本的安装程序。请向该程序的开发者获取，然后直接运行它，覆盖安装现有的程序。更新的版本不行：新版本必须先移除您现有的版本，而正是这一步需要这个文件。先卸载同样行不通，原因相同。这应当会恢复该文件并保持您的设置不变，但 Microsoft 并不保证。 |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有问题，但这些程序的更新或卸载可能会失败。要把某个文件放回去，您需要该程序当前所用版本的安装程序。请向该程序的开发者获取，然后直接运行它，覆盖安装现有的程序。更新的版本不行：新版本必须先移除您现有的版本，而正是这一步需要该文件。先卸载同样行不通，原因相同。这应当会恢复该文件并保持您的设置不变，但 Microsoft 并不保证。 |
-| InstallerClean stopped waiting for drive {0}, so it left alone the files it needed that drive to check. Once it's responding normally, run the command again. | InstallerClean 已停止等待驱动器 {0}，因此把需要该驱动器才能核对的文件原样保留了下来。待它恢复正常响应后，请重新运行该命令。 |
-| InstallerClean stopped waiting for {0}, so it left alone the files it needed that location to check. Once it's responding normally, run the command again. | InstallerClean 已停止等待 {0}，因此把需要该位置才能核对的文件原样保留了下来。待它恢复正常响应后，请重新运行该命令。 |
-| InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone the files it needed them to check. Once they're responding normally, run the command again. | InstallerClean 已停止等待多个驱动器或共享（{0}），因此把需要它们才能核对的文件原样保留了下来。待它们恢复正常响应后，请重新运行该命令。 |
+| InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again. | InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again. |
+| InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again. | InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again. |
+| InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Once they're responding normally, run the command again. | InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Once they're responding normally, run the command again. |
 | Deleting {0} unneeded {1}... | 正在删除 {0} 个不需要的{1}… |
 | Permanently deleted {0} unneeded {1}. | 已永久删除 {0} 个不需要的{1}。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 错误：未指定移动目标位置。请使用 /m 路径。（在 GUI 中设置的默认位置是按用户保存的，不适用于计划任务或服务账户下的运行。） |

@@ -1074,7 +1074,7 @@ public class CompletionViewModelTests
     // Delete it follows the held-back count on a line of its own.
 
     private const string DriveDLine =
-        "InstallerClean stopped waiting for drive D:, so it left alone the files it needed that drive to check. "
+        "InstallerClean stopped waiting for drive D:, so it left alone any file it couldn't check without it. "
         + "Re-scan once it's responding normally.";
 
     private static IReadOnlyList<SourceRootGivenUp> DriveD(int filesKept) =>
