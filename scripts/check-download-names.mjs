@@ -21,9 +21,11 @@
 // app's own names.
 //
 // The copies are also held to the folder each is copied from: the portable from the
-// merged window exe, the slim from that same exe signed under its own name in the
-// signing folder, the command line from its own publish and the setup from the signed
-// setup, so two names swapped between files are a difference too.
+// merged window exe, the slim from that same exe, signed under its own name in the
+// signing folder or unsigned from the window publish, the command line from its own
+// publish and the setup from the signed setup, so two names swapped between files are a
+// difference too. A copy whose source is a variable is held to every path the variable's
+// `$name = if (...) { 'a' } else { 'b' }` assignment in the step can give it.
 //
 // Each of the four places has to name exactly the files the app downloads and the ones
 // in EARLIER. A copy installed on somebody's PC asks for one of these names under the
@@ -126,8 +128,16 @@ function releaseNames(workflow) {
     return { name: path.replace(/^["']|["']$/g, '').replace(/^publish\//, ''), quote };
   };
   const named = ({ name, quote }) => powershellName(name, quote);
+  // The paths a source can be: itself, or for a $variable every branch of its if/else.
+  const sourcesOf = (source) => {
+    if (!source.startsWith('$')) return [source];
+    const escaped = source.replace(/[$]/g, '\\$');
+    const choice = code.match(new RegExp(`^\\s*${escaped}\\s*=\\s*if\\s*\\([^)]*\\)\\s*\\{\\s*(\\S+)\\s*\\}\\s*else\\s*\\{\\s*(\\S+)\\s*\\}\\s*$`, 'm'));
+    return choice ? [choice[1], choice[2]].map((p) => p.replace(/^["']|["']$/g, '')) : [];
+  };
   const copies = [...code.matchAll(/Copy-Item\s+(\S+)\s+(\S+)(?:\s+-Force)?\s*$/gm)].map((m) => ({
     source: m[1],
+    sources: sourcesOf(m[1]),
     name: named(unquote(m[2])),
   }));
   places.set('the copies made into publish/', copies.map((c) => c.name));
@@ -156,14 +166,14 @@ function releaseNames(workflow) {
   return { places, copies };
 }
 
-// The folder each kind's copy is made from, as a part of the source path. The
-// portable is the merged window exe; the slim is that same exe signed under its
-// own name, which sits in the signing folder rather than a publish one.
+// The folders each kind's copy may be made from, as a part of the source path. The
+// portable is the merged window exe; the slim is that same exe, signed under its own
+// name in the signing folder, or unsigned from the window publish.
 const SOURCES = new Map([
-  ['Setup', 'signed-setup'],
-  ['Portable', 'window'],
-  ['Slim', 'signed-executables'],
-  ['CommandLineDownload', 'cli'],
+  ['Setup', ['signed-setup']],
+  ['Portable', ['window']],
+  ['Slim', ['signed-executables', 'window']],
+  ['CommandLineDownload', ['cli']],
 ]);
 
 // What the app downloads, what the release names and every problem between them.
@@ -185,8 +195,13 @@ function compare(appSource, workflow) {
   }
   for (const [kind, file] of [...app.names, ...EARLIER]) {
     const copy = release.copies.find((c) => c.name === file);
-    if (copy && !copy.source.includes(SOURCES.get(kind)))
-      problems.push(`${RELEASE}: ${file} is copied from ${copy.source}, not from the ${SOURCES.get(kind)} publish.`);
+    if (!copy) continue;
+    const allowed = SOURCES.get(kind);
+    if (copy.sources.length === 0)
+      problems.push(`${RELEASE}: ${file} is copied from ${copy.source}, and the step has no if/else assignment that says which paths it can be.`);
+    for (const source of copy.sources)
+      if (!allowed.some((folder) => source.includes(folder)))
+        problems.push(`${RELEASE}: ${file} can be copied from ${source}, not from the ${allowed.join(' or the ')} publish.`);
   }
   return { problems, app, release };
 }
@@ -238,6 +253,11 @@ const controls = [
     'the portable copied from the slim\'s folder',
     appSource,
     reline(/Copy-Item\s+publish\/window\/InstallerClean\.exe(\s+)publish\/InstallerClean-portable\.exe/, 'Copy-Item signing/signed-executables/InstallerClean-slim.exe$1publish/InstallerClean-portable.exe'),
+  ],
+  [
+    'the slim\'s unsigned copy made from the command line\'s publish',
+    appSource,
+    reline(/(\$slim\s*=\s*if\s*\([^)]*\)\s*\{[^}]*\}\s*else\s*\{\s*)'publish\/window\/InstallerClean\.exe'/, "$1'publish/cli/installerclean-cli.exe'"),
   ],
   [
     'the app asking for a versioned portable',

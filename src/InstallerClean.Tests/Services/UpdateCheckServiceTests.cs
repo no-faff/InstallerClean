@@ -314,7 +314,9 @@ public class UpdateCheckServiceTests
         Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ResponseParseError), result);
         // The shape that would report GitHub having changed how /latest
         // answers, which is the one assumption the check rests on.
-        Assert.Single(logged);
+        Assert.StartsWith(
+            "The request for the GitHub releases page got 302 with an unusable Location: ",
+            Assert.Single(logged).Message);
     }
 
     [Fact]
@@ -325,7 +327,9 @@ public class UpdateCheckServiceTests
         var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
 
         Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ResponseParseError), result);
-        Assert.Contains("nightly", Assert.Single(logged).Message);
+        Assert.Equal(
+            "The request for the GitHub releases page got 302, a redirect to a tag that is not a version: nightly",
+            Assert.Single(logged).Message);
     }
 
     [Fact]
@@ -414,7 +418,7 @@ public class UpdateCheckServiceTests
         // A status on its own cannot tell a refusal by GitHub apart from a
         // refusal by whatever sits between; the headers it arrived with can,
         // which is the whole point of the breadcrumb.
-        Assert.Contains("403", entry.Message);
+        Assert.StartsWith("The request for the GitHub releases page got 403 ", entry.Message);
         Assert.Contains("x-ratelimit-remaining=0", entry.Message);
     }
 
@@ -437,7 +441,8 @@ public class UpdateCheckServiceTests
         var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
 
         Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ResponseParseError), result);
-        Assert.Single(logged);
+        Assert.StartsWith(
+            "The request for the GitHub releases page got 200 ", Assert.Single(logged).Message);
     }
 
     /// <summary>
