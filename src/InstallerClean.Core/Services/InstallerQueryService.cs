@@ -235,7 +235,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// lists that account's per-user unmanaged programs' patches from the account's own
     /// hive as well as from <c>UserData</c>, and another account's from <c>UserData</c>
     /// alone, so which of the two a program is decides what its listing must be read
-    /// beside (<see cref="ListingCoversTheWalk"/>).
+    /// beside (<see cref="ListingCoversTheWalk"/>). A process running as the local system
+    /// is another account to every user's installation.
     /// </param>
     internal readonly record struct FallbackRead(
         int Failures,

@@ -240,9 +240,9 @@ public class InstallerQueryServiceShortProgramTests
     /// short, in a scan run as another account, or as an account that was not read where
     /// <paramref name="runningAs"/> is null. Windows Installer lists another account's
     /// program's patches from that account's <c>UserData</c> key alone, so the program's
-    /// own listing stands in by itself, and a listing under any other account does not. The
-    /// local system is such another account. Where the scan does not know which account it
-    /// runs as, nothing stands in.
+    /// own listing stands in by itself, and a listing under any other account does not. A
+    /// process running as the local system is another account to every user's installation.
+    /// Where the scan does not know which account it runs as, nothing stands in.
     /// </summary>
     [Theory]
     [InlineData(OwnerAccount, OtherAccount, 0)]
@@ -251,6 +251,9 @@ public class InstallerQueryServiceShortProgramTests
     [InlineData(null, OtherAccount, 1)]
     [InlineData(OwnerAccount, null, 1)]
     [InlineData(OwnerAccount, MachineAccount, 0)]
+    [InlineData(OtherAccount, MachineAccount, 1)]
+    [InlineData(MachineAccount, MachineAccount, 1)]
+    [InlineData(null, MachineAccount, 1)]
     public async Task Another_accounts_per_user_programs_short_patch_list_holds_every_superseded_patch_unless_its_own_accounts_listing_names_every_patch_it_returned(
         string? listedUnder, string? runningAs, int unsettled)
     {
@@ -750,9 +753,9 @@ public class InstallerQueryServiceShortProgramTests
     /// than the one the scan runs as, the listing is all Windows Installer's own list reads,
     /// and the registry's reading stands. For the running account's own, it stands only
     /// where that account's advertised key lists no patch the listing leaves out, and not
-    /// where that key has no entry or was not read. A scan run as the local system is run
-    /// as another account. Where the scan does not know which account it runs as, and for a
-    /// managed installation, the superseded patch is held back.
+    /// where that key has no entry or was not read. A process running as the local system is
+    /// another account to every user's installation. Where the scan does not know which
+    /// account it runs as, and for a managed installation, the superseded patch is held back.
     /// </summary>
     [Theory]
     [InlineData(MsiInstallContext.UserUnmanaged, OtherAccount, false, null, true, false)]
