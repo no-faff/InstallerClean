@@ -748,7 +748,7 @@ public partial class CompletionViewModel : ObservableObject
     /// <summary>
     /// The line about files <paramref name="scan"/> held back because their times are not
     /// before the moment it began (<see cref="RecentChangeReport.Line(ScanResult)"/>), or
-    /// empty. "Nothing offered on this PC" gets it here for its own scan.
+    /// empty. "No files can be deleted" gets it here for its own scan.
     /// </summary>
     private static string RecentChangeLine(ScanResult? scan) => RecentChangeReport.Line(scan);
 

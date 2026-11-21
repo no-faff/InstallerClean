@@ -674,9 +674,9 @@
   <!-- The line under Action.StopWaiting's button, shown while the button is: what
        giving up on the drive or share costs. A file already checked against it keeps
        its answer; every file still to be checked against it is left alone rather than
-       offered. "It" is the drive or share the waiting line names, and "left alone" is
+       listed as safe to delete. "It" is the drive or share the waiting line names, and "left alone" is
        worded as in Window.Registered.Title. -->
-  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Mọi tệp còn cần đối chiếu với nó sẽ được để nguyên.</value></data>
+  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Mọi tệp mà InstallerClean vẫn cần vị trí này để kiểm tra sẽ được để nguyên.</value></data>
   <!-- What a screen reader says for the waiting line while Action.StopWaiting's
        button shows; nothing on screen changes. 0 = the waiting line as drawn
        (Status.WaitingForDrive or Status.WaitingForPath), 1 = the access key of
@@ -754,19 +754,19 @@
        summary + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Đã quét {0} {1} trong {2}</value></data>
-  <!-- THE HEADING FOR A RUN THAT OFFERED NOTHING AND HELD BACK FILES IT COULD NOT
-       ESTABLISH ARE UNNEEDED, or carried on without a drive or share and left a file alone
-       because of it. That is a different finding from a folder with nothing in it to
-       remove and must not share a screen with one: Completion.AllClean over
+  <!-- THE HEADING FOR A RUN THAT LISTED NO FILE AS SAFE TO DELETE AND LEFT ALONE FILES IT
+       COULD NOT ESTABLISH ARE UNNEEDED, or stopped waiting for a drive or share and left a
+       file alone because of it. That is a different finding from a folder with nothing in it
+       to remove and must not share a screen with one: Completion.AllClean over
        Completion.NothingToCleanUp says the folder is clear, and this heading says only that
-       nothing was offered. Under it the card carries the receipt,
+       no file can be deleted this time, the lines under it saying why. Under it the card carries the receipt,
        Completion.NothingToCleanUpReceipt, and above that each line saying what to do that
        applies: Completion.RecentChange, Summary.ScanSignal.* and Summary.SourceGivenUp.*
        or Summary.SourcesGivenUp. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>Không có gì được đề xuất trên máy này</value></data>
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>Không có tệp nào có thể xóa</value></data>
   <!-- Files the scan left alone because the latest of their times, as Windows records
        them, is at or after the moment the scan began. The window's finished cards, its
-       "Nothing offered on this PC" screen and the command line all print it, from
+       "No files can be deleted" screen and the command line all print it, from
        RecentChangeReport.Line, and only where at least one file was left alone for that
        reason on a scan that found Windows Installer's in-progress signals clear. A file
        the scan held because one of those signals was set is spoken of through that
@@ -780,8 +780,8 @@
        0 = files held back for their times, 1 = pluralised "file"/"files", 2 = their size.
        THE ONE-FORM NAMES THE SIZE AND NOT THE NUMERAL, so it spends 2 and leaves 0
        and 1 unused. -->
-  <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>Một tệp ({2}) đã được để nguyên vì Windows cho thấy nó đã bị thay đổi sau khi InstallerClean bắt đầu quét. Nếu khi đó có chương trình đang cài đặt hoặc cập nhật, hãy quét lại khi việc đó xong và InstallerClean sẽ kiểm tra lại tệp này.</value></data>
-  <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>{0} {1} ({2}) đã được để nguyên vì Windows cho thấy chúng đã bị thay đổi sau khi InstallerClean bắt đầu quét. Nếu khi đó có chương trình đang cài đặt hoặc cập nhật, hãy quét lại khi việc đó xong và InstallerClean sẽ kiểm tra lại chúng.</value></data>
+  <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>Một tệp ({2}) đã được để nguyên vì Windows cho thấy nó đã thay đổi sau khi bắt đầu quét. Nếu khi đó có gì đang cài đặt hoặc cập nhật, hãy quét lại khi việc đó xong.</value></data>
+  <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>{0} {1} ({2}) đã được để nguyên vì Windows cho thấy chúng đã thay đổi sau khi bắt đầu quét. Nếu khi đó có gì đang cài đặt hoặc cập nhật, hãy quét lại khi việc đó xong.</value></data>
   <!-- The line under the post-Move summary, in its two forms: the backup folder
        is on another drive, or on the drive the files came from. Delete has no
        counterpart, and deliberately: nothing is left in a folder after a delete,
@@ -887,8 +887,8 @@
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>Đã để nguyên {0} tệp. Lần quét đã liệt kê nó là có thể xóa an toàn. Lần kiểm tra cuối không xác nhận được điều đó.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>Đã để nguyên {0} tệp. Lần quét đã liệt kê chúng là có thể xóa an toàn. Lần kiểm tra cuối không xác nhận được điều đó.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>Đã để nguyên {0} tệp. Lần quét đã liệt kê nó là có thể xóa an toàn, nhưng lần kiểm tra cuối trước khi di chuyển hoặc xóa không xác nhận được điều đó.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>Đã để nguyên {0} tệp. Lần quét đã liệt kê chúng là có thể xóa an toàn, nhưng lần kiểm tra cuối trước khi di chuyển hoặc xóa không xác nhận được điều đó.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -1059,16 +1059,16 @@
        the main window's left-alone line, as the body of the finished card where a scan
        offered nothing, and under the held-back line on the card after a Move or Delete.
        The app gives a drive up when somebody presses Action.StopWaiting, when it does
-       not answer, or when its reads take too long, and "carried on without" is true of
+       not answer, or when its reads take too long, and "stopped waiting for" is true of
        each. The drive is named inside the sentence, so a language that declines the noun
-       after "without" declines it here. "Left alone" is worded as in
+       after "for" declines it here. "Left alone" is worded as in
        Window.Registered.Title, and "Re-scan" is Action.Rescan's label without its
        access-key marker. 0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean đã tiếp tục mà không có ổ đĩa {0} và để nguyên mọi tệp còn cần đối chiếu với nó. Khi ổ đĩa phản hồi bình thường trở lại, hãy nhấn Quét lại.</value></data>
+  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean đã ngừng chờ ổ đĩa {0}, nên đã để nguyên các tệp cần ổ đĩa đó để kiểm tra. Hãy nhấn Quét lại khi ổ đĩa phản hồi bình thường trở lại.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, for a folder that is not on a drive letter, named
        as it is spelled. 0 = a network share such as "\\fileserver\apps", or another
        path -->
-  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean đã tiếp tục mà không có {0} và để nguyên mọi tệp còn cần đối chiếu với nó. Khi nó phản hồi bình thường trở lại, hãy nhấn Quét lại.</value></data>
+  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean đã ngừng chờ {0}, nên đã để nguyên các tệp cần vị trí đó để kiểm tra. Hãy nhấn Quét lại khi nó phản hồi bình thường trở lại.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
@@ -1076,32 +1076,32 @@
        brackets, so its separators cannot be read as the sentence's own punctuation, and
        it carries no "and", which a list joined in code cannot place in every
        language. -->
-  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean đã tiếp tục mà không có nhiều ổ đĩa hoặc chia sẻ mạng ({0}) và để nguyên mọi tệp còn cần đối chiếu với một trong số đó. Khi chúng phản hồi bình thường trở lại, hãy nhấn Quét lại.</value></data>
+  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean đã ngừng chờ nhiều ổ đĩa hoặc chia sẻ mạng ({0}), nên đã để nguyên các tệp cần chúng để kiểm tra. Hãy nhấn Quét lại khi chúng phản hồi bình thường trở lại.</value></data>
   <!-- The window's line under the left-alone count, where the scan found one of the
        signals the Body.PendingReboot.* banners name set when it read them just after its
-       clock, and so held back every file in the folder no record names. One line per
+       clock, and so left alone every file in the folder no record names. One line per
        reason, as Cli.ScanSignal.* has them and with the same placeholders, ending with
-       the Re-scan button's label rather than with running a command again. The "Nothing
-       offered on this PC" card carries the same line.
+       the Re-scan button's label rather than with running a command again. The "No files
+       can be deleted" card carries the same line.
 
        IN THE PAST TENSE, AND IT IS SHOWN WHETHER OR NOT THE SIGNAL IS STILL SET. Where it
        is, the warning banner above says so in the present, and both are true. -->
-  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer khi bắt đầu quét, chẳng hạn một bản cập nhật Windows hoặc một chương trình đang cài, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy nhấn Quét lại khi việc đó xong.</value></data>
-  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>Có một giao dịch Windows Installer đang bị treo trên máy này khi bắt đầu quét, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy, hoặc khởi động lại Windows, rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>Khi bắt đầu quét, Windows đã xếp hàng một thao tác đổi tên tệp cho lần khởi động tới, có ảnh hưởng tới {InstallerFolder}, nên InstallerClean đã để nguyên các tệp ở đó không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Khi bắt đầu quét, có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>Khi bắt đầu quét, Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không đọc được một trong các thiết lập Windows mà nó kiểm tra, nên không biết được có thao tác cài đặt nào đang chạy hay đang chờ khởi động lại không, và vì vậy InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không, vì Windows báo lỗi: {0} (lỗi {1}). Vì vậy InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
-  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>Windows Installer có việc gì đó đang chạy hoặc đang chờ khi bắt đầu quét, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy nhấn Quét lại khi việc đó đã xong xuôi.</value></data>
+  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer khi bắt đầu quét, chẳng hạn Windows Update hoặc một chương trình đang được cài đặt hoặc gỡ bỏ. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy nhấn Quét lại khi việc đó xong.</value></data>
+  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>Khi bắt đầu quét, Windows Installer có một tác vụ trước đó đang tạm dừng, chưa hoàn tất. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy hoàn tất hoặc hoàn tác lần cài đặt ấy, hoặc khởi động lại Windows, rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows có một thay đổi đối với {InstallerFolder} đang chờ lần khởi động lại tới. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows có một thay đổi tệp đang chờ lần khởi động lại tới, và InstallerClean không biết được nó ảnh hưởng tới những tệp nào. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>Khi bắt đầu quét, Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không đọc được một thiết lập Windows mà nó kiểm tra, nên không biết được Windows Installer có đang bận hay có việc đang chờ khởi động lại không. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không. Windows báo lỗi: {0} (lỗi {1}). Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>Windows Installer có việc chưa xong khi bắt đầu quét. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy nhấn Quét lại khi việc đó đã xong xuôi.</value></data>
   <!-- The window's line in the same place, where the system clock went back while the
        scan read the files' times (the wall clock advanced less than a monotonic timer by
        more than a small allowance), so the scan held back every file in the folder no
        record names. "Went back or lost time" covers a clock set back and one slowed
        beyond the allowance. Never shown beside a Summary.ScanSignal.* line above: where a
        signal was set, no file's times are read. -->
-  <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>Đồng hồ của PC này đã lùi lại hoặc chạy chậm đi trong lúc quét, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy nhấn Quét lại.</value></data>
+  <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>Đồng hồ của PC này đã lùi lại hoặc chạy chậm đi trong lúc quét, nên InstallerClean không biết được tệp nào vừa được thêm vào, và đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy nhấn Quét lại.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1910,16 +1910,16 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
        named inside the sentence, so a language that declines the noun after "for"
        declines it here. "Left alone" is worded as in Summary.SourceGivenUp.Drive.
        0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean đã ngừng chờ ổ đĩa {0} và để nguyên mọi tệp còn cần đối chiếu với nó. Khi ổ đĩa phản hồi bình thường trở lại, hãy chạy lại lệnh.</value></data>
+  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean đã ngừng chờ ổ đĩa {0}, nên đã để nguyên các tệp cần ổ đĩa đó để kiểm tra. Khi ổ đĩa phản hồi bình thường trở lại, hãy chạy lại lệnh.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, for a folder that is not on a drive letter, named as
        it is spelled. 0 = a network share such as "\\fileserver\apps", or another path -->
-  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean đã ngừng chờ {0} và để nguyên mọi tệp còn cần đối chiếu với nó. Khi nó phản hồi bình thường trở lại, hãy chạy lại lệnh.</value></data>
+  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean đã ngừng chờ {0}, nên đã để nguyên các tệp cần vị trí đó để kiểm tra. Khi nó phản hồi bình thường trở lại, hãy chạy lại lệnh.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
        Display.ListSeparator, e.g. "drive D:, \\nas\installers". The list stands in
        brackets and carries no "and", as in Summary.SourcesGivenUp. -->
-  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean đã ngừng chờ nhiều ổ đĩa hoặc chia sẻ mạng ({0}) và để nguyên mọi tệp còn cần đối chiếu với một trong số đó. Khi chúng phản hồi bình thường trở lại, hãy chạy lại lệnh.</value></data>
+  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean đã ngừng chờ nhiều ổ đĩa hoặc chia sẻ mạng ({0}), nên đã để nguyên các tệp cần chúng để kiểm tra. Khi chúng phản hồi bình thường trở lại, hãy chạy lại lệnh.</value></data>
   <!-- The outcome entry, Event ID 1000, for a scan that offered nothing, has no other
        withholding to report, and stopped waiting for a drive or share while files still
        had to be checked against it. It is written in place of Cli.EventLogScanNoOrphans,
@@ -2061,23 +2061,23 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
        number, in decimal.
 
        Every line speaks of the moment the scan started, in the past tense: the signal
-       may have cleared by the time it is read. "The files ... that no installed
-       program's records name" is what the scan holds back, every one of them, and it
-       leaves out the superseded patches still listed, which a record names.
+       may have cleared by the time it is read. "Every file that could have just been added" is every file
+       in the folder no record names, which is what the scan leaves alone, and it leaves out
+       the superseded patches still listed as safe to delete, which a record names.
        Other: Windows Installer's in-progress file was there, or a reason with no line of
        its own, which reads true of the whole family. -->
-  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer khi bắt đầu quét, chẳng hạn một bản cập nhật Windows hoặc một chương trình đang cài, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy chạy lại lệnh khi việc đó xong.</value></data>
-  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>Có một giao dịch Windows Installer đang bị treo trên máy này khi bắt đầu quét, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy, hoặc khởi động lại Windows, rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>Khi bắt đầu quét, Windows đã xếp hàng một thao tác đổi tên tệp cho lần khởi động tới, có ảnh hưởng tới {InstallerFolder}, nên InstallerClean đã để nguyên các tệp ở đó không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Khi bắt đầu quét, có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>Khi bắt đầu quét, Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không đọc được một trong các thiết lập Windows mà nó kiểm tra, nên không biết được có thao tác cài đặt nào đang chạy hay đang chờ khởi động lại không, và vì vậy InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không, vì Windows báo lỗi: {0} (lỗi {1}). Vì vậy InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
-  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>Windows Installer có việc gì đó đang chạy hoặc đang chờ khi bắt đầu quét, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy chạy lại lệnh khi việc đó đã xong xuôi.</value></data>
+  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer khi bắt đầu quét, chẳng hạn Windows Update hoặc một chương trình đang được cài đặt hoặc gỡ bỏ. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy chạy lại lệnh khi việc đó xong.</value></data>
+  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>Khi bắt đầu quét, Windows Installer có một tác vụ trước đó đang tạm dừng, chưa hoàn tất. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy hoàn tất hoặc hoàn tác lần cài đặt ấy, hoặc khởi động lại Windows, rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows có một thay đổi đối với {InstallerFolder} đang chờ lần khởi động lại tới. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows có một thay đổi tệp đang chờ lần khởi động lại tới, và InstallerClean không biết được nó ảnh hưởng tới những tệp nào. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>Khi bắt đầu quét, Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không đọc được một thiết lập Windows mà nó kiểm tra, nên không biết được Windows Installer có đang bận hay có việc đang chờ khởi động lại không. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>Khi bắt đầu quét, InstallerClean không kiểm tra được Windows Installer có đang bận không. Windows báo lỗi: {0} (lỗi {1}). Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy khởi động lại Windows rồi chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>Windows Installer có việc chưa xong khi bắt đầu quét. Một tệp vừa được một lần cài đặt thêm vào trông giống một tệp không cần thiết, nên InstallerClean đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy chạy lại lệnh khi việc đó đã xong xuôi.</value></data>
   <!-- The command line's form of Summary.ScanSignal.ClockSetBack, printed where a
        Cli.ScanSignal.* line would be, ending with running it again. -->
-  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>Đồng hồ của PC này đã lùi lại hoặc chạy chậm đi trong lúc quét, nên InstallerClean đã để nguyên các tệp trong {InstallerFolder} không được nêu tên trong bản ghi của bất kỳ chương trình đã cài nào. Hãy chạy lại lệnh.</value></data>
+  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>Đồng hồ của PC này đã lùi lại hoặc chạy chậm đi trong lúc quét, nên InstallerClean không biết được tệp nào vừa được thêm vào, và đã để nguyên mọi tệp có thể vừa được thêm vào. Hãy chạy lại lệnh.</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
        string rather than a shared one because this whole family is: all five
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after

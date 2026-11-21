@@ -626,10 +626,11 @@ public record ScanResult(
     /// nobody established.
     ///
     /// AND THE WHOLESALE READING NEEDS NOTHING WALK-DERIVED ON THE OFFER. The wholesale
-    /// sentences say the scan offered nothing it found by looking in the folder, so a run
-    /// offering a walk-derived file takes the per-file reading, whose sentences are true of
-    /// every held file. An offered superseded patch comes from its own registration and
-    /// not from the folder, so it does not count against the wholesale reading.
+    /// sentences say no file the scan found by looking in the folder was listed as safe to
+    /// delete, so a run listing a walk-derived file takes the per-file reading, whose
+    /// sentences are true of every file left alone. A superseded patch listed as safe to
+    /// delete comes from its own registration and not from the folder, so it does not
+    /// count against the wholesale reading.
     ///
     /// A RUN WHOSE WITHHELD FILES WERE ALL COUNTED BY THE DECLARED-PRODUCT-INSTALLED AND
     /// DECLARED-PATCH-REGISTERED ARMS AND <see cref="WithholdingSplit.NotBeforeTheClockCount"/> READS AS

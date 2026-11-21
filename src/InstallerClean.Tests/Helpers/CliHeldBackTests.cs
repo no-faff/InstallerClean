@@ -363,8 +363,8 @@ public class CliHeldBackTests
         var perFile = MachineContract.English(() => string.Format(
             Strings.Cli_EventLogNothingOfferedPerFileNotice, "/s", 3, DisplayHelpers.PluraliseFile(3)));
 
-        Assert.Contains("no file it found by looking in the folder is listed as safe to delete", wholesale, StringComparison.Ordinal);
-        Assert.DoesNotContain("no file it found by looking in the folder is listed as safe to delete", perFile, StringComparison.Ordinal);
+        Assert.Contains("no file it found by looking in the folder was listed as safe to delete", wholesale, StringComparison.Ordinal);
+        Assert.DoesNotContain("no file it found by looking in the folder was listed as safe to delete", perFile, StringComparison.Ordinal);
     }
 
     /// <summary>

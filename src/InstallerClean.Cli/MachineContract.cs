@@ -64,14 +64,15 @@ internal static class MachineContract
     /// never the run's outcome. THE LIST BELOW IS THE WHOLE BAND, which is the part
     /// a consumer building a filter needs of it. 3000: the scan could not check some
     /// program entries in Windows Installer's records, or could not match some cached
-    /// patch files to a program it asks about, so no superseded patch was offered.
-    /// 3001: packages Windows still references have no file on disk. 3002: files were
-    /// held back rather than offered, and the entry's own text says which condition
-    /// produced it, so a filter built for one phrase sees only some of the machines:
-    /// either the scan could not establish which cached files belong to the programs
-    /// installed here and offered nothing it walked, or it could not establish that
-    /// particular files it found are unneeded. 3003: superseded files were held back,
-    /// with their count, whatever the reason and whether or not anything was offered
+    /// patch files to a program it asks about, so no superseded patch was listed as
+    /// safe to delete. 3001: packages Windows still references have no file on disk.
+    /// 3002: files were left alone because the scan could not be certain about them,
+    /// and the entry's own text says which condition produced it, so a filter built for
+    /// one phrase sees only some of the machines: either the scan could not establish
+    /// which cached files belong to the programs installed here and listed as safe to
+    /// delete no file it walked, or it could not establish that particular files it
+    /// found are unneeded. 3003: superseded files were left alone, with their count,
+    /// whatever the reason and whether or not anything was listed as safe to delete
     /// beside them. 3004: the scan, or the check made before a Move or Delete, stopped
     /// waiting for drives or shares while files still had to be checked against them and
     /// left those files alone; the entry names them, says which of the two it was, and

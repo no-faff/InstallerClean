@@ -674,9 +674,9 @@
   <!-- The line under Action.StopWaiting's button, shown while the button is: what
        giving up on the drive or share costs. A file already checked against it keeps
        its answer; every file still to be checked against it is left alone rather than
-       offered. "It" is the drive or share the waiting line names, and "left alone" is
+       listed as safe to delete. "It" is the drive or share the waiting line names, and "left alone" is
        worded as in Window.Registered.Title. -->
-  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>仍需與它核對的檔案都會原樣保留。</value></data>
+  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>InstallerClean 仍需要它才能核對的檔案都會原樣保留。</value></data>
   <!-- What a screen reader says for the waiting line while Action.StopWaiting's
        button shows; nothing on screen changes. 0 = the waiting line as drawn
        (Status.WaitingForDrive or Status.WaitingForPath), 1 = the access key of
@@ -754,19 +754,19 @@
        summary + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>掃描了 {0} 個{1}，費時：{2}</value></data>
-  <!-- THE HEADING FOR A RUN THAT OFFERED NOTHING AND HELD BACK FILES IT COULD NOT
-       ESTABLISH ARE UNNEEDED, or carried on without a drive or share and left a file alone
-       because of it. That is a different finding from a folder with nothing in it to
-       remove and must not share a screen with one: Completion.AllClean over
+  <!-- THE HEADING FOR A RUN THAT LISTED NO FILE AS SAFE TO DELETE AND LEFT ALONE FILES IT
+       COULD NOT ESTABLISH ARE UNNEEDED, or stopped waiting for a drive or share and left a
+       file alone because of it. That is a different finding from a folder with nothing in it
+       to remove and must not share a screen with one: Completion.AllClean over
        Completion.NothingToCleanUp says the folder is clear, and this heading says only that
-       nothing was offered. Under it the card carries the receipt,
+       no file can be deleted this time, the lines under it saying why. Under it the card carries the receipt,
        Completion.NothingToCleanUpReceipt, and above that each line saying what to do that
        applies: Completion.RecentChange, Summary.ScanSignal.* and Summary.SourceGivenUp.*
        or Summary.SourcesGivenUp. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>這台電腦上沒有可提供的檔案</value></data>
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>沒有可以刪除的檔案</value></data>
   <!-- Files the scan left alone because the latest of their times, as Windows records
        them, is at or after the moment the scan began. The window's finished cards, its
-       "Nothing offered on this PC" screen and the command line all print it, from
+       "No files can be deleted" screen and the command line all print it, from
        RecentChangeReport.Line, and only where at least one file was left alone for that
        reason on a scan that found Windows Installer's in-progress signals clear. A file
        the scan held because one of those signals was set is spoken of through that
@@ -780,8 +780,8 @@
        0 = files held back for their times, 1 = pluralised "file"/"files", 2 = their size.
        THE ONE-FORM NAMES THE SIZE AND NOT THE NUMERAL, so it spends 2 and leaves 0
        and 1 unused. -->
-  <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>已原樣保留 1 個檔案（{2}），因為 Windows 顯示它在 InstallerClean 開始掃描後被變更過。如果當時有程式正在安裝或更新，請等它完成後再掃描一次，InstallerClean 會重新檢查它。</value></data>
-  <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>已原樣保留 {0} 個{1}（{2}），因為 Windows 顯示它們在 InstallerClean 開始掃描後被變更過。如果當時有程式正在安裝或更新，請等它完成後再掃描一次，InstallerClean 會重新檢查它們。</value></data>
+  <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>已原樣保留 1 個檔案（{2}），因為 Windows 顯示它在掃描開始後被變更過。如果當時有安裝或更新正在進行，請等它完成後再掃描一次。</value></data>
+  <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>已原樣保留 {0} 個{1}（{2}），因為 Windows 顯示它們在掃描開始後被變更過。如果當時有安裝或更新正在進行，請等它完成後再掃描一次。</value></data>
   <!-- The line under the post-Move summary, in its two forms: the backup folder
        is on another drive, or on the drive the files came from. Delete has no
        counterpart, and deliberately: nothing is left in a folder after a delete,
@@ -887,8 +887,8 @@
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>已原樣保留 {0} 個檔案。掃描已將它列為可安全刪除，但最後的檢查無法確認這一點。</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>已原樣保留 {0} 個檔案。掃描已將它們列為可安全刪除，但最後的檢查無法確認這一點。</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>已原樣保留 {0} 個檔案。掃描已將它列為可安全刪除，但移動或刪除前的最後檢查無法確認這一點。</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>已原樣保留 {0} 個檔案。掃描已將它們列為可安全刪除，但移動或刪除前的最後檢查無法確認這一點。</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -1059,16 +1059,16 @@
        the main window's left-alone line, as the body of the finished card where a scan
        offered nothing, and under the held-back line on the card after a Move or Delete.
        The app gives a drive up when somebody presses Action.StopWaiting, when it does
-       not answer, or when its reads take too long, and "carried on without" is true of
+       not answer, or when its reads take too long, and "stopped waiting for" is true of
        each. The drive is named inside the sentence, so a language that declines the noun
-       after "without" declines it here. "Left alone" is worded as in
+       after "for" declines it here. "Left alone" is worded as in
        Window.Registered.Title, and "Re-scan" is Action.Rescan's label without its
        access-key marker. 0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean 已不再等候磁碟機 {0}，繼續進行，並將仍需與它核對的檔案都原樣保留。等它恢復正常回應後，請按「重新掃描」。</value></data>
+  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean 已不再等候磁碟機 {0}，因此把需要該磁碟機才能核對的檔案原樣保留了下來。等它恢復正常回應後，請按「重新掃描」。</value></data>
   <!-- As Summary.SourceGivenUp.Drive, for a folder that is not on a drive letter, named
        as it is spelled. 0 = a network share such as "\\fileserver\apps", or another
        path -->
-  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean 已不再等候 {0}，繼續進行，並將仍需與它核對的檔案都原樣保留。等它恢復正常回應後，請按「重新掃描」。</value></data>
+  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean 已不再等候 {0}，因此把需要該位置才能核對的檔案原樣保留了下來。等它恢復正常回應後，請按「重新掃描」。</value></data>
   <!-- As Summary.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
@@ -1076,32 +1076,32 @@
        brackets, so its separators cannot be read as the sentence's own punctuation, and
        it carries no "and", which a list joined in code cannot place in every
        language. -->
-  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean 已不再等候多個磁碟機或共用資料夾（{0}），繼續進行，並將仍需與其中任何一個核對的檔案都原樣保留。等它們恢復正常回應後，請按「重新掃描」。</value></data>
+  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean 已不再等候多個磁碟機或共用資料夾（{0}），因此把需要它們才能核對的檔案原樣保留了下來。等它們恢復正常回應後，請按「重新掃描」。</value></data>
   <!-- The window's line under the left-alone count, where the scan found one of the
        signals the Body.PendingReboot.* banners name set when it read them just after its
-       clock, and so held back every file in the folder no record names. One line per
+       clock, and so left alone every file in the folder no record names. One line per
        reason, as Cli.ScanSignal.* has them and with the same placeholders, ending with
-       the Re-scan button's label rather than with running a command again. The "Nothing
-       offered on this PC" card carries the same line.
+       the Re-scan button's label rather than with running a command again. The "No files
+       can be deleted" card carries the same line.
 
        IN THE PAST TENSE, AND IT IS SHOWN WHETHER OR NOT THE SIGNAL IS STILL SET. Where it
        is, the warning banner above says so in the present, and both are true. -->
-  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>掃描開始時，有程式正在使用 Windows Installer，例如 Windows Update 或正在安裝的程式，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。等它結束後，請按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>掃描開始時，這台電腦上有一筆 Windows Installer 交易已暫停，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請繼續或復原那次安裝，或重新啟動 Windows，然後按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>掃描開始時，Windows 已排定在下次重新啟動時重新命名一個檔案，這會影響 {InstallerFolder}，因此 InstallerClean 把該資料夾中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>掃描開始時，有一項檔案作業已排定在下次重新啟動時執行，而 InstallerClean 無法得知它涉及哪些檔案，因此把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>掃描開始時，Windows 拒絕讓 InstallerClean 檢查 Windows Installer 是否忙碌，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 並按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>掃描開始時，InstallerClean 無法讀取它會檢查的一項 Windows 設定，因此無法判斷是否有安裝程式作業正在執行或正在等候重新啟動，於是把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 並按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>掃描開始時，InstallerClean 無法檢查 Windows Installer 是否忙碌，因此把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 並按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>掃描開始時，InstallerClean 無法檢查 Windows Installer 是否忙碌，因為 Windows 傳回了錯誤：{0}（錯誤 {1}）。因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 並按「重新掃描」。</value></data>
-  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>掃描開始時，Windows Installer 有作業正在進行或等候中，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。等它結束後，請按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>掃描開始時，有程式正在使用 Windows Installer，例如 Windows Update 或某個正在安裝或解除安裝的程式。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。等它結束後，請按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>掃描開始時，Windows Installer 有一項先前的工作已暫停，尚未完成。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請完成或復原那次安裝，或重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows 有一項對 {InstallerFolder} 的變更正在等候下次重新啟動。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows 有一項檔案變更正在等候下次重新啟動，而 InstallerClean 無法得知它會影響哪些檔案。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>Windows 拒絕讓 InstallerClean 檢查掃描開始時 Windows Installer 是否忙碌。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>InstallerClean 無法讀取它會檢查的一項 Windows 設定，因此無法判斷掃描開始時 Windows Installer 是否忙碌，或是否有等候重新啟動的工作。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>InstallerClean 無法檢查掃描開始時 Windows Installer 是否忙碌。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>InstallerClean 無法檢查掃描開始時 Windows Installer 是否忙碌。Windows 傳回了錯誤：{0}（錯誤 {1}）。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>掃描開始時，Windows Installer 有未完成的作業。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。等它結束後，請按「重新掃描」。</value></data>
   <!-- The window's line in the same place, where the system clock went back while the
        scan read the files' times (the wall clock advanced less than a monotonic timer by
        more than a small allowance), so the scan held back every file in the folder no
        record names. "Went back or lost time" covers a clock set back and one slowed
        beyond the allowance. Never shown beside a Summary.ScanSignal.* line above: where a
        signal was set, no file's times are read. -->
-  <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>掃描期間，這台電腦的時鐘倒退或變慢了，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請按「重新掃描」。</value></data>
+  <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>掃描期間，這台電腦的時鐘倒退或變慢了，因此 InstallerClean 無法判斷哪些檔案是剛新增的，於是把所有可能是剛新增的檔案都原樣保留了下來。請按「重新掃描」。</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} 個{2}中的 {0} 個</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1910,16 +1910,16 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        named inside the sentence, so a language that declines the noun after "for"
        declines it here. "Left alone" is worded as in Summary.SourceGivenUp.Drive.
        0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean 已不再等候磁碟機 {0}，並將仍需與它核對的檔案都原樣保留。等它恢復正常回應後，請再執行一次命令。</value></data>
+  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean 已不再等候磁碟機 {0}，因此把需要該磁碟機才能核對的檔案原樣保留了下來。等它恢復正常回應後，請再執行一次命令。</value></data>
   <!-- As Cli.SourceGivenUp.Drive, for a folder that is not on a drive letter, named as
        it is spelled. 0 = a network share such as "\\fileserver\apps", or another path -->
-  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean 已不再等候 {0}，並將仍需與它核對的檔案都原樣保留。等它恢復正常回應後，請再執行一次命令。</value></data>
+  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean 已不再等候 {0}，因此把需要該位置才能核對的檔案原樣保留了下來。等它恢復正常回應後，請再執行一次命令。</value></data>
   <!-- As Cli.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
        Display.ListSeparator, e.g. "drive D:, \\nas\installers". The list stands in
        brackets and carries no "and", as in Summary.SourcesGivenUp. -->
-  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean 已不再等候多個磁碟機或共用資料夾（{0}），並將仍需與其中任何一個核對的檔案都原樣保留。等它們恢復正常回應後，請再執行一次命令。</value></data>
+  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean 已不再等候多個磁碟機或共用資料夾（{0}），因此把需要它們才能核對的檔案原樣保留了下來。等它們恢復正常回應後，請再執行一次命令。</value></data>
   <!-- The outcome entry, Event ID 1000, for a scan that offered nothing, has no other
        withholding to report, and stopped waiting for a drive or share while files still
        had to be checked against it. It is written in place of Cli.EventLogScanNoOrphans,
@@ -2061,23 +2061,23 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        number, in decimal.
 
        Every line speaks of the moment the scan started, in the past tense: the signal
-       may have cleared by the time it is read. "The files ... that no installed
-       program's records name" is what the scan holds back, every one of them, and it
-       leaves out the superseded patches still listed, which a record names.
+       may have cleared by the time it is read. "Every file that could have just been added" is every file
+       in the folder no record names, which is what the scan leaves alone, and it leaves out
+       the superseded patches still listed as safe to delete, which a record names.
        Other: Windows Installer's in-progress file was there, or a reason with no line of
        its own, which reads true of the whole family. -->
-  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>掃描開始時，有程式正在使用 Windows Installer，例如 Windows Update 或正在安裝的程式，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。等它結束後，請再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>掃描開始時，這台電腦上有一筆 Windows Installer 交易已暫停，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請繼續或復原那次安裝，或重新啟動 Windows，然後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>掃描開始時，Windows 已排定在下次重新啟動時重新命名一個檔案，這會影響 {InstallerFolder}，因此 InstallerClean 把該資料夾中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>掃描開始時，有一項檔案作業已排定在下次重新啟動時執行，而 InstallerClean 無法得知它涉及哪些檔案，因此把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>掃描開始時，Windows 拒絕讓 InstallerClean 檢查 Windows Installer 是否忙碌，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>掃描開始時，InstallerClean 無法讀取它會檢查的一項 Windows 設定，因此無法判斷是否有安裝程式作業正在執行或正在等候重新啟動，於是把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>掃描開始時，InstallerClean 無法檢查 Windows Installer 是否忙碌，因此把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>掃描開始時，InstallerClean 無法檢查 Windows Installer 是否忙碌，因為 Windows 傳回了錯誤：{0}（錯誤 {1}）。因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請重新啟動 Windows 後再執行一次命令。</value></data>
-  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>掃描開始時，Windows Installer 有作業正在進行或等候中，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。等它結束後，請再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>掃描開始時，有程式正在使用 Windows Installer，例如 Windows Update 或某個正在安裝或解除安裝的程式。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。等它結束後，請再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>掃描開始時，Windows Installer 有一項先前的工作已暫停，尚未完成。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請完成或復原那次安裝，或重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows 有一項對 {InstallerFolder} 的變更正在等候下次重新啟動。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows 有一項檔案變更正在等候下次重新啟動，而 InstallerClean 無法得知它會影響哪些檔案。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>Windows 拒絕讓 InstallerClean 檢查掃描開始時 Windows Installer 是否忙碌。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>InstallerClean 無法讀取它會檢查的一項 Windows 設定，因此無法判斷掃描開始時 Windows Installer 是否忙碌，或是否有等候重新啟動的工作。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>InstallerClean 無法檢查掃描開始時 Windows Installer 是否忙碌。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>InstallerClean 無法檢查掃描開始時 Windows Installer 是否忙碌。Windows 傳回了錯誤：{0}（錯誤 {1}）。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。請重新啟動 Windows，然後再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>掃描開始時，Windows Installer 有未完成的作業。安裝剛剛新增的檔案看起來像不需要的檔案，因此 InstallerClean 把所有可能是剛新增的檔案都原樣保留了下來。等它結束後，請再執行一次命令。</value></data>
   <!-- The command line's form of Summary.ScanSignal.ClockSetBack, printed where a
        Cli.ScanSignal.* line would be, ending with running it again. -->
-  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>掃描期間，這台電腦的時鐘倒退或變慢了，因此 InstallerClean 把 {InstallerFolder} 中任何已安裝程式的記錄都沒有提到的檔案原樣保留了下來。請再執行一次命令。</value></data>
+  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>掃描期間，這台電腦的時鐘倒退或變慢了，因此 InstallerClean 無法判斷哪些檔案是剛新增的，於是把所有可能是剛新增的檔案都原樣保留了下來。請再執行一次命令。</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
        string rather than a shared one because this whole family is: all five
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after

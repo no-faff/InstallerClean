@@ -447,8 +447,8 @@ public class MainViewModelTests : IDisposable
     }
 
     private const string DriveDLine =
-        "InstallerClean carried on without drive D: and left alone any file still to be checked against it. "
-        + "Once it's responding normally, Re-scan.";
+        "InstallerClean stopped waiting for drive D:, so it left alone the files it needed that drive to check. "
+        + "Re-scan once it's responding normally.";
 
     [Fact]
     public async Task Files_kept_for_an_installed_program_at_a_drive_given_up_get_the_screen_naming_the_drive()
@@ -539,8 +539,8 @@ public class MainViewModelTests : IDisposable
 
         Assert.False(vm.Completion.IsComplete);
         Assert.Equal(
-            @"InstallerClean carried on without \\nas\installers and left alone any file still to be checked against it. "
-            + "Once it's responding normally, Re-scan.",
+            @"InstallerClean stopped waiting for \\nas\installers, so it left alone the files it needed that location to check. "
+            + "Re-scan once it's responding normally.",
             vm.Scan.SourcesGivenUpText);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);

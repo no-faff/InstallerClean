@@ -423,7 +423,7 @@ public class DisplayHelpersTests
 
         Assert.Equal(
             "Waiting for drive D: to respond... Press Alt+W to carry on without it. "
-            + "Any file still to be checked against it will be left alone.",
+            + "Any file InstallerClean still needs it to check will be left alone.",
             DisplayHelpers.WaitingLineWithStopKey(DisplayHelpers.WaitingFor("D:")));
     }
 
