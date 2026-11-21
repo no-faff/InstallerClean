@@ -195,7 +195,7 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Qualquer arquivo desnecessário abaixo pode ser excluído com segurança.`,
-  'Body.MainExplanation.Why': `Eles ficam em {InstallerFolder}. O InstallerClean pergunta ao Windows sobre cada programa instalado: um arquivo entra na lista quando nenhum programa o reivindica ({0}), ou quando um patch mais novo o substituiu e nenhum programa poderia voltar a ele ({1}).`,
+  'Body.MainExplanation.Why': `Eles ficam em {InstallerFolder}. O InstallerClean pergunta ao Windows sobre cada programa instalado: um arquivo entra na lista dos que podem ser excluídos com segurança quando nenhum programa o reivindica ({0}), ou quando um patch mais novo o substituiu e nenhum programa poderia voltar a ele ({1}).`,
   'Body.MainExplanation.Action': `Mova-os para uma pasta de backup que você escolher e depois exclua essa pasta quando estiver convencido de que seus programas ainda atualizam e desinstalam normalmente. Colocá-los de volta em {InstallerFolder} restaura tudo. Ou exclua-os permanentemente agora.`,
   'Body.PendingReboot.MsiExecuteMutex': `Algo está usando o Windows Installer neste momento, como o Windows Update ou um programa sendo instalado ou removido. Mover e Excluir ficam pausados enquanto isso acontece, para que o InstallerClean não toque em {InstallerFolder} até isso terminar. Depois, clique em Reanalisar e eles voltam.`,
   'Body.PendingReboot.MsiExecuteMutexAccessRefused': `O Windows negou ao InstallerClean permissão para verificar se o Windows Installer está ocupado, então Mover e Excluir ficam pausados e o InstallerClean não vai tocar em {InstallerFolder}. Reinicie o Windows e use Reanalisar. Se o Windows continuar negando, este não é um computador que o InstallerClean possa limpar.`,

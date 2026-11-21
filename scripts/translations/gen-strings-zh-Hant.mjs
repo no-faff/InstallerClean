@@ -172,7 +172,7 @@ const MAP = {
   'Tooltip.Delete': `永久刪除不需要的檔案。如果您想先確認一切正常，請改用移動。`,
   'Tooltip.SigningCertificate': `來自內嵌 Authenticode 憑證的主體名稱。未驗證憑證鏈。`,
   'Body.MainExplanation.Lead': `下列不需要的檔案都可以安全刪除。`,
-  'Body.MainExplanation.Why': `它們位於 {InstallerFolder}。InstallerClean 會就每個已安裝的程式詢問 Windows：沒有任何程式認領的檔案會列出（{0}），已被較新的修補程式取代、且沒有任何程式能復原到它的檔案也會列出（{1}）。`,
+  'Body.MainExplanation.Why': `它們位於 {InstallerFolder}。InstallerClean 會就每個已安裝的程式詢問 Windows：沒有任何程式認領的檔案會被列為可安全刪除（{0}），已被較新的修補程式取代、且沒有任何程式能復原到它的檔案也會被列為可安全刪除（{1}）。`,
   'Body.MainExplanation.Action': `將它們移到您選擇的備份資料夾，等您確定程式仍能照常更新和解除安裝後，再刪除那個資料夾。把它們放回 {InstallerFolder} 就能恢復原狀。或者現在就永久刪除。`,
   'Body.PendingReboot.MsiExecuteMutex': `目前有程式正在使用 Windows Installer，例如 Windows Update 或某個正在安裝或解除安裝的程式。在這期間移動和刪除會暫停，InstallerClean 在它結束之前不會碰 {InstallerFolder}。之後重新掃描，移動和刪除就會恢復。`,
   'Body.PendingReboot.MsiExecuteMutexAccessRefused': `Windows 拒絕讓 InstallerClean 檢查 Windows Installer 是否忙碌，因此移動和刪除已暫停，InstallerClean 不會碰 {InstallerFolder}。請重新啟動 Windows 並重新掃描。如果 Windows 仍然拒絕，這台電腦就不是 InstallerClean 能清理的。`,

@@ -164,7 +164,7 @@ const MAP = {
   'Tooltip.Delete': `永久删除不需要的文件。如果您想有机会自己确认一切正常，请改用移动。`,
   'Tooltip.SigningCertificate': `来自内嵌 Authenticode 证书的使用者名称。未验证证书链。`,
   'Body.MainExplanation.Lead': `下面这些不需要的文件都可以安全删除。`,
-  'Body.MainExplanation.Why': `它们位于 {InstallerFolder} 中。InstallerClean 会就每个已安装的程序询问 Windows：当没有任何程序认领某个文件时（{0}），或者当更新的补丁已经取代了它、并且没有任何程序能够回退到它时（{1}），该文件才会列出。`,
+  'Body.MainExplanation.Why': `它们位于 {InstallerFolder} 中。InstallerClean 会就每个已安装的程序询问 Windows：当没有任何程序认领某个文件时（{0}），或者当更新的补丁已经取代了它、并且没有任何程序能够回退到它时（{1}），该文件才会被列为可安全删除。`,
   'Body.MainExplanation.Action': `把它们移动到您选择的备份文件夹，等您确信自己的程序仍能照常更新和卸载时，再删除那个文件夹。把它们放回 {InstallerFolder} 就能恢复原状。或者现在就永久删除。`,
   'Body.PendingReboot.MsiExecuteMutex': `此刻有程序正在使用 Windows Installer，比如 Windows 更新，或者某个正在安装或卸载的程序。在此期间，移动和删除会暂停，InstallerClean 在它结束之前不会去碰 {InstallerFolder}。之后重新扫描，两者就会恢复。`,
   'Body.PendingReboot.MsiExecuteMutexAccessRefused': `Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此移动和删除已暂停，InstallerClean 不会去碰 {InstallerFolder}。请重启 Windows 并重新扫描。如果 Windows 仍然拒绝，这台机器就不是 InstallerClean 能清理的。`,

@@ -124,7 +124,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Any unneeded files below are safe to delete. | 下にある不要ファイルはいずれも安全に削除できます。 |
-| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | これらは {InstallerFolder} にあります。InstallerClean はインストール済みのすべてのプログラムについて Windows に問い合わせます。どのプログラムもそのファイルを自分のものだと示さない場合({0})、または新しいパッチが置き換えていてどのプログラムもそこへ戻れない場合({1})に、そのファイルが一覧に載ります。 |
+| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed as safe to delete when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | これらは {InstallerFolder} にあります。InstallerClean はインストール済みのすべてのプログラムについて Windows に問い合わせます。どのプログラムもそのファイルを自分のものだと示さない場合({0})、または新しいパッチが置き換えていてどのプログラムもそこへ戻れない場合({1})に、そのファイルが削除しても安全なファイルとして一覧に載ります。 |
 | Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | 選んだバックアップフォルダーへ移動し、プログラムがこれまでどおり更新およびアンインストールできると納得できたら、そのフォルダーを削除してください。{InstallerFolder} に戻せばすべて元どおりになります。または、今すぐ完全に削除することもできます。 |
 | Nothing scanned yet. | まだ何もスキャンしていません。 |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 「再スキャン」を押すと、{InstallerFolder} を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。 |

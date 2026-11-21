@@ -124,7 +124,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Any unneeded files below are safe to delete. | 下面这些不需要的文件都可以安全删除。 |
-| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | 它们位于 {InstallerFolder} 中。InstallerClean 会就每个已安装的程序询问 Windows：当没有任何程序认领某个文件时（{0}），或者当更新的补丁已经取代了它、并且没有任何程序能够回退到它时（{1}），该文件才会列出。 |
+| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed as safe to delete when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | 它们位于 {InstallerFolder} 中。InstallerClean 会就每个已安装的程序询问 Windows：当没有任何程序认领某个文件时（{0}），或者当更新的补丁已经取代了它、并且没有任何程序能够回退到它时（{1}），该文件才会被列为可安全删除。 |
 | Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | 把它们移动到您选择的备份文件夹，等您确信自己的程序仍能照常更新和卸载时，再删除那个文件夹。把它们放回 {InstallerFolder} 就能恢复原状。或者现在就永久删除。 |
 | Nothing scanned yet. | 尚未扫描。 |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 点击“重新扫描”，在 {InstallerFolder} 中查找没有任何程序仍然需要的安装程序文件。 |

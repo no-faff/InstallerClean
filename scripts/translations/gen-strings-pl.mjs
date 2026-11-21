@@ -225,7 +225,7 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Wszystkie niepotrzebne pliki poniżej można bezpiecznie usunąć.`,
-  'Body.MainExplanation.Why': `Leżą w {InstallerFolder}. InstallerClean pyta system Windows o każdy zainstalowany program: plik trafia na listę, gdy żaden program się do niego nie przyznaje ({0}) albo gdy nowsza poprawka go zastąpiła i żaden program nie mógłby do niego wrócić ({1}).`,
+  'Body.MainExplanation.Why': `Leżą w {InstallerFolder}. InstallerClean pyta system Windows o każdy zainstalowany program: plik trafia na listę plików, które można bezpiecznie usunąć, gdy żaden program się do niego nie przyznaje ({0}) albo gdy nowsza poprawka go zastąpiła i żaden program nie mógłby do niego wrócić ({1}).`,
   'Body.MainExplanation.Action': `Przenieś je do wybranego przez siebie folderu kopii zapasowej, a potem skasuj ten folder, gdy nabierzesz pewności, że twoje programy nadal normalnie się aktualizują i odinstalowują. Przełożenie ich z powrotem do {InstallerFolder} przywraca wszystko. Albo usuń je trwale już teraz.`,
   'Body.PendingReboot.MsiExecuteMutex': `Coś właśnie korzysta z Instalatora Windows, na przykład Windows Update lub program, który jest instalowany albo usuwany. Przenieś i Usuń są wstrzymane, dopóki to trwa, więc InstallerClean nie ruszy {InstallerFolder} do czasu zakończenia. Potem skanuj ponownie, a wrócą.`,
   'Body.PendingReboot.MsiExecuteMutexAccessRefused': `Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc Przenieś i Usuń są wstrzymane, a InstallerClean nie ruszy {InstallerFolder}. Uruchom Windows ponownie i skanuj ponownie. Jeśli Windows nadal odmawia, to nie jest maszyna, którą InstallerClean może wyczyścić.`,

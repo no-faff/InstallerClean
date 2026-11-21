@@ -124,7 +124,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 繁體中文 |
 | --- | --- |
 | Any unneeded files below are safe to delete. | 下列不需要的檔案都可以安全刪除。 |
-| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | 它們位於 {InstallerFolder}。InstallerClean 會就每個已安裝的程式詢問 Windows：沒有任何程式認領的檔案會列出（{0}），已被較新的修補程式取代、且沒有任何程式能復原到它的檔案也會列出（{1}）。 |
+| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed as safe to delete when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | 它們位於 {InstallerFolder}。InstallerClean 會就每個已安裝的程式詢問 Windows：沒有任何程式認領的檔案會被列為可安全刪除（{0}），已被較新的修補程式取代、且沒有任何程式能復原到它的檔案也會被列為可安全刪除（{1}）。 |
 | Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | 將它們移到您選擇的備份資料夾，等您確定程式仍能照常更新和解除安裝後，再刪除那個資料夾。把它們放回 {InstallerFolder} 就能恢復原狀。或者現在就永久刪除。 |
 | Nothing scanned yet. | 尚未掃描。 |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 按下「重新掃描」，在 {InstallerFolder} 中尋找已沒有任何程式需要的安裝程式檔案。 |

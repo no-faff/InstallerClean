@@ -187,7 +187,7 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Mọi tệp không cần thiết bên dưới đều có thể xóa an toàn.`,
-  'Body.MainExplanation.Why': `Chúng nằm trong {InstallerFolder}. InstallerClean hỏi Windows về từng chương trình đã cài: một tệp được liệt kê khi không chương trình nào nhận nó ({0}), hoặc khi một bản vá mới hơn đã thay thế nó và không chương trình nào có thể quay lại dùng nó ({1}).`,
+  'Body.MainExplanation.Why': `Chúng nằm trong {InstallerFolder}. InstallerClean hỏi Windows về từng chương trình đã cài: một tệp được liệt kê là có thể xóa an toàn khi không chương trình nào nhận nó ({0}), hoặc khi một bản vá mới hơn đã thay thế nó và không chương trình nào có thể quay lại dùng nó ({1}).`,
   'Body.MainExplanation.Action': `Hãy chuyển chúng vào một thư mục sao lưu do bạn chọn, rồi xóa thư mục đó khi bạn đã yên tâm rằng các chương trình của mình vẫn cập nhật và gỡ cài đặt bình thường. Đưa chúng trở lại {InstallerFolder} sẽ khôi phục mọi thứ. Hoặc xóa vĩnh viễn ngay bây giờ.`,
   'Body.PendingReboot.MsiExecuteMutex': `Có thứ gì đó đang dùng Windows Installer ngay lúc này, chẳng hạn Windows Update hoặc một chương trình đang được cài đặt hoặc gỡ bỏ. Chuyển và Xóa tạm dừng trong lúc đó, nên InstallerClean sẽ không đụng vào {InstallerFolder} cho đến khi việc đó xong. Sau đó, hãy nhấn Quét lại và hai nút sẽ trở lại.`,
   'Body.PendingReboot.MsiExecuteMutexAccessRefused': `Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên Chuyển và Xóa tạm dừng và InstallerClean sẽ không đụng vào {InstallerFolder}. Hãy khởi động lại Windows rồi quét lại. Nếu Windows vẫn từ chối thì đây không phải máy mà InstallerClean có thể dọn.`,
