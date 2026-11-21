@@ -5595,16 +5595,17 @@ public class DeclaredProductCheckTests
 
     // ---- A copy carrying the package code an ordinary installation records ----
     //
-    // An installation whose cached package does not say what it declares, and whose own
-    // record shows an ordinary installation, can be one made from a copy in the Installer
-    // folder through a transform that gave it a new product code, so no declared code ties it
-    // to that copy. The package code it records does: a repair needs a package carrying it. A
-    // copy the rest of the check would let through is put to those package codes, and is kept
-    // where it carries one or where its own package code does not read. Each test below starts
-    // from the second copy's fixture with its cached package broken as the fault says and its
-    // record answering as an ordinary installation, recording
-    // <see cref="OrdinaryRecordedPackageCode"/> in the API and in its product key (the fake
-    // mirrors the one in the other), and the candidate carrying whatever the test scripts.
+    // An installation whose cached package does not say what it declares, and whose own record
+    // shows an ordinary installation, can be one made from a copy in the Installer folder
+    // through a transform that gave it a new product code, so no declared code ties it to that
+    // copy. The package code it records does: a repair needs a package carrying it. A copy the
+    // rest of the check would let through is put to those package codes, and is kept where it
+    // carries one or where its own package code does not read. Most tests below start from
+    // AnOrdinaryInstallationWhoseCachedPackageDoesNotRead: the second copy's fixture with its
+    // cached package broken as the fault says and its record answering as an ordinary
+    // installation, recording <see cref="OrdinaryRecordedPackageCode"/> in the API and in its
+    // product key (the fake mirrors the one in the other), and the candidate carrying whatever
+    // the test scripts.
 
     /// <summary>The package code <see cref="ScriptedMsiProducts.AnswersItsOwnRecord"/> scripts.</summary>
     private const string OrdinaryRecordedPackageCode = "{55555555-5555-5555-5555-555555555555}";
@@ -6022,7 +6023,7 @@ public class DeclaredProductCheckTests
     public void No_candidates_package_code_is_read_where_a_record_does_not_show_an_ordinary_installation()
     {
         // The record shows a second instance, so nothing is taken from it, and every
-        // installation package is kept as it was before the package code was asked.
+        // installation package is kept without the package code being asked.
         var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, MsiInstallContext.Machine);
         f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine, instanceType: "1");
 
@@ -6069,8 +6070,8 @@ public class DeclaredProductCheckTests
     [InlineData(MsiInstallContext.UserManaged)]
     public void Another_accounts_per_user_installation_adds_no_package_code_to_put_a_copy_to(MsiInstallContext context)
     {
-        // Its record is not read, being another account's, so it is judged as it was before: it
-        // keeps every installation package, and neither its package code nor any copy's is read.
+        // Its record is not read, being another account's, so it keeps every installation
+        // package, and neither its package code nor any copy's is read.
         var f = AnOrdinaryInstallationWhoseCachedPackageDoesNotRead(CachedPackageFault.ReadFails, context);
         f.Packages.CarriesPackageCode(Candidate, OrdinaryRecordedPackageCode);
 

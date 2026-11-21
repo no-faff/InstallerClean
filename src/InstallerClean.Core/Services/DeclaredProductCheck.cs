@@ -33,21 +33,24 @@ namespace InstallerClean.Services;
 /// and has no source list, by the API's answer and in the registry, and its
 /// <c>InstallProperties</c> key, where it has one, records no cached package and no folder it was
 /// installed from that could be the Installer folder, so that Windows Installer has no package to
-/// open for it. An installation that records no cached package and has a package to open is judged
-/// by its sources, and every candidate is compared with the packages they name where its
+/// open for it. An ordinary one is linked by the package code its record holds instead: a candidate
+/// carrying that code is kept, and where the API or the product key gives no package code, its
+/// sources are read, and where they cannot be ruled out either, every candidate installation
+/// package is kept. An installation that records no cached package and has a package to open is
+/// judged by its sources, and every candidate is compared with the packages they name where its
 /// <c>InstallProperties</c> key records no cached package either and they can all be seen. An
 /// installation whose recorded cached package names nothing is judged by its sources as well, and a
 /// candidate carrying the package code it records, read through the API and from the registry
 /// alike, is kept as that missing package, as is one whose own package code does not read, unless
-/// its summary information opens and holds no Revision Number. For each
-/// candidate patch it reads the patch's own code and the products its Template names, finds the
-/// registrations of that patch through the machine-wide patch enumeration and the keyed patch read,
-/// and reads the <c>LocalPackage</c> each registration records. A product's source list in another
-/// account's per-user-unmanaged context is not read, and an installation in one keeps the file; one
-/// in the account this process runs as is read like any other. Every source list it does read is
-/// read twice, through the API and from the registry key that holds it, and a list the two do not
-/// agree on keeps the file. Every <c>InstallSource</c> it reads is read the same two ways, and one
-/// the two do not agree on keeps the file too. A file all of that would let through is put to the
+/// its summary information opens and holds no Revision Number. For each candidate patch it reads
+/// the patch's own code and the products its Template names, finds the registrations of that patch
+/// through the machine-wide patch enumeration and the keyed patch read, and reads the
+/// <c>LocalPackage</c> each registration records. A product's source list in another account's
+/// per-user-unmanaged context is not read, and an installation in one keeps the file; one in the
+/// account this process runs as is read like any other. Every source list it does read is read
+/// twice, through the API and from the registry key that holds it, and a list the two do not agree
+/// on keeps the file. Every <c>InstallSource</c> it reads is read the same two ways, and one the
+/// two do not agree on keeps the file too. A file all of that would let through is put to the
 /// product keys no installation accounts for (<see cref="PutToUnlistedKeys"/>), whose sources are
 /// read from the registry alone.
 ///
@@ -337,21 +340,23 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// copy opens.
     ///
     /// A SECOND COPY OPENS PACKAGES THAT DECLARE NO PARTICULAR CODE. A program installed
-    /// under an instance transform is registered under the code the transform produced,
-    /// and the package it was installed from, and the package cached for it, need not
-    /// declare that code or any code the check can link it by. So the candidate is
-    /// compared by file identity with every package such an installation opens, its
-    /// cached package and the packages its sources name, whatever each declares, and with
-    /// the packages the sources name of an installation recording no cached package whose
-    /// record does not show an ordinary installation. A candidate that opens as one of them
-    /// is kept as <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>, and a
-    /// candidate shown to be a different file from all of them is given the answer it
-    /// already had. Where those packages cannot all be seen
-    /// (<see cref="PackagesSecondCopiesOpen"/>), or an installation's cached package does
-    /// not say what it declares and its own record does not show an ordinary installation
-    /// nor that it opens no package, nor, where it records none, that its
-    /// <c>InstallProperties</c> key records none as well and every package its sources name
-    /// can be seen (<see cref="LinksOf"/>), every candidate the answer lets through is
+    /// under an instance transform is registered under the code the transform produced, and
+    /// the package it was installed from, and the package cached for it, need not declare
+    /// that code or any code the check can link it by. So the candidate is compared by file
+    /// identity with every package such an installation opens, its cached package and the
+    /// packages its sources name, whatever each declares, and with the packages the sources
+    /// name of an installation recording no cached package whose record does not show an
+    /// ordinary installation, or of an ordinary one whose recorded package code does not
+    /// read as a GUID both ways. A candidate that opens as one of them is kept as
+    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>, and a candidate shown
+    /// to be a different file from all of them is given the answer it already had. Where
+    /// those packages cannot all be seen (<see cref="PackagesSecondCopiesOpen"/>), or an
+    /// installation's cached package does not say what it declares and its own record does
+    /// not show an ordinary installation nor that it opens no package, nor, where it
+    /// records none, that its <c>InstallProperties</c> key records none as well and every
+    /// package its sources name can be seen, or an ordinary one's recorded package code does
+    /// not read as a GUID both ways and its sources cannot be ruled out
+    /// (<see cref="LinksOf"/>), every candidate the answer lets through is
     /// <see cref="DeclaredProductOutcome.SecondCopyUnestablished"/>.
     ///
     /// A CANDIDATE THAT IS, OR COULD BE, A MISSING PACKAGE IS KEPT FIRST. Where an
@@ -623,15 +628,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// The identity of every package opened by an installation the caller listed and
-    /// could not rule out as a second copy of a program
+    /// The identity of every package opened by an installation the caller listed and could not
+    /// rule out as a second copy of a program
     /// (<see cref="ListedInstallation.SecondCopyNotRuledOut"/>): the cached package each
-    /// records, and the original package at each folder its sources name, a package
-    /// compared by name being left for each candidate whose name it could be
-    /// (<see cref="OpenedPackages.ByName"/>); with them, the packages the sources name of
-    /// each installation recording no cached package whose record does not show an ordinary
-    /// installation, read for the pass's links (<see cref="InstallationLinks.Opened"/>). Those
-    /// alone where no such installation is listed, and null where any package read here
+    /// records, and the original package at each folder its sources name, a package compared by
+    /// name being left for each candidate whose name it could be
+    /// (<see cref="OpenedPackages.ByName"/>); with them, the packages the sources name of each
+    /// installation recording no cached package whose record does not show an ordinary
+    /// installation, and of each ordinary one whose recorded package code does not read as a
+    /// GUID both ways, read for the pass's links (<see cref="InstallationLinks.Opened"/>).
+    /// Those alone where no such installation is listed, and null where any package read here
     /// cannot be seen. Read once per pass, the first time a candidate the answer lets through
     /// is put to them, and kept for every candidate after it.
     ///
@@ -1148,7 +1154,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// AN ANSWER FINDING A PACKAGE TO OPEN STANDS FOR THE PASS, AND ONE FINDING NONE IS ASKED AGAIN
     /// AT THE NEXT CALL (<see cref="PassAnswers.OpensNoPackageOf"/>), the folder's own answer being
-    /// taken from the pass. Once any of the three steps finds a package to open for an
+    /// taken from the pass. Once any step finds a package to open for an
     /// installation, whatever the case of the code's letters, every later step of the pass takes
     /// that answer, and the root it names, without asking. <see cref="LinksOf"/> and
     /// <see cref="PackagesSecondCopiesOpen"/> each reach their conclusion once in a pass, and
@@ -2226,10 +2232,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// PER-USER INSTALLATION OF THE SAME CODE, where it has one, read once the per-machine list
     /// is seen (<see cref="AddSystemsOwnPerUserSources"/>).
     ///
-    /// THE RUNNING ACCOUNT'S OWN PER-USER-UNMANAGED LIST IS COUNTED FOR THE PASS once it is
-    /// read, by whether every package it names was read or left to be compared by name
-    /// (<see cref="PassAnswers.OwnPerUserListRead"/>). A list stopped by the gates before the
-    /// read is not counted.
+    /// THE RUNNING ACCOUNT'S OWN PER-USER-UNMANAGED LIST IS COUNTED FOR THE PASS once its read
+    /// is made, by whether every package it names was read or left to be compared by name, a
+    /// list whose read failed counted as kept (<see cref="PassAnswers.OwnPerUserListRead"/>). A
+    /// list stopped by the gates before the read is not counted.
     ///
     /// FALSE, WHICH KEEPS THE FILE, for: no way to compare against the Installer folder
     /// or to read the registry; where <paramref name="noneRecorded"/> says the installation's
@@ -3163,7 +3169,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// A WALK THAT AN ERROR STOPS IS MADE AGAIN FROM THE FIRST INDEX
     /// (<see cref="WalkRestarts.KeyedWalk"/>), and the first walk that reaches the end is
-    /// the list. Null, which keeps the file, is the answer only where none of them does.
+    /// the list. A walk that ends without an error and short of the end
+    /// (<see cref="WalkSources"/>) is taken as it is, a second walk meeting the same entry.
+    /// Null, which keeps the file, is the answer wherever the walk taken did not reach the end.
     /// A list that no walk read is walked once each time the pass asks for it again.
     /// </summary>
     private IReadOnlyList<string>? SourcesOf(
@@ -4930,7 +4938,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </param>
     /// <param name="Opened">
     /// The packages the sources of each installation recording no cached package name, where
-    /// its record does not show an ordinary installation and every one of them was seen, which
+    /// its record does not show an ordinary installation, or of an ordinary one whose recorded
+    /// package code does not read as a GUID both ways, and every one of them was seen, which
     /// every candidate the answer would let through is compared with.
     /// </param>
     /// <param name="GivenUp">

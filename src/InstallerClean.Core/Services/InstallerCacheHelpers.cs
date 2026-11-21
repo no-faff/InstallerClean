@@ -391,9 +391,8 @@ internal static class InstallerCacheHelpers
     /// <summary>
     /// The containment comparison itself, over an ALREADY-resolved input, and the
     /// exact counterpart of <see cref="ResolvesInsideInstallerFolder"/> on the other
-    /// forbidden set. Split out for the same reason that one was: a caller that has
-    /// already resolved a path and is about to act on THAT value needs to ask the
-    /// question of the value rather than of the path, or it is answering about a
+    /// forbidden set. A caller that has already resolved a path and is about to act on
+    /// THAT value needs to ask the question of the value rather than of the path, or it is answering about a
     /// resolution it is not using.
     ///
     /// SHAPED TO MATCH ITS SIBLING RATHER THAN TO ITS OWN CONVENIENCE. Same
@@ -505,9 +504,9 @@ internal static class InstallerCacheHelpers
     /// <summary>
     /// <see cref="ResolveFinalPathOutcome(string, out string)"/> with the handle open and
     /// the final-name read made through <paramref name="kernel"/>. The two-argument form
-    /// is its only caller in the app, and passes
-    /// <see cref="Win32FinalPathKernel.Instance"/>, which makes the <c>CreateFile</c> and
-    /// <c>GetFinalPathNameByHandle</c> calls.
+    /// passes <see cref="Win32FinalPathKernel.Instance"/>, which makes the <c>CreateFile</c>
+    /// and <c>GetFinalPathNameByHandle</c> calls; <see cref="LocalPathThroughThisPCsVolumes"/>
+    /// passes a kernel of its own.
     /// </summary>
     internal static PathResolution ResolveFinalPathOutcome(
         string path, out string resolved, IFinalPathKernel kernel)

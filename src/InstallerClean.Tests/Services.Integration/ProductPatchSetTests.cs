@@ -373,8 +373,8 @@ public class ProductPatchSetTests
     }
 
     /// <summary>
-    /// Both patches declare a zero, and both are read as zero. A patch whose value is
-    /// stored as text is listed and not read as zero.
+    /// One patch's Uninstallable is a DWORD zero, and it is read as zero. The other's is
+    /// the text "0": that patch is listed and not read as zero.
     /// </summary>
     [Fact]
     public void A_patch_is_read_as_zero_only_where_its_value_is_a_DWORD_zero()

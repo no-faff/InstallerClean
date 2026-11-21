@@ -45,19 +45,16 @@ public interface IMoveFilesService
     /// re-read, which is the ordinary case: a true orphan carries no claim, and a
     /// caller that has none passes <see cref="UnderLeaseClaims.None"/>.
     ///
-    /// REQUIRED, AND ITS POSITION FOLLOWS FROM THAT RATHER THAN BEING A CHOICE.
-    /// It was optional and last, and an omitted argument became
+    /// REQUIRED. Made optional, an omitted argument would be
     /// <see cref="UnderLeaseClaims.None"/>, which the re-read answers at its first
-    /// line. So the last check standing in front of the act passed without asking
+    /// line, so the last check standing in front of the act would pass without asking
     /// anything, and nothing could say so: the files go either way, and the only
-    /// difference is whether a verdict that moved under the lease was looked for.
-    /// A required parameter cannot follow optional ones, so removing the omission
-    /// moved this in among the parameters that say what the batch is, which is
-    /// where it belongs by meaning. Passing <see cref="UnderLeaseClaims.None"/> is the statement
-    /// that there are none, and that is a different act from forgetting to look.
-    /// A <c>default</c> value is not a substitute for it: the two lists are then
-    /// null rather than empty and the re-read throws on the first of them, which
-    /// is loud and is meant to be.
+    /// difference is whether a verdict that moved under the lease was looked for. It
+    /// sits among the parameters that say what the batch is. Passing
+    /// <see cref="UnderLeaseClaims.None"/> is the statement that there are none, and
+    /// that is a different act from forgetting to look. A <c>default</c> value is not a
+    /// substitute for it: the two lists are then null rather than empty and the re-read
+    /// throws on the first of them, which is loud and is meant to be.
     /// </param>
     /// <param name="mayAct">
     /// Asked with each file's path before that file's progress report, and again before each
@@ -113,17 +110,17 @@ public interface IMoveFilesService
 /// </param>
 /// <param name="InstallerLockAccessRefused">
 /// The batch was refused before it started because the security on
-/// <c>Global\_MSIExecute</c> refused this process the rights to open it, so
-/// whether a transaction held it was never sampled: nothing was touched, and the
-/// service returns at the same point as <see cref="InstallerLockUnavailable"/>.
-/// Kept apart from that flag because the two are different facts about the
-/// machine and the user is told them in different words. This one is a setting on
-/// the object rather than a condition that arose while asking, so a sentence
-/// telling the user something was holding the lock would be false of it. The
-/// pending-reboot gate meets the same refusal as
-/// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/>, its probe asking
-/// for the same rights, so to a caller that runs the gate first, as both hosts do,
-/// this flag means a refusal that began after the gate ran.
+/// <c>Global\_MSIExecute</c> refused this process the rights to open it, so whether a
+/// transaction held it was never sampled: nothing was touched, and the service returns
+/// at the same point as <see cref="InstallerLockUnavailable"/>. Kept apart from that
+/// flag because the two are different facts about the machine and the user is told them
+/// in different words. This one is a setting on the object rather than a condition that
+/// arose while asking, so a sentence telling the user something was holding the lock
+/// would be false of it. The pending-reboot gate meets the same refusal as
+/// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/>, its probe asking for
+/// the rights the acquire falls back to where full access is refused, so to a caller
+/// that runs the gate first, as both hosts do, this flag means a refusal that began
+/// after the gate ran.
 /// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,

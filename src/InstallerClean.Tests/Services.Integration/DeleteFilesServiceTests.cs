@@ -14,9 +14,6 @@ namespace InstallerClean.Tests.Services.Integration;
 /// refusal needs a real symlink, and the containment guard needs a real path
 /// to resolve. The unit suite under InstallerClean.Tests.Services covers the
 /// outcome mapping against a mock.
-///
-/// These run on Windows only; the Linux pre-commit run filters the Integration
-/// namespace out.
 /// </summary>
 public class DeleteFilesServiceTests : IDisposable
 {
@@ -215,8 +212,9 @@ public class DeleteFilesServiceTests : IDisposable
     [Fact]
     public async Task DeleteFilesAsync_deletes_a_read_only_file_where_the_host_answers_yes_before_the_retry()
     {
-        // The host is asked before the first delete, before the attribute is cleared and
-        // before the retried delete, and a yes to each lets the clear and the retry happen.
+        // The host is asked before the file's progress report, before the first delete and
+        // once before the attribute is cleared and the delete retried, and a yes to each lets
+        // the clear and the retry happen.
         var file = Path.Combine(_tempDir, "readonly-allowed.msi");
         await File.WriteAllTextAsync(file, "content");
         File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.ReadOnly);

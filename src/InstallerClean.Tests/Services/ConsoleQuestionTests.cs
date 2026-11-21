@@ -4,8 +4,9 @@ namespace InstallerClean.Tests.Services;
 
 /// <summary>
 /// <see cref="ConsoleQuestion.Ask"/> reads an answer as starting with this language's yes or
-/// no letter as .NET 10 matches it in the user's culture, through the ICU Windows ships. The
-/// suite runs in English, whose letters are y and n.
+/// no letter as .NET 10 matches it in the user's culture, through the ICU collator Windows
+/// ships where it has one and NLS where it does not. The suite runs in English, whose letters
+/// are y and n.
 /// </summary>
 public class ConsoleQuestionTests
 {
@@ -35,7 +36,7 @@ public class ConsoleQuestionTests
     [InlineData(null)]
     public void A_Ctrl_C_whose_handler_runs_after_the_read_has_ended_never_answers_yes(string? line)
     {
-        // The read ends first, with Enter, a typed yes or no line, and the Ctrl+C handler
+        // The read ends first, with Enter, a typed yes or the end of input, and the Ctrl+C handler
         // cancels the token a moment later, as Windows runs it on a thread of its own.
         using var cancel = new CancellationTokenSource();
         var console = new Ending(line, () => cancel.CancelAfter(TimeSpan.FromMilliseconds(50)));

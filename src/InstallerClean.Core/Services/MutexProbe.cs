@@ -111,9 +111,10 @@ internal sealed class MutexProbe : IMutexProbe
             // so in their own words rather than telling the user the lock was
             // busy.
             //
-            // Sample opens with the same rights this constructor asks for, so a
-            // refusal already standing when the pending-reboot gate runs stops the
-            // run there, and this arm meets only one that began after it.
+            // Sample opens with SYNCHRONIZE and MUTEX_MODIFY_STATE, the rights this
+            // constructor asks for where full access is refused, so a refusal already
+            // standing when the pending-reboot gate runs stops the run there, and this
+            // arm meets only one that began after it.
             //
             // Both callers refuse on it. A file this app has moved out of the cache
             // is as absent from it as one this app has deleted, so an installer

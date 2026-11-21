@@ -460,43 +460,46 @@ public enum DeclaredProductOutcome
     /// an account other than the one this check runs as, where the installation's package code
     /// does not read through the API and from the registry alike, where this file carries that
     /// package code or its own does not read, unless it has no Revision Number, and otherwise
-    /// through the installation's sources, below. An empty value is covered where the installation's <c>InstallProperties</c> key
-    /// holds a cached package or will not read, and otherwise through its sources, below; it is
-    /// not covered at all for an installation that has no source list and no
-    /// <c>InstallProperties</c> key recording a cached package or a folder it was installed
-    /// from that could be the Installer folder. It covers a source list or package name that
-    /// will not read, a source whose package is this file, will not identify while not shown to
-    /// be on another volume than the Installer folder, or does not answer within the check's
-    /// time limit, a source on a drive or share the check has stopped reading for the pass (a
-    /// read there did not answer within that limit or failed only after a long wait, the reads
-    /// that failed there took more time between them than the check allows, or all the reads
-    /// there took more time between them than the check allows one drive or share, whatever
-    /// each answered), a source not on a local drive that is the Installer folder itself or
-    /// cannot be resolved, and an installation in the per-user-unmanaged context of an account
-    /// other than the one this check runs as, whose source list is not read. It covers a source
-    /// list holding a URL other than an http or https address, an entry naming an environment
-    /// variable or starting neither with a drive letter, a ':' and a '\' nor with two '\', a
-    /// media package path while Windows is set to follow a symbolic link reached through a
-    /// network path, or a package name naming a folder, a drive, a stream or a variable, or
-    /// holding a null, one whose source used last is neither a network or media source nor an
-    /// http or https address, and one whose registry key does not hold what the API returned
-    /// for it, package name included, or holds that name as anything but a REG_SZ. It covers an
-    /// <c>InstallSource</c> whose package is this file, will not identify while not shown to be
-    /// on another volume than the Installer folder, or does not answer within the time limit,
-    /// one on a drive or share the check has stopped reading, one not on a local drive that is
-    /// the Installer folder itself, and one that will not read, that the registry holds
-    /// otherwise than the API answers it or as anything but a REG_SZ, or that, being no http or
-    /// https address, names an environment variable or starts neither with a drive letter, a
-    /// ':' and a '\' nor with two '\'. A source or an <c>InstallSource</c> in a folder on the
-    /// network, under a drive letter at which Windows reports no drive to this check or on an
-    /// optical or removable drive that answers that it is not ready or has no media in it, and
-    /// the package the media search looks for, cover this only where the package name could be
-    /// this file's name or short name, or where Windows is set to follow a symbolic link
-    /// reached through a network path to this PC or to another network path. In each of them
-    /// this file is, or could be, the package that installation opens. A check constructed
-    /// without its two file readers or its registry reader, or screening without the Installer
-    /// folder to compare against, answers this for every installed product, having no way to
-    /// look.
+    /// through the installation's sources, below. An empty value is covered where the
+    /// installation's <c>InstallProperties</c> key holds a cached package or will not read, and
+    /// otherwise through its sources, below; it is not covered at all for an installation that
+    /// has no source list and no <c>InstallProperties</c> key recording a cached package or a
+    /// folder it was installed from that could be the Installer folder. It covers a source list
+    /// or package name that will not read, a source whose package is this file, will not
+    /// identify while not shown to be on another volume than the Installer folder, or does not
+    /// answer within the check's time limit, a source on a drive or share the check has stopped
+    /// reading for the pass (a read there did not answer within that limit or failed only after
+    /// a long wait, the reads that failed there took more time between them than the check
+    /// allows, or all the reads there took more time between them than the check allows one
+    /// drive or share, whatever each answered), a source not on a local drive that is the
+    /// Installer folder itself or cannot be resolved, and an installation in the
+    /// per-user-unmanaged context of an account other than the one this check runs as, whose
+    /// source list is not read. It covers a source list holding a URL other than an http or
+    /// https address, an entry naming an environment variable or starting neither with a drive
+    /// letter, a ':' and a '\' nor with two '\', a media package path while Windows is set to
+    /// follow a symbolic link reached through a network path, or a package name naming a
+    /// folder, a drive, a stream or a variable, or holding a null, one whose source used last
+    /// is neither a network or media source nor an http or https address, and one whose
+    /// registry key does not hold what the API returned for it, package name included, or holds
+    /// that name as anything but a REG_SZ. It covers an <c>InstallSource</c> whose package is
+    /// this file, will not identify while not shown to be on another volume than the Installer
+    /// folder, or does not answer within the time limit, one on a drive or share the check has
+    /// stopped reading, one not on a local drive that is the Installer folder itself, and one
+    /// that will not read, that the registry holds otherwise than the API answers it or as
+    /// anything but a REG_SZ, or that, being no http or https address, names an environment
+    /// variable or starts neither with a drive letter, a ':' and a '\' nor with two '\'. A
+    /// source or an <c>InstallSource</c> in a folder on the network, under a drive letter at
+    /// which Windows reports no drive to this check or on an optical or removable drive that
+    /// answers that it is not ready or has no media in it, and the package the media search
+    /// looks for, cover this only where the package name could be this file's name or short
+    /// name, or where Windows is set to follow a symbolic link reached through a network path
+    /// to this PC or to another network path. In each of them this file is, or could be, the
+    /// package that installation opens. For an ordinary installation whose cached package does
+    /// not say which product it declares, it covers this file carrying the package code the
+    /// installation's record holds, or its own package code not reading, unless it has no
+    /// Revision Number. A check constructed without its two file readers or its registry reader, or
+    /// screening without the Installer folder to compare against, answers this for every
+    /// installed product, having no way to look.
     ///
     /// Where every package was seen and this file's own identity does not read, the
     /// answer is <see cref="CandidateIdentityUnestablished"/> instead.
@@ -671,13 +674,15 @@ public enum DeclaredProductOutcome
     /// <summary>
     /// The answer about the product this installation package declares would let it
     /// through, and either an installation the caller could not rule out as a second copy
-    /// of a program opens packages the check could not all see, or an installation's
-    /// cached package does not say which product it declares, its own record does not
-    /// show it to be an ordinary installation, and it is not shown to record no cached
-    /// package and either have no source list and no <c>InstallProperties</c> key recording a
-    /// cached package or a folder it was installed from that could be the Installer folder, or
-    /// have sources whose packages the check saw.
-    /// Kept back.
+    /// of a program opens packages the check could not all see, or an installation's cached
+    /// package does not say which product it declares, its own record does not show it to
+    /// be an ordinary installation, and it is not shown to record no cached package and
+    /// either have no source list and no <c>InstallProperties</c> key recording a cached
+    /// package or a folder it was installed from that could be the Installer folder, or
+    /// have sources whose packages the check saw, or an ordinary installation's cached
+    /// package does not say which product it declares, the package code its record holds
+    /// does not read through the API and from the registry alike, and its sources cannot be
+    /// ruled out. Kept back.
     ///
     /// IT IS ABOUT ANOTHER INSTALLATION AND NOT ABOUT THIS FILE. Such an installation
     /// could be a second copy of a program installed under an instance transform, whose

@@ -493,11 +493,10 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     [Fact]
     public async Task Real_directory_walk_matches_the_two_patterns_it_replaced()
     {
-        // The walk is one pass over the folder filtered on the extension rather
-        // than a "*.msi" pass concatenated with a "*.msp" one. This is the
-        // equivalence the single pass rests on, asserted against .NET 10's pattern
-        // matcher (FrameworkDirectory's port of it) rather than argued: the names
-        // below are the ones where a pattern and an extension test could plausibly
+        // The walk is one pass over the folder filtered on the extension, and lists
+        // the same names as a "*.msi" listing and a "*.msp" listing together, matched
+        // by FrameworkDirectory's port of .NET 10's pattern matcher. The names below
+        // are the ones where a pattern and an extension test could plausibly
         // disagree. The port and the walk list through the same enumerator, so the
         // names both must find are also written out: a fault in that enumerator
         // drops a name from both sides alike.

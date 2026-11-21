@@ -9,11 +9,12 @@ namespace InstallerClean.Tests.Services.Integration;
 /// The production <see cref="FileTimesReader"/> against the real filesystem, in the
 /// test run's temp folder, which on the machines the suite runs on is a local NTFS volume.
 ///
-/// THE LAST TWO TESTS HOLD THE AGE CHECK'S FOOTING AS WELL AS THE READER. The check
-/// dates a file by the latest of its creation, last-write and change times, so a copy
-/// has to come out of each way of making one with at least one of those three its
-/// own. Setting a file's older times and copying a file are the two ways these tests
-/// can make one.
+/// TWO TESTS HOLD THE AGE CHECK'S FOOTING AS WELL AS THE READER:
+/// A_file_given_old_creation_and_last_write_times_is_still_dated_by_a_time_of_its_own and
+/// A_copy_of_a_file_whose_three_times_are_old_is_dated_by_a_time_of_its_own. The check
+/// dates a file by the latest of its creation, last-write and change times, so a copy has
+/// to come out of each way of making one with at least one of those three its own. Setting
+/// a file's older times and copying a file are the two ways these tests can make one.
 /// </summary>
 public class FileTimesReaderTests
 {

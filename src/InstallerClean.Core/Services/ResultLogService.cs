@@ -20,9 +20,8 @@ public sealed class ResultLogService : IResultLogService
 {
     /// <summary>
     /// Maximum size of <c>last-run.json</c> the service will read or
-    /// POST. The writer caps the JSON at this size by construction
-    /// (the schema's natural size is well under it); a file larger
-    /// than this came from outside the process and is rejected.
+    /// POST. The schema's natural size is well under it, so a file
+    /// larger than this did not come from the writer and is rejected.
     /// </summary>
     public const long MaxLogBytes = 64 * 1024;
 
@@ -248,8 +247,8 @@ public sealed class ResultLogService : IResultLogService
             using var fs = new FileStream(handle, FileAccess.Read);
             if (fs.Length > MaxLogBytes)
             {
-                // Oversize is not a normal outcome (writer caps at the
-                // schema's natural size); record it so a report that never
+                // Oversize is not a normal outcome (the schema's natural
+                // size is well under the cap); record it so a report that never
                 // went has a breadcrumb to follow.
                 CrashLog.TryWrite(new InvalidDataException(
                     $"last-run.json exceeds the {MaxLogBytes}-byte cap and was not read."));

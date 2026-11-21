@@ -11,10 +11,11 @@ namespace InstallerClean.Tests.Services;
 /// that a row it cannot read stops is made again from the first index
 /// (<see cref="WalkRestarts"/>).
 ///
-/// EVERY TEST RUNS THE SAME MACHINE: two products, each holding a superseded patch of its
-/// own that the scan offers. An error that passes is planted on one row of one list, and
-/// the scan then offers exactly what it offers with nothing planted. An error that stays
-/// leaves the scan holding or refusing as a single walk that met it does.
+/// EVERY TEST STARTS FROM THE SAME MACHINE: two products, each holding a superseded patch
+/// of its own that the scan offers, one test adding products whose patch lists never read.
+/// An error that passes is planted on one row of one list, and the scan then offers exactly
+/// what it offers with nothing planted. An error that stays leaves the scan holding or
+/// refusing as a single walk that met it does.
 ///
 /// The pause is recorded and never slept. <see cref="InstallerQueryServiceKeyedReadRetryTests"/>
 /// scans the same machine.

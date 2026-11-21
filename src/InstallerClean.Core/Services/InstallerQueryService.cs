@@ -14,7 +14,7 @@ namespace InstallerClean.Services;
 /// It asks the filesystem one question and no more: whether a path only the
 /// registry claimed is really on the disk, which is what separates an
 /// enumeration that came back short from a registry key an uninstall left
-/// behind (see the cross-check in <see cref="GetRegisteredPackagesCore"/>). It
+/// behind (see <see cref="LocateProductsTheEnumerationMissed"/>). It
 /// does not walk the cache folder and does not decide what is orphaned; that is
 /// <see cref="IFileSystemScanService"/>'s, off the paths this returns.
 /// </summary>
@@ -77,9 +77,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <param name="ProductKeys">
     /// Product subkeys walked under <c>UserData</c>, whether or not the entry
     /// inside carried a package path. It is the app's only independent count of
-    /// how many products this machine has, which is what makes an enumeration
-    /// that ended early visible at all; see the cross-check in
-    /// <see cref="GetRegisteredPackagesCore"/> for what it can and cannot say.
+    /// how many products this machine has, and the census reports it. An
+    /// enumeration that ended early is found by name, not by this count
+    /// (<see cref="LocateProductsTheEnumerationMissed"/>).
     /// </param>
     /// <param name="UnclaimedProductFileCodes">
     /// One member per product entry with a cached-package path, under either name in
@@ -1090,7 +1090,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     int.TryParse(stateStr, out var patchState);
 
                     // THIS PATCH'S CONTRIBUTION TO ITS PRODUCT'S PATCH SET, which is
-                    // the API's reading of one of the three sources the superseded
+                    // the API's reading of one of the sources the superseded
                     // condition unions. Free here: the loop has just read this
                     // pairing's Uninstallable for its own purposes. It turns on
                     // Uninstallable alone, as the registry's reading does
@@ -1179,8 +1179,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. A product it
         // lost is recovered by name above, through ResolveProductInstances, which asks
-        // whether the code is installed and walks no list, so it establishes an account
-        // and a context and reads no property at all. This loop puts the InstanceType
+        // whether the code is installed, walking that one code's installations and not the
+        // machine's list of products, so it establishes an account and a context and reads
+        // no property at all. This loop puts the InstanceType
         // question to each recovered product in that account and context.
         //
         // ASKED RATHER THAN ASSUMED UNANSWERABLE. A recovered product marked unasked
@@ -1266,11 +1267,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // On a machine whose records read cleanly both counters are zero and this
         // does not fire.
         //
-        // Keyed on what the API said about itself, never on the cross-check
-        // below: this gate REFUSES, and a refusal must rest on a product the
-        // enumeration itself reported it could not read. The cross-check infers
-        // a loss from two counts that can differ for innocent reasons, which is
-        // sound enough to withhold on and not to refuse on.
+        // Keyed on what the API said about itself: this gate REFUSES, and a
+        // refusal must rest on a product the enumeration itself reported it could
+        // not read.
         if (unreadableProducts > 0
             && EnumerationCensus.CachedFileRecordsUnreadAt(fallback.Failures, fallback.PatchListFailures))
             throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
@@ -1995,7 +1994,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// code the first holds and the second never returned is not evidence that
     /// something was missed; it is the thing that was missed, identified. Each one
     /// is then put to Windows on its own (<see cref="ResolveProductInstances"/>,
-    /// which asks about that code and walks no list), and the answer decides which
+    /// which walks that one code's installations and not the machine's list of products),
+    /// and the answer decides which
     /// of three quite different states this is:
     ///
     /// INSTALLED. The enumeration was short and this product is why. It is
@@ -3523,9 +3523,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     /// <returns>
     /// True where this call put a path into <paramref name="claimed"/> that was
-    /// not there before. For a fallback claim that is the whole signal the
-    /// cross-check in <see cref="GetRegisteredPackagesCore"/> keys on, the
-    /// scoping above being what makes it mean anything: the fallback runs after
+    /// not there before. For a fallback claim that is what puts a product's code in
+    /// <see cref="FallbackRead.UnclaimedProductFileCodes"/>, the scoping above being
+    /// what makes it mean anything: the fallback runs after
     /// the whole API loop over the same UserData keys, so a path it is the first
     /// to claim is one the API never claimed rather than one it saw first.
     /// </returns>
@@ -4239,8 +4239,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// read is a patch Windows holds and did not name, so a walk that met one needs an
     /// established listing that names at least one patch however few rows the walk named:
     /// an empty listing says the program holds no patch where Windows has just met one. A
-    /// walk refused before it returned or met any row is answered by the
-    /// installation's own product key alone (<see cref="ReadOwnProductKey"/>): the
+    /// walk refused before it returned or met any row is answered, where
+    /// <see cref="ListingCoversTheWalk"/> holds, by the installation's own product key
+    /// (<see cref="ReadOwnProductKey"/>) in place of the listing: the
     /// registry's verdict for that key stands, a product key with no <c>Patches</c> key
     /// reading as one that holds no patch. Anything else marks the product Unestablished.
     ///
@@ -6012,8 +6013,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <paramref name="NotRegistered"/> NARROWS <paramref name="Unreadable"/>
     /// rather than replacing it, and the pairing is deliberate: the read produced
     /// no value, so every caller that only asks "did I get an answer" keeps the
-    /// behaviour it has, and the one caller that has to NAME a cause can ask the
-    /// narrower question. It is set only for a code documented as meaning the
+    /// behaviour it has, and a caller that has to tell an absent record from a failed
+    /// read can ask the narrower question. It is set only for a code documented as meaning the
     /// record itself is not there, which is a positive answer about the machine
     /// and not a failure to read one.
     ///
@@ -6172,8 +6173,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// among that function's documented returns, and a code added here on how its
     /// name sounds is a guess with a file on the end of it.
     ///
-    /// Only the under-lease re-read of a batch's own pairings asks this, and it holds
-    /// the file back on it. The other consumers of <see cref="PropertyRead"/> read
+    /// The under-lease re-read of a batch's own pairings asks this, and holds the file
+    /// back on it. <see cref="RegistryMayStandIn"/> asks it so that no registry value
+    /// answers for such a read, and <see cref="GetPatchProperty"/> so that such an answer
+    /// spends the installation's read again, its other reads then answered by their first
+    /// read alone (<see cref="WalkRestarts"/>). The other consumers of <see cref="PropertyRead"/> read
     /// <c>Unreadable</c>, which is set for both codes, <c>PatchNotHeld</c>, which
     /// carries the second alone (<see cref="IsPatchNotHeld"/>), or the value and
     /// nothing else, so none of them takes an answer that the product is not
@@ -6248,7 +6252,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// that only names a row and takes the value alone;
     /// <see cref="IsRecordAbsent"/> does carry it, so the same return is
     /// NotRegistered as well, which the under-lease re-read of a batch's own
-    /// pairings alone asks and which is a different question: whether a
+    /// pairings asks, as the readers named on <see cref="PropertyRead.NotRegistered"/> do,
+    /// and which is a different question: whether a
     /// registration has gone since the scan read it. At
     /// <see cref="GetPatchProperty"/> a third predicate,
     /// <see cref="IsPatchNotHeld"/>, leaves the code off PatchNotHeld, which is the

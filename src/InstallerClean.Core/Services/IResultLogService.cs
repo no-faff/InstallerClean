@@ -33,13 +33,13 @@ public interface IResultLogService
     Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Reads <c>last-run.json</c> as UTF-8 text and returns the
-    /// raw content, which is the body <see cref="SendAsync"/> sends. Returns null
-    /// when the file doesn't exist, exceeds the <see cref="ResultLogService.MaxLogBytes"/>
-    /// cap, or fails to read; oversize and read-failure cases write a
-    /// breadcrumb to crash.log. Never throws for an IO failure; a token
-    /// cancelled by the caller surfaces as OperationCanceledException, so
-    /// a caller that passes one must catch it.
+    /// Reads <c>last-run.json</c> as UTF-8 text and returns the raw content, which
+    /// is the body <see cref="SendAsync"/> sends. Returns null when the file
+    /// doesn't exist, exceeds the <see cref="ResultLogService.MaxLogBytes"/> cap,
+    /// is not a file the atomic open accepts, or fails to read; the oversize and
+    /// read-failure cases write a breadcrumb to crash.log. Never throws for an IO
+    /// failure; a token cancelled by the caller surfaces as
+    /// OperationCanceledException, so a caller that passes one must catch it.
     /// </summary>
     Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default);
 

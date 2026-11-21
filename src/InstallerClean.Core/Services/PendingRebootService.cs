@@ -61,11 +61,11 @@ public sealed class PendingRebootService : IPendingRebootService
 
     public PendingRebootResult Check()
     {
-        // Mutex first because an active install is the most decisive signal; if it
-        // fires, every probe after it is skipped.
-        // A refused open is read here too and stops the run just as early: the
-        // action services' acquire asks for the same rights, so a refusal standing
-        // now refuses the batch later whatever the other two signals say.
+        // Mutex first because an active install is the most decisive signal; if it fires,
+        // every probe after it is skipped. A refused open is read here too and stops the
+        // run just as early: the action services' acquire falls back to the rights this
+        // probe asks for where full access is refused, so a refusal standing now refuses
+        // the batch later whatever the other two signals say.
         MutexSampling mutex;
         try
         {

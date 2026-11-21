@@ -169,8 +169,8 @@ public enum HeldBackReason
     /// under the lease failed being the registry value Windows Installer answers it
     /// from; and a candidate the scan found no claim on at
     /// all, which the re-enumeration finds claimed, by its path or by the file its
-    /// path names. The second is the one the name flatters: nothing was reclaimed,
-    /// because nothing this app saw ever held it, and whether the claim is new is not
+    /// path names. For the second, nothing was reclaimed, because nothing this app saw
+    /// ever held it, and whether the claim is new is not
     /// something either route can be told apart on (see this file's interface
     /// remarks). What is true of both, and the whole of what may be said, is that the
     /// records claim the file now.
@@ -196,7 +196,7 @@ public enum HeldBackReason
     /// established either way. It has not shown the file to be removable, which is
     /// what keeps it in place.
     ///
-    /// THREE MECHANISMS REACH IT and the sentence is a superordinate over all three
+    /// THESE MECHANISMS REACH IT and the sentence is a superordinate over all of them
     /// rather than a convenience: a patch's own State or Uninstallable read failing, or
     /// coming back empty where the verdict turns on it, during the re-verify's
     /// enumeration (<see cref="Models.RegisteredPackage.VerdictUnreadable"/>); a
@@ -208,15 +208,15 @@ public enum HeldBackReason
     /// on a product the batch's pairings name. Where that patch is per machine and its
     /// read failed, the registry value Windows Installer answers it from is read in its
     /// place, and the read counts here only where that value is not there or will not
-    /// read. The first reaches it too on an empty
-    /// answer the verdict turns on, as the enumeration's does. The second reaches it too
-    /// where it answers that the installation holds no record of the patch or that the
+    /// read. The same pairing's read reaches it too on
+    /// an empty answer the verdict turns on, as the enumeration's does. The other patch's
+    /// read reaches it too where it answers that the installation holds no record of the patch or that the
     /// product is not installed, or comes back empty. Under the lease the path's own
     /// pairings decide first: a path is counted here where none of them found a live
     /// claim or a registration that has gone and one did not answer, or where they all
     /// passed and the other patches on its products found no live claim and one did not
-    /// answer. A walk-derived file whose identity matches a row of either of the first
-    /// two kinds is counted here as well, the row deciding the cause. The merged count
+    /// answer. A walk-derived file whose identity matches a row of either of the
+    /// enumeration's two kinds is counted here as well, the row deciding the cause. The merged count
     /// does not distinguish them.
     ///
     /// Anything else that reaches it is held to the same test against the code that

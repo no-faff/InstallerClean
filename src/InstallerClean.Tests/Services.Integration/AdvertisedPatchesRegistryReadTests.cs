@@ -53,8 +53,8 @@ public class AdvertisedPatchesRegistryReadTests
     }
 
     /// <summary>
-    /// Windows Installer listed the product, so a product key that is not there disagrees
-    /// with it, and the list is not read.
+    /// The registry holds the product's records, so a product key that is not there leaves
+    /// its list unread.
     /// </summary>
     [Fact]
     public void A_product_key_that_is_not_there_leaves_the_list_unread()

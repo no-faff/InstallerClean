@@ -296,7 +296,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     // file inside C:\Windows\Installer; and the user has
                     // confirmed the deletion. Only the read-only attribute is
                     // cleared, only once, and any throw from clearing it or from
-                    // the retry fails closed exactly as before.
+                    // the retry fails closed as the first delete does.
                     // The host's question is asked again before the attribute is cleared, the
                     // clear and the retried delete being acts on the file as the first was.
                     if (mayAct is not null && !mayAct(filePath)) throw new BatchStoppedException();

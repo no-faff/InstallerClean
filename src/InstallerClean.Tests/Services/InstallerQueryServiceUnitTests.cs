@@ -17,16 +17,16 @@ namespace InstallerClean.Tests.Services;
 /// enumeration; these pin the merge, the fail-safe guards and the enumeration
 /// failure handling that had no test before.
 ///
-/// The registry fallback runs after the API enumeration on every call, and
-/// these tests bind it to a stub that reads nothing and reports no failures, so
-/// a run's outcome depends on the scripted API alone. Letting it read the live
-/// UserData keys of whatever host the suite ran on would be tolerable if the
-/// fallback could only ADD rows (the assertions filter to the paths the fake
-/// produces), but the degraded-sources gate reads its failure count and the
-/// enumeration cross-check reads how many products it walked, so a CI machine's
-/// own registry would decide the outcome of every test that scripts a short
-/// enumeration. The merge rules the fallback participates in are pinned by
-/// calling <c>MergeClaim</c> directly.
+/// The registry fallback runs after the API enumeration on every call, and these
+/// tests bind it to a stub that reads nothing and reports no failures, so a run's
+/// outcome depends on the scripted API alone. Letting it read the live UserData
+/// keys of whatever host the suite ran on would be tolerable if the fallback could
+/// only ADD rows (the assertions filter to the paths the fake produces), but the
+/// degraded-sources gate reads its failure count and the recovery by name asks
+/// Windows about every product code it hands over, so a CI machine's own registry
+/// would decide the outcome of every test that scripts a short enumeration. The
+/// merge rules the fallback participates in are pinned by calling <c>MergeClaim</c>
+/// directly.
 /// </summary>
 public class InstallerQueryServiceUnitTests
 {
@@ -176,8 +176,8 @@ public class InstallerQueryServiceUnitTests
 
     /// <summary>
     /// Runs with a healthy fallback that names <paramref name="registryProducts"/>
-    /// product keys, which is the count the enumeration cross-check weighs the
-    /// API's own against, and reports one entry in
+    /// product keys, which the census reports beside the API's own count, and reports
+    /// one entry in
     /// <paramref name="unclaimedProductFileCodes"/> per registry product entry naming a
     /// cached file that is on disk and that the API's own loop never claimed, each the
     /// code its key name unpacked to.
@@ -3265,10 +3265,6 @@ public class InstallerQueryServiceUnitTests
         // sources is refused rather than reported. This pins the gate on the
         // fallback's failure count as handed to the scan; that a non-string value
         // adds to that count is pinned in RegistryFallbackCachedPackageTests.
-        //
-        // It also pins that a refusal carries no census at all, which is right: a
-        // machine whose records this app could not read is the last machine whose
-        // population figures are worth anything.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");

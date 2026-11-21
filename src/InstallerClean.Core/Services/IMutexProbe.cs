@@ -14,8 +14,9 @@ public interface IMutexProbe
     /// <see cref="MutexSample.NotHeld"/> for a mutex that is not there, one that is
     /// there and unowned, and an abandoned one.
     ///
-    /// The open asks for exactly the rights <see cref="TryAcquire"/> asks for, so an
-    /// object that refuses one refuses the other.
+    /// The open asks for SYNCHRONIZE and MUTEX_MODIFY_STATE. <see cref="TryAcquire"/> asks
+    /// for full access to an existing object first and, where that is refused, for those
+    /// same two rights, so an object that refuses one refuses the other.
     ///
     /// An <see cref="MutexSample.Unestablished"/> answer carries the Windows error number
     /// the failure was raised for, where it was raised for one

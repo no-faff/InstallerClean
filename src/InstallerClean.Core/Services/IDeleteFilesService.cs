@@ -95,17 +95,17 @@ public interface IDeleteFilesService
 /// </param>
 /// <param name="InstallerLockAccessRefused">
 /// The batch was refused before it started because the security on
-/// <c>Global\_MSIExecute</c> refused this process the rights to open it, so
-/// whether a transaction held it was never sampled: nothing was touched, and the
-/// service returns at the same point as <see cref="InstallerLockUnavailable"/>.
-/// Kept apart from that flag because the two are different facts about the
-/// machine and the user is told them in different words. This one is a setting on
-/// the object rather than a condition that arose while asking, so a sentence
-/// telling the user something was holding the lock would be false of it. The
-/// pending-reboot gate meets the same refusal as
-/// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/>, its probe asking
-/// for the same rights, so to a caller that runs the gate first, as both hosts do,
-/// this flag means a refusal that began after the gate ran.
+/// <c>Global\_MSIExecute</c> refused this process the rights to open it, so whether a
+/// transaction held it was never sampled: nothing was touched, and the service returns
+/// at the same point as <see cref="InstallerLockUnavailable"/>. Kept apart from that
+/// flag because the two are different facts about the machine and the user is told them
+/// in different words. This one is a setting on the object rather than a condition that
+/// arose while asking, so a sentence telling the user something was holding the lock
+/// would be false of it. The pending-reboot gate meets the same refusal as
+/// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/>, its probe asking for
+/// the rights the acquire falls back to where full access is refused, so to a caller
+/// that runs the gate first, as both hosts do, this flag means a refusal that began
+/// after the gate ran.
 /// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,

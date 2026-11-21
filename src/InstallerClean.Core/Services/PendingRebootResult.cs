@@ -57,10 +57,10 @@ public enum PendingRebootReason
     /// Installer right now; this one says only that the app was not allowed to look,
     /// and nothing has been seen holding the lock.
     ///
-    /// The action services' acquire asks for the same rights the gate's probe does, so
-    /// they meet the same refusal, and the command line reports a refusal met there
-    /// under this reason too: one condition, one sentence and one exit code, wherever it
-    /// is met.
+    /// The action services' acquire falls back to the rights the gate's probe asks for
+    /// where full access is refused, so they meet the same refusal, and the command line
+    /// reports a refusal met there under this reason too: one condition, one sentence and
+    /// one exit code, wherever it is met.
     /// </summary>
     MsiExecuteMutexAccessRefused,
 

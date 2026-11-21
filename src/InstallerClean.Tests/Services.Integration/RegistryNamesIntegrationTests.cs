@@ -5,8 +5,8 @@ namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// <see cref="RegistryNames"/> over a real key, through the Windows calls themselves. The
-/// key is a GUID-named one under HKCU, removed in a finally, so nothing needs elevation
-/// and nothing outlives the test.
+/// key is a GUID-named one under <c>HKCU\Software\InstallerClean.Tests</c>, removed in a
+/// finally, so nothing needs elevation.
 /// </summary>
 public class RegistryNamesIntegrationTests
 {

@@ -81,9 +81,9 @@ internal static class NetFrameworkCheck
     }
 
     /// <summary>
-    /// The neutral values in Strings.resx of the keys the message is built from, as constants.
-    /// NeutralTextTests holds each equal to the resx, so a change to the English there fails
-    /// the build until these change with it.
+    /// The neutral values in Strings.resx of the keys the message and its title are built from,
+    /// as constants. NeutralTextTests holds each equal to the resx, so a change to the English
+    /// there fails the test run until these change with it.
     /// </summary>
     internal static class NeutralText
     {
