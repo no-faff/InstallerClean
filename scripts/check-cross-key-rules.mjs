@@ -188,16 +188,12 @@ const QUOTES_A_LABEL = [
   // A batch that stopped because the backup folder would no longer resolve says
   // which button starts the scan again.
   { sentence: 'Error.DestinationChangedMidBatch', label: 'Action.Rescan' },
-  // The line naming a drive or share the app carried on without ends by saying
-  // which button to press once it responds normally.
-  { sentence: 'Summary.SourceGivenUp.Drive', label: 'Action.Rescan' },
-  { sentence: 'Summary.SourceGivenUp.Path', label: 'Action.Rescan' },
-  { sentence: 'Summary.SourcesGivenUp', label: 'Action.Rescan' },
   // The line saying why a scan held back the files no record names ends, for every
-  // reason, by saying which button to press.
-  ...['Busy', 'Suspended', 'RenameInCache', 'RenameUnresolved', 'AccessRefused',
-    'RegistryUnreadable', 'LockUnreadable', 'LockUnreadableWindowsError', 'Other',
-    'ClockSetBack'].map((reason) => ({ sentence: `Summary.ScanSignal.${reason}`, label: 'Action.Rescan' })),
+  // reason the app can see clear while it stays open, by saying which button to
+  // press. The reasons a restart clears end with the restart instead, the app
+  // being closed by it, so they quote no button. Busy and Other are in rule 3a.
+  ...['Suspended', 'ClockSetBack']
+    .map((reason) => ({ sentence: `Summary.ScanSignal.${reason}`, label: 'Action.Rescan' })),
 ];
 
 // ---------------------------------------------------------------------------
@@ -221,7 +217,17 @@ const QUOTES_A_LABEL = [
 // Either leg holds a slot out; a slot neither holds is checked. Every slot held
 // out is printed with the leg that held it, and an entry no language holds out any
 // more fails the run as something to move up into rule 3.
-const QUOTES_A_LABEL_ONCE_TRANSLATED = [];
+const QUOTES_A_LABEL_ONCE_TRANSLATED = [
+  // The line naming a drive or share the app carried on without ends by saying
+  // which button to press once it responds normally.
+  { sentence: 'Summary.SourceGivenUp.Drive', label: 'Action.Rescan' },
+  { sentence: 'Summary.SourceGivenUp.Path', label: 'Action.Rescan' },
+  { sentence: 'Summary.SourcesGivenUp', label: 'Action.Rescan' },
+  // The scan-signal lines for the two reasons that clear while the app stays open,
+  // as rule 3's entry for the rest of the family describes.
+  { sentence: 'Summary.ScanSignal.Busy', label: 'Action.Rescan' },
+  { sentence: 'Summary.ScanSignal.Other', label: 'Action.Rescan' },
+];
 
 // ---------------------------------------------------------------------------
 // Rule 4. A string must not repeat a word the control it hangs on already says.

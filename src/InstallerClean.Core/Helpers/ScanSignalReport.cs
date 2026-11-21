@@ -8,8 +8,9 @@ namespace InstallerClean.Helpers;
 /// The line saying why a scan held back every file from the folder walk, where one of
 /// Windows Installer's in-progress signals was set when it read them just after its
 /// clock (<see cref="ScanResult.InstallerActivityAtScan"/>): one sentence per reason the
-/// gate's banners tell apart, in a window form ending with the
-/// Re-scan button and a command-line form ending with running it again. And the line in
+/// gate's banners tell apart, in a window form and a command-line form, each ending with
+/// what to do there: Re-scan or running the command again, or restarting Windows where a
+/// restart clears the signal. And the line in
 /// the same place where the system clock went back while the scan read the files' times
 /// (<see cref="WithholdingSplit.ClockSetBackCount"/>), which never meets a signal's line:
 /// where a signal was set, no file's times are read.
