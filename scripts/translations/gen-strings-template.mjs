@@ -718,6 +718,7 @@ const MAP = {
   'Startup.NeedsWindows10Version1607': `InstallerClean needs Windows 10 version 1607 or later, or Windows 11.`,
   'Error.NothingRemoved': `Nothing has been removed.`,
   'Error.NothingOfferedNothingRemoved': `Nothing has been offered and nothing has been removed.`,
+  'Cli.ReportCancelledWhileSending': `Cancelled while sending the report. It may have arrived anyway.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

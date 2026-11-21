@@ -564,6 +564,7 @@ Where French needs a different form of a line for some counts, the form is in a 
 | Report sent. Thank you. | Rapport envoyé. Merci. |
 | Report not sent. | Rapport non envoyé. |
 | No answer after a minute. | Pas de réponse après une minute. |
+| Cancelled while sending the report. It may have arrived anyway. | Annulé pendant l’envoi du rapport. Il est peut-être parvenu quand même. |
 | The report could not be sent. It is kept in {0}. | Le rapport n'a pas pu être envoyé. Il est conservé dans {0}. |
 | Sending a report left waiting by an earlier run. | Envoi d'un rapport en attente depuis une exécution précédente. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | La nouvelle version va analyser et lister ce qu'elle trouve, sans rien supprimer. Pour supprimer, relancez /d ensuite. |

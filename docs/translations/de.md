@@ -561,6 +561,7 @@ Where German needs a different form of a line for some counts, the form is in a 
 | Report sent. Thank you. | Bericht gesendet. Danke. |
 | Report not sent. | Bericht nicht gesendet. |
 | No answer after a minute. | Keine Antwort nach einer Minute. |
+| Cancelled while sending the report. It may have arrived anyway. | Beim Senden des Berichts abgebrochen. Er kann trotzdem angekommen sein. |
 | The report could not be sent. It is kept in {0}. | Der Bericht konnte nicht gesendet werden. Er wird in {0} aufbewahrt. |
 | Sending a report left waiting by an earlier run. | Ein Bericht, der seit einem früheren Durchlauf auf das Senden wartet, wird gesendet. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | Die neue Version scannt und listet auf, was sie findet, ohne etwas zu löschen. Zum Löschen führe danach /d erneut aus. |

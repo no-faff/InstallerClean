@@ -2209,11 +2209,14 @@ Vuelve a ejecutar InstallerClean como administrador.</value></data>
   <data name="Cli.ReportInFull" xml:space="preserve"><value>El informe completo se muestra a continuación.</value></data>
   <!-- After the report was sent and the server accepted it. -->
   <data name="Cli.ReportSent" xml:space="preserve"><value>Informe enviado. Gracias.</value></data>
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <data name="Cli.ReportNotSent" xml:space="preserve"><value>Informe no enviado.</value></data>
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>Sin respuesta tras un minuto.</value></data>
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>Cancelado mientras se enviaba el informe. Puede que haya llegado de todos modos.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>No se pudo enviar el informe. Se conserva en {0}.</value></data>

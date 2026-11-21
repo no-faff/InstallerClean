@@ -304,6 +304,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_PendingRebootBlocked_PendingRenameUnresolved => Get("Cli.PendingRebootBlocked.PendingRenameUnresolved");
     public static string Cli_PendingRebootBlocked_RegistryCheckUnreadable => Get("Cli.PendingRebootBlocked.RegistryCheckUnreadable");
+    public static string Cli_ReportCancelledWhileSending => Get("Cli.ReportCancelledWhileSending");
     public static string Cli_ReportChartAt => Get("Cli.ReportChartAt");
     public static string Cli_ReportCouldNotBeSent => Get("Cli.ReportCouldNotBeSent");
     public static string Cli_ReportInFull => Get("Cli.ReportInFull");

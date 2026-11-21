@@ -8860,6 +8860,24 @@
       "vi": "d428130fa1ab8a83",
       "zh-Hans": "d428130fa1ab8a83",
       "zh-Hant": "d428130fa1ab8a83"
+    },
+    "Cli.ReportCancelledWhileSending": {
+      "de": "cc96630c4c0831b5",
+      "es": "cc96630c4c0831b5",
+      "fr": "cc96630c4c0831b5",
+      "id": "cc96630c4c0831b5",
+      "it": "cc96630c4c0831b5",
+      "ja": "cc96630c4c0831b5",
+      "ko": "cc96630c4c0831b5",
+      "nl": "cc96630c4c0831b5",
+      "pl": "cc96630c4c0831b5",
+      "pt-BR": "cc96630c4c0831b5",
+      "ru": "cc96630c4c0831b5",
+      "tr": "cc96630c4c0831b5",
+      "uk": "cc96630c4c0831b5",
+      "vi": "cc96630c4c0831b5",
+      "zh-Hans": "cc96630c4c0831b5",
+      "zh-Hant": "cc96630c4c0831b5"
     }
   }
 }

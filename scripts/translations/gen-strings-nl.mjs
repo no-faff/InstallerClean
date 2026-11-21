@@ -634,6 +634,7 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Toont de licenties van de lettertypen, pictogrammen en code die InstallerClean bevat.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  De kennisgevingen van derden weergeven`,
   'Startup.NeedsWindows10Version1607': `InstallerClean heeft Windows 10 versie 1607 of nieuwer, of Windows 11 nodig.`,
+  'Cli.ReportCancelledWhileSending': `Geannuleerd tijdens het versturen van het rapport. Het kan toch zijn aangekomen.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -2217,11 +2217,14 @@ InstallerClean を管理者としてもう一度実行してください。</val
   <data name="Cli.ReportInFull" xml:space="preserve"><value>レポートの全文を以下に表示します。</value></data>
   <!-- After the report was sent and the server accepted it. -->
   <data name="Cli.ReportSent" xml:space="preserve"><value>レポートを送信しました。ありがとうございます。</value></data>
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <data name="Cli.ReportNotSent" xml:space="preserve"><value>レポートは送信されませんでした。</value></data>
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>1 分たっても応答がありませんでした。</value></data>
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>レポートの送信中にキャンセルされました。レポートはそれでも届いている可能性があります。</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>レポートを送信できませんでした。{0} に保存されています。</value></data>

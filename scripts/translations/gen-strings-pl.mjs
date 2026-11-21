@@ -695,6 +695,7 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Pokazuje licencje czcionek, ikon i kodu, które zawiera InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices   Wypisz uwagi dotyczące innych firm`,
   'Startup.NeedsWindows10Version1607': `InstallerClean wymaga systemu Windows 10 w wersji 1607 lub nowszej albo systemu Windows 11.`,
+  'Cli.ReportCancelledWhileSending': `Anulowano podczas wysyłania raportu. Mógł mimo to dotrzeć.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

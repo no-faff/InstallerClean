@@ -564,6 +564,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Report sent. Thank you. | Rapporto inviato. Grazie. |
 | Report not sent. | Rapporto non inviato. |
 | No answer after a minute. | Nessuna risposta dopo un minuto. |
+| Cancelled while sending the report. It may have arrived anyway. | Annullato durante l’invio del rapporto. Potrebbe essere arrivato comunque. |
 | The report could not be sent. It is kept in {0}. | Non è stato possibile inviare il rapporto. È conservato in {0}. |
 | Sending a report left waiting by an earlier run. | Invio di un rapporto in attesa da un'esecuzione precedente. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | La nuova versione eseguirà la scansione ed elencherà ciò che trova, senza eliminare nulla. Per eliminare, esegui di nuovo /d al termine. |

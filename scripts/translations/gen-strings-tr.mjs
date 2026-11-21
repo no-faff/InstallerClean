@@ -580,6 +580,7 @@ Ayrıntılar şuraya yazıldı:
   'Automation.About.Notices.HelpText': `InstallerClean'in içerdiği yazı tiplerinin, simgelerin ve kodun lisanslarını gösterir.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Üçüncü taraf bildirimlerini yazdır`,
   'Startup.NeedsWindows10Version1607': `InstallerClean için Windows 10 sürüm 1607 veya üzeri ya da Windows 11 gerekiyor.`,
+  'Cli.ReportCancelledWhileSending': `Rapor gönderilirken iptal edildi. Yine de ulaşmış olabilir.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

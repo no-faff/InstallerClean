@@ -229,7 +229,20 @@ public class ConsoleReportOfferTests
         Assert.Equal(ReportOfferOutcome.Cancelled, outcome);
         Assert.False(rig.Settings.State.ReportSendPending);
         Assert.False(rig.Settings.State.HasSentResultLog);
-        Assert.Equal(Strings.Cli_ReportNotSent, rig.Console.Lines[^1]);
+        Assert.Equal(Strings.Cli_ReportCancelledWhileSending, rig.Console.Lines[^1]);
+        Assert.DoesNotContain(Strings.Cli_ReportNotSent, rig.Console.Lines);
+    }
+
+    [Fact]
+    public void A_console_being_closed_while_a_yes_is_being_sent_prints_nothing()
+    {
+        var rig = new Rig("y") { SendThrowsCancelled = true, Closing = true };
+
+        var outcome = rig.Offer();
+
+        Assert.Equal(ReportOfferOutcome.Cancelled, outcome);
+        Assert.DoesNotContain(Strings.Cli_ReportCancelledWhileSending, rig.Console.Lines);
+        Assert.DoesNotContain(Strings.Cli_ReportNotSent, rig.Console.Lines);
     }
 
     [Fact]
@@ -243,6 +256,7 @@ public class ConsoleReportOfferTests
         Assert.Equal(ReportOfferOutcome.Cancelled, outcome);
         Assert.True(rig.Settings.State.ReportSendPending);
         Assert.False(rig.Settings.State.HasSentResultLog);
+        Assert.Equal(Strings.Cli_ReportCancelledWhileSending, rig.Console.Lines[^1]);
     }
 
     [Fact]

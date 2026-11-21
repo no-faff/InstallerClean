@@ -585,6 +585,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | Report sent. Thank you. | Звіт надіслано. Дякую. |
 | Report not sent. | Звіт не надіслано. |
 | No answer after a minute. | Відповіді немає вже хвилину. |
+| Cancelled while sending the report. It may have arrived anyway. | Скасовано під час надсилання звіту. Він усе одно міг дійти. |
 | The report could not be sent. It is kept in {0}. | Не вдалося надіслати звіт. Його збережено в {0}. |
 | Sending a report left waiting by an earlier run. | Надсилається звіт, що чекає на надсилання ще з раннішого запуску. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | Нова версія просканує й покаже список знайденого, нічого не видаляючи. Щоб видалити, потім знову запустіть /d. |

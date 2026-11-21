@@ -557,6 +557,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Report sent. Thank you. | レポートを送信しました。ありがとうございます。 |
 | Report not sent. | レポートは送信されませんでした。 |
 | No answer after a minute. | 1 分たっても応答がありませんでした。 |
+| Cancelled while sending the report. It may have arrived anyway. | レポートの送信中にキャンセルされました。レポートはそれでも届いている可能性があります。 |
 | The report could not be sent. It is kept in {0}. | レポートを送信できませんでした。{0} に保存されています。 |
 | Sending a report left waiting by an earlier run. | 以前の実行から送信待ちになっているレポートを送信しています。 |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | 新しいバージョンはスキャンして見つかったものを一覧表示するだけで、何も削除しません。削除するには、その後もう一度 /d を実行してください。 |

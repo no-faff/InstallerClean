@@ -2151,9 +2151,11 @@ InstallerClean уже был запущен от имени администра
   <!-- After the panel's words when the question mark is typed, ahead of the report itself,
        which follows on the next lines. -->
   <!-- After the report was sent and the server accepted it. -->
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
@@ -2504,4 +2506,5 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>Ответа нет уже минуту.</value></data>
   <data name="Cli.NeedsNetFramework48" xml:space="preserve"><value>Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.</value></data>
   <data name="Cli.Help.Notices" xml:space="preserve"><value>  installerclean-cli --notices    Показать уведомления третьих сторон</value></data>
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>Отменено во время отправки отчёта. Он всё равно мог дойти.</value></data>
 </root>

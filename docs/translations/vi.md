@@ -557,6 +557,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Report sent. Thank you. | Đã gửi báo cáo. Cảm ơn bạn. |
 | Report not sent. | Chưa gửi báo cáo. |
 | No answer after a minute. | Không có câu trả lời sau một phút. |
+| Cancelled while sending the report. It may have arrived anyway. | Đã hủy trong lúc gửi báo cáo. Báo cáo vẫn có thể đã đến nơi. |
 | The report could not be sent. It is kept in {0}. | Không thể gửi báo cáo. Báo cáo được lưu giữ tại {0}. |
 | Sending a report left waiting by an earlier run. | Đang gửi một báo cáo còn chờ từ một lần chạy trước đó. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | Phiên bản mới sẽ quét và liệt kê những gì tìm thấy, không xóa gì cả. Để xóa, hãy chạy lại /d sau đó. |

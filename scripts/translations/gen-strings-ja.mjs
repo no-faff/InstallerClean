@@ -580,6 +580,7 @@ const MAP = {
   'Automation.About.Notices.HelpText': `InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  サードパーティ通知を表示`,
   'Startup.NeedsWindows10Version1607': `InstallerClean には Windows 10 バージョン 1607 以降、または Windows 11 が必要です。`,
+  'Cli.ReportCancelledWhileSending': `レポートの送信中にキャンセルされました。レポートはそれでも届いている可能性があります。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

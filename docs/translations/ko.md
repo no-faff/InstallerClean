@@ -557,6 +557,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Report sent. Thank you. | 보고서를 보냈습니다. 감사합니다. |
 | Report not sent. | 보고서를 보내지 않았습니다. |
 | No answer after a minute. | 1분 동안 응답이 없었습니다. |
+| Cancelled while sending the report. It may have arrived anyway. | 보고서를 보내는 중에 취소되었습니다. 보고서가 이미 도착했을 수도 있습니다. |
 | The report could not be sent. It is kept in {0}. | 보고서를 보내지 못했습니다. {0}에 보관되어 있습니다. |
 | Sending a report left waiting by an earlier run. | 이전 실행 때부터 대기 중이던 보고서를 보내는 중입니다. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | 새 버전은 검사하여 찾은 항목을 나열하기만 하고 아무것도 삭제하지 않습니다. 삭제하려면 그 후에 /d를 다시 실행하세요. |

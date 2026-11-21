@@ -2209,11 +2209,14 @@ Jalankan InstallerClean lagi sebagai administrator.</value></data>
   <data name="Cli.ReportInFull" xml:space="preserve"><value>Laporan lengkap dicetak di bawah ini.</value></data>
   <!-- After the report was sent and the server accepted it. -->
   <data name="Cli.ReportSent" xml:space="preserve"><value>Laporan terkirim. Terima kasih.</value></data>
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <data name="Cli.ReportNotSent" xml:space="preserve"><value>Laporan tidak dikirim.</value></data>
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>Tidak ada jawaban setelah satu menit.</value></data>
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>Dibatalkan saat laporan dikirim. Laporan mungkin tetap sampai.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>Laporan tidak dapat dikirim. Laporan disimpan di {0}.</value></data>

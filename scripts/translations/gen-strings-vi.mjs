@@ -654,6 +654,7 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices     In ra thông báo của bên thứ ba`,
   'Startup.NeedsWindows10Version1607': `InstallerClean cần Windows 10 phiên bản 1607 trở lên hoặc Windows 11.`,
+  'Cli.ReportCancelledWhileSending': `Đã hủy trong lúc gửi báo cáo. Báo cáo vẫn có thể đã đến nơi.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

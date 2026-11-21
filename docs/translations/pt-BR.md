@@ -564,6 +564,7 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | Report sent. Thank you. | Relatório enviado. Obrigado. |
 | Report not sent. | Relatório não enviado. |
 | No answer after a minute. | Sem resposta após um minuto. |
+| Cancelled while sending the report. It may have arrived anyway. | Cancelado durante o envio do relatório. Ele pode ter chegado mesmo assim. |
 | The report could not be sent. It is kept in {0}. | Não foi possível enviar o relatório. Ele está guardado em {0}. |
 | Sending a report left waiting by an earlier run. | Enviando um relatório pendente desde uma execução anterior. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | A nova versão vai analisar e listar o que encontrar, sem excluir nada. Para excluir, execute /d novamente depois. |

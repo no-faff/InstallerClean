@@ -2209,11 +2209,14 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
   <data name="Cli.ReportInFull" xml:space="preserve"><value>Toàn bộ báo cáo được in bên dưới.</value></data>
   <!-- After the report was sent and the server accepted it. -->
   <data name="Cli.ReportSent" xml:space="preserve"><value>Đã gửi báo cáo. Cảm ơn bạn.</value></data>
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <data name="Cli.ReportNotSent" xml:space="preserve"><value>Chưa gửi báo cáo.</value></data>
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>Không có câu trả lời sau một phút.</value></data>
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>Đã hủy trong lúc gửi báo cáo. Báo cáo vẫn có thể đã đến nơi.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>Không thể gửi báo cáo. Báo cáo được lưu giữ tại {0}.</value></data>

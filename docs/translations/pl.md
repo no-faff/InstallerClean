@@ -581,6 +581,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Report sent. Thank you. | Raport wysłany. Dziękuję. |
 | Report not sent. | Raport nie został wysłany. |
 | No answer after a minute. | Brak odpowiedzi po minucie. |
+| Cancelled while sending the report. It may have arrived anyway. | Anulowano podczas wysyłania raportu. Mógł mimo to dotrzeć. |
 | The report could not be sent. It is kept in {0}. | Nie udało się wysłać raportu. Jest przechowywany w {0}. |
 | Sending a report left waiting by an earlier run. | Wysyłanie raportu oczekującego od wcześniejszego uruchomienia. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | Nowa wersja przeskanuje i wyświetli listę tego, co znajdzie, niczego nie usuwając. Aby usunąć, uruchom potem ponownie /d. |

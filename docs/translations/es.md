@@ -564,6 +564,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Report sent. Thank you. | Informe enviado. Gracias. |
 | Report not sent. | Informe no enviado. |
 | No answer after a minute. | Sin respuesta tras un minuto. |
+| Cancelled while sending the report. It may have arrived anyway. | Cancelado mientras se enviaba el informe. Puede que haya llegado de todos modos. |
 | The report could not be sent. It is kept in {0}. | No se pudo enviar el informe. Se conserva en {0}. |
 | Sending a report left waiting by an earlier run. | Se envía un informe que esperaba desde una ejecución anterior. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | La nueva versión analizará y mostrará lo que encuentre, sin eliminar nada. Para eliminar, vuelve a ejecutar /d después. |

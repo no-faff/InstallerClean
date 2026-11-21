@@ -2209,11 +2209,14 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
   <data name="Cli.ReportInFull" xml:space="preserve"><value>전체 보고서는 아래에 출력됩니다.</value></data>
   <!-- After the report was sent and the server accepted it. -->
   <data name="Cli.ReportSent" xml:space="preserve"><value>보고서를 보냈습니다. 감사합니다.</value></data>
-  <!-- After the answer was no, and after Ctrl+C at the question or while the report was being sent. -->
+  <!-- After the answer was no, and after Ctrl+C at the question. -->
   <data name="Cli.ReportNotSent" xml:space="preserve"><value>보고서를 보내지 않았습니다.</value></data>
   <!-- After Cli.ReportPrompt where nothing was answered within a minute, and before
        Cli.ReportNotSent. -->
   <data name="Cli.ReportNoAnswer" xml:space="preserve"><value>1분 동안 응답이 없었습니다.</value></data>
+  <!-- After Ctrl+C while the report was being sent, which can come after the request reached the
+       server, so the line says the report may have arrived. -->
+  <data name="Cli.ReportCancelledWhileSending" xml:space="preserve"><value>보고서를 보내는 중에 취소되었습니다. 보고서가 이미 도착했을 수도 있습니다.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>보고서를 보내지 못했습니다. {0}에 보관되어 있습니다.</value></data>

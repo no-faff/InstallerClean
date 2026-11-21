@@ -557,6 +557,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Report sent. Thank you. | Rapor gönderildi. Teşekkürler. |
 | Report not sent. | Rapor gönderilmedi. |
 | No answer after a minute. | Bir dakika içinde yanıt gelmedi. |
+| Cancelled while sending the report. It may have arrived anyway. | Rapor gönderilirken iptal edildi. Yine de ulaşmış olabilir. |
 | The report could not be sent. It is kept in {0}. | Rapor gönderilemedi. {0} konumunda saklanıyor. |
 | Sending a report left waiting by an earlier run. | Daha önceki bir çalıştırmadan beri bekleyen bir rapor gönderiliyor. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | Yeni sürüm tarayıp bulduklarını listeleyecek, hiçbir şeyi silmeyecek. Silmek için ardından /d komutunu yeniden çalıştırın. |

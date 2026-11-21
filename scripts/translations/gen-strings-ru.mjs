@@ -725,6 +725,7 @@ const CLI = {
   'Cli.ReportNoAnswer': `Ответа нет уже минуту.`,
   'Cli.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices    Показать уведомления третьих сторон`,
+  'Cli.ReportCancelledWhileSending': `Отменено во время отправки отчёта. Он всё равно мог дойти.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

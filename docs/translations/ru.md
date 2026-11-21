@@ -577,6 +577,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Report sent. Thank you. | Отчёт отправлен. Спасибо. |
 | Report not sent. | Отчёт не отправлен. |
 | No answer after a minute. | Ответа нет уже минуту. |
+| Cancelled while sending the report. It may have arrived anyway. | Отменено во время отправки отчёта. Он всё равно мог дойти. |
 | The report could not be sent. It is kept in {0}. | Не удалось отправить отчёт. Он хранится в {0}. |
 | Sending a report left waiting by an earlier run. | Отправляется отчёт, ожидающий отправки ещё с более раннего запуска. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | Новая версия просканирует и покажет список найденного, ничего не удаляя. Чтобы удалить, затем снова запустите /d. |

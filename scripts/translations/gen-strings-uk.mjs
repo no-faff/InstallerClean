@@ -673,6 +673,7 @@ const MAP = {
   'Automation.About.Notices.HelpText': `Показує ліцензії шрифтів, значків і коду, що входять до InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Вивести повідомлення третіх сторін`,
   'Startup.NeedsWindows10Version1607': `Для InstallerClean потрібна Windows 10 версії 1607 або новішої чи Windows 11.`,
+  'Cli.ReportCancelledWhileSending': `Скасовано під час надсилання звіту. Він усе одно міг дійти.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

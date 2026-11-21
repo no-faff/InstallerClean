@@ -564,6 +564,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Report sent. Thank you. | Rapport verstuurd. Bedankt. |
 | Report not sent. | Rapport niet verstuurd. |
 | No answer after a minute. | Na een minuut geen antwoord. |
+| Cancelled while sending the report. It may have arrived anyway. | Geannuleerd tijdens het versturen van het rapport. Het kan toch zijn aangekomen. |
 | The report could not be sent. It is kept in {0}. | Het rapport kon niet worden verstuurd. Het wordt bewaard in {0}. |
 | Sending a report left waiting by an earlier run. | Een rapport dat sinds een eerdere uitvoering wacht, wordt nu verstuurd. |
 | The new version will scan and list what it finds, without deleting anything. To delete, run /d again afterwards. | De nieuwe versie scant en toont wat hij vindt, zonder iets te verwijderen. Voer daarna /d opnieuw uit om te verwijderen. |

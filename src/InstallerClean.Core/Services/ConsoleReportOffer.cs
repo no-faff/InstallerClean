@@ -185,7 +185,7 @@ internal sealed class ConsoleReportOffer(
             if (!waiting && !settings.Update(s => s.ReportSendPending = false))
                 CrashLog.TryWrite(new InvalidOperationException(
                     "settings.json could not record that the report is not waiting to be sent."));
-            if (!consoleClosing()) console.WriteLine(Strings.Cli_ReportNotSent);
+            if (!consoleClosing()) console.WriteLine(Strings.Cli_ReportCancelledWhileSending);
             return ReportOfferOutcome.Cancelled;
         }
 
