@@ -627,12 +627,16 @@ function Invoke-Teardown {
         else { Say "CLEAN: the Installer folder holds no .msi or .msp file it did not hold when the probe started ($($atStart.Count) then)." }
     }
     else { $notClean++; Say "NOT CLEAN: the list of the Installer folder's files at the start, $startList, is not there, so what the probe added to the folder is not known." }
-    $tasks = @(Get-ScheduledTask | Where-Object { $_.TaskName -like "$taskPrefix*" })
-    foreach ($task in $tasks) {
-        try { Unregister-ScheduledTask -TaskName $task.TaskName -Confirm:$false; Say "CLEAN: the scheduled task '$($task.TaskName)' was still registered and is removed." }
-        catch { $notClean++; Say "NOT CLEAN: the scheduled task '$($task.TaskName)' is still registered: $($_.Exception.Message)" }
+    # A failure to read the scheduled tasks is a NOT CLEAN line, and the checks after it still run.
+    try {
+        $tasks = @(Get-ScheduledTask | Where-Object { $_.TaskName -like "$taskPrefix*" })
+        foreach ($task in $tasks) {
+            try { Unregister-ScheduledTask -TaskName $task.TaskName -Confirm:$false; Say "CLEAN: the scheduled task '$($task.TaskName)' was still registered and is removed." }
+            catch { $notClean++; Say "NOT CLEAN: the scheduled task '$($task.TaskName)' is still registered: $($_.Exception.Message)" }
+        }
+        if (-not $tasks.Count) { Say "CLEAN: no scheduled task named '$taskPrefix...' is registered." }
     }
-    if (-not $tasks.Count) { Say "CLEAN: no scheduled task named '$taskPrefix...' is registered." }
+    catch { $notClean++; Say "NOT CLEAN: the scheduled tasks were not read, so whether a task named '$taskPrefix...' is registered is not known: $($_.Exception.Message)" }
     $running = @(Get-Process -Name 'Procmon*' -ErrorAction SilentlyContinue)
     if ($running.Count) { $notClean++; Say "NOT CLEAN: Process Monitor is still running ($(($running | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', '))." }
     else { Say 'CLEAN: Process Monitor is not running.' }
@@ -761,6 +765,17 @@ Say "Windows build $($windows.CurrentBuild).$($windows.UBR), $($windows.EditionI
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 Say "Run as $([Security.Principal.WindowsIdentity]::GetCurrent().Name), $mySid; administrator: $isAdmin"
 if (-not $isAdmin -or -not [Environment]::Is64BitProcess) { Say 'STOPPED: the probe needs an administrator and a 64-bit process. Nothing was done.'; throw 'Not an administrator in a 64-bit process.' }
+
+# The scheduled-task cmdlets come from the ScheduledTasks module Windows ships, imported by its path,
+# because PowerShell 7 finds it by name only where PSModulePath names the Windows PowerShell
+# module folder. Without them nothing is asked as SYSTEM, so a run stops here before it changes
+# anything; the teardown alone carries on and reports the task check as not read.
+$scheduledTasksModule = Join-Path ([Environment]::SystemDirectory) 'WindowsPowerShell\v1.0\Modules\ScheduledTasks\ScheduledTasks.psd1'
+try { Import-Module -Name $scheduledTasksModule }
+catch {
+    if (-not $TeardownOnly) { Say "STOPPED: the ScheduledTasks module did not load from ${scheduledTasksModule}: $($_.Exception.Message) Nothing was done."; throw }
+    Say "The ScheduledTasks module did not load from ${scheduledTasksModule}: $($_.Exception.Message)"
+}
 
 if ($TeardownOnly) {
     $script:procmonExe = if ($Procmon) { $Procmon } else { Join-Path $capture 'procmon\Procmon64.exe' }
@@ -1276,7 +1291,12 @@ catch {
 }
 finally {
     Stop-Procmon
-    $notClean = Invoke-Teardown
+    try { $notClean = Invoke-Teardown }
+    catch {
+        $notClean++
+        Say "NOT CLEAN: the teardown stopped before its end, so what it had still to read is not known: $($_.Exception.Message)"
+        Say "    at $($_.ScriptStackTrace -replace "`n", ' < ')"
+    }
     Say "Process Monitor's own settings key, HKU\$mySid\Software\Sysinternals\Process Monitor, was there before the run: $sysinternalsAtStart; is there now: $(Test-Location "HKU\$mySid\Software\Sysinternals\Process Monitor")."
 }
 
