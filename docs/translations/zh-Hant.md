@@ -339,8 +339,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 無法下載更新。 |
 | The update couldn't be installed. | 無法安裝更新。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 無法連線到 GitHub。請檢查您的網際網路連線，然後再試一次。 |
-| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | 更新檢查收到的是一個錯誤，而不是 GitHub 的發行頁面。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器。請稍後再試，或在瀏覽器中開啟發行頁面。 |
-| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | 更新檢查收到的回應中沒有指明任何發行版本。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器或登入頁面。請稍後再試，或在瀏覽器中開啟發行頁面。 |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser. | The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser. |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser. | The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser. |
 | The check timed out. Your connection to GitHub may be slow; try again. | 檢查逾時。您與 GitHub 的連線可能較慢；請再試一次。 |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 檢查因不明原因失敗。如果您需要回報這個問題，詳細資料在 {0}。 |
 | The check failed for an unknown reason. The crash log could not be written. | 檢查因不明原因失敗。無法寫入當機記錄檔。 |

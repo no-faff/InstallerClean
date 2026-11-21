@@ -381,8 +381,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Не вдалося зв'язатися з GitHub. Перевірте інтернет-з'єднання та спробуйте ще раз.`,
-  'UpdateCheck.Failed.ServerError': `Перевірка оновлень отримала помилку замість сторінки випусків GitHub. Вона могла надійти від GitHub або від чогось у вашій мережі, наприклад від проксі-сервера. Спробуйте пізніше або відкрийте сторінку випусків у браузері.`,
-  'UpdateCheck.Failed.ResponseParseError': `Перевірка оновлень отримала відповідь, у якій не названо жодного випуску. Вона могла надійти від GitHub або від чогось у вашій мережі, наприклад від проксі-сервера чи сторінки входу. Спробуйте пізніше або відкрийте сторінку випусків у браузері.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `Час перевірки вичерпано. Можливо, ваше з'єднання з GitHub повільне; спробуйте ще раз.`,
   'UpdateCheck.Failed.Unknown': `Перевірка не вдалася з невідомої причини. Деталі у {0}, якщо вам потрібно про це повідомити.`,
 

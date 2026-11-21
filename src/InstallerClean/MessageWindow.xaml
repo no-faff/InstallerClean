@@ -71,6 +71,23 @@
                      Margin="{StaticResource GapBottom.Lg}"
                      AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}"/>
 
+            <!-- The body of a message that carries a link, shown in place of the box
+                 above: a TextBox holds plain text only, so a Hyperlink needs a
+                 TextBlock, which cannot be selected; a message given a link names no
+                 path or address to copy, the page being one click away. Code-behind
+                 fills it and swaps the two. It scrolls as the box does once the
+                 work-area height binds, and the region takes a Tab stop only while
+                 it overflows. -->
+            <ScrollViewer x:Name="LinkedMessageRegion" Grid.Row="1" Visibility="Collapsed"
+                          Style="{StaticResource BodyScrollRegion}"
+                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          Margin="{StaticResource GapBottom.Lg}"
+                          AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}">
+                <TextBlock x:Name="LinkedMessageText"
+                           Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
+                           TextWrapping="Wrap"/>
+            </ScrollViewer>
+
             <Button x:Name="CloseButton" Grid.Row="2" Style="{StaticResource StandardPill}"
                     Content="{loc:Translate Action.Close}" Click="OnClose"
                     IsDefault="True" IsCancel="True"

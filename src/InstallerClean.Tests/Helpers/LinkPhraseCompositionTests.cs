@@ -8,7 +8,7 @@ namespace InstallerClean.Tests.Helpers;
 /// <summary>
 /// Every sentence the app renders with a link inside it, in every language.
 ///
-/// Two windows hand a resx value to CompositionParsing.SplitAtBracketedPhrase and
+/// Three windows hand a resx value to CompositionParsing.SplitAtBracketedPhrase and
 /// hyperlink the phrase wrapped in <c>[ ]</c>. The brackets are ordinary characters
 /// in a resx value, so a translation can drop one, add one or add a second pair, and
 /// check-resx-parity, which reads key presence and placeholder arity, is looking at
@@ -53,6 +53,8 @@ public class LinkPhraseCompositionTests
     {
         "Body.RegisteredMissingFromDisk.SeeAlso", // the registered-files window
         "Completion.ReportPanel.Intro",           // the panel the report box's "i" opens
+        "UpdateCheck.Failed.ResponseParseError",  // the update check's warning box
+        "UpdateCheck.Failed.ServerError",         // the update check's warning box
     };
 
     /// <summary>

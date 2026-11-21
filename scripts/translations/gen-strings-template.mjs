@@ -444,8 +444,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Couldn't reach GitHub. Check your internet connection and try again.`,
-  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser.`,
-  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `The check timed out. Your connection to GitHub may be slow; try again.`,
   'UpdateCheck.Failed.Unknown': `The check failed for an unknown reason. Details are in {0} if you need to report it.`,
   'UpdateCheck.Failed.Unknown.NoLog': `The check failed for an unknown reason. The crash log could not be written.`,

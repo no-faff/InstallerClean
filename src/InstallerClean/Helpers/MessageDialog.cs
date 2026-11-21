@@ -28,22 +28,26 @@ public enum MessageKind
 /// </summary>
 internal static class MessageDialog
 {
-    public static void Show(string message, string caption, MessageKind kind)
+    /// <summary>
+    /// Shows the message. Where <paramref name="linkUrl"/> is given, the phrase in
+    /// <c>[ ]</c> inside the message is a link to it.
+    /// </summary>
+    public static void Show(string message, string caption, MessageKind kind, string? linkUrl = null)
     {
         var app = Application.Current;
         if (app is null || app.Dispatcher.CheckAccess())
         {
-            ShowCore(message, caption, kind);
+            ShowCore(message, caption, kind, linkUrl);
             return;
         }
-        app.Dispatcher.Invoke(() => ShowCore(message, caption, kind));
+        app.Dispatcher.Invoke(() => ShowCore(message, caption, kind, linkUrl));
     }
 
-    private static void ShowCore(string message, string caption, MessageKind kind)
+    private static void ShowCore(string message, string caption, MessageKind kind, string? linkUrl)
     {
         try
         {
-            var dialog = new MessageWindow(message, caption, kind);
+            var dialog = new MessageWindow(message, caption, kind, linkUrl);
 
             // Owner only once the main window is real: assigning a Window that
             // has not been shown throws, and the startup failures and the
@@ -68,9 +72,18 @@ internal static class MessageDialog
             // this fallback, or give it anything from the theme, and a failure in
             // the theme shows the user no message at all.
             CrashLog.TryWrite(ex);
-            MessageBox.Show(message, caption, MessageBoxButton.OK, IconFor(kind));
+            MessageBox.Show(Unbracketed(message, linkUrl), caption, MessageBoxButton.OK, IconFor(kind));
         }
     }
+
+    /// <summary>
+    /// The message as the stock box shows it: a link phrase's brackets taken out,
+    /// the stock box having no link to put there.
+    /// </summary>
+    private static string Unbracketed(string message, string? linkUrl) =>
+        linkUrl is not null && CompositionParsing.SplitAtBracketedPhrase(message) is { } split
+            ? split.Prefix + split.LinkText + split.Suffix
+            : message;
 
     private static MessageBoxImage IconFor(MessageKind kind) => kind switch
     {

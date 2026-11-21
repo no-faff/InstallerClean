@@ -362,8 +362,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại.`,
-  'UpdateCheck.Failed.ServerError': `Lần kiểm tra cập nhật nhận về một lỗi thay vì trang phát hành của GitHub. Lỗi có thể đến từ GitHub hoặc từ thứ gì đó trên mạng của bạn, chẳng hạn proxy. Hãy thử lại sau, hoặc mở trang phát hành trong trình duyệt của bạn.`,
-  'UpdateCheck.Failed.ResponseParseError': `Lần kiểm tra cập nhật nhận về một phản hồi không nêu tên bản phát hành nào. Phản hồi có thể đến từ GitHub hoặc từ thứ gì đó trên mạng của bạn, chẳng hạn proxy hoặc trang đăng nhập. Hãy thử lại sau, hoặc mở trang phát hành trong trình duyệt của bạn.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại.`,
   'UpdateCheck.Failed.Unknown': `Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong {0} nếu bạn cần báo cáo.`,
 

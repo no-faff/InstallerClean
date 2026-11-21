@@ -355,8 +355,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Не удалось подключиться к GitHub. Проверьте подключение к интернету и повторите попытку.`,
-  'UpdateCheck.Failed.ServerError': `Проверка обновлений получила ошибку вместо страницы выпусков GitHub. Она могла прийти от GitHub или от чего-то в вашей сети, например от прокси-сервера. Повторите попытку позже или откройте страницу выпусков в браузере.`,
-  'UpdateCheck.Failed.ResponseParseError': `Проверка обновлений получила ответ, в котором не назван ни один выпуск. Он мог прийти от GitHub или от чего-то в вашей сети, например от прокси-сервера или страницы входа. Повторите попытку позже или откройте страницу выпусков в браузере.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `Время ожидания проверки истекло. Возможно, соединение с GitHub медленное; повторите попытку.`,
   'UpdateCheck.Failed.Unknown': `Проверка не удалась по неизвестной причине. Подробности в {0}, если нужно сообщить об этом.`,
 

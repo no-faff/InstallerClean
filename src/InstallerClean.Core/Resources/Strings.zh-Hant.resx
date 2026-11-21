@@ -1563,8 +1563,12 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>無法連線到 GitHub。請檢查您的網際網路連線，然後再試一次。</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>更新檢查收到的是一個錯誤，而不是 GitHub 的發行頁面。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器。請稍後再試，或在瀏覽器中開啟發行頁面。</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>更新檢查收到的回應中沒有指明任何發行版本。它可能來自 GitHub，也可能來自您網路中的其他環節，例如代理伺服器或登入頁面。請稍後再試，或在瀏覽器中開啟發行頁面。</value></data>
+  <!-- The next two are shown in the update check's warning box. The phrase in
+       [ ] becomes a link to the releases page (MessageWindow
+       .ShowLinkedMessage), so a translator can place it anywhere in the
+       sentence; a string with no [ ] pair is shown as plain text. -->
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>檢查逾時。您與 GitHub 的連線可能較慢；請再試一次。</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write

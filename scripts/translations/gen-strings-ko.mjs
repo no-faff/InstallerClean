@@ -360,8 +360,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.`,
-  'UpdateCheck.Failed.ServerError': `업데이트 확인에서 GitHub의 릴리스 페이지 대신 오류가 돌아왔습니다. GitHub에서 왔을 수도 있고, 프록시 같은 네트워크상의 다른 무언가에서 왔을 수도 있습니다. 나중에 다시 시도하거나 브라우저에서 릴리스 페이지를 여세요.`,
-  'UpdateCheck.Failed.ResponseParseError': `업데이트 확인에서 릴리스를 가리키지 않는 응답이 돌아왔습니다. GitHub에서 왔을 수도 있고, 프록시나 로그인 페이지 같은 네트워크상의 다른 무언가에서 왔을 수도 있습니다. 나중에 다시 시도하거나 브라우저에서 릴리스 페이지를 여세요.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요.`,
   'UpdateCheck.Failed.Unknown': `알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 {0}에 있습니다.`,
 

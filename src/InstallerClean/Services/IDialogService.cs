@@ -8,5 +8,12 @@ namespace InstallerClean.Services;
 public interface IDialogService
 {
     void ShowWarning(string message, string caption);
+
+    /// <summary>
+    /// A warning whose phrase in <c>[ ]</c> is a link to <paramref name="url"/>. A
+    /// message with no complete pair is shown as plain text.
+    /// </summary>
+    void ShowWarningWithLink(string message, string caption, string url);
+
     void ShowError(string message, string caption);
 }

@@ -10,6 +10,9 @@ public sealed class DialogService : IDialogService
     public void ShowWarning(string message, string caption) =>
         MessageDialog.Show(message, caption, MessageKind.Warning);
 
+    public void ShowWarningWithLink(string message, string caption, string url) =>
+        MessageDialog.Show(message, caption, MessageKind.Warning, url);
+
     public void ShowError(string message, string caption) =>
         MessageDialog.Show(message, caption, MessageKind.Error);
 }

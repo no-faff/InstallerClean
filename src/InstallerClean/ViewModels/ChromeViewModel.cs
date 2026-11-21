@@ -552,7 +552,14 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
             case CheckFailed failed:
                 UpdateStatusText = string.Empty;
-                _dialogs.ShowWarning(FailureReasonText(failed), Strings.UpdateCheck_Title);
+                // The two reasons whose sentence sends the user to the releases page
+                // carry it as a link; the others name nothing to open.
+                if (failed.ReasonCode is UpdateCheckFailureReason.ServerError
+                    or UpdateCheckFailureReason.ResponseParseError)
+                    _dialogs.ShowWarningWithLink(FailureReasonText(failed), Strings.UpdateCheck_Title,
+                        UpdateCheckService.ReleasesPageUrl);
+                else
+                    _dialogs.ShowWarning(FailureReasonText(failed), Strings.UpdateCheck_Title);
                 break;
         }
 

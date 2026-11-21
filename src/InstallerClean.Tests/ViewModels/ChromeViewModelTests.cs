@@ -94,6 +94,7 @@ public class ChromeViewModelTests
         // doing, and the status line beside the button stays empty.
         Assert.Equal(string.Empty, vm.UpdateStatusText);
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+        _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
         _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
     }
 
@@ -108,6 +109,7 @@ public class ChromeViewModelTests
         Assert.Equal(string.Empty, vm.UpdateStatusText);
         Assert.False(vm.HasNewerVersion);
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+        _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
     }
 
     /// <summary>
@@ -181,6 +183,7 @@ public class ChromeViewModelTests
         Assert.Equal(string.Format(Strings.UpdateNotice_Available, "9.9.9"), vm.UpdateNoticeText);
         _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+        _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
     }
 
     /// <summary>
@@ -240,6 +243,49 @@ public class ChromeViewModelTests
             Strings.UpdateCheck_Failed_Timeout, Strings.UpdateCheck_Title);
         Assert.Equal(string.Empty, vm.UpdateStatusText);
         Assert.False(vm.HasNewerVersion);
+    }
+
+    /// <summary>
+    /// The two reasons whose sentence sends the user to the releases page show it as
+    /// a link to that page, and only through the link form, so the plain warning is
+    /// asserted absent beside it.
+    /// </summary>
+    [Theory]
+    [InlineData(UpdateCheckFailureReason.ServerError)]
+    [InlineData(UpdateCheckFailureReason.ResponseParseError)]
+    public async Task Manual_check_that_fails_at_github_links_the_releases_page(UpdateCheckFailureReason reason)
+    {
+        CheckAnswers(new CheckFailed(reason));
+        var vm = CreateViewModel();
+
+        await vm.CheckForUpdatesCommand.ExecuteAsync(null);
+
+        var expected = reason == UpdateCheckFailureReason.ServerError
+            ? Strings.UpdateCheck_Failed_ServerError
+            : Strings.UpdateCheck_Failed_ResponseParseError;
+        _dialogService.Received(1).ShowWarningWithLink(
+            expected, Strings.UpdateCheck_Title, UpdateCheckService.ReleasesPageUrl);
+        _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    /// <summary>
+    /// The reasons whose sentence names no page to open show the plain warning.
+    /// </summary>
+    [Theory]
+    [InlineData(UpdateCheckFailureReason.NetworkUnavailable)]
+    [InlineData(UpdateCheckFailureReason.Timeout)]
+    public async Task Manual_check_that_fails_before_github_answers_shows_no_link(UpdateCheckFailureReason reason)
+    {
+        CheckAnswers(new CheckFailed(reason));
+        var vm = CreateViewModel();
+
+        await vm.CheckForUpdatesCommand.ExecuteAsync(null);
+
+        var expected = reason == UpdateCheckFailureReason.NetworkUnavailable
+            ? Strings.UpdateCheck_Failed_NetworkUnavailable
+            : Strings.UpdateCheck_Failed_Timeout;
+        _dialogService.Received(1).ShowWarning(expected, Strings.UpdateCheck_Title);
+        _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
     }
 
     [Fact]
@@ -770,6 +816,7 @@ public class ChromeViewModelTests
         Assert.False(vm.ShowsReleaseLink);
         Assert.Equal(Strings.UpdateNotice_Recommended, vm.UpdateNoticeDetailText);
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+        _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
     }
 
     /// <summary>
@@ -814,6 +861,7 @@ public class ChromeViewModelTests
         Assert.False(vm.HasNewerVersion);
         Assert.False(vm.ShowsUpdateNow);
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+        _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
     }
 
     [Fact]

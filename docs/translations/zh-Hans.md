@@ -339,8 +339,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The update couldn't be downloaded. | 无法下载更新。 |
 | The update couldn't be installed. | 无法安装更新。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 无法连接到 GitHub。请检查您的网络连接后重试。 |
-| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open the releases page in your browser. | 更新检查收到的是一个错误，而不是 GitHub 的发布页面。它可能来自 GitHub，也可能来自您网络中的其他环节，例如代理服务器。请稍后重试，或在浏览器中打开发布页面。 |
-| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open the releases page in your browser. | 更新检查收到的响应中没有指明任何发布版本。它可能来自 GitHub，也可能来自您网络中的其他环节，例如代理服务器或登录页面。请稍后重试，或在浏览器中打开发布页面。 |
+| The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser. | The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser. |
+| The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser. | The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser. |
 | The check timed out. Your connection to GitHub may be slow; try again. | 检查超时。您与 GitHub 的连接可能较慢；请重试。 |
 | The check failed for an unknown reason. Details are in {0} if you need to report it. | 检查因未知原因失败。如果您需要报告此问题，详情在 {0} 中。 |
 | The check failed for an unknown reason. The crash log could not be written. | 检查因未知原因失败。无法写入崩溃日志。 |

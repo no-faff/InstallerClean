@@ -1563,8 +1563,12 @@ Szczegóły w {1}.</value></data>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Nie udało się połączyć z GitHub. Sprawdź połączenie internetowe i spróbuj ponownie.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>Sprawdzanie aktualizacji dostało błąd zamiast strony wydań GitHub. Mógł pochodzić od GitHub albo od czegoś w twojej sieci, na przykład serwera proxy. Spróbuj ponownie później lub otwórz stronę wydań w przeglądarce.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Sprawdzanie aktualizacji dostało odpowiedź, w której nie wskazano żadnego wydania. Mogła pochodzić od GitHub albo od czegoś w twojej sieci, na przykład serwera proxy lub strony logowania. Spróbuj ponownie później lub otwórz stronę wydań w przeglądarce.</value></data>
+  <!-- The next two are shown in the update check's warning box. The phrase in
+       [ ] becomes a link to the releases page (MessageWindow
+       .ShowLinkedMessage), so a translator can place it anywhere in the
+       sentence; a string with no [ ] pair is shown as plain text. -->
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Upłynął limit czasu sprawdzania. Połączenie z GitHub może być wolne; spróbuj ponownie.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write

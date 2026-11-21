@@ -384,8 +384,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi.`,
-  'UpdateCheck.Failed.ServerError': `Pemeriksaan pembaruan menerima kesalahan alih-alih halaman rilis GitHub. Kesalahan itu bisa berasal dari GitHub atau dari sesuatu di jaringan Anda, seperti proxy. Coba lagi nanti, atau buka halaman rilis di browser Anda.`,
-  'UpdateCheck.Failed.ResponseParseError': `Pemeriksaan pembaruan menerima jawaban yang tidak menyebutkan rilis mana pun. Jawaban itu bisa berasal dari GitHub atau dari sesuatu di jaringan Anda, seperti proxy atau halaman masuk. Coba lagi nanti, atau buka halaman rilis di browser Anda.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `Pemeriksaan kehabisan waktu. Koneksi Anda ke GitHub mungkin lambat; coba lagi.`,
   'UpdateCheck.Failed.Unknown': `Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di {0} jika Anda perlu melaporkannya.`,
 

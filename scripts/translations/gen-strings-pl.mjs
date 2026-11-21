@@ -397,8 +397,8 @@ const MAP = {
 
   // 0 = installed version, 1 = latest version on GitHub
   'UpdateCheck.Failed.NetworkUnavailable': `Nie udało się połączyć z GitHub. Sprawdź połączenie internetowe i spróbuj ponownie.`,
-  'UpdateCheck.Failed.ServerError': `Sprawdzanie aktualizacji dostało błąd zamiast strony wydań GitHub. Mógł pochodzić od GitHub albo od czegoś w twojej sieci, na przykład serwera proxy. Spróbuj ponownie później lub otwórz stronę wydań w przeglądarce.`,
-  'UpdateCheck.Failed.ResponseParseError': `Sprawdzanie aktualizacji dostało odpowiedź, w której nie wskazano żadnego wydania. Mogła pochodzić od GitHub albo od czegoś w twojej sieci, na przykład serwera proxy lub strony logowania. Spróbuj ponownie później lub otwórz stronę wydań w przeglądarce.`,
+  'UpdateCheck.Failed.ServerError': `The update check got an error back instead of GitHub's releases page. It may have come from GitHub or from something on your network, such as a proxy. Try again later, or open [the releases page] in your browser.`,
+  'UpdateCheck.Failed.ResponseParseError': `The update check got an answer that didn't name a release. It may have come from GitHub or from something on your network, such as a proxy or a sign-in page. Try again later, or open [the releases page] in your browser.`,
   'UpdateCheck.Failed.Timeout': `Upłynął limit czasu sprawdzania. Połączenie z GitHub może być wolne; spróbuj ponownie.`,
   'UpdateCheck.Failed.Unknown': `Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w {0}, jeśli chcesz to zgłosić.`,
 
