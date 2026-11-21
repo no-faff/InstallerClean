@@ -454,7 +454,8 @@ public class ResultLogEntryTests
                 "unlistedKeysWithInstallPropertiesCount", "unlistedKeysWithoutInstallPropertiesCount",
                 "filesHeldForKeysWithInstallPropertiesCount", "filesHeldForKeysWithoutInstallPropertiesCount",
                 "supersededHeldForUnlistedKeyCount",
-                // The keys without an InstallProperties key one of whose source lists did not read.
+                // The keys without an InstallProperties key one of whose source lists did not read
+                // or holds a value in a form the check does not compare.
                 "unlistedKeysWithoutInstallPropertiesListUnreadCount",
                 // The files kept by the package code an ordinary installation records whose cached
                 // package does not say what it declares, those kept there because their own

@@ -174,7 +174,8 @@ public sealed record ResultLogEntry(
     /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
     ///
     /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys without an
-    /// <c>InstallProperties</c> key one of whose source lists did not read
+    /// <c>InstallProperties</c> key one of whose source lists did not read or holds a value in a
+    /// form the check does not compare
     /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
     ///
     /// SCHEMA 13 ADDS ONE KEY AT THE TOP LEVEL, TWO UNDER <c>machine</c> AND THREE UNDER
@@ -1674,7 +1675,7 @@ public sealed record MachineInfo(
 /// (<c>ScanResult.UnlistedKeysWithoutInstallPropertiesListUnread</c>). Asked of every such key from
 /// the registry alone, whatever the screen read. Keys, not files, and part of
 /// <paramref name="UnlistedKeysWithoutInstallPropertiesCount"/> and of no other count. IT
-/// COUNTS LISTS, NOT HOLDS: the screen keeps every installation package for each key counted here
+/// COUNTS KEYS BY THEIR LISTS, NOT BY HOLDS: the screen keeps every installation package for each key counted here
 /// once it reaches it, and also for a key whose lists all read where the read of a package at a
 /// folder on one does not settle, which is not counted here. A check with no registry reader
 /// counts every such key, its lists not read.

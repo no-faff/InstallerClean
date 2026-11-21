@@ -3895,13 +3895,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// caller's other source may be short at the same time. The count is what
     /// makes that state visible; see the gate in GetRegisteredPackagesCore.
     ///
-    /// The four catches carry a cause apiece. Two of them read a per-entry key
-    /// inside a loop and two read the loop's own parent key, and a subtree
-    /// problem hits all four with the same exception type and HRESULT, which is
+    /// The five catches carry a cause apiece. Three of them read a per-entry key
+    /// inside a loop (product-patches, product-entry and patch-entry) and two read
+    /// the loop's own parent key (products-key and patches-key), and a subtree
+    /// problem hits all five with the same exception type and HRESULT, which is
     /// what the budget keys on. Without the causes the first kind past the
-    /// budget would swallow the other three, and "the Products key would not
+    /// budget would swallow the other four, and "the Products key would not
     /// open" and "one patch's key would not read" are the two ends of a
-    /// diagnosis.
+    /// diagnosis. product-patches reads a program's own Patches key, and is the
+    /// one failure counted apart as well, in FallbackRead.PatchListFailures.
     ///
     /// Also reports how many entries named a cached file the API's own loop
     /// never claimed and that is really on the disk. The existence half is

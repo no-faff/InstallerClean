@@ -285,7 +285,8 @@ public interface IDeclaredProductCheck
     /// read, so nothing here waits on a drive or share. A check with no registry reader reads no
     /// list, and counts every such key.
     ///
-    /// IT COUNTS LISTS, NOT HOLDS. A key whose lists all read is not counted, though the screen
+    /// IT COUNTS KEYS BY THEIR LISTS, NOT BY HOLDS, each key once however many of its lists do not
+    /// read. A key whose lists all read is not counted, though the screen
     /// also keeps every installation package where the read of a package at a folder on one
     /// does not settle, and where the check has no way to read the packages a list names.
     /// </summary>

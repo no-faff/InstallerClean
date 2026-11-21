@@ -433,8 +433,9 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="UnlistedKeysWithoutInstallPropertiesListUnread">
 /// The keys counted in <paramref name="UnlistedKeysWithoutInstallProperties"/> one of whose source
-/// lists did not read (<see cref="Services.IDeclaredProductCheck.CountKeysWithAListUnread"/>), asked
-/// of every such key whatever the screen read. 0 where the scan has no declared-product check.
+/// lists did not read or holds a value in a form the check does not compare
+/// (<see cref="Services.IDeclaredProductCheck.CountKeysWithAListUnread"/>), each key counted once,
+/// asked of every such key whatever the screen read. 0 where the scan has no declared-product check.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
