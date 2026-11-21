@@ -64,7 +64,11 @@ public enum PendingRebootReason
     /// </summary>
     MsiExecuteMutexAccessRefused,
 
-    /// <summary>HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress exists: a previous Windows Installer transaction is suspended. Source: MS Learn, Msizap Remarks.</summary>
+    /// <summary>
+    /// HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress exists: an
+    /// earlier Windows Installer installation is active and incomplete, and Windows Installer
+    /// deletes the key when that installation completes. Source: MS Learn, Msizap Remarks.
+    /// </summary>
     InstallerInProgress,
 
     /// <summary>An entry in HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations targets a path under %SystemRoot%\Installer. The value and its pair format are documented at MS Learn, MoveFileExA.</summary>

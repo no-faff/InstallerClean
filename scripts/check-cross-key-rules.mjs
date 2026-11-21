@@ -192,8 +192,7 @@ const QUOTES_A_LABEL = [
   // reason the app can see clear while it stays open, by saying which button to
   // press. The reasons a restart clears end with the restart instead, the app
   // being closed by it, so they quote no button. Busy and Other are in rule 3a.
-  ...['Suspended', 'ClockSetBack']
-    .map((reason) => ({ sentence: `Summary.ScanSignal.${reason}`, label: 'Action.Rescan' })),
+  { sentence: 'Summary.ScanSignal.ClockSetBack', label: 'Action.Rescan' },
 ];
 
 // ---------------------------------------------------------------------------
