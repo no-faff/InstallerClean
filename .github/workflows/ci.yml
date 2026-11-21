@@ -2316,10 +2316,10 @@ jobs:
             "  a second run of the file at the path, with /s /noupdate, exited with $($again.ExitCode)"
             if ($update.Run.ExitCode -ne $again.ExitCode) {
               # What the second run printed, and what it wrote to crash.log, are the evidence of
-              # why the file at the path ended differently.
-              Write-Host "::group::$($update.Label), the second run's output"
-              Write-Host $again.Output
-              Write-Host "::endgroup::"
+              # why the file at the path ended differently. Each line is indented, so none of
+              # them can be read as a workflow command.
+              Write-Host "  the second run printed:"
+              $again.Output -split "`r?`n" | Where-Object { $_ } | ForEach-Object { Write-Host "    $_" }
               $logged = CrashLogSince $logLength
               if ($logged) { Write-Host "  crash.log gained in the second run:"; $logged -split "`r?`n" | Where-Object { $_ } | ForEach-Object { Write-Host "    $_" } }
               else { Write-Host "  crash.log gained nothing in the second run" }

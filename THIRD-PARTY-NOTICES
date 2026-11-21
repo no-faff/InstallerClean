@@ -2391,8 +2391,19 @@ The .NET runtime's third-party notices in .NET 5
 -------------------------------------------------------------------------------
 
 System.ComponentModel.Annotations 5.0.0 carries THIRD-PARTY-NOTICES.TXT as it
-stood in .NET 5. Its notices that the file above also has are not repeated;
-the four it alone has follow as it has them:
+stood in .NET 5. Its notices that the file above also has are not repeated.
+Its notice for ASP.NET gives the Apache License 2.0, where the file above
+gives the MIT License, so it follows, with the four notices it alone has, as
+it has them:
+
+License notice for ASP.NET
+-------------------------------
+
+Copyright (c) .NET Foundation. All rights reserved.
+Licensed under the Apache License, Version 2.0.
+
+Available at
+https://github.com/aspnet/AspNetCore/blob/master/LICENSE.txt
 
 License notice for Zlib 
 -----------------------
