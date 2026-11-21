@@ -83,7 +83,7 @@
 
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
-  <data name="Window.About.Title" xml:space="preserve"><value>Informazioni</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>Info programma</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>File non toccati</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>File non necessari, sicuri da eliminare</value></data>
   <data name="Window.Report.Title" xml:space="preserve">
@@ -102,7 +102,7 @@
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCH</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>DETTAGLI PRODOTTO</value></data>
-  <data name="Section.Backup.Folder" xml:space="preserve"><value>CARTELLA DI BACKUP</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>CARTELLA BACKUP</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>PER RINGRAZIARMI</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -154,7 +154,7 @@
   <data name="Field.Missing" xml:space="preserve"><value>mancante</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
-  <data name="Action.About" xml:space="preserve"><value>_Informazioni</value></data>
+  <data name="Action.About" xml:space="preserve"><value>_Info programma</value></data>
   <data name="Action.Copy" xml:space="preserve"><value>Copia</value></data>
   <data name="Action.Cut" xml:space="preserve"><value>Taglia</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Incolla</value></data>
@@ -367,7 +367,7 @@
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Cartella di backup</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Cartella backup</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Patch</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Dettagli prodotto</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
@@ -375,7 +375,7 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.BackupFolder in every language. -->
-  <data name="Automation.BackupFolder" xml:space="preserve"><value>Cartella di backup</value></data>
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>Cartella backup</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Avanzamento operazione</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Nuova scansione di {InstallerFolder}</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Avanzamento scansione</value></data>
