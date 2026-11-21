@@ -228,10 +228,10 @@ internal static class SetupReplacement
     /// Whether a process other than this one may be running from <paramref name="exePath"/>.
     /// Only processes whose image has the exe's file name are asked, Windows giving no path
     /// for its own (System, Registry and the like). Each one answers no only where it has
-    /// ended since the list was taken, or where its image path opens to a file known to be
-    /// another: by the two files' identities, or where a volume gives none, by the two
-    /// files being on volumes with different serial numbers. Anything that cannot be read
-    /// answers yes. Never throws.
+    /// ended, whether or not Windows still lists it, or where its image path opens to a file
+    /// known to be another: by the two files' identities, or where a volume gives none, by
+    /// the two files being on volumes with different serial numbers. Anything that cannot be
+    /// read answers yes. Never throws.
     /// </summary>
     /// <remarks>
     /// This finds a copy that is still starting, which holds no mutex yet, as well as one
@@ -279,6 +279,8 @@ internal static class SetupReplacement
     /// </summary>
     private static bool RunsFromAnotherFile(int processId, FileOnDisk ours, char[] buffer)
     {
+        if (HasEnded(processId)) return true;
+
         using var process = Kernel32.OpenProcess(
             Kernel32.PROCESS_QUERY_LIMITED_INFORMATION, bInheritHandle: false, (uint)processId);
         if (process.IsInvalid)
@@ -287,6 +289,20 @@ internal static class SetupReplacement
         var length = (uint)buffer.Length;
         if (!Kernel32.QueryFullProcessImageName(process, 0, buffer, ref length)) return false;
         return FileOnDisk.At(new string(buffer, 0, (int)length)).IsKnownToBeAnotherThan(ours);
+    }
+
+    /// <summary>
+    /// Whether the process <paramref name="processId"/> has ended while Windows still lists it,
+    /// which it does for as long as any process holds a handle to it, an antivirus scanner
+    /// among them. A process signals a handle opened with SYNCHRONIZE once it has ended. The
+    /// handle is opened apart from the image-path query's, so a process that refuses
+    /// SYNCHRONIZE and grants the query is still read through the query; one that cannot be
+    /// opened for this answers no here, and the query decides.
+    /// </summary>
+    internal static bool HasEnded(int processId)
+    {
+        using var process = Kernel32.OpenProcess(Ntdll.SYNCHRONIZE, bInheritHandle: false, (uint)processId);
+        return !process.IsInvalid && HandleWait.One(process, 0, out _) == Kernel32.WAIT_OBJECT_0;
     }
 
     /// <summary>The longest path Windows gives for a process's image, in characters.</summary>
