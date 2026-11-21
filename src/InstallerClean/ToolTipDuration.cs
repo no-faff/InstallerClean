@@ -12,9 +12,8 @@ namespace InstallerClean;
 /// where the switch is on, as long as the pointer rests where it is off (PresentationFramework,
 /// <c>ToolTipService</c>'s type initializer). The app sets the duration itself so every PC
 /// behaves the same whatever the switch says. Five seconds is too short for the app's longest
-/// tooltip, the sentence explaining why Cancel has gone dead mid-operation, which has no
-/// HelpText twin to reach by another route. Lasting as long as the pointer rests is one of
-/// WCAG 1.4.13's requirements of hover content.
+/// tooltip, the sentence explaining why Cancel has gone dead mid-operation. Lasting as long as
+/// the pointer rests is one of WCAG 1.4.13's requirements of hover content.
 ///
 /// A default rather than a Setter on the two ToolTip styles: this is an attached property,
 /// read from the element the tooltip hangs off, and those are Buttons, TextBlocks and Borders
