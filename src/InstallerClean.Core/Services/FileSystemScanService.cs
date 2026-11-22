@@ -1066,9 +1066,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // the missing side counts the same rows: a superseded file having gone is
         // not read as its expected end state. So a machine whose absent in-folder
         // registrations are mostly superseded patches can reach the bound. That
-        // needs at most two registered files present in the folder, twenty times
-        // as many absent, and an offer with something in it, which is not a shape
-        // a healthy machine takes.
+        // needs at most two registered files present in the folder, more than
+        // nineteen times as many absent, and an offer with something in it, which
+        // is not a shape a healthy machine takes.
         //
         // Two rather than a round number, because the absolute bound answers the
         // finding and no more; machines with most of their cache missing are
@@ -1082,9 +1082,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // and not the fault this gate was written for. Floored, a machine with no
         // survivor has to show the same twenty missing rows a machine with one
         // survivor already had to, and P = 1 and P = 2 are arithmetically
-        // untouched. It is a fifth of the in-folder registrations rather than of
-        // all of them, and the tests pin both sides at each P the absolute bound
-        // admits.
+        // untouched. So the gate fires when the survivors, floored at one, are
+        // fewer than a twentieth of that floored count and the missing in-folder
+        // registrations together. The proportion is of the in-folder
+        // registrations rather than of all of them, and the tests pin both sides
+        // at each P the absolute bound admits.
         var presentRegistered = registeredInFolderPresent;
         var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2

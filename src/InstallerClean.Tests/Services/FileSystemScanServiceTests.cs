@@ -362,7 +362,7 @@ public class FileSystemScanServiceTests
     public async Task ScanAsync_does_not_refuse_a_small_machine_where_two_survivors_are_a_tenth_of_it()
     {
         // The proportional bound doing its own work: two present out of twenty
-        // is a fifth of the registrations, which is nothing like a collapse, and
+        // is a tenth of the registrations, which is nothing like a collapse, and
         // without it the absolute bound alone would refuse this scan.
         var result = await ScanWithRegisteredSplit(present: 2, missing: 18);
 
