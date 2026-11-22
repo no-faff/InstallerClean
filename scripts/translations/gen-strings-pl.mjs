@@ -344,16 +344,16 @@ const MAP = {
   'Error.ScanFailedTitle': `Skanowanie nie powiodło się`,
   'Error.NothingRemoved': `Nic nie zostało usunięte.`,
   'Error.NothingOfferedNothingRemoved': `Żadnego pliku nie umieszczono na liście plików, które można bezpiecznie usunąć, i niczego nie usunięto.`,
-  'Error.InstallerDbEmpty': `Rekordy Windows Installera wróciły całkowicie puste: ani jeden zainstalowany program ani jedna aktualizacja nie rości sobie prawa do żadnego pliku instalacyjnego w pamięci podręcznej. Na działającym komputerze to się nie zdarza (nawet świeża instalacja Windows ma takie pliki), więc albo rekordy są uszkodzone, albo nie dało się ich odczytać, a skanowanie, które uwierzyłoby w tę odpowiedź, błędnie uznałoby każdy plik w {InstallerFolder} za osierocony. InstallerClean zamiast tego się zatrzymał.`,
-  'Error.MsiAccessDenied': `Windows Installer nie pozwolił InstallerClean wypisać tego, co jest zainstalowane. InstallerClean działał już jako administrator, więc uruchomienie go ponownie jako administrator niczego nie zmieni. Bez tej listy nie da się bezpiecznie stwierdzić, które pliki w pamięci podręcznej są nadal potrzebne, więc InstallerClean się zatrzymał.`,
-  'Error.MsiNonSuccess': `Windows Installer nie zdołał przekazać InstallerClean czytelnej listy zainstalowanych programów: odczytał {1} {2}, a potem jeden wpis wrócił nieczytelny (kod błędu {0}). Zamiast pracować na liście odczytanej tylko częściowo, InstallerClean się zatrzymał.`,
+  'Error.InstallerDbEmpty': `Rekordy Instalatora Windows wróciły całkowicie puste: ani jeden zainstalowany program ani jedna aktualizacja nie rości sobie prawa do żadnego pliku instalacyjnego w pamięci podręcznej. Na działającym komputerze to się nie zdarza (nawet świeża instalacja Windows ma takie pliki), więc albo rekordy są uszkodzone, albo nie dało się ich odczytać, a skanowanie, które uwierzyłoby w tę odpowiedź, błędnie uznałoby każdy plik w {InstallerFolder} za osierocony. InstallerClean zamiast tego się zatrzymał.`,
+  'Error.MsiAccessDenied': `Instalator Windows nie pozwolił InstallerClean wypisać tego, co jest zainstalowane. InstallerClean działał już jako administrator, więc uruchomienie go ponownie jako administrator niczego nie zmieni. Bez tej listy nie da się bezpiecznie stwierdzić, które pliki w pamięci podręcznej są nadal potrzebne, więc InstallerClean się zatrzymał.`,
+  'Error.MsiNonSuccess': `Instalator Windows nie zdołał przekazać InstallerClean czytelnej listy zainstalowanych programów: odczytał {1} {2}, a potem jeden wpis wrócił nieczytelny (kod błędu {0}). Zamiast pracować na liście odczytanej tylko częściowo, InstallerClean się zatrzymał.`,
   'Error.InvalidDestinationTitle': `Nieprawidłowy folder docelowy`,
   'Error.DestinationWriteFailedTitle': `Nie udało się użyć tego folderu kopii zapasowej`,
   'Error.MoveFailedTitle': `Przenoszenie nie powiodło się`,
   'Error.DeleteFailedTitle': `Usuwanie nie powiodło się`,
   'Error.SettingNotSavedTitle': `Ustawienie nie zostało zapisane`,
   'Error.SettingNotSavedBody': `Nie udało się zapisać zmiany. Przy następnym uruchomieniu InstallerClean wróci do poprzedniego ustawienia.`,
-  'Error.DestinationInsideInstaller': `Folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.`,
+  'Error.DestinationInsideInstaller': `Folder docelowy nie może znajdować się wewnątrz folderu Instalatora Windows.`,
 
   // 0 = the destination path the user typed
   'Error.DestinationInSystemFolder': `Miejsce docelowe {0} rozwija się wewnątrz folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% i %ProgramData%.`,
@@ -386,7 +386,7 @@ const MAP = {
   // 0 = shell error code
 
   // 0 = destination
-  'Error.MoveIntoInstaller': `Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}).`,
+  'Error.MoveIntoInstaller': `Odmowa przeniesienia plików do folderu Instalatora Windows (cel: {0}).`,
 
   // 0 = the relative path the caller passed
   'Error.DestinationNotFullyQualified': `Folder kopii zapasowej musi być pełną ścieżką do folderu, zaczynającą się od litery dysku albo udziału sieciowego (na przykład D:\\Backup albo \\\\serwer\\backup). InstallerClean nie może użyć tej: {0}`,
@@ -476,7 +476,7 @@ const MAP = {
   'Cli.DeletingFiles': `Trwa usuwanie: {0} niepotrzebnych {1}...`,
   'Cli.DeletedFiles': `Trwale usunięto {0} niepotrzebnych {1}.`,
   'Cli.NoMoveDestination': `Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA. (Lokalizacja domyślna ustawiona w GUI jest przypisana do użytkownika i nie dotyczy uruchomień zaplanowanych ani na koncie usługi.)`,
-  'Cli.MoveDestinationInsideInstaller': `Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.`,
+  'Cli.MoveDestinationInsideInstaller': `Błąd: folder docelowy nie może znajdować się wewnątrz folderu Instalatora Windows.`,
   'Cli.MoveDestinationRelative': `Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Błąd: miejsce docelowe {0} rozwija się wewnątrz folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% i %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Błąd: coś właśnie korzysta z Instalatora Windows, na przykład Windows Update lub program, który jest instalowany albo usuwany. /m i /d są zablokowane, dopóki to trwa. Spróbuj ponownie, gdy to się skończy.`,
@@ -505,15 +505,15 @@ const MAP = {
   'Body.NotScanned.Why': `Naciśnij przycisk Skanuj ponownie, aby przejrzeć {InstallerFolder} w poszukiwaniu plików instalatora, których żaden program już nie potrzebuje.`,
   'Confirm.MoveSameDrive': `Ten folder jest na tym samym dysku, więc miejsce nie wróci, dopóki go nie skasujesz. Wybierz folder na innym dysku, jeśli chcesz mieć miejsce od razu.`,
   'Error.ScanCorrelationFailed': `InstallerClean nie zdołał dopasować rekordów Instalatora Windows do zawartości {InstallerFolder}. Prawie nic z tego, na co wskazują rekordy, tam nie ma, i prawie nic z tego, co tam jest, nie jest wskazane przez żaden rekord, więc o żadnym pliku nie dało się wykazać, że jest niepotrzebny.`,
-  'Error.CandidateOutsideCache': `Ten plik nie znajduje się bezpośrednio w folderze Windows Installer; odrzucono ze względów bezpieczeństwa.`,
+  'Error.CandidateOutsideCache': `Ten plik nie znajduje się bezpośrednio w folderze Instalator Windows; odrzucono ze względów bezpieczeństwa.`,
   'Completion.MoveCancelledSummary': `Przed anulowaniem przeniesiono {0}/{1} {2} do {3}.`,
   'Completion.PermanentDeleteCancelledSummary': `Przed anulowaniem usunięto trwale {0}/{1} {2}.`,
   'Body.PendingReboot.Lead': `Tych plików nie można teraz wyczyścić.`,
   'Cli.TooManyArguments': `Błąd: nieoczekiwany dodatkowy argument „{0}”. Jeśli ścieżka folderu docelowego zawiera spację, ujmij całą ścieżkę w cudzysłów: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Folder dla każdego użytkownika; zaplanowane lub SYSTEM: /m ŚCIEŻKA.`,
-  'Error.ScanRecordsUnreadable': `InstallerClean nie zdołał odczytać dość rekordów Windows Installera, by mieć pewność, co jest jeszcze potrzebne: lista zainstalowanych programów wróciła niepełna, a odczyt tych samych rekordów prosto z rejestru również napotkał błędy. Plik mógłby wyglądać na osierocony tylko dlatego, że rekord, który go wymienia, był jednym z nieczytelnych, więc InstallerClean się zatrzymał.`,
-  'Error.MsiEnumerationNeverEnded': `Windows Installer nigdy nie zasygnalizował końca listy zainstalowanych programów: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.`,
-  'Error.MsiPatchEnumerationNeverEnded': `Windows Installer nigdy nie zasygnalizował końca listy poprawek jednego programu: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.`,
+  'Error.ScanRecordsUnreadable': `InstallerClean nie zdołał odczytać dość rekordów Instalatora Windows, by mieć pewność, co jest jeszcze potrzebne: lista zainstalowanych programów wróciła niepełna, a odczyt tych samych rekordów prosto z rejestru również napotkał błędy. Plik mógłby wyglądać na osierocony tylko dlatego, że rekord, który go wymienia, był jednym z nieczytelnych, więc InstallerClean się zatrzymał.`,
+  'Error.MsiEnumerationNeverEnded': `Instalator Windows nigdy nie zasygnalizował końca listy zainstalowanych programów: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.`,
+  'Error.MsiPatchEnumerationNeverEnded': `Instalator Windows nigdy nie zasygnalizował końca listy poprawek jednego programu: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.`,
   'Completion.DonateAsk': `Każdy napiwek jest bardzo mile widziany`,
   'About.Link.Guide': `Przewodnik i FAQ`,
   'About.Link.ReportProblem': `Zgłoś problem`,

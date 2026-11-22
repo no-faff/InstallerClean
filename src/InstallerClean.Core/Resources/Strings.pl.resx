@@ -1239,8 +1239,8 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
        Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
   <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>Żadnego pliku nie umieszczono na liście plików, które można bezpiecznie usunąć, i niczego nie usunięto.</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Rekordy Windows Installera wróciły całkowicie puste: ani jeden zainstalowany program ani jedna aktualizacja nie rości sobie prawa do żadnego pliku instalacyjnego w pamięci podręcznej. Na działającym komputerze to się nie zdarza (nawet świeża instalacja Windows ma takie pliki), więc albo rekordy są uszkodzone, albo nie dało się ich odczytać, a skanowanie, które uwierzyłoby w tę odpowiedź, błędnie uznałoby każdy plik w {InstallerFolder} za osierocony. InstallerClean zamiast tego się zatrzymał.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer nie pozwolił InstallerClean wypisać tego, co jest zainstalowane. InstallerClean działał już jako administrator, więc uruchomienie go ponownie jako administrator niczego nie zmieni. Bez tej listy nie da się bezpiecznie stwierdzić, które pliki w pamięci podręcznej są nadal potrzebne, więc InstallerClean się zatrzymał.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Rekordy Instalatora Windows wróciły całkowicie puste: ani jeden zainstalowany program ani jedna aktualizacja nie rości sobie prawa do żadnego pliku instalacyjnego w pamięci podręcznej. Na działającym komputerze to się nie zdarza (nawet świeża instalacja Windows ma takie pliki), więc albo rekordy są uszkodzone, albo nie dało się ich odczytać, a skanowanie, które uwierzyłoby w tę odpowiedź, błędnie uznałoby każdy plik w {InstallerFolder} za osierocony. InstallerClean zamiast tego się zatrzymał.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Instalator Windows nie pozwolił InstallerClean wypisać tego, co jest zainstalowane. InstallerClean działał już jako administrator, więc uruchomienie go ponownie jako administrator niczego nie zmieni. Bez tej listy nie da się bezpiecznie stwierdzić, które pliki w pamięci podręcznej są nadal potrzebne, więc InstallerClean się zatrzymał.</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1253,7 +1253,7 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer nie zdołał przekazać InstallerClean czytelnej listy zainstalowanych programów: odczytał {1} {2}, a potem jeden wpis wrócił nieczytelny (kod błędu {0}). Zamiast pracować na liście odczytanej tylko częściowo, InstallerClean się zatrzymał.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Instalator Windows nie zdołał przekazać InstallerClean czytelnej listy zainstalowanych programów: odczytał {1} {2}, a potem jeden wpis wrócił nieczytelny (kod błędu {0}). Zamiast pracować na liście odczytanej tylko częściowo, InstallerClean się zatrzymał.</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1265,7 +1265,7 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer nigdy nie zasygnalizował końca listy zainstalowanych programów: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Instalator Windows nigdy nie zasygnalizował końca listy zainstalowanych programów: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1273,7 +1273,7 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer nigdy nie zasygnalizował końca listy poprawek jednego programu: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Instalator Windows nigdy nie zasygnalizował końca listy poprawek jednego programu: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1331,7 +1331,7 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean nie zdołał odczytać dość rekordów Windows Installera, by mieć pewność, co jest jeszcze potrzebne: lista zainstalowanych programów wróciła niepełna, a odczyt tych samych rekordów prosto z rejestru również napotkał błędy. Plik mógłby wyglądać na osierocony tylko dlatego, że rekord, który go wymienia, był jednym z nieczytelnych, więc InstallerClean się zatrzymał.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean nie zdołał odczytać dość rekordów Instalatora Windows, by mieć pewność, co jest jeszcze potrzebne: lista zainstalowanych programów wróciła niepełna, a odczyt tych samych rekordów prosto z rejestru również napotkał błędy. Plik mógłby wyglądać na osierocony tylko dlatego, że rekord, który go wymienia, był jednym z nieczytelnych, więc InstallerClean się zatrzymał.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
@@ -1421,7 +1421,7 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        placeholders. -->
   <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Ustawienie nie zostało zapisane</value></data>
   <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Nie udało się zapisać zmiany. Przy następnym uruchomieniu InstallerClean wróci do poprzedniego ustawienia.</value></data>
-  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Folder docelowy nie może znajdować się wewnątrz folderu Instalatora Windows.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Miejsce docelowe {0} rozwija się wewnątrz folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% i %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Za mało miejsca</value></data>
@@ -1452,7 +1452,7 @@ Szczegóły w {1}.</value></data>
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Ten plik nie znajduje się bezpośrednio w folderze Windows Installer; odrzucono ze względów bezpieczeństwa.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Ten plik nie znajduje się bezpośrednio w folderze Instalator Windows; odrzucono ze względów bezpieczeństwa.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -1481,7 +1481,7 @@ Szczegóły w {1}.</value></data>
   <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Coś poszło nie tak z tym plikiem; został pozostawiony na miejscu.</value></data>
   <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Coś poszło nie tak z tymi plikami; zostały pozostawione na miejscu.</value></data>
   <!-- 0 = destination -->
-  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}).</value></data>
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Odmowa przeniesienia plików do folderu Instalatora Windows (cel: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
        bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
@@ -1997,7 +1997,7 @@ Uruchom InstallerClean ponownie jako administrator.</value></data>
        "Recovered" is accurate here now and was not before: the space comes
        back at the moment of the delete rather than when a bin is emptied. -->
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA. (Lokalizacja domyślna ustawiona w GUI jest przypisana do użytkownika i nie dotyczy uruchomień zaplanowanych ani na koncie usługi.)</value></data>
-  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Błąd: folder docelowy nie może znajdować się wewnątrz folderu Instalatora Windows.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0}</value></data>
   <!-- 0 = the destination. The four names are the four roots
