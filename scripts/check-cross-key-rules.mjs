@@ -2,7 +2,8 @@
 // Fails (exit 1) when a rule that lives BETWEEN two strings, or between a string
 // and the code that shows it, is broken in any language in LANGS. The rules are
 // numbered below: a control's spoken name against its visible label, a sentence
-// against the button it names, a word a string must not repeat, how github is cased
+// against the button it names, a line against the banner whose restart
+// instruction it ends with, a word a string must not repeat, how github is cased
 // for the surface it is on, the folder token and the link phrase a translation has
 // to keep, a window title written in code as well as in XAML, and a resource read
 // that goes round Strings. Exit 2 where Strings.resx cannot be read, a resx file's
@@ -191,7 +192,7 @@ const QUOTES_A_LABEL = [
   // The line saying why a scan left alone the files no record names ends, for every
   // reason the app can see clear while it stays open, by saying which button to
   // press. The reasons a restart clears end with the restart instead, the app
-  // being closed by it, so they quote no button.
+  // being closed by it, so they quote no button; rule 3b holds those.
   { sentence: 'Summary.ScanSignal.Busy', label: 'Action.Rescan' },
   { sentence: 'Summary.ScanSignal.Other', label: 'Action.Rescan' },
   { sentence: 'Summary.ScanSignal.ClockSetBack', label: 'Action.Rescan' },
@@ -201,6 +202,49 @@ const QUOTES_A_LABEL = [
   { sentence: 'Summary.SourceGivenUp.Path', label: 'Action.Rescan' },
   { sentence: 'Summary.SourcesGivenUp', label: 'Action.Rescan' },
 ];
+
+// ---------------------------------------------------------------------------
+// Rule 3b. A line that ends with the restart instruction ends with the banner's.
+//
+// The reasons a restart clears quote no button: their line under the left-alone
+// count ends by telling the reader to restart Windows and saying the app checks
+// again when it next starts, in the words the Body.PendingReboot.* banner for the
+// same kind of signal ends with. The restart sentence is read off the banner for a
+// change waiting for the restart (RESTART_FROM), which ends with it and the
+// check-again sentence and nothing else. Each entry's line has to end with its
+// banner's text from that restart sentence on, word for word, so a language that
+// loses the restart from either side, or rewords it in one, fails. The six that end
+// with the restart and the check again are held to that banner itself; the
+// unfinished installation is held to its own banner, which goes on to say what to
+// do if the message comes back.
+const RESTART_FROM = 'Body.PendingReboot.PendingRenameInCache';
+const ENDS_LIKE_A_BANNER = [
+  ...['RenameInCache', 'RenameUnresolved', 'AccessRefused', 'RegistryUnreadable',
+    'LockUnreadable', 'LockUnreadableWindowsError'].map((reason) => ({
+    sentence: `Summary.ScanSignal.${reason}`,
+    banner: RESTART_FROM,
+  })),
+  { sentence: 'Summary.ScanSignal.Suspended', banner: 'Body.PendingReboot.InstallerInProgress' },
+];
+
+// The second-last sentence of `value`, which in RESTART_FROM is the restart, or null
+// where it has fewer than two. A sentence ends at a full stop, question or
+// exclamation mark followed by white space, or at the full-width marks Chinese and
+// Japanese end one with, which take no space after them. The restart names
+// Windows, which no language translates, so a split that has gone wrong shows as
+// a restart sentence without it.
+const secondLastSentence = (value) => {
+  const text = value.trimEnd();
+  const starts = [0];
+  const end = /[.!?](?=\s+\S)|[。！？](?=\S)/g;
+  for (let m; (m = end.exec(text));) {
+    let i = m.index + 1;
+    while (/\s/.test(text[i])) i += 1;
+    starts.push(i);
+  }
+  if (starts.length < 2) return null;
+  return text.slice(starts[starts.length - 2], starts[starts.length - 1]).trimEnd();
+};
 
 // ---------------------------------------------------------------------------
 // Rule 3a. The same rule, on the sentences whose satellites cannot meet it yet.
@@ -1008,6 +1052,7 @@ const declaredKeys = [
   ...ELABORATES_A_LABEL.flatMap((p) => [p.label, p.name]),
   ...ELABORATES_A_LABEL_IN_CODE.flatMap((p) => [p.label, p.name]),
   ...QUOTES_A_LABEL.flatMap((p) => [p.sentence, p.label]),
+  ...ENDS_LIKE_A_BANNER.flatMap((p) => [p.sentence, p.banner]),
   ...MUST_NOT_NAME.map((p) => p.key),
   ...GITHUB_SPOKEN, ...GITHUB_DRAWN,
 ];
@@ -1195,6 +1240,25 @@ for (const lang of LANGS) {
       failures.push(`${sentence} does not quote ${label} ("${wording(button)}")`);
   }
 
+  const restart = map.has(RESTART_FROM) ? secondLastSentence(map.get(RESTART_FROM)) : null;
+  if (restart === null || !restart.includes('Windows'))
+    failures.push(`${RESTART_FROM} does not end with a restart sentence naming Windows and one `
+      + 'after it, so no line can be held to the restart instruction');
+  else for (const { sentence, banner } of ENDS_LIKE_A_BANNER) {
+    const line = read(sentence), bannerValue = read(banner);
+    if (line === null || bannerValue === null) continue;
+    const at = bannerValue.lastIndexOf(restart);
+    if (at < 0) {
+      failures.push(`${banner} does not carry the restart sentence ${RESTART_FROM} ends with `
+        + `("${wording(restart)}")`);
+      continue;
+    }
+    const closing = bannerValue.slice(at).trimEnd();
+    if (!line.trimEnd().endsWith(closing))
+      failures.push(`${sentence} does not end with the restart instruction ${banner} ends with `
+        + `("${wording(closing)}")`);
+  }
+
   // Rule 3a. The same comparison, run only where neither leg holds the sentence
   // out. An override of a held-out sentence goes through it as well, because a
   // few-form of an untranslated sentence is untranslated in the same way.
@@ -1350,6 +1414,7 @@ if (problems.length) {
 console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs `
   + `and ${ELABORATES_A_LABEL.length + ELABORATES_A_LABEL_IN_CODE.length} measured by containment `
   + `(${ELABORATES_A_LABEL_IN_CODE.length} of them built in code), `
+  + `${ENDS_LIKE_A_BANNER.length} lines ending with a banner's restart instruction, `
   + `${tokenKeys.size} keys carrying ${FOLDER_TOKEN}, ${frameworkCheckKeys.length} through `
   + `Strings.FrameworkCheck carrying none, ${linkKeys.size} carrying a [link phrase], `
   + `${tooltipKeys.size} tooltips judged for a closing full stop, `
