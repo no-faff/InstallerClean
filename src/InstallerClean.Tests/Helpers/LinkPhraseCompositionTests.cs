@@ -118,9 +118,8 @@ public class LinkPhraseCompositionTests
                 continue;
             }
 
-            // The window builds its line, and its accessible name, as prefix + link +
-            // suffix, so the three parts have to reconstitute the sentence minus its
-            // two brackets. A second pair leaves one of them in the suffix.
+            // The window builds its line as prefix + link + suffix, so the three parts
+            // have to reconstitute the sentence minus its two brackets. A second pair leaves one of them in the suffix.
             if (split.Prefix + split.LinkText + split.Suffix
                 != value.Replace("[", "").Replace("]", ""))
             {

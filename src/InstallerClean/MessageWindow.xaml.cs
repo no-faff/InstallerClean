@@ -97,11 +97,11 @@ public partial class MessageWindow : Window
             Style = (Style)FindResource("SubtleLink"),
         };
         link.Click += (_, _) => UrlLauncher.OpenUrl(linkUrl);
-        // The link's words are a phrase from the middle of a sentence, and in a
-        // translation need not say what they open on their own; the whole message,
-        // already in the displayed language, does, and it still contains the
-        // words on screen for voice control to click.
-        AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
+        // Named by its own words, which name the page it opens, as the link phrase
+        // in each message raised with a link does in every language. The window's
+        // announced title already carries the whole message, so the link is heard
+        // as what it opens, and voice control reaches it by the words on screen.
+        AutomationProperties.SetName(link, split.LinkText);
 
         if (split.Prefix.Length > 0) LinkedMessageText.Inlines.Add(new Run(InstallerPathText.ForDrawing(split.Prefix)));
         LinkedMessageText.Inlines.Add(link);
