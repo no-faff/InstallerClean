@@ -548,7 +548,7 @@
        open, and the last sentence says plainly what it means if the refusal survives
        one, as Body.PendingReboot.RegistryCheckUnreadable does for its own read. "Re-scan"
        is the button's own label. -->
-  <data name="Body.PendingReboot.MsiExecuteMutexAccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer is busy, so Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Restart Windows. InstallerClean will check again the next time you start it. If Windows still refuses, this isn't a machine InstallerClean can clean.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutexAccessRefused" xml:space="preserve"><value>Windows가 InstallerClean에 Windows Installer가 사용 중인지 확인할 권한을 주지 않아, 이동과 삭제가 일시 중지되었고 InstallerClean은 {InstallerFolder}를 건드리지 않습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다. 그래도 Windows가 거부한다면, 이 PC는 InstallerClean이 정리할 수 있는 PC가 아닙니다.</value></data>
   <!-- The banner for a sample of the Windows Installer lock that failed in a way that is
        neither a refusal nor a finding. Names the folder with the {InstallerFolder} token
        like the rest of the family. It says only that the check could not be made: nothing
@@ -561,10 +561,10 @@
        one, which gives no cause, where it gave none. 0 = the text Windows gives for the error,
        in the language Windows is shown in, without its full stop; 1 = its number, in
        decimal. Cli.PendingRebootBlocked.MsiExecuteMutexUnreadable has the same pair. -->
-  <data name="Body.PendingReboot.MsiExecuteMutexUnreadable" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer is busy, so Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Restart Windows. InstallerClean will check again the next time you start it. If it still can't check, this isn't a machine InstallerClean can clean.</value></data>
-  <data name="Body.PendingReboot.MsiExecuteMutexUnreadableWindowsError" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer is busy, because Windows gave an error: {0} (error {1}). Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Restart Windows. InstallerClean will check again the next time you start it. If it still can't check, this isn't a machine InstallerClean can clean.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>An earlier Windows Installer installation hasn't finished, so Move and Delete are paused and InstallerClean won't touch {InstallerFolder}. Restart Windows. An installation waiting for a restart carries on after it, and InstallerClean will check again the next time you start it. If this message comes back, run the setup of the program that was being installed or removed again, and Windows Installer will offer to undo the installation it didn't finish.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a change to {InstallerFolder} waiting for the next restart, so Move and Delete are paused. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutexUnreadable" xml:space="preserve"><value>InstallerClean이 Windows Installer가 사용 중인지 확인할 수 없어서, 이동과 삭제가 일시 중지되었고 InstallerClean은 {InstallerFolder}를 건드리지 않습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다. 그래도 확인할 수 없다면, 이 PC는 InstallerClean이 정리할 수 있는 PC가 아닙니다.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutexUnreadableWindowsError" xml:space="preserve"><value>Windows가 오류를 반환해서 InstallerClean이 Windows Installer가 사용 중인지 확인할 수 없었습니다: {0}(오류 {1}). 이동과 삭제가 일시 중지되었고 InstallerClean은 {InstallerFolder}를 건드리지 않습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다. 그래도 확인할 수 없다면, 이 PC는 InstallerClean이 정리할 수 있는 PC가 아닙니다.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Windows Installer를 통한 이전 설치가 아직 끝나지 않아 이동과 삭제가 일시 중지되었고, InstallerClean은 {InstallerFolder}를 건드리지 않습니다. Windows를 다시 시작하세요. 재시작을 기다리던 설치는 재시작 후에 이어서 진행되며, InstallerClean은 다음에 실행할 때 다시 확인합니다. 이 메시지가 다시 나타나면, 설치 또는 제거 중이던 프로그램의 설치 프로그램을 다시 실행하세요. 그러면 Windows Installer가 끝나지 않은 설치로 변경된 내용을 취소할지 묻습니다.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows에 다음 재시작 때 적용될 {InstallerFolder}에 대한 변경이 대기 중이라 이동과 삭제가 일시 중지되었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
   <!-- The banner for an entry the gate cannot place. Names the folder with the
        {InstallerFolder} token like the rest of the family. It states what the machine
        holds, a file change waiting for the next restart, and stops there: nothing here
@@ -572,7 +572,7 @@
        the two banners that say so would both be untrue, and Body.PendingReboot.Other says
        something is unfinished and would be untrue as well. The restart is the instruction because
        these operations are carried out at the next boot and not before. -->
-  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>Windows has a file change waiting for the next restart, and InstallerClean can't tell which files it affects, so it can't rule out that they're in {InstallerFolder}. Move and Delete are paused. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
+  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>Windows에 다음 재시작 때 적용될 파일 변경이 대기 중인데, InstallerClean은 그 변경이 어떤 파일에 영향을 주는지 알 수 없으므로, 그 파일들이 {InstallerFolder}에 있지 않다고 단정할 수 없습니다. 이동과 삭제가 일시 중지되었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
   <!-- The banner for a registry read that did not answer. Names the folder with the
        {InstallerFolder} token like the rest of the family. It names neither of the two
        reads, because one sentence has to be true whichever of them it was, and it claims
@@ -581,7 +581,7 @@
        because it clears a transient fault, and the last sentence says plainly what it
        means if it does not, rather than leaving somebody re-scanning at a machine whose
        permissions will refuse the read again tomorrow. -->
-  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether Windows Installer is busy or has work waiting for a restart. Move and Delete are paused. Restart Windows. InstallerClean will check again the next time you start it. If the setting still won't read, this isn't a machine InstallerClean can clean.</value></data>
+  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean이 {InstallerFolder}를 건드리기 전에 확인하는 Windows 설정 중 하나를 읽을 수 없어서, Windows Installer가 사용 중인지 또는 재시작을 기다리는 작업이 있는지 알 수 없습니다. 이동과 삭제가 일시 중지되었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다. 그래도 설정을 읽을 수 없다면, 이 PC는 InstallerClean이 정리할 수 있는 PC가 아닙니다.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -676,7 +676,7 @@
        its answer; every file still to be checked against it is left alone rather than
        listed as safe to delete. "It" is the drive or share the waiting line names, and "left alone" is
        worded as in Window.Registered.Title. -->
-  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>Any file InstallerClean can't check without it will be left alone.</value></data>
+  <data name="Status.StopWaitingLeavesAlone" xml:space="preserve"><value>InstallerClean이 이것 없이는 확인할 수 없는 파일은 모두 그대로 둡니다.</value></data>
   <!-- What a screen reader says for the waiting line while Action.StopWaiting's
        button shows; nothing on screen changes. 0 = the waiting line as drawn
        (Status.WaitingForDrive or Status.WaitingForPath), 1 = the access key of
@@ -887,8 +887,8 @@
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file left alone. The scan listed it as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files left alone. The scan listed them as safe to delete, but the final check before moving or deleting couldn't confirm it.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0}개 파일을 그대로 두었습니다. 검사는 이 파일을 안전하게 삭제할 수 있다고 목록에 올렸지만, 이동하거나 삭제하기 직전의 최종 확인에서 그것을 확인할 수 없었습니다.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0}개 파일을 그대로 두었습니다. 검사는 이 파일들을 안전하게 삭제할 수 있다고 목록에 올렸지만, 이동하거나 삭제하기 직전의 최종 확인에서 그것을 확인할 수 없었습니다.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -1064,11 +1064,11 @@
        after "for" declines it here. "Left alone" is worded as in
        Window.Registered.Title, and "Re-scan" is Action.Rescan's label without its
        access-key marker. 0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally.</value></data>
+  <data name="Summary.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean이 드라이브 {0}에 대한 대기를 중단했기 때문에, 그 드라이브 없이는 확인할 수 없는 파일을 그대로 두었습니다. 정상적으로 응답하게 되면 다시 검사를 누르세요.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, for a folder that is not on a drive letter, named
        as it is spelled. 0 = a network share such as "\\fileserver\apps", or another
        path -->
-  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Re-scan once it's responding normally.</value></data>
+  <data name="Summary.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean이 {0}에 대한 대기를 중단했기 때문에, 그 위치 없이는 확인할 수 없는 파일을 그대로 두었습니다. 정상적으로 응답하게 되면 다시 검사를 누르세요.</value></data>
   <!-- As Summary.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
@@ -1076,7 +1076,7 @@
        brackets, so its separators cannot be read as the sentence's own punctuation, and
        it carries no "and", which a list joined in code cannot place in every
        language. -->
-  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Re-scan once they're responding normally.</value></data>
+  <data name="Summary.SourcesGivenUp" xml:space="preserve"><value>InstallerClean이 여러 드라이브 또는 공유 ({0})에 대한 대기를 중단했기 때문에, 그것들 없이는 확인할 수 없는 파일을 그대로 두었습니다. 정상적으로 응답하게 되면 다시 검사를 누르세요.</value></data>
   <!-- The window's line under the left-alone count, where the scan found one of the
        signals the Body.PendingReboot.* banners name set when it read them just after its
        clock, and so left alone every file in the folder no record names. One line per
@@ -1088,15 +1088,15 @@
 
        IN THE PAST TENSE, AND IT IS SHOWN WHETHER OR NOT THE SIGNAL IS STILL SET. Where it
        is, the warning banner above says so in the present, and both are true. -->
-  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>Windows Installer was busy when the scan started, for example with Windows Update or a program being installed or removed, so InstallerClean left alone the files it can't check while it's busy. Re-scan once it has finished.</value></data>
-  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>An earlier Windows Installer installation hadn't finished when the scan started, so InstallerClean left alone the files it can't check until it has. Restart Windows. An installation waiting for a restart carries on after it, and InstallerClean will check again the next time you start it. If this message comes back, run the setup of the program that was being installed or removed again, and Windows Installer will offer to undo the installation it didn't finish.</value></data>
-  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows had a change to {InstallerFolder} waiting for the next restart when the scan started, so InstallerClean left alone the files it can't check until that change is made. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
-  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows had a file change waiting for the next restart when the scan started, and InstallerClean couldn't tell which files it affects, so it left alone the files it can't check until that change is made. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
-  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy when the scan started, so it left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
-  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>InstallerClean couldn't read a Windows setting it checks, so it couldn't tell whether Windows Installer was busy or had work waiting for a restart when the scan started. It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
-  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started, so it left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
-  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it.</value></data>
-  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished.</value></data>
+  <data name="Summary.ScanSignal.Busy" xml:space="preserve"><value>검사가 시작될 때 Windows Installer가 Windows 업데이트나 설치 또는 제거 중인 프로그램 등으로 사용 중이었기 때문에, InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. 그 작업이 끝나면 다시 검사를 누르세요.</value></data>
+  <data name="Summary.ScanSignal.Suspended" xml:space="preserve"><value>검사가 시작될 때 Windows Installer를 통한 이전 설치가 끝나지 않은 상태였기 때문에, InstallerClean은 그 설치가 끝날 때까지 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. 재시작을 기다리던 설치는 재시작 후에 이어서 진행되며, InstallerClean은 다음에 실행할 때 다시 확인합니다. 이 메시지가 다시 나타나면, 설치 또는 제거 중이던 프로그램의 설치 프로그램을 다시 실행하세요. 그러면 Windows Installer가 끝나지 않은 설치로 변경된 내용을 취소할지 묻습니다.</value></data>
+  <data name="Summary.ScanSignal.RenameInCache" xml:space="preserve"><value>검사가 시작될 때 Windows에 다음 재시작 때 적용될 {InstallerFolder}에 대한 변경이 대기 중이었기 때문에, InstallerClean은 그 변경이 적용될 때까지 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
+  <data name="Summary.ScanSignal.RenameUnresolved" xml:space="preserve"><value>검사가 시작될 때 Windows에 다음 재시작 때 적용될 파일 변경이 대기 중이었는데, InstallerClean은 그 변경이 어떤 파일에 영향을 주는지 알 수 없었기 때문에, 그 변경이 적용될 때까지 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
+  <data name="Summary.ScanSignal.AccessRefused" xml:space="preserve"><value>검사가 시작될 때 Windows가 InstallerClean에 Windows Installer가 사용 중인지 확인할 권한을 주지 않았기 때문에, InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
+  <data name="Summary.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>검사가 시작될 때 InstallerClean이 확인하는 Windows 설정을 읽을 수 없어서, Windows Installer가 사용 중인지 또는 재시작을 기다리는 작업이 있는지 알 수 없었습니다. InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
+  <data name="Summary.ScanSignal.LockUnreadable" xml:space="preserve"><value>검사가 시작될 때 InstallerClean이 Windows Installer가 사용 중인지 확인할 수 없었기 때문에, Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
+  <data name="Summary.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>검사가 시작될 때 InstallerClean이 Windows Installer가 사용 중인지 확인할 수 없었습니다. Windows가 오류를 반환했습니다: {0}(오류 {1}). InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작하세요. InstallerClean은 다음에 실행할 때 다시 확인합니다.</value></data>
+  <data name="Summary.ScanSignal.Other" xml:space="preserve"><value>검사가 시작될 때 Windows Installer에 끝나지 않은 작업이 있었기 때문에, InstallerClean은 그 작업이 끝날 때까지 확인할 수 없는 파일을 그대로 두었습니다. 그 작업이 끝나면 다시 검사를 누르세요.</value></data>
   <!-- The window's line in the same place, where the system clock went back while the
        scan read the files' times (the wall clock advanced less than a monotonic timer by
        more than a small allowance), so the scan held back every file in the folder no
@@ -1569,8 +1569,8 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        [ ] becomes a link to the releases page (MessageWindow
        .ShowLinkedMessage), so a translator can place it anywhere in the
        sentence; a string with no [ ] pair is shown as plain text. -->
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>업데이트 확인에서 GitHub의 릴리스 페이지 대신 오류를 받았습니다. 나중에 다시 시도하거나 브라우저에서 [릴리스 페이지]를 여세요.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>업데이트 확인에서 GitHub의 응답으로는 어느 버전이 최신인지 알 수 없었습니다. 나중에 다시 시도하거나 브라우저에서 [릴리스 페이지]를 여세요.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -1916,16 +1916,16 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
        named inside the sentence, so a language that declines the noun after "for"
        declines it here. "Left alone" is worded as in Summary.SourceGivenUp.Drive.
        0 = a drive letter and its colon in capitals, e.g. "D:" -->
-  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean stopped waiting for drive {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.</value></data>
+  <data name="Cli.SourceGivenUp.Drive" xml:space="preserve"><value>InstallerClean이 드라이브 {0}에 대한 대기를 중단했기 때문에, 그 드라이브 없이는 확인할 수 없는 파일을 그대로 두었습니다. 정상적으로 응답하게 되면 명령을 다시 실행하세요.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, for a folder that is not on a drive letter, named as
        it is spelled. 0 = a network share such as "\\fileserver\apps", or another path -->
-  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean stopped waiting for {0}, so it left alone any file it couldn't check without it. Once it's responding normally, run the command again.</value></data>
+  <data name="Cli.SourceGivenUp.Path" xml:space="preserve"><value>InstallerClean이 {0}에 대한 대기를 중단했기 때문에, 그 위치 없이는 확인할 수 없는 파일을 그대로 두었습니다. 정상적으로 응답하게 되면 명령을 다시 실행하세요.</value></data>
   <!-- As Cli.SourceGivenUp.Drive, where more than one drive or share was given up.
        0 = the list of them in the order they were given up, each drive as
        Display.DriveName and each share or path as it is spelled, joined with
        Display.ListSeparator, e.g. "drive D:, \\nas\installers". The list stands in
        brackets and carries no "and", as in Summary.SourcesGivenUp. -->
-  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean stopped waiting for more than one drive or share ({0}), so it left alone any file it couldn't check without them. Once they're responding normally, run the command again.</value></data>
+  <data name="Cli.SourcesGivenUp" xml:space="preserve"><value>InstallerClean이 여러 드라이브 또는 공유 ({0})에 대한 대기를 중단했기 때문에, 그것들 없이는 확인할 수 없는 파일을 그대로 두었습니다. 정상적으로 응답하게 되면 명령을 다시 실행하세요.</value></data>
   <!-- The outcome entry, Event ID 1000, for a scan that offered nothing, has no other
        withholding to report, and stopped waiting for a drive or share while files still
        had to be checked against it. It is written in place of Cli.EventLogScanNoOrphans,
@@ -2019,7 +2019,7 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>오류: 지금 Windows 업데이트나 설치 또는 제거 중인 프로그램 등 무언가가 Windows Installer를 사용하고 있습니다. 그동안 /m과 /d는 차단됩니다. 끝나면 다시 시도하세요.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: an earlier Windows Installer installation hasn't finished. /m and /d are blocked, so InstallerClean won't touch {InstallerFolder}. Restart Windows, then run the command again. An installation waiting for a restart carries on after it. If this message comes back, run the setup of the program that was being installed or removed again, and Windows Installer will offer to undo the installation it didn't finish.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>오류: Windows Installer를 통한 이전 설치가 아직 끝나지 않았습니다. /m과 /d가 차단되었고 InstallerClean은 {InstallerFolder}를 건드리지 않습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요. 재시작을 기다리던 설치는 재시작 후에 이어서 진행됩니다. 이 메시지가 다시 나타나면, 설치 또는 제거 중이던 프로그램의 설치 프로그램을 다시 실행하세요. 그러면 Windows Installer가 끝나지 않은 설치로 변경된 내용을 취소할지 묻습니다.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>오류: Windows에 다음 재시작 때 적용될 {InstallerFolder}에 대한 변경이 대기 중입니다({0}). /m과 /d가 차단되었습니다. Windows를 다시 시작한 다음 다시 시도하세요.</value></data>
   <!-- The command-line twin of Body.PendingReboot.PendingRenameUnresolved, adapted the
@@ -2073,18 +2073,18 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
        record names.
        Other: Windows Installer's in-progress file was there, or a reason with no line of
        its own, which reads true of the whole family. -->
-  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>Windows Installer was busy when the scan started, for example with Windows Update or a program being installed or removed, so InstallerClean left alone the files it can't check while it's busy. Run the command again once it has finished.</value></data>
-  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>An earlier Windows Installer installation hadn't finished when the scan started, so InstallerClean left alone the files it can't check until it has. Restart Windows, then run the command again. An installation waiting for a restart carries on after it. If this message comes back, run the setup of the program that was being installed or removed again, and Windows Installer will offer to undo the installation it didn't finish.</value></data>
-  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>Windows had a change to {InstallerFolder} waiting for the next restart when the scan started, so InstallerClean left alone the files it can't check until that change is made. Restart Windows, then run the command again.</value></data>
-  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>Windows had a file change waiting for the next restart when the scan started, and InstallerClean couldn't tell which files it affects, so it left alone the files it can't check until that change is made. Restart Windows, then run the command again.</value></data>
-  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy when the scan started, so it left alone the files it can't check while Windows Installer is busy. Restart Windows, then run the command again.</value></data>
-  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>InstallerClean couldn't read a Windows setting it checks, so it couldn't tell whether Windows Installer was busy or had work waiting for a restart when the scan started. It left alone the files it can't check while Windows Installer is busy. Restart Windows, then run the command again.</value></data>
-  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started, so it left alone the files it can't check while Windows Installer is busy. Restart Windows, then run the command again.</value></data>
-  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows, then run the command again.</value></data>
-  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Run the command again once it has finished.</value></data>
+  <data name="Cli.ScanSignal.Busy" xml:space="preserve"><value>검사가 시작될 때 Windows Installer가 Windows 업데이트나 설치 또는 제거 중인 프로그램 등으로 사용 중이었기 때문에, InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. 그 작업이 끝나면 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.Suspended" xml:space="preserve"><value>검사가 시작될 때 Windows Installer를 통한 이전 설치가 끝나지 않은 상태였기 때문에, InstallerClean은 그 설치가 끝날 때까지 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요. 재시작을 기다리던 설치는 재시작 후에 이어서 진행됩니다. 이 메시지가 다시 나타나면, 설치 또는 제거 중이던 프로그램의 설치 프로그램을 다시 실행하세요. 그러면 Windows Installer가 끝나지 않은 설치로 변경된 내용을 취소할지 묻습니다.</value></data>
+  <data name="Cli.ScanSignal.RenameInCache" xml:space="preserve"><value>검사가 시작될 때 Windows에 다음 재시작 때 적용될 {InstallerFolder}에 대한 변경이 대기 중이었기 때문에, InstallerClean은 그 변경이 적용될 때까지 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.RenameUnresolved" xml:space="preserve"><value>검사가 시작될 때 Windows에 다음 재시작 때 적용될 파일 변경이 대기 중이었는데, InstallerClean은 그 변경이 어떤 파일에 영향을 주는지 알 수 없었기 때문에, 그 변경이 적용될 때까지 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.AccessRefused" xml:space="preserve"><value>검사가 시작될 때 Windows가 InstallerClean에 Windows Installer가 사용 중인지 확인할 권한을 주지 않았기 때문에, InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.RegistryUnreadable" xml:space="preserve"><value>검사가 시작될 때 InstallerClean이 확인하는 Windows 설정을 읽을 수 없어서, Windows Installer가 사용 중인지 또는 재시작을 기다리는 작업이 있는지 알 수 없었습니다. InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.LockUnreadable" xml:space="preserve"><value>검사가 시작될 때 InstallerClean이 Windows Installer가 사용 중인지 확인할 수 없었기 때문에, Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.LockUnreadableWindowsError" xml:space="preserve"><value>검사가 시작될 때 InstallerClean이 Windows Installer가 사용 중인지 확인할 수 없었습니다. Windows가 오류를 반환했습니다: {0}(오류 {1}). InstallerClean은 Windows Installer가 사용 중인 동안 확인할 수 없는 파일을 그대로 두었습니다. Windows를 다시 시작한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.ScanSignal.Other" xml:space="preserve"><value>검사가 시작될 때 Windows Installer에 끝나지 않은 작업이 있었기 때문에, InstallerClean은 그 작업이 끝날 때까지 확인할 수 없는 파일을 그대로 두었습니다. 그 작업이 끝나면 명령을 다시 실행하세요.</value></data>
   <!-- The command line's form of Summary.ScanSignal.ClockSetBack, printed where a
        Cli.ScanSignal.* line would be, ending with running it again. -->
-  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Run the command again.</value></data>
+  <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>검사하는 동안 이 PC의 시계가 뒤로 돌아가거나 느려져서, InstallerClean은 어떤 파일이 방금 추가되었는지 알 수 없었고, 방금 추가되었을 수 있는 파일을 모두 그대로 두었습니다. 명령을 다시 실행하세요.</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
        string rather than a shared one because this whole family is: all five
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
