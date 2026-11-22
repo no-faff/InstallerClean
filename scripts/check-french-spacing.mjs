@@ -47,6 +47,7 @@
 //
 // Run from the repo root: node scripts/check-french-spacing.mjs
 import { readFileSync } from 'node:fs';
+import { isKeptAsTranslation } from './still-english-keeps.mjs';
 
 const FILE = 'src/InstallerClean.Core/Resources/Strings.fr.resx';
 const NEUTRAL = 'src/InstallerClean.Core/Resources/Strings.resx';
@@ -125,9 +126,13 @@ const parseControl = (file, xml, parsed) => {
 // of it. A key whose English has moved holds the neutral's value in every satellite
 // until it is translated again, and check-still-english is what names it; held to
 // this rule, the English colon in "Error: " would fail here as well, for a reason the
-// translation removes. Read through the same regex and the same parse control as the
-// French file, so a neutral this check could not read stops it rather than leaving
-// every value measured.
+// translation removes. A value French keeps identical to the English on purpose is
+// French text and IS read, so a kept value carrying English punctuation spacing fails
+// here. The keeps are the ones check-still-english uses (still-english-keeps.mjs), so
+// every value passed over here is one that check fails on, and between the two every
+// French value equal to the English is answered for. Read through the same regex and the same parse
+// control as the French file, so a neutral this check could not read stops it rather
+// than leaving every value measured.
 const neutralXml = readFileSync(NEUTRAL, 'utf8');
 const english = new Map();
 for (const n of neutralXml.matchAll(dataRe)) english.set(n[1], n[2]);
@@ -146,7 +151,7 @@ let m;
 while ((m = dataRe.exec(xml)) !== null) {
   const [, key, value] = m;
   parsed.add(key);
-  if (english.get(key) === value) {
+  if (english.get(key) === value && !isKeptAsTranslation('fr', key)) {
     stillEnglish.push(key);
     continue;
   }
@@ -204,6 +209,6 @@ if (guillemetProblems.length) {
 
 if (problems.length || missing.length || guillemetProblems.length) process.exit(1);
 
-console.log(`French spacing OK: ${parsed.size} value(s) read from ${FILE.split('/').pop()}, no plain ASCII space and no missing space before ! ? : ;, and a no-break space inside each of the ${guillemets} guillemet mark(s) found.`);
+console.log(`French spacing OK: ${parsed.size - stillEnglish.length} value(s) read from ${FILE.split('/').pop()}, no plain ASCII space and no missing space before ! ? : ;, and a no-break space inside each of the ${guillemets} guillemet mark(s) found.`);
 if (stillEnglish.length)
   console.log(`Not read, being the English until translated: ${stillEnglish.join(', ')}.`);
