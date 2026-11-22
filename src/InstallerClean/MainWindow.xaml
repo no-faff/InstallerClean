@@ -367,13 +367,16 @@
                          warning appears: after a scan, ahead of the headline
                          as it is drawn; after the card a scan put up, or as the
                          Move or Delete card goes where no card follows it; at a
-                         Move or Delete click, at once. -->
+                         Move or Delete click, at once. The text goes through the
+                         converter so the folder's path cannot wrap part-way, and
+                         the screen-reader name is the line as composed. -->
                     <TextBlock x:Name="PendingRebootBannerText"
-                               Text="{Binding Scan.PendingRebootBannerText}"
+                               Text="{Binding Scan.PendingRebootBannerText, Converter={StaticResource KeepInstallerPathWhole}}"
                                TextWrapping="Wrap"
                                Foreground="{StaticResource Text.Body}"
                                FontSize="{DynamicResource Type.Body}"
                                VerticalAlignment="Center"
+                               AutomationProperties.Name="{Binding Scan.PendingRebootBannerText}"
                                AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
 
@@ -515,7 +518,9 @@
                      The code-behind reads it out when it appears or its count
                      changes: after the scan's headline and the line above, after
                      the card a scan put up, or as the Move or Delete card goes where
-                     no card follows it. -->
+                     no card follows it. The text goes through the converter so the
+                     folder's path cannot wrap part-way, and the screen-reader name is
+                     the line as composed. -->
                 <DockPanel Margin="{StaticResource GapTop.Sm}"
                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
@@ -523,11 +528,12 @@
                           Width="{a11y:TextScaled 16}" Height="{a11y:TextScaled 16}"
                           DockPanel.Dock="Left" VerticalAlignment="Top" Margin="{StaticResource GapRight.Icon}"/>
                     <TextBlock x:Name="MissingFromDiskBannerText"
-                               Text="{Binding Scan.MissingFromDiskSummaryText}"
+                               Text="{Binding Scan.MissingFromDiskSummaryText, Converter={StaticResource KeepInstallerPathWhole}}"
                                TextWrapping="Wrap"
                                Foreground="{StaticResource Text.Muted}"
                                FontSize="{DynamicResource Type.Caption}"
                                VerticalAlignment="Center"
+                               AutomationProperties.Name="{Binding Scan.MissingFromDiskSummaryText}"
                                AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
 

@@ -72,9 +72,10 @@ namespace InstallerClean.Helpers;
 /// finished card's summary. A drawn string keeps its joiners even where it is also
 /// the spoken one, a TextBlock's automation peer reporting its Text as its name,
 /// except on the lines showing a wait, the lines naming a drive or share carried on
-/// without and the finished card's summary: each sets its screen-reader name to the
-/// text as composed, so what a path in it takes reaches the layout and not the
-/// speech.
+/// without, the line saying why a scan held files back, the pending-reboot warning,
+/// the missing-from-disk footnote and the finished card's summary: each sets its
+/// screen-reader name to the text as composed, so what a path in it takes reaches the
+/// layout and not the speech.
 /// A string that is only ever spoken does not get them, having no layout to
 /// protect and nothing to hand a speech engine but invisible format characters:
 /// the message dialog's title and the main window's invisible scan announcer are
