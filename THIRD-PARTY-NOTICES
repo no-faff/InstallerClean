@@ -12,12 +12,10 @@ Which of it a download carries depends on which download it is:
                                          Inno Setup translation files
   InstallerClean-portable.exe            Poppins, Montserrat, the Phosphor
   InstallerClean-slim.exe                icon, the two Material Icons, the
-                                         code from the .NET runtime, the
-                                         code PolySharp writes and the
+                                         code from the .NET runtime and the
                                          packages merged into it
-  installerclean-cli.exe                 the code from the .NET runtime,
-                                         the code PolySharp writes and the
-                                         packages merged into it: it is
+  installerclean-cli.exe                 the code from the .NET runtime and
+                                         the packages merged into it: it is
                                          built from InstallerClean.Core,
                                          with no font, no icon and no wizard
 
@@ -243,8 +241,9 @@ line is quoted for a new process, and the exception a refused start carries;
 how a proxy is taken from the variables that name one;
 how the machine's architecture is read; how a culture is named in the language
 of the window; how names are sorted in a culture, through the ICU Windows ships; the dictionary, sequence, string, stream, ASCII, Math,
-environment and timing members .NET Framework 4.8 lacks; and the text of the
-messages its exceptions carry.
+environment and timing members .NET Framework 4.8 lacks; the Index and Range
+types and the attributes the C# compiler reads, none of which 4.8 defines; and
+the text of the messages its exceptions carry.
 
   https://github.com/dotnet/runtime
 
@@ -261,7 +260,9 @@ FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
 ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs,
 FrameworkProcess.cs, FrameworkRuntimeInformation.cs,
-FrameworkCultureDisplayName.cs, WindowsIcu.cs and FrameworkCollation.cs;
+FrameworkCultureDisplayName.cs, WindowsIcu.cs, FrameworkCollation.cs,
+Index.cs, Range.cs, IsExternalInit.cs, ModuleInitializerAttribute.cs,
+CallerArgumentExpressionAttribute.cs and NullableAttributes.cs;
 in src/InstallerClean/Helpers/CollatedSort.cs, which also follows the list
 sort of WPF, and src/InstallerClean/Helpers/WindowChromeExtensions.cs, which
 shows a window's system menu as WPF's SystemCommands does (WPF:
@@ -340,44 +341,6 @@ details. The attributions in them:
 installer/Languages/Japanese.isl was written for InstallerClean by coolvitto,
 who also wrote the app's Japanese translation, and was contributed to this
 repository.
-
--------------------------------------------------------------------------------
-PolySharp
--------------------------------------------------------------------------------
-
-PolySharp 1.17.1 is a source generator. No assembly of it ships: it writes
-into InstallerClean.Core, as internal types, the attributes and types the C#
-compiler needs that .NET Framework 4.8 does not define, and its code is
-compiled in with Core's, which is merged into InstallerClean.exe and
-installerclean-cli.exe.
-
-  https://github.com/Sergio0694/PolySharp
-
-The package's own metadata declares "Copyright (c) 2026 Sergio Pedri". Its
-licence, LICENSE in that repository at the commit the package was built from
-(3cf93c5e434d14007ba55c569223cbd517edac65):
-
-  MIT License
-
-  Copyright (c) 2026 Sergio Pedri
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
 
 -------------------------------------------------------------------------------
 The packages merged into each program

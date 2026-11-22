@@ -44,24 +44,7 @@
          referenced here, it is in every restore graph and every build
          compiles against the same assemblies. -->
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <!-- A source generator, used at compile time only. It adds, as internal
-         types, the attributes the C# compiler needs for init accessors,
-         required members, module initialisers and the nullable-analysis
-         annotations, which .NET Framework 4.8 does not define. No PolySharp
-         assembly ships. -->
-    <PackageReference Include="PolySharp" Version="1.17.1" PrivateAssets="all" />
   </ItemGroup>
-  <PropertyGroup>
-    <!-- PolySharp generates a type only where the compilation cannot already
-         see one, so the two exes and the tests, which see InstallerClean.Core's
-         internal types through InternalsVisibleTo, use Core's copies and
-         generate none of their own. Marked [Embedded], PolySharp's default,
-         a copy is hidden from every other assembly, and each assembly would
-         generate its own: the tests' ModuleInitializerAttribute would then be
-         another type from the one each exe's SetBeforeMain carries, and
-         SystemLibrariesSearchTests could not find the attribute on it. -->
-    <PolySharpUseEmbeddedAttributeForGeneratedTypes>false</PolySharpUseEmbeddedAttributeForGeneratedTypes>
-  </PropertyGroup>
   <!-- A compile-time analyzer, no assembly of it ships. It refuses a call to
        any member BannedSymbols.txt names, in the three projects that ship, so
        a framework member the app replaces with its own code cannot be called

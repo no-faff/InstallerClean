@@ -36,12 +36,6 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
-      "PolySharp": {
-        "type": "Direct",
-        "requested": "[1.17.1, )",
-        "resolved": "1.17.1",
-        "contentHash": "Fv7mkMwEqA3vR03wey85rWT7UdJqC5jN2GrkzRondHpAfVTYoKtlh2Aun0ZVMijAo4Ijhi3PT2yWYgg9VC2f9A=="
-      },
       "System.IO.Abstractions.TestingHelpers": {
         "type": "Direct",
         "requested": "[23.0.1, )",
