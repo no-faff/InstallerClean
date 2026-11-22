@@ -18,12 +18,18 @@ namespace InstallerClean;
 /// A default rather than a Setter on the two ToolTip styles: this is an attached property,
 /// read from the element the tooltip hangs off, and those are Buttons, TextBlocks and Borders
 /// in every window of the app. Changing the default on FrameworkElement covers each of them
-/// without an opinion about which end the framework reads. Called before any window exists,
-/// because OverrideMetadata is refused once the property has been used on the type.
+/// without an opinion about which end the framework reads, and changing it on
+/// FrameworkContentElement covers a tooltip on a Hyperlink, a Run or a Span, which are not
+/// FrameworkElements. Called before any window exists, because OverrideMetadata is refused
+/// once the property has been used on the type.
 /// </remarks>
 internal static class ToolTipDuration
 {
-    internal static void KeepOpenWhileThePointerRests() =>
+    internal static void KeepOpenWhileThePointerRests()
+    {
         ToolTipService.ShowDurationProperty.OverrideMetadata(
             typeof(FrameworkElement), new FrameworkPropertyMetadata(int.MaxValue));
+        ToolTipService.ShowDurationProperty.OverrideMetadata(
+            typeof(FrameworkContentElement), new FrameworkPropertyMetadata(int.MaxValue));
+    }
 }

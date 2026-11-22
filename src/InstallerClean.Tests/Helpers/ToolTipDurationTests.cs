@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace InstallerClean.Tests.Helpers;
 
@@ -17,14 +18,14 @@ public class ToolTipDurationTests
     [Fact]
     public void With_the_switch_on_wpf_s_own_default_is_five_seconds()
     {
-        Assert.Equal(new[] { 5000, 5000, 5000 },
+        Assert.Equal(new[] { 5000, 5000, 5000, 5000 },
             FrameworkSwitchesTests.InDomain((DefaultProbe probe) => probe.Read()));
     }
 
     [Fact]
-    public void With_the_switch_on_a_tooltip_stays_open_while_the_pointer_rests_on_any_element_the_app_hangs_one_off()
+    public void With_the_switch_on_a_tooltip_stays_open_while_the_pointer_rests_on_any_element_or_content_element()
     {
-        Assert.Equal(new[] { int.MaxValue, int.MaxValue, int.MaxValue },
+        Assert.Equal(new[] { int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue },
             FrameworkSwitchesTests.InDomain((AppProbe probe) => probe.Read()));
     }
 
@@ -33,6 +34,7 @@ public class ToolTipDurationTests
         (int)ToolTipService.ShowDurationProperty.GetMetadata(typeof(Button)).DefaultValue,
         (int)ToolTipService.ShowDurationProperty.GetMetadata(typeof(TextBlock)).DefaultValue,
         (int)ToolTipService.ShowDurationProperty.GetMetadata(typeof(Border)).DefaultValue,
+        (int)ToolTipService.ShowDurationProperty.GetMetadata(typeof(Hyperlink)).DefaultValue,
     ];
 
     /// <summary>Turns the switch on and reads WPF's own default, the app's code untouched.</summary>
