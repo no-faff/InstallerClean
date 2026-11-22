@@ -890,6 +890,17 @@ jobs:
         if: success() || failure()
         run: node scripts/verify-shipped-artefacts.mjs
 
+      # Builds both exes a second time, every project compiled again by a new compiler
+      # process, and compares the two merged exes, the .exe.config beside each and the three
+      # assemblies merged into them with what the steps above built, byte for byte. A
+      # difference fails the step with the file named and, for an assembly, its type table read
+      # from both builds. The second build writes its merged exes to a folder of its own, so
+      # publish/ stays as the merges above left it for the setup compiled below.
+      - name: Check a second build of this commit gives the same bytes
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-reproducible-build.ps1
+
       # ISCC is the only thing that reads installer/*.iss, so a typo there shows
       # up nowhere else. Compiling the setup here finds it on the push that
       # caused it rather than on the release machine. The window and CLI merges
