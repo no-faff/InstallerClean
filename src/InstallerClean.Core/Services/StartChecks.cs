@@ -37,20 +37,30 @@ internal static class StartChecks
     /// need. A copy built for .NET Framework 4.8 meets none of them on 4.8, so the start ends
     /// on one with the .NET Framework 4.8 message in English (NetFrameworkCheck.EnglishMessage),
     /// and goes on after any other exception, so that a fault in a check never stops a PC
-    /// that can run the copy. A <see cref="TypeInitializationException"/> is read by the
-    /// exception it carries, through any number of them: a type initializer that could not
-    /// load what it needs is a load failure, and one that threw anything else, or carries
-    /// nothing, is not, so a type initializer failing for another reason on a PC with 4.8 lets
-    /// the start go on.
+    /// that can run the copy. An exception that only carries another is read by what it
+    /// carries, through any number of them: a <see cref="TypeInitializationException"/>, which
+    /// a type initializer that threw raises, a <see cref="System.Reflection.TargetInvocationException"/>,
+    /// which a call made through reflection raises, and an <see cref="AggregateException"/>,
+    /// which waiting on a task raises and which is a load failure where any exception it
+    /// carries is one. One that carries nothing, or carries anything else, is not, so a type
+    /// initializer failing for another reason on a PC with 4.8 lets the start go on.
     /// </summary>
-    internal static bool IsLoadFailure(Exception exception)
+    internal static bool IsLoadFailure(Exception? exception)
     {
-        Exception? carried = exception;
-        while (carried is TypeInitializationException initializer)
-            carried = initializer.InnerException;
-
-        return carried is TypeLoadException or MissingMethodException or MissingFieldException
-            or FileLoadException or FileNotFoundException;
+        switch (exception)
+        {
+            case TypeInitializationException initializer:
+                return IsLoadFailure(initializer.InnerException);
+            case System.Reflection.TargetInvocationException invocation:
+                return IsLoadFailure(invocation.InnerException);
+            case AggregateException aggregate:
+                foreach (var carried in aggregate.InnerExceptions)
+                    if (IsLoadFailure(carried)) return true;
+                return false;
+            default:
+                return exception is TypeLoadException or MissingMethodException or MissingFieldException
+                    or FileLoadException or FileNotFoundException;
+        }
     }
 
     /// <summary>

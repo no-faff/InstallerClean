@@ -52,6 +52,11 @@ public class NeutralTextTests
             new TypeInitializationException("InstallerClean.Services.RegistryReader", new MissingMethodException())),
         new FileLoadException(),
         new FileNotFoundException(),
+        new System.Reflection.TargetInvocationException(new MissingMethodException()),
+        new AggregateException(new FileLoadException()),
+        new AggregateException(new InvalidOperationException(),
+            new System.Reflection.TargetInvocationException(
+                new TypeInitializationException("InstallerClean.Resources.Strings", new TypeLoadException()))),
     };
 
     public static TheoryData<Exception> OtherFailures() => new()
@@ -64,6 +69,10 @@ public class NeutralTextTests
         new TypeInitializationException("InstallerClean.Services.UpdateManifest", new InvalidOperationException()),
         new TypeInitializationException("InstallerClean.Services.RegistryReader", new UnauthorizedAccessException()),
         new TypeInitializationException("InstallerClean.Services.UpdateManifest", null),
+        new System.Reflection.TargetInvocationException(new InvalidOperationException()),
+        new System.Reflection.TargetInvocationException(null),
+        new AggregateException(new IOException(), new UnauthorizedAccessException()),
+        new AggregateException(),
     };
 
     [Theory]
