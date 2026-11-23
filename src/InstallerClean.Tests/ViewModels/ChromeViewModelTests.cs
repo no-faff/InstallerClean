@@ -409,7 +409,7 @@ public class ChromeViewModelTests
     // ---- What's new on the card and the notice ----
 
     [Fact]
-    public async Task What_s_new_on_the_card_and_the_notice_opens_the_releases_once_a_newer_version_is_found()
+    public async Task What_s_new_on_the_notice_opens_the_releases_once_a_newer_version_is_found()
     {
         CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"));
         var vm = CreateViewModel();
@@ -433,12 +433,15 @@ public class ChromeViewModelTests
         CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"), new UpToDate("2.1.0"));
         var vm = CreateViewModel();
         await vm.RunAutomaticUpdateCheckAsync();
+        vm.OfferUpdate();
         Assert.True(vm.OpenWhatsNewCommand.CanExecute(null));
+        Assert.True(vm.OpenWhatsNewOnCardCommand.CanExecute(null));
 
         await vm.CheckForUpdatesCommand.ExecuteAsync(null);
 
         Assert.False(vm.HasNewerVersion);
         Assert.False(vm.OpenWhatsNewCommand.CanExecute(null));
+        Assert.False(vm.OpenWhatsNewOnCardCommand.CanExecute(null));
         vm.OpenWhatsNewCommand.Execute(null);
         _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
     }

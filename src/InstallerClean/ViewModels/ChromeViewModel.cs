@@ -458,9 +458,10 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// What's new on the line saying InstallerClean has been updated: opens the list of
     /// every release, newest first, in the browser. Enabled only where the line shows, for
     /// the reason <see cref="OpenReleasePage"/> gives. The notice and the card carry
-    /// commands of their own (<see cref="OpenWhatsNew"/>, <see cref="OpenWhatsNewOnCard"/>):
-    /// each is enabled only while its own surface shows, since one command enabled for
-    /// several would leave an enabled link inside whichever of them is collapsed.
+    /// commands of their own (<see cref="OpenWhatsNew"/>, <see cref="OpenWhatsNewOnCard"/>),
+    /// since one command enabled for several would leave an enabled link inside whichever
+    /// of them is collapsed. The notice's stays enabled while the card stands over it: the
+    /// main window's content is hidden then, and Tab cycles inside the card.
     /// </summary>
     [RelayCommand(CanExecute = nameof(ShowsUpdatedNotice))]
     private void OpenReleases()
