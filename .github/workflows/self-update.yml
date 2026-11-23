@@ -731,8 +731,10 @@ jobs:
           "The update to $newer, run by the newer version:"
 
           "The command line's output:"
+          # The old version's line names the newer version, and from 3.8.0 the old copy's own
+          # after it. Both are given, and -f fills what the old version's string holds.
           foreach ($expected in @(
-              ((Line 'UpdateNotice.Available') -f $newer),
+              ((Line 'UpdateNotice.Available') -f $newer, $old),
               ((Line 'UpdateNotice.Downloading') -f $newer),
               $runningNewer)) {
             if ($run.Output.Contains($expected)) { "  printed: $expected" } else { Fail "It did not print: $expected" }

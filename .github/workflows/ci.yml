@@ -2328,7 +2328,10 @@ jobs:
             }
           }
 
-          $available = (Line 'UpdateNotice.Available') -f $latest
+          # The line naming the newer version names the old copy's own version after it, and
+          # What's new is printed straight under it in every case.
+          $available = (Line 'UpdateNotice.Available') -f $latest, $old
+          $whatsNew = (Line 'Cli.UpdateDownloadLink') -f (Line 'UpdateNotice.WhatsNew'), 'https://github.com/no-faff/InstallerClean/releases'
           $downloading = (Line 'UpdateNotice.Downloading') -f $latest
           $runningNewer = (Line 'Cli.UpdateRunningNewer') -f '/s', $latest
           $notRun = Line 'Cli.UpdateNotRun'
@@ -2348,14 +2351,14 @@ jobs:
           $failedLike = '*' + ((Line 'Cli.EventLogUpdateNotRun') -f '/s', $old, $latest) + '*'
 
           $update = Update 'signals' $signals ''
-          Expect-Printed $update @($available, $downloading, $runningNewer) @($notRun, $runningInstead)
+          Expect-Printed $update @($available, $whatsNew, $downloading, $runningNewer) @($notRun, $runningInstead)
           Expect-Entries $update 3005 $updatedLike 3006
           Expect-File $update $latest
           Expect-Logged $update @() @('did not say it had started', 'before it said it had started')
           Expect-ExitCode $update
 
           $update = Update 'exits' $standIn 'exit'
-          Expect-Printed $update @($available, $downloading, $notRun, $runningInstead) @($runningNewer)
+          Expect-Printed $update @($available, $whatsNew, $downloading, $notRun, $runningInstead) @($runningNewer)
           Expect-Entries $update 3006 $failedLike 3005
           Expect-File $update $old
           Expect-Logged $update @('The newer version ended with exit code 7 before it said it had started.') @($endRefused, $notEnded)
@@ -2364,7 +2367,7 @@ jobs:
           Expect-ExitCode $update
 
           $update = Update 'sleeps' $standIn 'sleep'
-          Expect-Printed $update @($available, $downloading, $notRun, $runningInstead) @($runningNewer)
+          Expect-Printed $update @($available, $whatsNew, $downloading, $notRun, $runningInstead) @($runningNewer)
           Expect-Entries $update 3006 $failedLike 3005
           Expect-File $update $old
           Expect-Logged $update @('The newer version did not say it had started within 60 seconds.') @($endRefused, $notEnded)
@@ -2382,7 +2385,7 @@ jobs:
           }
           foreach ($label in $refusals.Keys) {
             $update = Update $label $signals '' $refusals[$label]
-            Expect-Printed $update @($available, $cannotInstall, $releasePage) @($downloading, $runningNewer, $notRun, $runningInstead)
+            Expect-Printed $update @($available, $whatsNew, $cannotInstall, $releasePage) @($downloading, $runningNewer, $notRun, $runningInstead)
             Expect-Entries $update 3006 $refusedLike 3005
             Expect-File $update $old
             if ($update.Logged) { Fail "$label`: crash.log gained text." } else { "  crash.log gained nothing" }
