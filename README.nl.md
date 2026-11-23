@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Licentie: Apache 2.0"></a>
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet-framework/net48"><img src="https://img.shields.io/badge/.NET_Framework-4.8-purple.svg" alt=".NET Framework 4.8"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="GitHub-release"></a>
@@ -36,8 +36,8 @@
 <!-- reports-stats-end -->
 
 - **Wat:** InstallerClean doet één ding: het verwijdert overbodige bestanden uit `C:\Windows\Installer`, een verborgen map die voller wordt naarmate je software installeert en bijwerkt. Na een snelle scan vertelt het je of je die hebt, laat het meer detail zien voor wie nieuwsgierig is, en kun je ze ergens anders naartoe verplaatsen of verwijderen om ruimte vrij te maken op je C:-schijf.
-- **Je bent hier misschien omdat:** je [WinDirStat](https://github.com/windirstat/windirstat), WizTree of TreeSize hebt gebruikt, zag dat `C:\Windows\Installer` veel ruimte innam en niet wist wat erin zat. In dat geval is InstallerClean precies wat je nodig hebt. Het weet wat er in die bestanden met willekeurig ogende namen als `9f05cba.msi` zit en vertelt je snel welke je veilig kunt verwijderen.
-- **Hoeveel ruimte:** De grafiek hierboven toont de uitkomsten van de optionele rapporten die via de app zijn verstuurd (bedankt allemaal). Van de <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> die ruimte heeft vrijgemaakt, is de mediaan van wat er vrijkwam <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Dat zijn bestanden waarvan je waarschijnlijk niet wist dat ze bestonden en die alleen maar ruimte innemen. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> van *alle* machines haalde er meer dan 5 GB uit, en veel mensen maakten honderden GB vrij. Kort gezegd: hoe meer MSI-software je installeert, hoe meer overbodige bestanden je krijgt. Zodra je InstallerClean draait, weet je het.
+- **Je bent hier misschien omdat:** je [WinDirStat](https://github.com/windirstat/windirstat), WizTree of TreeSize hebt gebruikt, zag dat `C:\Windows\Installer` veel ruimte innam en niet wist wat erin zat. InstallerClean weet wat er in die bestanden met willekeurig ogende namen als `9f05cba.msi` zit en vertelt je welke je veilig kunt verwijderen.
+- **Hoeveel ruimte:** De grafiek hierboven toont de uitkomsten van de optionele rapporten die via de app zijn verstuurd (bedankt allemaal). Van de <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> die ruimte heeft vrijgemaakt, is de mediaan van wat er vrijkwam <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Dat zijn bestanden waarvan je waarschijnlijk niet wist dat ze bestonden en die alleen maar ruimte innemen. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> van *alle* machines haalde er meer dan 5 GB uit, en sommigen maakten honderden GB vrij. Hoe meer MSI-software je installeert, hoe meer overbodige bestanden je krijgt.
   <!-- reports-scaled-start -->
   <details>
   <summary><kbd>Klik om te zien</kbd> hoe de grafiek eruit zou zien als de rapporten een exact beeld gaven van alle 142.145 downloads</summary>
@@ -50,7 +50,7 @@
   </p>
   </details>
   <!-- reports-scaled-end -->
-- **Is het veilig:** Ja. Het komt alleen aan bestanden in `C:\Windows\Installer`. Het vraagt Windows Installer wat er nog nodig is, en leest dezelfde records ook uit het register. Het biedt een bestand alleen aan wanneer niets wat op de machine geïnstalleerd is het opeist, of wanneer een nieuwere patch het heeft vervangen en geen enkel programma hier op het oude terug zou kunnen vallen. Alles waar het geen helder antwoord over krijgt, houdt het achter. [Meer hieronder](#hoe-het-werkt).
+- **Is het veilig:** Ja. Het komt alleen aan bestanden in `C:\Windows\Installer`. Het vraagt Windows Installer wat er nog nodig is, en leest dezelfde records ook uit het register. Het merkt een bestand alleen aan als veilig te verwijderen wanneer niets wat op de machine geïnstalleerd is het opeist, of wanneer een nieuwere patch het heeft vervangen en geen enkel programma hier op het oude terug zou kunnen vallen. Alles waar het geen helder antwoord over krijgt, laat het ongemoeid. [Meer hieronder](#hoe-het-werkt).
 - **Niets over jou:** Open source (Apache 2.0). Geen account, geen advertenties, geen tracking, niets dat op de achtergrond draait. Het kijkt bij het starten op GitHub of er een nieuwere versie is, wat je kunt uitzetten, en de eerste keer dat het op een pc een run afrondt, verstuurt het één anoniem rapport over hoe de run ging, tenzij je op het resultaatscherm het vinkje weghaalt.
 - **Downloaden:** [Download de nieuwste versie](../../releases/latest). Voer hem uit; klik je door [een eventuele waarschuwing van Windows](#unknown-publisher) en [de beheerdersvraag](#admin) heen. Verplaats of verwijder wat het vindt. Klaar.
 
@@ -61,6 +61,7 @@
 - [De map waar niemand het over heeft](#de-map-waar-niemand-het-over-heeft)
 - [De zoektocht naar hulp](#de-zoektocht-naar-hulp)
 - [Wat InstallerClean doet](#wat-installerclean-doet)
+- [Wat mensen zeggen](#wat-mensen-zeggen)
 - [Screenshots](#screenshots)
 - [Hoe het werkt](#hoe-het-werkt)
 - [Download](#download)
@@ -90,7 +91,7 @@ Als een nieuwere patch een oudere vervangt, blijven ze allebei staan. Net als de
 
 Dit zijn geen tijdelijke bestanden die vanzelf terugkomen. Het is echte dode last: oude installers van software die je jaren geleden hebt verwijderd en patches die al meerdere keren zijn vervangen. Eenmaal weg komen ze niet terug.
 
-**Zoek je een makkelijke manier om schijfruimte vrij te maken op Windows, dan is deze map een goed beginpunt.** InstallerClean vindt de overbodige bestanden en verwijdert ze veilig.
+InstallerClean vindt de overbodige bestanden en verwijdert ze veilig.
 
 ## De zoektocht naar hulp
 
@@ -108,9 +109,20 @@ Het standaardadvies haalt twee dingen door elkaar. Lukraak bestanden verwijderen
 
 1. **Scant** `C:\Windows\Installer` op `.msi`- en `.msp`-bestanden
 2. **Vraagt** Windows Installer wat er nog nodig is, en leest dezelfde records ook uit het register
-3. **Houdt achter** wat de twee lezingen samen niet kunnen uitmaken
+3. **Laat** elk bestand dat een programma nog nodig heeft **ongemoeid**, en ook wat de twee lezingen samen niet kunnen uitmaken
 4. **Vertelt je hoeveel je kunt vrijmaken**, en hoeveel het ongemoeid laat, met optionele detailvensters die elk bestand op een rij zetten
 5. **Haalt de overbodige bestanden weg**: verplaats ze naar een back-upmap die je zelf kiest, of verwijder ze definitief
+
+## Wat mensen zeggen
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/nl-1-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/nl-1-light.svg"><img src="docs/quotes/nl-1-light.svg" width="400" alt="Legally_Alienated, YouTube (vertaald uit het Engels): Wow, net bijna 200GB schijfruimte vrijgemaakt - ik heb uren geprobeerd uit te zoeken waar de ruimte op mijn bijna 10 jaar oude pc bleef - nu weet ik het en kan ik het oplossen, heel erg bedankt"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/nl-2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/nl-2-light.svg"><img src="docs/quotes/nl-2-light.svg" width="400" alt="Een supporter via Ko-fi (vertaald uit het Engels): Makkelijk te installeren en te gebruiken, en de instructies zijn duidelijk. Goed gedaan!"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/nl-3-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/nl-3-light.svg"><img src="docs/quotes/nl-3-light.svg" width="400" alt="Een supporter via Ko-fi (vertaald uit het Engels): Scheelde me 12 GB in 1 minuut. Top."></picture></a>
+  <a href="https://www.reddit.com/r/sysadmin/comments/1ucp6kd/adobe_updates_in_cwindowsinstaller/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/nl-4-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/nl-4-light.svg"><img src="docs/quotes/nl-4-light.svg" width="400" alt="BSRider, r/sysadmin (vertaald uit het Engels): Ik zou InstallerClean aanraden [...] omdat het een optie met alleen CLI heeft (of portable als je een gui wilt) die je gewoon via een geplande taak kunt scripten [...]"></picture></a>
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/nl-5-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/nl-5-light.svg"><img src="docs/quotes/nl-5-light.svg" width="400" alt="leehelck4606, YouTube (vertaald uit het Engels): hiermee 4 gb teruggekregen. niet veel, maar alle beetjes helpen."></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/nl-6-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/nl-6-light.svg"><img src="docs/quotes/nl-6-light.svg" width="400" alt="Een supporter via Ko-fi (vertaald uit het Engels): Bedankt voor de app! Nu kan ik mijn laptop blijven gebruiken!"></picture></a>
+</p>
 
 ## Screenshots
 
@@ -167,7 +179,7 @@ Het standaardadvies haalt twee dingen door elkaar. Lukraak bestanden verwijderen
 
 Als Windows Installer een programma installeert, bewaart het een kopie van de installer in `C:\Windows\Installer`, en als er een patch bij een programma wordt geregistreerd, bewaart het daar ook een kopie van. Met die kopieën werkt het later wanneer het de software repareert, bijwerkt of deïnstalleert, en daarom blijven ze nog lang na de installatie staan. Beide soorten kopieën komen in de map terecht: `.msi`-installers en `.msp`-patches, die een programma dat je al hebt bijwerken in plaats van het te vervangen.
 
-InstallerClean biedt een bestand om een van twee redenen aan.
+InstallerClean merkt een bestand om een van twee redenen aan als veilig te verwijderen.
 
 **Verweesd** betekent dat niets op de machine het bestand opeist. Het wordt door geen enkel geïnstalleerd product en geen enkele geregistreerde patch genoemd.
 
@@ -181,13 +193,13 @@ InstallerClean werkt de twee in tegengestelde richtingen uit, en alleen bij het 
 
 **Een record aan zijn bestand koppelen.** Een record noemt het bestand in de cache als een pad, en dezelfde map wordt daarin niet altijd hetzelfde gespeld. In plaats van op de spelling te vertrouwen vraagt InstallerClean daarom aan Windows waar elk vastgelegd pad werkelijk naartoe wijst, en vergelijkt dat met de bestanden die het in de map heeft gevonden. Alles wat dan nog niet is opgeëist, krijgt een tweede vergelijking die helemaal niet via namen loopt: het opent het bestand en vraagt Windows om het te identificeren, zodat twee verschillende namen voor hetzelfde bestand als één bestand worden herkend.
 
-**Records die niet te koppelen zijn.** Zegt Windows niet waar een vastgelegd pad naartoe wijst, of is het bestand aan het eind daarvan niet te identificeren, dan weet InstallerClean niet over welk bestand dat record ging, en kan elk van de bestanden die het heeft gevonden het bedoelde bestand zijn. Hetzelfde geldt als een programma mogelijk meer dan één keer is geïnstalleerd, want dan valt niet te zeggen welk bestand in de cache bij welke kopie hoort. In al die gevallen biedt het die keer niets aan van wat het in de map heeft gevonden. Een record dat naar een bestand wijst dat al weg is, ligt anders: er is niets meer over waar het over kán zijn gegaan, dus het kan niet over een van de bestanden gaan die nog in de map staan.
+**Records die niet te koppelen zijn.** Zegt Windows niet waar een vastgelegd pad naartoe wijst, of is het bestand aan het eind daarvan niet te identificeren, dan weet InstallerClean niet over welk bestand dat record ging, en kan elk van de bestanden die het heeft gevonden het bedoelde bestand zijn. Hetzelfde geldt als een programma mogelijk meer dan één keer is geïnstalleerd, want dan valt niet te zeggen welk bestand in de cache bij welke kopie hoort. In al die gevallen wordt die keer geen enkel bestand dat het in de map heeft gevonden aangemerkt als veilig te verwijderen. Een record dat naar een bestand wijst dat al weg is, ligt anders: er is niets meer over waar het over kán zijn gegaan, dus het kan niet over een van de bestanden gaan die nog in de map staan.
 
-**Vanaf de andere kant vragen.** Een verweesd bestand wordt bepaald door een afwezigheid, en een afwezigheid kan ook betekenen dat de app het record niet heeft gevonden. Voordat InstallerClean een `.msi`-installer aanbiedt, opent het daarom het bestand, leest het de productcode die het bestand zelf bij zich draagt, en vraagt het aan Windows of dat product geïnstalleerd is. Is dat zo, dan blijft het bestand staan, wat de rest van de scan ook heeft gevonden. Die controle kan een bestand alleen van de lijst halen. Geen enkel antwoord dat die controle kan geven, zet er een op.
+**Vanaf de andere kant vragen.** Een verweesd bestand wordt bepaald door een afwezigheid, en een afwezigheid kan ook betekenen dat de app het record niet heeft gevonden. Voordat InstallerClean een `.msi`-installer aanmerkt als veilig te verwijderen, opent het daarom het bestand, leest het de productcode die het bestand zelf bij zich draagt, en vraagt het aan Windows of dat product geïnstalleerd is. Is dat zo, dan blijft het bestand staan, wat de rest van de scan ook heeft gevonden. Die controle kan een bestand alleen van de lijst halen. Geen enkel antwoord dat die controle kan geven, zet er een op.
 
-**Wat een `.msp`-patch bepaalt.** Een patch wordt niet geopend om te vragen bij welk programma hij hoort. Wat het in plaats daarvan uitmaakt, is dat een patchregistratie het bestand in de cache op twee plaatsen noemt: bij de patches die per product geregistreerd staan, en in één registerlijst van elke patchregistratie op de machine. Een patch wordt pas als verweesd aangeboden wanneer geen van beide hem noemt.
+**Wat een `.msp`-patch bepaalt.** Een patch wordt niet geopend om te vragen bij welk programma hij hoort. Wat het in plaats daarvan uitmaakt, is dat een patchregistratie het bestand in de cache op twee plaatsen noemt: bij de patches die per product geregistreerd staan, en in één registerlijst van elke patchregistratie op de machine. Een patch wordt pas als veilig te verwijderen aangemerkt wanneer geen van beide hem noemt.
 
-**Waar een vervangen patch van afwijkt.** Die doorloopt niets van het bovenstaande, want het gaat niet om een onopgeëist bestand. Windows heeft er een record van, en dat record is juist wat zegt dat hij is vervangen. Het risico is een ander: een patch kan bij meerdere programma's geregistreerd staan, terwijl er maar één klaar mee is. Een vervangen patch wordt daarom pas aangeboden wanneer Windows vastlegt dat hij niet te deïnstalleren is, elk programma waarbij hij geregistreerd staat is geraadpleegd, geen ervan hem nog heeft toegepast, en geen ervan een patch bevat waarvan Windows zegt dat die te deïnstalleren is. Dat laatste staat er omdat het ongedaan maken van een patch op een programma naar het oudere bestand kan teruggrijpen. Kan een van die dingen niet worden beantwoord, dan blijft het bestand staan.
+**Waar een vervangen patch van afwijkt.** Die doorloopt niets van het bovenstaande, want het gaat niet om een onopgeëist bestand. Windows heeft er een record van, en dat record is juist wat zegt dat hij is vervangen. Het risico is een ander: een patch kan bij meerdere programma's geregistreerd staan, terwijl er maar één klaar mee is. Een vervangen patch wordt daarom pas als veilig te verwijderen aangemerkt wanneer Windows vastlegt dat hij niet te deïnstalleren is, elk programma waarbij hij geregistreerd staat is geraadpleegd, geen ervan hem nog heeft toegepast, en geen ervan een patch bevat waarvan Windows zegt dat die te deïnstalleren is. Dat laatste staat er omdat het ongedaan maken van een patch op een programma naar het oudere bestand kan teruggrijpen. Kan een van die dingen niet worden beantwoord, dan blijft het bestand staan.
 
 <details>
 <summary>De Windows Installer-aanroepen die hiervoor worden gebruikt</summary>
@@ -207,9 +219,9 @@ Dat alles gezegd hebbende, moedigt de app je aan om de bestanden naar een back-u
 
 Drie varianten, kies er een:
 
-- **Portable** (`InstallerClean-portable.exe`): één bestand, met de .NET 10-runtime erin. Geen installatie, geen de-installatieprogramma: dubbelklikken en het draait. Bewaar het bestand ergens voor de volgende keer, of verwijder het als je klaar bent.
-- **Setup** (`InstallerClean-3.7.0-setup.exe`): een gewone Windows-installer met de .NET 10-runtime meegeleverd. Voegt een vermelding in het Startmenu toe en deïnstalleert netjes. Staat tussen je programma's, zodat je het over een half jaar zo terugvindt, of je het vaker draait als je veel software installeert en verwijdert.
-- **CLI** (`installerclean-cli.exe`): de opdrachtregelversie op zichzelf, één bestand met de runtime erin. Geen installatie, geen de-installatieprogramma. Zet hem op een client, draai een scan of een opschoning, verwijder hem weer. Gemaakt voor scripts, geplande taken en massa-uitrol, waar je de bewerkingen wilt zonder desktopapp op de client. Zie [Opdrachtregel](#opdrachtregel) voor de argumenten en afsluitcodes.
+- **Portable** (`InstallerClean-portable.exe`): één bestand. Geen installatie, geen de-installatieprogramma: dubbelklikken en het draait. Bewaar het bestand ergens voor de volgende keer, of verwijder het als je klaar bent.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): een gewone Windows-installer. Voegt een vermelding in het Startmenu toe en deïnstalleert netjes. Staat tussen je programma's, zodat je het over een half jaar zo terugvindt, of je het vaker draait als je veel software installeert en verwijdert.
+- **CLI** (`installerclean-cli.exe`): de opdrachtregelversie op zichzelf, één bestand. Geen installatie, geen de-installatieprogramma. Zet hem op een client, draai een scan of een opschoning, verwijder hem weer. Gemaakt voor scripts, geplande taken en massa-uitrol, waar je de bewerkingen wilt zonder desktopapp op de client. Zie [Opdrachtregel](#opdrachtregel) voor de argumenten en afsluitcodes.
 
 Sinds 2.2.0 dragen de bestandsnamen van de setup en de portable hun versienummer, zodat een gedownloade kopie altijd zegt wat hij is; de CLI houdt zijn kale naam `installerclean-cli.exe`, zodat geplande taken en scripts die ernaar wijzen over updates heen blijven werken.
 
@@ -236,7 +248,7 @@ InstallerClean is niet ondertekend. Dit kun je controleren voordat je het uitvoe
 - De SHA-256 van elke download staat op de bijbehorende releasepagina.
 - VirusTotal: elke build wordt gescand voordat hij uitgaat, en op de releasepagina staat voor elke download het volledige resultaat per engine.
 - De broncode staat hier op [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). De services voor scannen, opvragen, verplaatsen, verwijderen, instellingen en een openstaande herstart worden gedekt door een geautomatiseerde testsuite die op Windows draait bij elke push naar `main` en bij elke pull request, en de CI-badge boven aan deze pagina meldt de uitkomst.
-- Release-builds zijn deterministisch: dezelfde broncode, dezelfde SDK en dezelfde publicatieopties leveren dezelfde bytes op, en een release kan pas worden getagd als elke bouwinvoer overeenkomt met de broncode op die tag. Je kunt de tag dus uitchecken, zelf bouwen en de hashes vergelijken met de gepubliceerde. De release-notes van elke versie dragen wat je daarvoor nodig hebt: de SDK-versie waarmee is gebouwd, en de publicatieopties voor elke download die niet met de standaardopties is gebouwd. De setup is de uitzondering: die wordt door Inno Setup gecompileerd in plaats van door de SDK en stempelt het bouwjaar in zichzelf, dus om die hash te reproduceren heb je ook dezelfde Inno-versie en hetzelfde kalenderjaar nodig.
+- Release-builds zijn deterministisch: dezelfde broncode, dezelfde SDK en dezelfde publicatieopties leveren dezelfde bytes op, en een release kan pas worden getagd als elke bouwinvoer overeenkomt met de broncode op die tag. Je kunt de tag dus uitchecken, zelf bouwen en de hashes vergelijken met de gepubliceerde. De release-notes van elke versie dragen wat je daarvoor nodig hebt: de SDK-versie waarmee is gebouwd, en de publicatieopties voor elke download die niet met de standaardopties is gebouwd. De setup wordt door Inno Setup gecompileerd in plaats van door de SDK, dus om die hash te reproduceren heb je ook dezelfde Inno Setup-versie nodig en een compilatie via `scripts/compile-setup.ps1`, dat elk bestand dat de setup inpakt de datum en tijd van de commit geeft.
 - <!-- downloads-start -->142.000+<!-- downloads-end --> downloads via GitHub, MajorGeeks en Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) test elke inzending in een virtuele machine en neemt haar alleen op als ze hun beoordeling doorstaat.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Door MajorGeeks gecertificeerd: 100% schoon" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) heeft het beoordeeld en gecertificeerd als vrij van spyware, adware en virussen.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia-award 100% gratis, gecertificeerd vrij van spyware, adware en virussen" width="190"></a>
@@ -251,7 +263,7 @@ InstallerClean is niet ondertekend. Dit kun je controleren voordat je het uitvoe
 
 **Waarom zegt Windows “Onbekende uitgever”?** InstallerClean is niet code-ondertekend, en Windows markeert bestanden die van internet komen, dus bij de eerste start toont SmartScreen meestal de melding dat Windows je pc heeft beschermd, met de uitgever als onbekend. Een betaald certificaat om te ondertekenen kost elk jaar geld, en ik houd de app liever gratis dan daarvoor te betalen, dus heb ik me aangemeld bij de SignPath Foundation, die opensourcesoftware gratis ondertekent, en InstallerClean is aangenomen (zie [Beleid voor code-ondertekening](#beleid-voor-code-ondertekening)). Het certificaat is nog niet uitgegeven, dus klik voorlopig op **Meer informatie** en dan op **Toch uitvoeren**. Dat kan met een gerust hart: de broncode is openbaar, en elke release heeft VirusTotal-links en SHA-256-hashes die je vooraf kunt controleren.
 
-**Werkt het op Windows 7 of 8?** Nee. Het heeft Windows 10 versie 1607 of nieuwer nodig, de oudste build die de .NET 10-runtime ondersteunt. De setup weigert op iets ouders te installeren en de portable start niet.
+**Werkt het op Windows 7 of 8?** Nee. Het heeft Windows 10 versie 1607 of nieuwer nodig, of Windows 11. De setup weigert op iets ouders te installeren, en de portable en de opdrachtregel zeggen dat en stoppen.
 
 ## Opdrachtregel
 
@@ -267,6 +279,7 @@ InstallerClean is niet ondertekend. Dit kun je controleren voordat je het uitvoe
 | `/m PAD` | Scant en verplaatst ze daarna naar `PAD`. Zet het tussen aanhalingstekens als er een spatie in staat. | |
 | `--help` | Drukt de helptekst af en sluit af met `0`. | `/?`, `-h` |
 | `--version` | Drukt de versie af en sluit af met `0`. | `-v` |
+| `--notices` | Drukt de kennisgevingen en licenties af van het werk van derden dat in InstallerClean zit, en sluit af met `0`. | |
 
 Opties zijn niet hoofdlettergevoelig, dus `/S` en `/D` werken net zo goed als `/s` en `/d`. Eén optie per run: ze zijn niet te combineren, en `/s` en `/d` nemen niets achter zich aan.
 
@@ -298,7 +311,7 @@ Elke run schrijft een vermelding met de uitkomst naar het toepassingslogboek, en
 | `4000` | Harde fout |
 | `3000` | Melding: de scan kreeg niet elk geïnstalleerd programma in beeld |
 | `3001` | Melding: er ontbreken bestanden in de map die Windows wel verwacht |
-| `3002` | Melding: er zijn bestanden achtergehouden in plaats van aangeboden |
+| `3002` | Melding: bestanden waar InstallerClean niet zeker over kon zijn, zijn ongemoeid gelaten |
 
 De `3000`-reeks is een melding en geen uitkomst, en telt niet als resultaat van de run. Het type vermelding is Informatie waar er niets is misgegaan met de run, en Waarschuwing waar dat wel zo is. **Het gebeurtenislogboek is altijd in het Engels**, wat de weergavetaal van de machine ook is, zodat een zoekactie op een bekende zin een vast doelwit heeft. Vertaald is de console: die volgt de taal van de machine zelf, en schrijft groottes en datums volgens de regio ervan.
 
@@ -354,7 +367,7 @@ InstallerClean is gebouwd om volledig bruikbaar te zijn met het toetsenbord en m
 - **Verteller en spraaktoegang.** Elk element heeft een label, en het zichtbare woord op een knop is het woord waarmee je hem met je stem activeert. Wanneer een verplaatsing of verwijdering klaar is, wordt de uitkomst voorgelezen.
 - **Gemaakt om te lezen.** De tekst haalt overal in het donkere thema het WCAG AA-contrast.
 
-Zit iets je hier in de weg, [open dan een issue](../../issues). Toegankelijkheidsproblemen zijn bugs, geen randgevallen.
+Zit iets je hier in de weg, [open dan een issue](../../issues). Een toegankelijkheidsprobleem behandel ik als een bug.
 
 ## Beleid voor code-ondertekening
 
@@ -366,7 +379,7 @@ Zodra het is uitgegeven, draagt elke release de regel waar SignPath om vraagt: f
 
 ## Privacy
 
-De eerste keer dat InstallerClean op een pc een run afrondt, staat er op het resultaatscherm een vakje “Anoniem rapport versturen”, en het rapport gaat weg wanneer je dat scherm sluit, tenzij je het vinkje weghaalt. Er is per pc nooit meer dan één rapport. Het vakje is in het begin niet aangevinkt als Windows is ingesteld op een land in de Europese Unie, IJsland, Liechtenstein of Noorwegen, of als InstallerClean die instelling niet kan lezen. In het rapport staat wat de scan heeft gevonden, wat het heeft achtergehouden en waarom, of je hebt verplaatst of verwijderd, hoeveel dat heeft vrijgemaakt, hoe lang het duurde, en wat er is mislukt, samen met de versie van de app, de taal waarin je hem leest, de taal waarop Windows is ingesteld en je Windows-versie. Geen bestandsnamen, geen mapnamen, geen accountnaam, niets dat je machine identificeert en niets waarmee twee rapporten aan elkaar te knopen zijn. De kleine “i” naast het vakje laat zien wat het rapport bevat, en “Precies zien wat er wordt verstuurd” toont je het rapport zelf. De grafiek bovenaan deze pagina wordt uit de rapporten opgebouwd, zodat iedereen kan zien hoeveel ruimte mensen echt terugwinnen. Ze vertellen me ook of de app werkt, en wat hij achterhoudt, op andere machines dan de mijne.
+De eerste keer dat InstallerClean op een pc een run afrondt, staat er op het resultaatscherm een vakje “Anoniem rapport versturen”, en het rapport gaat weg wanneer je dat scherm sluit, tenzij je het vinkje weghaalt. Er is per pc nooit meer dan één rapport. In het rapport staat wat de scan heeft gevonden, wat het ongemoeid heeft gelaten en waarom, of je hebt verplaatst of verwijderd, hoeveel dat heeft vrijgemaakt, hoe lang het duurde, en wat er is mislukt, samen met de versie van de app, de taal waarin je hem leest, de taal waarop Windows is ingesteld, je Windows-versie en een willekeurige code die voor het rapport is gemaakt, zodat het maar één keer wordt meegeteld als het meer dan eens wordt verstuurd. Geen bestandsnamen, geen mapnamen, geen accountnaam, niets dat je machine identificeert en niets waarmee twee rapporten aan elkaar te knopen zijn. De kleine “i” naast het vakje laat zien wat het rapport bevat, en “Precies zien wat er wordt verstuurd” toont je het rapport zelf. De grafiek bovenaan deze pagina wordt uit de rapporten opgebouwd, zodat iedereen kan zien hoeveel ruimte mensen echt terugwinnen. Ze vertellen me ook of de app werkt, en wat hij ongemoeid laat, op andere machines dan de mijne.
 
 Geen advertenties. De enige andere verbindingen zijn de versiecontrole bij het starten van de app (één verzoek aan GitHub, dat je in het venster Over kunt uitzetten) en knoppen met links naar GitHub en naar een pagina waar je kunt doneren als je je gul voelt. Het volledige [privacybeleid](PRIVACY.md) (in het Engels).
 
@@ -400,7 +413,7 @@ Het verschil tussen de twee tools zit hier in wat elk aan Windows vraagt, niet i
 |---|---|---|
 | Laatst bijgewerkt | 2026 (actief) | 3 maart 2016 |
 | Broncode | Open source (Apache 2.0) | Closed source |
-| Runtime | .NET 10 (op zichzelf staand) | .NET Framework 4.5.2 + VBScript |
+| Runtime | .NET Framework 4.8 | .NET Framework 4.5.2 + VBScript |
 | API | Windows Installer-API in `msi.dll` (in-process) | Windows Installer-COM (out-of-process via VBScript) |
 | Vervangen patches | Herkend aan de patchrecords van Windows | Niet onderscheiden van onopgeëiste bestanden |
 | Adobe-bestanden | Vervangen patches worden herkend en gelabeld | Uitgesloten door een naamfilter, standaard aan |
@@ -414,12 +427,12 @@ Schijfopruiming, Opslaginzicht, CCleaner en BleachBit ruimen `C:\Windows\Install
 
 Ontbreekt er inderdaad een bestand in die map, dan draait het programma waar het bij hoorde gewoon door. Maar probeer je dat programma bij te werken of te verwijderen, dan mislukt dat waarschijnlijk. Windows gaat het bestand zoeken, vindt het niet, en de stap loopt vast.
 
-Het hele doel van InstallerClean is om alleen bestanden aan te bieden om te verplaatsen of te verwijderen die *niet* nodig zijn, maar het merkt wel wanneer er een bestand ontbreekt, dus markeert het elk ontbrekend bestand dat het tegenkomt met een waarschuwingsdriehoek en een link naar deze plek. Zo probeer je het programma te repareren:
+InstallerClean merkt een bestand alleen aan als veilig te verwijderen wanneer het *niet* nodig is, maar het weet wel wanneer er een bestand ontbreekt, dus markeert het elk ontbrekend bestand dat het tegenkomt met een waarschuwingsdriehoek en een link naar deze plek. Zo probeer je het programma te repareren:
 
 - Zoek het versienummer op van het programma zoals je het hebt geïnstalleerd (Instellingen, Apps, Geïnstalleerde apps)
 - Download de installer **voor die versie** bij de maker. Een nieuwere werkt niet, en eerst deïnstalleren ook niet: allebei moeten ze weghalen wat er geïnstalleerd staat voordat ze verder kunnen, en juist die stap heeft het ontbrekende bestand nodig.
 - Voer die installer uit
-- Dat zou het bestand moeten terugzetten en je instellingen ongemoeid moeten laten. Scan opnieuw in InstallerClean; is de waarschuwing weg, dan is het gelukt.
+- Dat zou het bestand moeten terugzetten en je instellingen ongemoeid moeten laten. Klik in InstallerClean op **Opnieuw scannen**; is de waarschuwing weg, dan is het gelukt.
 
 Microsoft garandeert echter niet dat dat werkt. Wat volgt is het eigen, uitgebreidere verhaal van Microsoft:
 
@@ -456,7 +469,8 @@ Is InstallerClean ooit de reden dat een bestand ontbreekt, dan wil ik dat weten.
 
 ## Vereisten
 
-- Windows 10 (versie 1607 / build 14393 of nieuwer, de oudste die de .NET 10-runtime ondersteunt) of Windows 11
+- Windows 10 (versie 1607 / build 14393 of nieuwer) of Windows 11
+- .NET Framework 4.8, dat Windows 10 sinds versie 1903 bevat en Windows 11 altijd. Op een eerdere Windows 10 zonder dat zeggen de setup en de app dat en verwijzen ze naar de download van Microsoft.
 - 64-bits Windows. De setup installeert niet op 32-bits en zegt dat ook.
 - Beheerdersrechten, voor de setup en voor de app (`C:\Windows\Installer` is alleen voor beheerders)
 
@@ -497,6 +511,8 @@ Maakt InstallerClean wat ruimte vrij en voel je je gul, dan stel ik een [kleine 
 ## Licentie
 
 [Apache 2.0](LICENSE)
+
+InstallerClean bevat lettertypen, pictogrammen en code uit andere projecten, elk onder een eigen licentie, allemaal vermeld in [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Elke download bevat de tekst van dat bestand: de app toont hem in het venster Over, en `installerclean-cli --notices` drukt hem af.
 
 ---
 

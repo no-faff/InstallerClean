@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Giấy phép: Apache 2.0"></a>
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet-framework/net48"><img src="https://img.shields.io/badge/.NET_Framework-4.8-purple.svg" alt=".NET Framework 4.8"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="Bản phát hành GitHub"></a>
@@ -36,8 +36,8 @@
 <!-- reports-stats-end -->
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn cứ đầy dần lên khi bạn cài và cập nhật phần mềm. Sau một lượt quét nhanh, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn chuyển chúng đi nơi khác hoặc xóa chúng để giải phóng dung lượng trên ổ C: của bạn.
-- **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. Nếu vậy thì InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể loại bỏ an toàn.
-- **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và nhiều người đã giải phóng hàng trăm GB. Nói chung, càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết. Ngay khi chạy InstallerClean, bạn sẽ biết.
+- **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và cho bạn biết tệp nào có thể loại bỏ an toàn.
+- **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và một số người đã giải phóng hàng trăm GB. Càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết.
   <!-- reports-scaled-start -->
   <details>
   <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 142.145 lượt tải</summary>
@@ -50,7 +50,7 @@
   </p>
   </details>
   <!-- reports-scaled-end -->
-- **Có an toàn không:** Có. Thứ duy nhất nó động đến là các tệp trong `C:\Windows\Installer`. Nó hỏi Windows Installer xem những gì vẫn còn cần, và nó cũng đọc chính những bản ghi đó từ registry. Nó chỉ đề xuất một tệp khi không có gì đã cài trên máy nhận tệp đó là của mình, hoặc khi một bản vá mới hơn đã thay thế nó và không chương trình nào ở đây có thể quay lại dùng bản cũ. Bất cứ thứ gì nó không có được câu trả lời rõ ràng thì nó giữ lại. [Chi tiết ở bên dưới](#cách-hoạt-động).
+- **Có an toàn không:** Có. Thứ duy nhất nó động đến là các tệp trong `C:\Windows\Installer`. Nó hỏi Windows Installer xem những gì vẫn còn cần, và nó cũng đọc chính những bản ghi đó từ registry. Nó chỉ liệt kê một tệp là có thể xóa an toàn khi không có gì đã cài trên máy nhận tệp đó là của mình, hoặc khi một bản vá mới hơn đã thay thế nó và không chương trình nào ở đây có thể quay lại dùng bản cũ. Bất cứ thứ gì nó không có được câu trả lời rõ ràng thì nó để nguyên. [Chi tiết ở bên dưới](#cách-hoạt-động).
 - **Không thu thập gì về bạn:** Mã nguồn mở (Apache 2.0). Không tài khoản, không quảng cáo, không theo dõi, không có gì chạy ngầm. Nó kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, việc này bạn có thể tắt, và lần đầu tiên nó chạy xong trên một máy tính, nó gửi một báo cáo ẩn danh về việc lượt chạy đó diễn ra thế nào, trừ khi bạn bỏ chọn ô trên màn hình kết quả.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [mọi cảnh báo Windows hiện ra](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Chuyển hoặc xóa những gì nó tìm được. Xong.
 
@@ -61,6 +61,7 @@
 - [Thư mục không ai nói cho bạn biết](#thư-mục-không-ai-nói-cho-bạn-biết)
 - [Đi tìm trợ giúp](#đi-tìm-trợ-giúp)
 - [InstallerClean làm gì](#installerclean-làm-gì)
+- [Mọi người nói gì](#mọi-người-nói-gì)
 - [Ảnh chụp màn hình](#ảnh-chụp-màn-hình)
 - [Cách hoạt động](#cách-hoạt-động)
 - [Tải về](#tải-về)
@@ -90,7 +91,7 @@ Khi một bản vá mới hơn thay thế bản cũ, cả hai đều ở lại. 
 
 Đây không phải những tệp tạm tự quay lại. Chúng là gánh nặng thật sự: những trình cài đặt cũ của phần mềm bạn đã gỡ từ nhiều năm trước, và những bản vá đã bị thay thế nhiều lần. Một khi đã xóa, chúng không quay lại nữa.
 
-**Nếu bạn đang tìm một cách dễ dàng để giải phóng dung lượng đĩa trên Windows, thư mục này là một nơi tốt để bắt đầu.** InstallerClean tìm những tệp không cần thiết và loại bỏ chúng một cách an toàn.
+InstallerClean tìm những tệp không cần thiết và loại bỏ chúng một cách an toàn.
 
 ## Đi tìm trợ giúp
 
@@ -108,9 +109,20 @@ Lời khuyên thường gặp lẫn lộn hai chuyện khác nhau. Xóa tệp m�
 
 1. **Quét** `C:\Windows\Installer` để tìm các tệp `.msi` và `.msp`
 2. **Hỏi** Windows Installer xem những gì vẫn còn cần, rồi tự đọc lại chính những bản ghi đó từ registry
-3. **Giữ lại** bất cứ thứ gì mà hai lần đọc không thống nhất được với nhau
+3. **Để nguyên** mọi tệp mà một chương trình vẫn còn cần, và bất cứ thứ gì mà hai lần đọc không thống nhất được với nhau
 4. **Cho bạn biết có thể giải phóng bao nhiêu** và nó để nguyên bao nhiêu, kèm các cửa sổ chi tiết tùy chọn liệt kê từng tệp
 5. **Loại bỏ những tệp không cần thiết**: chuyển chúng vào một thư mục sao lưu bạn chọn, hoặc xóa vĩnh viễn
+
+## Mọi người nói gì
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/vi-1-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/vi-1-light.svg"><img src="docs/quotes/vi-1-light.svg" width="400" alt="Legally_Alienated, YouTube (dịch từ nguyên văn tiếng Anh): Chà, vừa giải phóng gần 200GB dung lượng ổ đĩa - mình đã mất hàng giờ tìm xem dung lượng trên chiếc máy gần 10 năm tuổi của mình đi đâu hết - giờ thì biết rồi và sửa được, cảm ơn nhiều lắm"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/vi-2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/vi-2-light.svg"><img src="docs/quotes/vi-2-light.svg" width="400" alt="Một người ủng hộ trên Ko-fi (dịch từ nguyên văn tiếng Anh): Dễ cài, dễ dùng và hướng dẫn rõ ràng. Làm tốt lắm!"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/vi-3-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/vi-3-light.svg"><img src="docs/quotes/vi-3-light.svg" width="400" alt="Một người ủng hộ trên Ko-fi (dịch từ nguyên văn tiếng Anh): Tiết kiệm cho mình 12 GB trong 1 phút. Đỉnh."></picture></a>
+  <a href="https://www.reddit.com/r/sysadmin/comments/1ucp6kd/adobe_updates_in_cwindowsinstaller/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/vi-4-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/vi-4-light.svg"><img src="docs/quotes/vi-4-light.svg" width="400" alt="BSRider, r/sysadmin (dịch từ nguyên văn tiếng Anh): Mình khuyên dùng InstallerClean [...] vì nó có bản chỉ CLI (hoặc bản portable nếu bạn muốn giao diện) mà bạn có thể viết script chạy bằng tác vụ theo lịch [...]"></picture></a>
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/vi-5-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/vi-5-light.svg"><img src="docs/quotes/vi-5-light.svg" width="400" alt="leehelck4606, YouTube (dịch từ nguyên văn tiếng Anh): mình lấy lại được 4 gb nhờ cái này. không nhiều, nhưng có còn hơn không."></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/vi-6-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/vi-6-light.svg"><img src="docs/quotes/vi-6-light.svg" width="400" alt="Một người ủng hộ trên Ko-fi (dịch từ nguyên văn tiếng Anh): Cảm ơn vì ứng dụng! Giờ mình có thể tiếp tục dùng laptop rồi!"></picture></a>
+</p>
 
 ## Ảnh chụp màn hình
 
@@ -167,7 +179,7 @@ Lời khuyên thường gặp lẫn lộn hai chuyện khác nhau. Xóa tệp m�
 
 Khi Windows Installer cài một chương trình, nó giữ lại một bản sao của trình cài đặt trong `C:\Windows\Installer`, và khi một bản vá được đăng ký cho một chương trình thì nó cũng giữ lại một bản sao của bản vá đó. Những bản sao ấy là thứ nó dựa vào để sửa chữa, cập nhật hay gỡ cài đặt phần mềm về sau, và đó là lý do chúng ở lại rất lâu sau khi việc cài đặt đã xong. Cả hai loại bản sao đều nằm trong thư mục này: trình cài đặt `.msi`; và bản vá `.msp`, thứ cập nhật một chương trình bạn đã có chứ không thay thế nó.
 
-InstallerClean đề xuất một tệp vì một trong hai lý do.
+InstallerClean liệt kê một tệp là có thể xóa an toàn vì một trong hai lý do.
 
 **Bị bỏ lại** nghĩa là không có gì trên máy nhận tệp đó là của mình. Không sản phẩm đã cài nào và không bản vá đã đăng ký nào nêu tên tệp đó.
 
@@ -181,13 +193,13 @@ InstallerClean xác định hai loại này theo hai chiều ngược nhau, và 
 
 **Khớp một bản ghi với tệp của nó.** Một bản ghi nêu tên tệp của nó trong bộ nhớ đệm dưới dạng một đường dẫn, và cùng một thư mục không phải lúc nào cũng được viết giống nhau trong các bản ghi. Nên thay vì tin vào cách viết, InstallerClean hỏi Windows xem mỗi đường dẫn được ghi thực sự trỏ tới đâu, rồi đối chiếu với những tệp đã liệt kê trong thư mục. Tệp nào vẫn chưa có bản ghi nào nhận là của mình thì được đối chiếu lần thứ hai, lần này không qua tên chút nào: InstallerClean mở tệp ra và nhờ Windows nhận dạng tệp đó, để hai cái tên khác nhau của cùng một tệp được nhận ra là một tệp.
 
-**Những bản ghi không khớp được.** Nếu Windows không chịu cho biết một đường dẫn được ghi trỏ tới đâu, hoặc không nhận dạng được tệp ở cuối đường dẫn đó, thì InstallerClean không biết bản ghi ấy nói về tệp nào, và bất kỳ tệp nào nó đã liệt kê cũng có thể là tệp đó. Điều tương tự xảy ra nếu một chương trình có thể đã được cài nhiều hơn một lần, vì khi đó nó không phân biệt được tệp nào trong bộ nhớ đệm thuộc về bản cài nào. Trong bất kỳ trường hợp nào như vậy, lượt quét đó không đề xuất gì trong số những tệp nó tìm được bằng cách liệt kê thư mục. Một bản ghi trỏ tới một tệp đã không còn nữa thì lại khác: không còn gì để nó có thể nói tới, nên nó không thể nói về bất kỳ tệp nào vẫn đang ở trong thư mục.
+**Những bản ghi không khớp được.** Nếu Windows không chịu cho biết một đường dẫn được ghi trỏ tới đâu, hoặc không nhận dạng được tệp ở cuối đường dẫn đó, thì InstallerClean không biết bản ghi ấy nói về tệp nào, và bất kỳ tệp nào nó đã liệt kê cũng có thể là tệp đó. Điều tương tự xảy ra nếu một chương trình có thể đã được cài nhiều hơn một lần, vì khi đó nó không phân biệt được tệp nào trong bộ nhớ đệm thuộc về bản cài nào. Trong bất kỳ trường hợp nào như vậy, lượt quét đó không liệt kê tệp nào trong số những tệp nó tìm được bằng cách liệt kê thư mục là có thể xóa an toàn. Một bản ghi trỏ tới một tệp đã không còn nữa thì lại khác: không còn gì để nó có thể nói tới, nên nó không thể nói về bất kỳ tệp nào vẫn đang ở trong thư mục.
 
-**Hỏi từ đầu bên kia.** Một tệp bị bỏ lại được xác định bằng một sự vắng mặt, mà vắng mặt cũng có thể có nghĩa là ứng dụng đã không tìm thấy bản ghi. Nên trước khi đề xuất một trình cài đặt `.msi`, InstallerClean mở tệp ra, đọc mã sản phẩm mà chính tệp đó mang, và hỏi Windows xem sản phẩm ấy có đang được cài hay không. Nếu có, tệp ở lại, bất kể phần còn lại của lượt quét đã tìm thấy gì. Phép kiểm tra đó chỉ có thể lấy một tệp ra khỏi danh sách. Không câu trả lời nào của nó đưa được một tệp vào danh sách.
+**Hỏi từ đầu bên kia.** Một tệp bị bỏ lại được xác định bằng một sự vắng mặt, mà vắng mặt cũng có thể có nghĩa là ứng dụng đã không tìm thấy bản ghi. Nên trước khi liệt kê một trình cài đặt `.msi` là có thể xóa an toàn, InstallerClean mở tệp ra, đọc mã sản phẩm mà chính tệp đó mang, và hỏi Windows xem sản phẩm ấy có đang được cài hay không. Nếu có, tệp ở lại, bất kể phần còn lại của lượt quét đã tìm thấy gì. Phép kiểm tra đó chỉ có thể lấy một tệp ra khỏi danh sách. Không câu trả lời nào của nó đưa được một tệp vào danh sách.
 
-**Điều gì quyết định một bản vá `.msp`.** Một bản vá không được mở ra để hỏi xem nó thuộc về chương trình nào. Thứ quyết định thay vào đó là việc một đăng ký bản vá nêu tên tệp của nó trong bộ nhớ đệm ở hai nơi: các bản vá đã đăng ký cho từng sản phẩm; và một danh sách registry duy nhất gồm mọi đăng ký bản vá trên máy. Một bản vá chỉ được đề xuất là bị bỏ lại khi không nơi nào trong hai nơi đó nêu tên tệp của bản vá ấy trong bộ nhớ đệm.
+**Điều gì quyết định một bản vá `.msp`.** Một bản vá không được mở ra để hỏi xem nó thuộc về chương trình nào. Thứ quyết định thay vào đó là việc một đăng ký bản vá nêu tên tệp của nó trong bộ nhớ đệm ở hai nơi: các bản vá đã đăng ký cho từng sản phẩm; và một danh sách registry duy nhất gồm mọi đăng ký bản vá trên máy. Một bản vá chỉ được liệt kê là có thể xóa an toàn khi không nơi nào trong hai nơi đó nêu tên tệp của bản vá ấy trong bộ nhớ đệm.
 
-**Bản vá bị thay thế khác ở chỗ nào.** Nó không đi qua bước nào ở trên, vì nó không phải một tệp không ai nhận. Windows có bản ghi về nó, và chính bản ghi đó nói rằng nó đã bị thay thế. Rủi ro ở đây là chuyện khác: một bản vá có thể được đăng ký cho nhiều chương trình, mà chỉ một trong số đó đã dùng xong nó. Vì vậy một bản vá bị thay thế chỉ được đề xuất khi Windows ghi nhận rằng nó không gỡ được, mọi chương trình có đăng ký nó đều đã được hỏi, không chương trình nào còn áp dụng nó, và không chương trình nào đang giữ một bản vá mà Windows nói là gỡ được. Điều cuối cùng có ở đó vì việc hoàn tác một bản vá trên một chương trình có thể quay lại cần đến tệp cũ hơn. Nếu có bất kỳ điều nào trong số đó không trả lời được, tệp ở lại.
+**Bản vá bị thay thế khác ở chỗ nào.** Nó không đi qua bước nào ở trên, vì nó không phải một tệp không ai nhận. Windows có bản ghi về nó, và chính bản ghi đó nói rằng nó đã bị thay thế. Rủi ro ở đây là chuyện khác: một bản vá có thể được đăng ký cho nhiều chương trình, mà chỉ một trong số đó đã dùng xong nó. Vì vậy một bản vá bị thay thế chỉ được liệt kê là có thể xóa an toàn khi Windows ghi nhận rằng nó không gỡ được, mọi chương trình có đăng ký nó đều đã được hỏi, không chương trình nào còn áp dụng nó, và không chương trình nào đang giữ một bản vá mà Windows nói là gỡ được. Điều cuối cùng có ở đó vì việc hoàn tác một bản vá trên một chương trình có thể quay lại cần đến tệp cũ hơn. Nếu có bất kỳ điều nào trong số đó không trả lời được, tệp ở lại.
 
 <details>
 <summary>Những lệnh gọi Windows Installer mà ứng dụng dùng</summary>
@@ -207,9 +219,9 @@ Dù đã nói tất cả những điều đó, ứng dụng vẫn khuyến khíc
 
 Ba bản dựng, chọn một:
 
-- **Portable** (`InstallerClean-portable.exe`): một tệp duy nhất, có sẵn .NET 10 runtime bên trong. Không cần cài, không có trình gỡ: bấm đúp là chạy. Hãy cất tệp đó ở đâu đó cho lần sau, hoặc xóa đi khi bạn xong việc.
-- **Setup** (`InstallerClean-3.7.0-setup.exe`): một trình cài đặt Windows thông thường, đã đóng gói sẵn .NET 10 runtime. Thêm một mục vào menu Bắt Đầu và gỡ cài đặt gọn gàng. Được xếp vào danh sách chương trình để sáu tháng nữa bạn vẫn dễ tìm lại, hoặc để chạy thường xuyên hơn thế nếu bạn cài và gỡ nhiều phần mềm.
-- **CLI** (`installerclean-cli.exe`): riêng bản dòng lệnh, một tệp duy nhất có sẵn runtime bên trong. Không cần cài, không có trình gỡ. Thả nó lên một máy khách, chạy một lượt quét hay một lượt dọn, rồi xóa đi. Được làm cho việc viết script, các tác vụ theo lịch và triển khai hàng loạt, khi bạn muốn thực hiện các thao tác mà không cần một ứng dụng desktop trên máy khách. Xem [Dòng lệnh](#dòng-lệnh) để biết các tham số và mã thoát.
+- **Portable** (`InstallerClean-portable.exe`): một tệp duy nhất. Không cần cài, không có trình gỡ: bấm đúp là chạy. Hãy cất tệp đó ở đâu đó cho lần sau, hoặc xóa đi khi bạn xong việc.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): một trình cài đặt Windows thông thường. Thêm một mục vào menu Bắt Đầu và gỡ cài đặt gọn gàng. Được xếp vào danh sách chương trình để sáu tháng nữa bạn vẫn dễ tìm lại, hoặc để chạy thường xuyên hơn thế nếu bạn cài và gỡ nhiều phần mềm.
+- **CLI** (`installerclean-cli.exe`): riêng bản dòng lệnh, một tệp duy nhất. Không cần cài, không có trình gỡ. Thả nó lên một máy khách, chạy một lượt quét hay một lượt dọn, rồi xóa đi. Được làm cho việc viết script, các tác vụ theo lịch và triển khai hàng loạt, khi bạn muốn thực hiện các thao tác mà không cần một ứng dụng desktop trên máy khách. Xem [Dòng lệnh](#dòng-lệnh) để biết các tham số và mã thoát.
 
 Từ 2.2.0, tên tệp của bản cài đặt và bản portable có kèm số phiên bản, nên một bản đã tải về luôn cho biết nó là gì; bản CLI vẫn giữ tên đơn giản `installerclean-cli.exe` để các tác vụ theo lịch và script đang trỏ tới nó tiếp tục chạy qua các lần cập nhật.
 
@@ -236,7 +248,7 @@ InstallerClean không được ký số. Đây là những thứ bạn có thể
 - Mã băm SHA-256 của mỗi bản tải về đều nằm trên trang phát hành của nó.
 - VirusTotal: mỗi bản dựng đều được quét trước khi phát hành, và trang phát hành mang kết quả đầy đủ theo từng công cụ cho mỗi bản tải về.
 - Mã nguồn nằm ở đây, tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra khởi động lại đang chờ đều được một bộ kiểm thử tự động bao phủ, và bộ kiểm thử đó chạy trên Windows ở mỗi lần đẩy lên `main` và ở mỗi pull request, còn huy hiệu CI ở đầu trang này cho biết kết quả.
-- Các bản dựng phát hành có tính tất định: cùng một mã nguồn, cùng một SDK và cùng những cờ publish sẽ cho ra đúng những byte như nhau, và một bản phát hành không thể được gắn tag trừ khi mọi đầu vào của bản dựng khớp với mã nguồn tại tag đó. Vậy nên bạn có thể checkout tag đó, tự dựng lấy rồi đối chiếu mã băm với mã băm đã công bố. Ghi chú của mỗi bản phát hành mang đủ những gì bạn cần cho việc đó: phiên bản SDK mà nó được dựng bằng, và các cờ publish của bất kỳ bản tải nào không dựng bằng giá trị mặc định. Bản setup là ngoại lệ: nó do Inno Setup biên dịch chứ không phải SDK, và nó tự đóng dấu năm dựng vào bên trong, nên muốn tái tạo mã băm của nó thì cần cả đúng phiên bản Inno lẫn đúng năm dương lịch.
+- Các bản dựng phát hành có tính tất định: cùng một mã nguồn, cùng một SDK và cùng những cờ publish sẽ cho ra đúng những byte như nhau, và một bản phát hành không thể được gắn tag trừ khi mọi đầu vào của bản dựng khớp với mã nguồn tại tag đó. Vậy nên bạn có thể checkout tag đó, tự dựng lấy rồi đối chiếu mã băm với mã băm đã công bố. Ghi chú của mỗi bản phát hành mang đủ những gì bạn cần cho việc đó: phiên bản SDK mà nó được dựng bằng, và các cờ publish của bất kỳ bản tải nào không dựng bằng giá trị mặc định. Bản setup do Inno Setup biên dịch chứ không phải SDK, nên muốn tái tạo mã băm của nó thì cần cả đúng phiên bản Inno Setup lẫn việc biên dịch qua `scripts/compile-setup.ps1`, công cụ gán cho mọi tệp mà bản setup đóng gói ngày giờ của commit.
 - <!-- downloads-start -->142.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) đã đánh giá nó và chứng nhận nó không có phần mềm gián điệp, phần mềm quảng cáo và virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Giải thưởng 100% miễn phí của Softpedia, chứng nhận không phần mềm gián điệp, không phần mềm quảng cáo và không virus" width="190"></a>
@@ -251,7 +263,7 @@ InstallerClean không được ký số. Đây là những thứ bạn có thể
 
 **Vì sao Windows báo “Nhà phát hành không xác định”?** InstallerClean không được ký số, và Windows đánh dấu các tệp tải về từ internet, nên trong lần chạy đầu tiên SmartScreen thường hiện “Windows đã bảo vệ PC của bạn” với nhà phát hành ghi là không xác định. Một chứng chỉ ký số trả phí tốn tiền mỗi năm, và tôi thà giữ ứng dụng miễn phí còn hơn phải trả tiền cho nó, nên tôi đã nộp đơn xin SignPath Foundation, nơi ký số miễn phí cho phần mềm mã nguồn mở, và InstallerClean đã được chấp thuận (xem [Chính sách ký số phần mềm](#chính-sách-ký-số-phần-mềm)). Chứng chỉ vẫn chưa được cấp, nên hiện tại hãy bấm **Thông tin khác**, rồi **Vẫn chạy**. Làm vậy là an toàn: mã nguồn là công khai, và mỗi bản phát hành đều có liên kết VirusTotal và mã băm SHA-256 mà bạn có thể kiểm tra trước.
 
-**Nó có chạy trên Windows 7 hay 8 không?** Không. Nó cần Windows 10 phiên bản 1607 trở lên, bản dựng cũ nhất mà .NET 10 runtime hỗ trợ. Trình cài đặt từ chối cài trên bất cứ bản nào cũ hơn, và bản portable sẽ không khởi động.
+**Nó có chạy trên Windows 7 hay 8 không?** Không. Nó cần Windows 10 phiên bản 1607 trở lên, hoặc Windows 11. Trình cài đặt từ chối cài trên bất cứ bản nào cũ hơn, còn bản portable và bản dòng lệnh sẽ báo như vậy rồi dừng lại.
 
 ## Dòng lệnh
 
@@ -267,6 +279,7 @@ InstallerClean không được ký số. Đây là những thứ bạn có thể
 | `/m ĐƯỜNG_DẪN` | Quét, rồi chuyển chúng tới `ĐƯỜNG_DẪN`. Hãy đặt trong dấu nháy nếu nó có dấu cách. | |
 | `--help` | In phần cách dùng rồi thoát với mã `0`. | `/?`, `-h` |
 | `--version` | In phiên bản rồi thoát với mã `0`. | `-v` |
+| `--notices` | In thông báo và giấy phép của phần việc bên thứ ba nằm trong InstallerClean, rồi thoát với mã `0`. | |
 
 Các cờ không phân biệt hoa thường, nên `/S` và `/D` chạy được y như `/s` và `/d`. Mỗi lần chạy chỉ một cờ: chúng không kết hợp được với nhau, và `/s` cùng `/d` không nhận gì đứng sau.
 
@@ -298,7 +311,7 @@ Mỗi lần chạy đều ghi một mục kết quả vào nhật ký Applicatio
 | `4000` | Thất bại nặng |
 | `3000` | Thông báo: lượt quét không bao quát được hết mọi sản phẩm đã cài |
 | `3001` | Thông báo: những tệp Windows trông đợi lại không có trong thư mục |
-| `3002` | Thông báo: có tệp bị giữ lại thay vì được đề xuất |
+| `3002` | Thông báo: có tệp InstallerClean không thể chắc chắn nên đã được để nguyên |
 
 Dải `3000` là thông báo chứ không phải kết quả, và không tính là kết quả của lượt chạy. Loại mục là Information khi lượt chạy không có gì trục trặc và là Warning khi có. **Nhật ký sự kiện luôn bằng tiếng Anh**, bất kể ngôn ngữ hiển thị của máy, nên một lệnh tìm theo cụm từ đã biết luôn có đích ổn định. Phần được dịch là dòng lệnh: nó theo ngôn ngữ của chính máy, và nó viết kích thước cùng ngày tháng theo vùng của máy.
 
@@ -354,7 +367,7 @@ InstallerClean được xây dựng để có thể sử dụng hoàn toàn bằ
 - **Trình tường thuật và Truy nhập bằng giọng nói.** Mọi điều khiển đều có nhãn, và từ ngữ hiển thị trên một nút chính là từ kích hoạt nút đó bằng giọng nói. Khi một thao tác Chuyển hoặc Xóa hoàn tất, kết quả được đọc to lên.
 - **Được làm để dễ đọc.** Văn bản đạt độ tương phản WCAG AA trên toàn bộ giao diện tối.
 
-Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../../issues). Các vấn đề về khả năng tiếp cận là lỗi, không phải trường hợp ngoại lệ hiếm gặp.
+Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../../issues). Tôi coi mọi vấn đề về khả năng tiếp cận là một lỗi.
 
 ## Chính sách ký số phần mềm
 
@@ -366,7 +379,7 @@ Khi chứng chỉ được cấp, mỗi bản phát hành sẽ mang dòng chữ 
 
 ## Quyền riêng tư
 
-Lần đầu tiên InstallerClean chạy xong trên một máy tính, màn hình kết quả có ô “Gửi báo cáo ẩn danh”, và báo cáo sẽ được gửi khi bạn đóng màn hình đó, trừ khi bạn bỏ chọn ô này. Mỗi máy tính không bao giờ có quá một báo cáo. Ô này ban đầu không được chọn nếu quốc gia trong Windows được đặt là một nước thuộc Liên minh châu Âu, hoặc là Iceland, Liechtenstein hay Na Uy, hoặc nếu InstallerClean không đọc được thiết lập đó. Báo cáo cho biết lượt quét đã tìm thấy gì, đã giữ lại những gì và vì sao, bạn đã chuyển hay đã xóa, việc đó giải phóng được bao nhiêu, mất bao lâu, và những gì thất bại, cùng với phiên bản của ứng dụng, ngôn ngữ bạn dùng để đọc nó, ngôn ngữ được đặt trong Windows và phiên bản Windows của bạn. Không tên tệp, không tên thư mục, không tên tài khoản, không có gì nhận dạng máy của bạn và không có gì có thể nối hai báo cáo lại với nhau. Chữ “i” nhỏ cạnh ô đó liệt kê những gì báo cáo chứa, còn “Xem chính xác những gì được gửi” cho bạn xem chính báo cáo. Biểu đồ ở đầu trang này được vẽ từ các báo cáo, để ai cũng thấy mọi người thực sự lấy lại được bao nhiêu dung lượng. Các báo cáo cũng cho tôi biết ứng dụng có hoạt động hay không, và nó đang giữ lại những gì, trên những máy khác máy của tôi.
+Lần đầu tiên InstallerClean chạy xong trên một máy tính, màn hình kết quả có ô “Gửi báo cáo ẩn danh”, và báo cáo sẽ được gửi khi bạn đóng màn hình đó, trừ khi bạn bỏ chọn ô này. Mỗi máy tính không bao giờ có quá một báo cáo. Báo cáo cho biết lượt quét đã tìm thấy gì, đã để nguyên những gì và vì sao, bạn đã chuyển hay đã xóa, việc đó giải phóng được bao nhiêu, mất bao lâu, và những gì thất bại, cùng với phiên bản của ứng dụng, ngôn ngữ bạn dùng để đọc nó, ngôn ngữ được đặt trong Windows, phiên bản Windows của bạn và một mã ngẫu nhiên tạo ra cho báo cáo, để nó chỉ được đếm một lần nếu được gửi nhiều hơn một lần. Không tên tệp, không tên thư mục, không tên tài khoản, không có gì nhận dạng máy của bạn và không có gì có thể nối hai báo cáo lại với nhau. Chữ “i” nhỏ cạnh ô đó liệt kê những gì báo cáo chứa, còn “Xem chính xác những gì được gửi” cho bạn xem chính báo cáo. Biểu đồ ở đầu trang này được vẽ từ các báo cáo, để ai cũng thấy mọi người thực sự lấy lại được bao nhiêu dung lượng. Các báo cáo cũng cho tôi biết ứng dụng có hoạt động hay không, và nó đang để nguyên những gì, trên những máy khác máy của tôi.
 
 Không quảng cáo. Những kết nối duy nhất còn lại là lần kiểm tra phiên bản khi ứng dụng khởi động (một yêu cầu tới GitHub mà bạn có thể tắt trong cửa sổ Giới thiệu) và các nút dẫn tới GitHub và tới một trang để bạn quyên góp nếu thấy rộng lòng. [Chính sách quyền riêng tư](PRIVACY.md) đầy đủ (bằng tiếng Anh).
 
@@ -400,7 +413,7 @@ Khác biệt giữa hai công cụ ở đây nằm ở chỗ mỗi bên hỏi Wi
 |---|---|---|
 | Cập nhật gần nhất | 2026 (đang hoạt động) | 3 tháng 3 năm 2016 |
 | Mã nguồn | Mã nguồn mở (Apache 2.0) | Mã nguồn đóng |
-| Runtime | .NET 10 (độc lập) | .NET Framework 4.5.2 + VBScript |
+| Runtime | .NET Framework 4.8 | .NET Framework 4.5.2 + VBScript |
 | API | API Windows Installer trong `msi.dll` (trong tiến trình) | Windows Installer COM (ngoài tiến trình, qua VBScript) |
 | Bản vá bị thay thế | Nhận ra từ bản ghi bản vá của Windows | Không phân biệt được với tệp không ai nhận |
 | Tệp của Adobe | Bản vá bị thay thế được phát hiện và ghi nhãn | Loại trừ bằng một bộ lọc theo tên, bật sẵn |
@@ -414,7 +427,7 @@ Dọn dẹp Ổ đĩa, Nhận biết Lưu trữ, CCleaner và BleachBit đều k
 
 Nếu bạn đúng là thiếu một tệp trong thư mục đó, chương trình mà tệp ấy thuộc về vẫn chạy bình thường. Nhưng khi bạn thử cập nhật hoặc gỡ cài đặt chương trình đó thì nhiều khả năng việc ấy sẽ thất bại. Windows đi tìm tệp, không thấy, và bước đó dừng lại.
 
-Toàn bộ mục đích của InstallerClean là chỉ đề xuất chuyển hoặc xóa những tệp *không* cần đến, nhưng nó có biết khi nào một tệp bị thiếu, nên nó đánh dấu mọi tệp như vậy mà nó tìm thấy bằng một hình tam giác cảnh báo và một liên kết trỏ tới đây. Đây là những việc cần làm để thử sửa chương trình:
+InstallerClean chỉ liệt kê một tệp là có thể xóa an toàn khi tệp đó không cần đến, nhưng nó có biết khi nào một tệp bị thiếu, nên nó đánh dấu mọi tệp như vậy mà nó tìm thấy bằng một hình tam giác cảnh báo và một liên kết trỏ tới đây. Đây là những việc cần làm để thử sửa chương trình:
 
 - Tìm số phiên bản của chương trình đã cài (Cài đặt, Ứng dụng, Ứng dụng đã cài đặt)
 - Tải trình cài đặt **đúng phiên bản đó** từ nhà sản xuất. Một bản mới hơn sẽ không được, mà gỡ cài đặt trước cũng không: cả hai cách đều phải bỏ đi bản đang cài trước khi đi tiếp, và chính việc bỏ đi ấy là bước cần đến tệp đang thiếu.
@@ -456,7 +469,8 @@ Nếu có lúc nào đó InstallerClean là nguyên nhân khiến một tệp b�
 
 ## Yêu cầu
 
-- Windows 10 (phiên bản 1607 / build 14393 trở lên, phiên bản cũ nhất mà .NET 10 runtime hỗ trợ) hoặc Windows 11
+- Windows 10 (phiên bản 1607 / build 14393 trở lên) hoặc Windows 11
+- .NET Framework 4.8, thứ mà Windows 10 đã có sẵn từ phiên bản 1903 và Windows 11 luôn có. Trên một bản Windows 10 cũ hơn mà chưa có nó, trình cài đặt và ứng dụng sẽ báo như vậy và dẫn tới trang tải về của Microsoft.
 - Windows 64-bit. Trình cài đặt sẽ không cài trên bản 32-bit và sẽ báo cho bạn biết.
 - Quyền quản trị viên, cho cả trình cài đặt lẫn ứng dụng (`C:\Windows\Installer` chỉ dành cho quản trị viên)
 
@@ -497,6 +511,8 @@ Nếu InstallerClean giải phóng được chút dung lượng cho bạn và b�
 ## Giấy phép
 
 [Apache 2.0](LICENSE)
+
+InstallerClean có chứa phông chữ, biểu tượng và mã từ các dự án khác, mỗi thứ theo giấy phép riêng của nó, tất cả được liệt kê trong [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Mỗi bản tải về đều kèm văn bản của tệp đó: ứng dụng hiển thị nó từ cửa sổ Giới thiệu, và `installerclean-cli --notices` in nó ra.
 
 ---
 

@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Licenza: Apache 2.0"></a>
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet-framework/net48"><img src="https://img.shields.io/badge/.NET_Framework-4.8-purple.svg" alt=".NET Framework 4.8"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="Versione di GitHub"></a>
@@ -36,8 +36,8 @@
 <!-- reports-stats-end -->
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che si riempie man mano che installi e aggiorni software. Dopo una scansione rapida ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia spostarli altrove oppure eliminarli per liberare spazio sull'unità C:.
-- **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. In quel caso InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi rimuovere in sicurezza.
-- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e molte persone hanno liberato centinaia di GB. In sostanza, più software basato su MSI installi, più file non necessari avrai. Appena esegui InstallerClean, lo scoprirai.
+- **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. InstallerClean sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice quali puoi rimuovere in sicurezza.
+- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e alcuni hanno liberato centinaia di GB. Più software basato su MSI installi, più file non necessari avrai.
   <!-- reports-scaled-start -->
   <details>
   <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 142.145 download</summary>
@@ -50,7 +50,7 @@
   </p>
   </details>
   <!-- reports-scaled-end -->
-- **È sicuro:** Sì. Tocca soltanto i file dentro `C:\Windows\Installer`. Chiede a Windows Installer cosa serve ancora e legge gli stessi record anche dal registro di sistema. Propone un file solo quando niente di installato sul computer lo rivendica, oppure quando una patch più recente lo ha sostituito e nessun programma qui presente potrebbe tornare a quella vecchia. Tutto ciò su cui non ottiene una risposta chiara, lo trattiene. [Più sotto i dettagli](#come-funziona).
+- **È sicuro:** Sì. Tocca soltanto i file dentro `C:\Windows\Installer`. Chiede a Windows Installer cosa serve ancora e legge gli stessi record anche dal registro di sistema. Indica un file come sicuro da eliminare solo quando niente di installato sul computer lo rivendica, oppure quando una patch più recente lo ha sostituito e nessun programma qui presente potrebbe tornare a quella vecchia. Tutto ciò su cui non ottiene una risposta chiara, non lo tocca. [Più sotto i dettagli](#come-funziona).
 - **Niente su di te:** Open source (Apache 2.0). Nessun account, nessuna pubblicità, nessun tracciamento, niente che giri in background. Controlla su GitHub se c'è una versione più recente quando lo avvii, cosa che puoi disattivare, e la prima volta che completa un'esecuzione su un PC invia un rapporto anonimo su com'è andata l'esecuzione, a meno che tu non tolga la spunta alla casella nella schermata dei risultati.
 - **Come ottenerlo:** [Scarica l'ultima versione](../../releases/latest). Avvialo; supera [l'eventuale avviso di Windows](#unknown-publisher) e [la richiesta di amministratore](#admin). Sposta o elimina quello che trova. Fatto.
 
@@ -61,6 +61,7 @@
 - [La cartella di cui nessuno ti parla](#la-cartella-di-cui-nessuno-ti-parla)
 - [La ricerca di aiuto](#la-ricerca-di-aiuto)
 - [Cosa fa InstallerClean](#cosa-fa-installerclean)
+- [Cosa dicono le persone](#cosa-dicono-le-persone)
 - [Schermate](#schermate)
 - [Come funziona](#come-funziona)
 - [Download](#download)
@@ -90,7 +91,7 @@ Quando una patch più recente ne sostituisce una vecchia, restano entrambe. E re
 
 Non sono file temporanei che ritornano da soli. Sono peso morto a tutti gli effetti: vecchi installer di software che hai disinstallato anni fa e patch sostituite più volte. Una volta spariti, non tornano più.
 
-**Se cerchi un modo semplice per liberare spazio su disco in Windows, questa cartella è un buon punto di partenza.** InstallerClean trova i file non necessari e li rimuove in sicurezza.
+InstallerClean trova i file non necessari e li rimuove in sicurezza.
 
 ## La ricerca di aiuto
 
@@ -108,9 +109,20 @@ Il consiglio abituale confonde due cose diverse. Eliminare file a caso ti impedi
 
 1. **Scansiona** `C:\Windows\Installer` alla ricerca di file `.msi` e `.msp`
 2. **Chiede** a Windows Installer cosa serve ancora, e legge gli stessi record anche dal registro di sistema
-3. **Trattiene** tutto quello che le due letture non riescono a chiarire fra loro
-4. **Ti dice quanto puoi liberare**, e quanto sta lasciando stare, con finestre di dettaglio opzionali che elencano ogni file
+3. **Non tocca** nessun file di cui un programma ha ancora bisogno, e tutto quello che le due letture non riescono a chiarire fra loro
+4. **Ti dice quanto puoi liberare**, e quanto spazio occupano i file che non tocca, con finestre di dettaglio opzionali che elencano ogni file
 5. **Rimuove i file non necessari**: li sposta in una cartella di backup che scegli tu, oppure li elimina definitivamente
+
+## Cosa dicono le persone
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/it-1-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/it-1-light.svg"><img src="docs/quotes/it-1-light.svg" width="400" alt="Legally_Alienated, YouTube (tradotto dall&#x27;inglese): Wow, ho appena liberato quasi 200GB di spazio su disco - ho passato ore a cercare di capire dove finisse lo spazio sul mio PC di quasi 10 anni - ora lo so e posso rimediare, grazie mille"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/it-2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/it-2-light.svg"><img src="docs/quotes/it-2-light.svg" width="400" alt="Un sostenitore su Ko-fi (tradotto dall&#x27;inglese): Facile da installare e da usare, e le istruzioni sono chiare. Ben fatto!"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/it-3-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/it-3-light.svg"><img src="docs/quotes/it-3-light.svg" width="400" alt="Un sostenitore su Ko-fi (tradotto dall&#x27;inglese): Mi ha fatto risparmiare 12 GB in 1 minuto. Top."></picture></a>
+  <a href="https://www.reddit.com/r/sysadmin/comments/1ucp6kd/adobe_updates_in_cwindowsinstaller/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/it-4-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/it-4-light.svg"><img src="docs/quotes/it-4-light.svg" width="400" alt="BSRider, r/sysadmin (tradotto dall&#x27;inglese): Suggerirei di usare InstallerClean [...] perché ha un&#x27;opzione solo CLI (o portable se vuoi una GUI) che puoi semplicemente automatizzare con un&#x27;attività pianificata [...]"></picture></a>
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/it-5-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/it-5-light.svg"><img src="docs/quotes/it-5-light.svg" width="400" alt="leehelck4606, YouTube (tradotto dall&#x27;inglese): ho recuperato 4 gb con questo. non è molto, ma tutto aiuta."></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/it-6-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/it-6-light.svg"><img src="docs/quotes/it-6-light.svg" width="400" alt="Un sostenitore su Ko-fi (tradotto dall&#x27;inglese): Grazie per l&#x27;app! Ora posso continuare a usare il mio portatile!"></picture></a>
+</p>
 
 ## Schermate
 
@@ -121,8 +133,8 @@ Il consiglio abituale confonde due cose diverse. Eliminare file a caso ti impedi
 </p>
 
 <p>
-  <img src="docs/screenshots/it/02-main-window.webp" alt="Finestra principale con 77 file non necessari da eliminare (2,88 GB) e 149 file lasciati stare (3,07 GB), il campo della cartella di backup e i pulsanti Elimina definitivamente e Sposta" width="900"><br>
-  <em>Risultati: quanto è rimovibile, quanto è stato lasciato stare.</em>
+  <img src="docs/screenshots/it/02-main-window.webp" alt="Finestra principale con 77 file non necessari da eliminare (2,88 GB) e 149 file non toccati (3,07 GB), il campo della cartella di backup e i pulsanti Elimina definitivamente e Sposta" width="900"><br>
+  <em>Risultati: quanto è rimovibile, quanto non è stato toccato.</em>
   <br><br>
 </p>
 
@@ -133,8 +145,8 @@ Il consiglio abituale confonde due cose diverse. Eliminare file a caso ti impedi
 </p>
 
 <p>
-  <img src="docs/screenshots/it/04-details-left-alone.webp" alt="Finestra «File lasciati stare» con l'elenco dei programmi installati e i dettagli che il pacchetto selezionato porta su di sé" width="900"><br>
-  <em>Dettagli dei file lasciati stare: il programma a cui Windows dice che ciascuno appartiene, e quello che il file dice di sé.</em>
+  <img src="docs/screenshots/it/04-details-left-alone.webp" alt="Finestra «File non toccati» con l'elenco dei programmi installati e i dettagli che il pacchetto selezionato porta su di sé" width="900"><br>
+  <em>Dettagli dei file non toccati: il programma a cui Windows dice che ciascuno appartiene, e quello che il file dice di sé.</em>
   <br><br>
 </p>
 
@@ -167,7 +179,7 @@ Il consiglio abituale confonde due cose diverse. Eliminare file a caso ti impedi
 
 Quando Windows Installer installa un programma tiene una copia dell'installer in `C:\Windows\Installer`, e quando una patch viene registrata su un programma tiene una copia anche di quella. Sono quelle copie a servirgli quando più avanti ripara, aggiorna o disinstalla il software, ed è per questo che restano lì molto tempo dopo la fine dell'installazione. Nella cartella finiscono entrambi i tipi di copia: gli installer `.msi`; e le patch `.msp`, che aggiornano un programma che hai già invece di sostituirlo.
 
-InstallerClean propone un file per uno di due motivi.
+InstallerClean indica un file come sicuro da eliminare per uno di due motivi.
 
 **Orfano** significa che niente sul computer rivendica il file. Nessun prodotto installato e nessuna patch registrata lo nomina.
 
@@ -181,13 +193,13 @@ InstallerClean arriva ai due per vie opposte, e di guardare dentro la cartella c
 
 **Far combaciare un record con il suo file.** Un record nomina il proprio file in cache come percorso, e in quei percorsi la stessa cartella non è sempre scritta allo stesso modo. Perciò, invece di fidarsi di come è scritta, InstallerClean chiede a Windows dove punta davvero ogni percorso registrato e confronta la risposta con i file che ha elencato nella cartella. Tutto quello che resta non rivendicato passa per un secondo confronto che non tocca affatto i nomi: apre il file e chiede a Windows di identificarlo, così due nomi diversi dello stesso file vengono riconosciuti come un unico file.
 
-**Record che non si riescono a far combaciare.** Se Windows non dice dove punta un percorso registrato, oppure se il file in fondo a uno dei percorsi registrati non si riesce a identificare, InstallerClean non sa di quale file parlasse quel record, e potrebbe essere uno qualunque di quelli che ha elencato. Lo stesso vale se un programma potrebbe essere stato installato più di una volta, perché allora non può dire quale file in cache appartiene a quale copia. In tutti questi casi non propone niente di quello che quella volta ha trovato elencando la cartella. Un record che punta a un file già sparito è un caso diverso: non è rimasto niente a cui potesse riferirsi, quindi non può riguardare nessuno dei file ancora nella cartella.
+**Record che non si riescono a far combaciare.** Se Windows non dice dove punta un percorso registrato, oppure se il file in fondo a uno dei percorsi registrati non si riesce a identificare, InstallerClean non sa di quale file parlasse quel record, e potrebbe essere uno qualunque di quelli che ha elencato. Lo stesso vale se un programma potrebbe essere stato installato più di una volta, perché allora non può dire quale file in cache appartiene a quale copia. In tutti questi casi, quella volta nessun file trovato elencando la cartella viene indicato come sicuro da eliminare. Un record che punta a un file già sparito è un caso diverso: non è rimasto niente a cui potesse riferirsi, quindi non può riguardare nessuno dei file ancora nella cartella.
 
-**Chiedere dall'altro capo.** Un orfano è deciso da un'assenza, e un'assenza può anche voler dire che l'app non è riuscita a trovare il record. Perciò, prima di proporre un installer `.msi`, InstallerClean apre il file, legge il codice prodotto che il file stesso porta con sé e chiede a Windows se quel prodotto è installato. Se lo è, il file resta, qualunque cosa abbia trovato il resto della scansione. Quel controllo può solo togliere un file dall'elenco. Nessuna risposta che possa dare ne aggiunge uno.
+**Chiedere dall'altro capo.** Un orfano è deciso da un'assenza, e un'assenza può anche voler dire che l'app non è riuscita a trovare il record. Perciò, prima di indicare un installer `.msi` come sicuro da eliminare, InstallerClean apre il file, legge il codice prodotto che il file stesso porta con sé e chiede a Windows se quel prodotto è installato. Se lo è, il file resta, qualunque cosa abbia trovato il resto della scansione. Quel controllo può solo togliere un file dall'elenco. Nessuna risposta che possa dare ne aggiunge uno.
 
-**Cosa decide una patch `.msp`.** Una patch non viene aperta per chiederle a quale programma appartiene. A deciderlo è invece il fatto che una registrazione di patch nomina il proprio file in cache in due posti: le patch registrate su ciascun prodotto; e un unico elenco, nel registro di sistema, di tutte le registrazioni di patch presenti sul computer. Una patch viene proposta come orfana solo quando il suo file in cache non è nominato in nessuno dei due.
+**Cosa decide una patch `.msp`.** Una patch non viene aperta per chiederle a quale programma appartiene. A deciderlo è invece il fatto che una registrazione di patch nomina il proprio file in cache in due posti: le patch registrate su ciascun prodotto; e un unico elenco, nel registro di sistema, di tutte le registrazioni di patch presenti sul computer. Una patch viene indicata come sicura da eliminare solo quando il suo file in cache non è nominato in nessuno dei due.
 
-**In cosa è diversa una patch sostituita.** Non passa per niente di tutto questo, perché non è un file non rivendicato. Windows ne ha un record, ed è quel record a dire che è stata rimpiazzata. Il rischio è un altro: una patch può essere registrata su più programmi, e solo uno di essi ha finito di usarla. Perciò una patch sostituita viene proposta solo quando Windows registra che non è disinstallabile, ogni programma su cui è registrata è stato interrogato, in nessuno di essi è ancora applicata e nessuno di essi ha una patch che Windows dice disinstallabile. L'ultima condizione c'è perché annullare una patch su un programma può andare a ripescare il file più vecchio. Se anche una sola di queste risposte manca, il file resta.
+**In cosa è diversa una patch sostituita.** Non passa per niente di tutto questo, perché non è un file non rivendicato. Windows ne ha un record, ed è quel record a dire che è stata rimpiazzata. Il rischio è un altro: una patch può essere registrata su più programmi, e solo uno di essi ha finito di usarla. Perciò una patch sostituita viene indicata come sicura da eliminare solo quando Windows registra che non è disinstallabile, ogni programma su cui è registrata è stato interrogato, in nessuno di essi è ancora applicata e nessuno di essi ha una patch che Windows dice disinstallabile. L'ultima condizione c'è perché annullare una patch su un programma può andare a ripescare il file più vecchio. Se anche una sola di queste risposte manca, il file resta.
 
 <details>
 <summary>Le chiamate a Windows Installer che usa</summary>
@@ -207,9 +219,9 @@ Detto tutto questo, l'app ti invita a spostare i file in una cartella di backup 
 
 Tre varianti, scegline una:
 
-- **Portable** (`InstallerClean-portable.exe`): un solo file, con dentro il runtime .NET 10. Nessuna installazione, nessun programma di disinstallazione: doppio clic e parte. Tieni il file da qualche parte per la prossima volta, oppure eliminalo quando hai finito.
-- **Setup** (`InstallerClean-3.7.0-setup.exe`): un normale programma di installazione di Windows con il runtime .NET 10 incluso. Aggiunge una voce nel menu Start e si disinstalla in modo pulito. Sistemato fra i programmi, così è facile da ritrovare fra sei mesi, o da usare più spesso se installi e disinstalli molto software.
-- **CLI** (`installerclean-cli.exe`): la versione a riga di comando da sola, un solo file con dentro il runtime. Nessuna installazione, nessun programma di disinstallazione. Mettilo su un client, esegui una scansione o una pulizia, eliminalo. Pensato per lo scripting, le attività pianificate e la distribuzione di massa, quando vuoi le operazioni senza un'app desktop sul client. Vedi [Riga di comando](#riga-di-comando) per gli argomenti e i codici di uscita.
+- **Portable** (`InstallerClean-portable.exe`): un solo file. Nessuna installazione, nessun programma di disinstallazione: doppio clic e parte. Tieni il file da qualche parte per la prossima volta, oppure eliminalo quando hai finito.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): un normale programma di installazione di Windows. Aggiunge una voce nel menu Start e si disinstalla in modo pulito. Sistemato fra i programmi, così è facile da ritrovare fra sei mesi, o da usare più spesso se installi e disinstalli molto software.
+- **CLI** (`installerclean-cli.exe`): la versione a riga di comando da sola, un solo file. Nessuna installazione, nessun programma di disinstallazione. Mettilo su un client, esegui una scansione o una pulizia, eliminalo. Pensato per lo scripting, le attività pianificate e la distribuzione di massa, quando vuoi le operazioni senza un'app desktop sul client. Vedi [Riga di comando](#riga-di-comando) per gli argomenti e i codici di uscita.
 
 Dalla 2.2.0 i nomi dei file del setup e della versione portable contengono il numero di versione, così una copia scaricata dice sempre cos'è; la CLI mantiene il suo nome semplice `installerclean-cli.exe`, perché le attività pianificate e gli script che la richiamano continuino a funzionare da un aggiornamento all'altro.
 
@@ -236,7 +248,7 @@ InstallerClean non è firmato. Ecco cosa puoi controllare prima di eseguirlo:
 - L'hash SHA-256 di ogni file scaricabile è sulla pagina della sua versione.
 - VirusTotal: ogni build viene analizzata prima di uscire, e la pagina della versione riporta il risultato completo motore per motore di ogni file scaricabile.
 - Il codice sorgente è qui, su [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). I servizi di scansione, interrogazione, spostamento, eliminazione, impostazioni e riavvio in sospeso sono coperti da una suite di test automatici che gira su Windows a ogni push su `main` e a ogni pull request, e il badge CI in cima a questa pagina ne riporta l'esito.
-- Le build di rilascio sono deterministiche: lo stesso codice sorgente, lo stesso SDK e gli stessi parametri di pubblicazione producono gli stessi byte, e non si può assegnare il tag a una versione a meno che ogni elemento in ingresso della build non corrisponda al codice sorgente di quel tag. Puoi quindi fare il checkout del tag, compilare tu stesso e confrontare gli hash con quelli pubblicati. Le note di ogni versione portano quello che ti serve per farlo: la versione dell'SDK con cui è stata compilata, e i parametri di pubblicazione di ogni file scaricabile che non sia stato compilato con quelli predefiniti. Il setup è l'eccezione: lo compila Inno Setup e non l'SDK, e ci stampa dentro l'anno di compilazione, quindi per riprodurne l'hash servono anche la stessa versione di Inno e lo stesso anno di calendario.
+- Le build di rilascio sono deterministiche: lo stesso codice sorgente, lo stesso SDK e gli stessi parametri di pubblicazione producono gli stessi byte, e non si può assegnare il tag a una versione a meno che ogni elemento in ingresso della build non corrisponda al codice sorgente di quel tag. Puoi quindi fare il checkout del tag, compilare tu stesso e confrontare gli hash con quelli pubblicati. Le note di ogni versione portano quello che ti serve per farlo: la versione dell'SDK con cui è stata compilata, e i parametri di pubblicazione di ogni file scaricabile che non sia stato compilato con quelli predefiniti. Il setup lo compila Inno Setup e non l'SDK, quindi per riprodurne l'hash servono anche la stessa versione di Inno Setup e una compilazione con `scripts/compile-setup.ps1`, che dà a ogni file contenuto nel setup la data e l'ora del commit.
 - <!-- downloads-start -->142.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prova ogni invio in una macchina virtuale e pubblica solo quelli che superano la loro revisione.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificato 100% pulito da MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) lo ha esaminato e lo ha certificato privo di spyware, adware e virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Premio «100% gratuito» di Softpedia, certificato senza spyware, senza adware e senza virus" width="190"></a>
@@ -251,7 +263,7 @@ InstallerClean non è firmato. Ecco cosa puoi controllare prima di eseguirlo:
 
 **Perché Windows dice «Autore sconosciuto»?** InstallerClean non è firmato digitalmente e Windows contrassegna i file scaricati da internet, quindi al primo avvio SmartScreen di solito mostra «PC protetto da Windows» con l'autore indicato come sconosciuto. Un certificato di firma a pagamento ha un costo ogni anno e preferisco tenere l'app gratuita piuttosto che pagarne uno, così ho fatto domanda alla SignPath Foundation, che firma gratuitamente il software open source, e InstallerClean è stato accettato (vedi [Politica di firma del codice](#politica-di-firma-del-codice)). Il certificato non è ancora stato emesso, quindi per ora clicca su **Ulteriori informazioni**, poi su **Esegui comunque**. Farlo è sicuro: il codice sorgente è pubblico, e ogni versione ha link a VirusTotal e hash SHA-256 che puoi controllare prima.
 
-**Funziona su Windows 7 o 8?** No. Serve Windows 10 versione 1607 o successiva, la build più vecchia supportata dal runtime .NET 10. Il setup si rifiuta di installarsi su qualcosa di più vecchio e la versione portable non parte.
+**Funziona su Windows 7 o 8?** No. Serve Windows 10 versione 1607 o successiva, oppure Windows 11. Il setup si rifiuta di installarsi su qualcosa di più vecchio, e la versione portable e la riga di comando lo dicono e si fermano.
 
 ## Riga di comando
 
@@ -267,6 +279,7 @@ InstallerClean non è firmato. Ecco cosa puoi controllare prima di eseguirlo:
 | `/m PERCORSO` | Scansiona, poi li sposta in `PERCORSO`. Mettilo fra virgolette se contiene uno spazio. | |
 | `--help` | Stampa le istruzioni d'uso ed esce con `0`. | `/?`, `-h` |
 | `--version` | Stampa la versione ed esce con `0`. | `-v` |
+| `--notices` | Stampa gli avvisi e le licenze delle opere di terze parti incluse in InstallerClean, ed esce con `0`. | |
 
 Le opzioni non fanno distinzione fra maiuscole e minuscole, quindi `/S` e `/D` funzionano quanto `/s` e `/d`. Una sola opzione per esecuzione: non si possono combinare, e `/s` e `/d` non vogliono niente dopo di sé.
 
@@ -298,7 +311,7 @@ Ogni esecuzione scrive una voce di esito nel registro applicazioni, e può aggiu
 | `4000` | Errore grave |
 | `3000` | Avviso: la scansione non è riuscita a tenere conto di ogni prodotto installato |
 | `3001` | Avviso: nella cartella mancano file che Windows si aspetta |
-| `3002` | Avviso: alcuni file sono stati trattenuti invece che proposti |
+| `3002` | Avviso: alcuni file di cui InstallerClean non poteva essere certo non sono stati toccati |
 
 La fascia `3000` è un avviso e non un esito, e non conta come risultato dell'esecuzione. Il tipo di voce è Informazioni quando nell'esecuzione non è andato storto niente e Avviso quando invece sì. **Il registro eventi è sempre in inglese**, qualunque sia la lingua di visualizzazione del computer, così una ricerca su una frase nota ha un bersaglio stabile. È la console a essere tradotta: segue la lingua del computer, e formatta dimensioni e date secondo la sua area geografica.
 
@@ -354,7 +367,7 @@ InstallerClean è realizzato per essere pienamente utilizzabile da tastiera e co
 - **Assistente vocale e Accesso vocale.** Ogni controllo è etichettato, e la parola visibile su un pulsante è quella che lo attiva con la voce. Quando uno spostamento o un'eliminazione si conclude, l'esito viene letto ad alta voce.
 - **Fatto per essere letto.** Il testo rispetta il contrasto WCAG AA in tutto il tema scuro.
 
-Se qualcosa qui ti ostacola, [apri un issue](../../issues). I problemi di accessibilità sono bug, non casi limite.
+Se qualcosa qui ti ostacola, [apri un issue](../../issues). Tratto ogni problema di accessibilità come un bug.
 
 ## Politica di firma del codice
 
@@ -366,16 +379,16 @@ Una volta emesso, ogni versione porterà la riga che SignPath chiede di riportar
 
 ## Privacy
 
-La prima volta che InstallerClean completa un'esecuzione su un PC, la schermata dei risultati ha una casella «Invia rapporto anonimo», e il rapporto parte quando chiudi quella schermata, a meno che tu non tolga la spunta. Per ogni PC non c'è mai più di un rapporto. La casella è inizialmente senza spunta se Windows è impostato su un paese dell'Unione europea, l'Islanda, il Liechtenstein o la Norvegia, oppure se InstallerClean non riesce a leggere quell'impostazione. Il rapporto dice cosa ha trovato la scansione, cosa ha trattenuto e perché, se hai spostato o eliminato, quanto spazio ha liberato quell'operazione, quanto tempo ci ha messo e tutto quello che è fallito, insieme alla versione dell'app, alla lingua in cui la leggi, alla lingua impostata in Windows e alla tua versione di Windows. Nessun nome di file, nessun nome di cartella, nessun nome di account, niente che identifichi il tuo computer e niente che permetta di collegare fra loro due rapporti. La piccola «i» accanto alla casella elenca cosa contiene il rapporto, e «Vedi esattamente cosa viene inviato» ti mostra il rapporto stesso. Dai rapporti viene disegnato il grafico in cima a questa pagina, così chiunque può vedere quanto spazio le persone recuperano davvero. Mi dicono anche se l'app funziona, e cosa sta trattenendo, su computer diversi dal mio.
+La prima volta che InstallerClean completa un'esecuzione su un PC, la schermata dei risultati ha una casella «Invia rapporto anonimo», e il rapporto parte quando chiudi quella schermata, a meno che tu non tolga la spunta. Per ogni PC non c'è mai più di un rapporto. Il rapporto dice cosa ha trovato la scansione, cosa non ha toccato e perché, se hai spostato o eliminato, quanto spazio ha liberato quell'operazione, quanto tempo ci ha messo e tutto quello che è fallito, insieme alla versione dell'app, alla lingua in cui la leggi, alla lingua impostata in Windows, alla tua versione di Windows e a un codice casuale creato per il rapporto, così viene contato una sola volta se viene inviato più di una volta. Nessun nome di file, nessun nome di cartella, nessun nome di account, niente che identifichi il tuo computer e niente che permetta di collegare fra loro due rapporti. La piccola «i» accanto alla casella elenca cosa contiene il rapporto, e «Vedi esattamente cosa viene inviato» ti mostra il rapporto stesso. Dai rapporti viene disegnato il grafico in cima a questa pagina, così chiunque può vedere quanto spazio le persone recuperano davvero. Mi dicono anche se l'app funziona, e cosa non sta toccando, su computer diversi dal mio.
 
-Nessuna pubblicità. Le uniche altre connessioni sono il controllo della versione all'avvio dell'app (una sola richiesta a GitHub, che puoi disattivare nella finestra Informazioni) e i pulsanti che rimandano a GitHub e a una pagina dove puoi fare una donazione, se ti va. L'[informativa sulla privacy](PRIVACY.md) completa (in inglese).
+Nessuna pubblicità. Le uniche altre connessioni sono il controllo della versione all'avvio dell'app (una sola richiesta a GitHub, che puoi disattivare nella finestra Info programma) e i pulsanti che rimandano a GitHub e a una pagina dove puoi fare una donazione, se ti va. L'[informativa sulla privacy](PRIVACY.md) completa (in inglese).
 
 ## Cosa non fa
 
 - WinSxS (`C:\Windows\WinSxS`) è una cartella diversa con regole diverse. Per quella, esegui `Dism /Online /Cleanup-Image /StartComponentCleanup` da un prompt con privilegi elevati.
 - Nessun servizio in background, nessuna attività pianificata, nessuna pulizia automatica. L'app gira quando la avvii tu.
 - Non modifica i tuoi programmi installati né il database di Windows Installer, li legge soltanto. Scrive due cose nel registro di sistema: la registrazione una tantum dell'origine eventi, che serve allo strumento da riga di comando perché le sue esecuzioni compaiano nel registro eventi di Windows, e un valore che annota che il PC ha avuto la sua prima esecuzione, così il rapporto anonimo viene proposto una volta sola.
-- Di sua iniziativa fa due tipi di connessione: un rapido controllo sulla pagina delle release di GitHub quando lo avvii, per vedere se c'è una versione più recente (puoi disattivarlo in Informazioni), e un rapporto anonimo dalla prima esecuzione completata su un PC (numeri sull'esecuzione, niente che nomini te o i tuoi file), a meno che tu non tolga la spunta alla sua casella. Tutto il resto succede solo quando glielo dici tu: i link alla documentazione su GitHub e a una pagina per le donazioni, che si aprono nel tuo browser se li clicchi.
+- Di sua iniziativa fa due tipi di connessione: un rapido controllo sulla pagina delle release di GitHub quando lo avvii, per vedere se c'è una versione più recente (puoi disattivarlo in Info programma), e un rapporto anonimo dalla prima esecuzione completata su un PC (numeri sull'esecuzione, niente che nomini te o i tuoi file), a meno che tu non tolga la spunta alla sua casella. Tutto il resto succede solo quando glielo dici tu: i link alla documentazione su GitHub e a una pagina per le donazioni, che si aprono nel tuo browser se li clicchi.
 - Niente barre degli strumenti, niente software incluso, niente adware.
 
 ## Le alternative
@@ -400,7 +413,7 @@ La differenza fra i due strumenti sta in cosa ciascuno chiede a Windows, non in 
 |---|---|---|
 | Ultimo aggiornamento | 2026 (attivo) | 3 marzo 2016 |
 | Codice sorgente | Open source (Apache 2.0) | Codice chiuso |
-| Runtime | .NET 10 (autonomo) | .NET Framework 4.5.2 + VBScript |
+| Runtime | .NET Framework 4.8 | .NET Framework 4.5.2 + VBScript |
 | API | API di Windows Installer in `msi.dll` (nello stesso processo) | Windows Installer COM (in un processo separato, tramite VBScript) |
 | Patch sostituite | Individuate dai record delle patch di Windows | Non distinte dai file non rivendicati |
 | File Adobe | Patch sostituite rilevate ed etichettate | Esclusi da un filtro sul nome, attivo per impostazione predefinita |
@@ -414,12 +427,12 @@ Pulizia disco, Sensore memoria, CCleaner e BleachBit non puliscono `C:\Windows\I
 
 Se ti manca davvero un file da quella cartella, il programma a cui apparteneva continua a funzionare normalmente. Ma quando proverai ad aggiornare o disinstallare quel programma, con ogni probabilità fallirà. Windows va a cercare il file, non lo trova, e il passaggio si ferma.
 
-Tutto lo scopo di InstallerClean è proporre lo spostamento o l'eliminazione solo di file che *non* servono, ma l'app sa riconoscere un file mancante, quindi segnala ognuno di quelli che trova con un triangolo di avviso e un link che porta qui. Ecco cosa fare per provare a riparare il programma:
+InstallerClean indica come sicuri da eliminare solo file che *non* servono, ma l'app sa riconoscere un file mancante, quindi segnala ognuno di quelli che trova con un triangolo di avviso e un link che porta qui. Ecco cosa fare per provare a riparare il programma:
 
 - Scopri il numero di versione del programma che hai installato (Impostazioni, App, App installate)
 - Scarica dal produttore il programma di installazione **di quella versione**. Uno più recente non funzionerà, e nemmeno disinstallare prima: entrambe le strade devono rimuovere quello che è installato prima di poter proseguire, e rimuoverlo è proprio il passaggio che ha bisogno del file mancante.
 - Esegui quel programma di installazione
-- Questo dovrebbe rimettere a posto il file e lasciare intatte le tue impostazioni. Esegui di nuovo la scansione in InstallerClean e, se ha funzionato, l'avviso sarà sparito.
+- Questo dovrebbe rimettere a posto il file e lasciare intatte le tue impostazioni. Clicca su **Ripeti scansione** in InstallerClean e, se ha funzionato, l'avviso sarà sparito.
 
 Microsoft però non garantisce che funzioni. Quello che segue è il suo resoconto, più completo:
 
@@ -456,7 +469,8 @@ Se InstallerClean fosse mai il motivo per cui manca un file, voglio saperlo. [Ap
 
 ## Requisiti
 
-- Windows 10 (versione 1607 / build 14393 o successiva, la più vecchia supportata dal runtime .NET 10) o Windows 11
+- Windows 10 (versione 1607 / build 14393 o successiva) o Windows 11
+- .NET Framework 4.8, che Windows 10 include dalla versione 1903 e che Windows 11 ha sempre. Su un Windows 10 precedente che non lo ha, il setup e l'app lo dicono e rimandano al download di Microsoft.
 - Windows a 64 bit. Il setup non si installa su un sistema a 32 bit e te lo dirà.
 - Privilegi di amministratore, per il setup e per l'app (`C:\Windows\Installer` è riservata agli amministratori)
 
@@ -497,6 +511,8 @@ Se InstallerClean ti libera un po' di spazio e ti va di essere generoso, un [pic
 ## Licenza
 
 [Apache 2.0](LICENSE)
+
+InstallerClean include font, icone e codice di altri progetti, ognuno con la propria licenza, tutti elencati in [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Ogni download porta il testo di quel file: l'app lo mostra dalla finestra Info programma, e `installerclean-cli --notices` lo stampa.
 
 ---
 

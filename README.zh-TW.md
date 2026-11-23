@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="授權條款：Apache 2.0"></a>
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet-framework/net48"><img src="https://img.shields.io/badge/.NET_Framework-4.8-purple.svg" alt=".NET Framework 4.8"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="GitHub 版本"></a>
@@ -36,8 +36,8 @@
 <!-- reports-stats-end -->
 
 - **簡介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 裡不需要的檔案，這個隱藏資料夾會隨著您安裝和更新軟體而越塞越滿。快速掃描之後，它會告訴您有沒有這類檔案，想細看的人還能看到更多詳細資料，並讓您把它們移到別處，或者刪掉，替 C: 磁碟機騰出空間。
-- **您可能是為了這個而來：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 時，看到 `C:\Windows\Installer` 佔了一大堆空間，卻不知道裡面是什麼。這種情況下，InstallerClean 正是您需要的。像 `9f05cba.msi` 這種名字看起來毫無規則的檔案，它知道裡面是什麼，而且很快就會告訴您哪些可以安全清除。
-- **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.5 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有不少人釋放了數百 GB。基本上，安裝的 MSI 軟體越多，不需要的檔案就越多。一執行 InstallerClean，您就知道了。
+- **您可能是為了這個而來：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 時，看到 `C:\Windows\Installer` 佔了一大堆空間，卻不知道裡面是什麼。像 `9f05cba.msi` 這種名字看起來毫無規則的檔案，InstallerClean 知道裡面是什麼，並會告訴您哪些可以安全清除。
+- **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.5 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有一些人釋放了數百 GB。安裝的 MSI 軟體越多，不需要的檔案就越多。
   <!-- reports-scaled-start -->
   <details>
   <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 142,145 次下載，圖表會是什麼樣</summary>
@@ -50,7 +50,7 @@
   </p>
   </details>
   <!-- reports-scaled-end -->
-- **安全嗎：** 安全。它動到的只有 `C:\Windows\Installer` 裡的檔案。它會問 Windows Installer 哪些還需要，同時也從登錄把同一批記錄再讀一遍。只有當這台電腦上沒有任何已安裝的東西認領某個檔案，或者較新的修補程式已經取代了它、而且這裡沒有任何程式還能退回到舊的那個時，它才會把這個檔案提供出來。凡是它得不到明確答案的，一律保留。[詳見下文](#運作原理)。
+- **安全嗎：** 安全。它動到的只有 `C:\Windows\Installer` 裡的檔案。它會問 Windows Installer 哪些還需要，同時也從登錄把同一批記錄再讀一遍。只有當這台電腦上沒有任何已安裝的東西認領某個檔案，或者較新的修補程式已經取代了它、而且這裡沒有任何程式還能退回到舊的那個時，它才會把這個檔案列為可安全刪除。凡是它得不到明確答案的，一律原樣保留。[詳見下文](#運作原理)。
 - **不碰您的任何資訊：** 開源（Apache 2.0）。不用帳戶，沒有廣告，沒有追蹤，也沒有任何東西在背景執行。它會在您執行時到 GitHub 查一下有沒有新版本，這可以關掉；它在一台電腦上第一次執行完成時，會傳送一份關於這次執行情況的匿名報告，除非您在結果畫面上取消勾選那個方塊。
 - **取得方式：** [下載最新版本](../../releases/latest)。執行它；按過 [Windows 顯示的任何警告](#unknown-publisher)和[系統管理員提示](#admin)。把它找到的檔案移走或刪掉。完成。
 
@@ -61,6 +61,7 @@
 - [沒有人告訴您的資料夾](#沒有人告訴您的資料夾)
 - [尋求協助](#尋求協助)
 - [InstallerClean 做什麼](#installerclean-做什麼)
+- [大家怎麼說](#大家怎麼說)
 - [螢幕擷取畫面](#螢幕擷取畫面)
 - [運作原理](#運作原理)
 - [下載](#下載)
@@ -90,7 +91,7 @@
 
 這些不是那種刪了又會自己冒出來的暫存檔。它們是貨真價實的累贅：多年前解除安裝的軟體留下的舊安裝程式，以及被取代了好幾次的修補程式。一旦清掉，就不會再回來。
 
-**如果您想找個簡單的方法替 Windows 騰出磁碟空間，從這個資料夾下手是個好開始。** InstallerClean 會找出不需要的檔案，並安全地清除它們。
+InstallerClean 會找出不需要的檔案，並安全地清除它們。
 
 ## 尋求協助
 
@@ -108,9 +109,20 @@
 
 1. **掃描** `C:\Windows\Installer`，找出其中的 `.msi` 和 `.msp` 檔案
 2. **詢問** Windows Installer 哪些還需要，同時也從登錄把同一批記錄再讀一遍
-3. **保留**兩次讀取之間無法定論的一切
+3. **原樣保留**每一個仍被程式需要的檔案，以及兩次讀取之間無法定論的一切
 4. **告訴您能釋放多少**，以及有多少原樣保留，還可以另外開啟詳細資料視窗，逐一列出每個檔案
 5. **清除不需要的檔案**：把它們移到您選擇的備份資料夾，或永久刪除
+
+## 大家怎麼說
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/zh-TW-1-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/zh-TW-1-light.svg"><img src="docs/quotes/zh-TW-1-light.svg" width="400" alt="Legally_Alienated, YouTube（譯自英文原帖）：哇，剛剛清出了將近 200GB 的磁碟空間。我花了好幾個小時想搞清楚這台快 10 年的老電腦空間都跑去哪了，現在終於知道了，也能解決了，非常感謝"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/zh-TW-2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/zh-TW-2-light.svg"><img src="docs/quotes/zh-TW-2-light.svg" width="400" alt="一位 Ko-fi 支持者（譯自英文原帖）：安裝和使用都很簡單，說明也很清楚。做得好！"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/zh-TW-3-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/zh-TW-3-light.svg"><img src="docs/quotes/zh-TW-3-light.svg" width="400" alt="一位 Ko-fi 支持者（譯自英文原帖）：1 分鐘幫我省下 12 GB。讚。"></picture></a>
+  <a href="https://www.reddit.com/r/sysadmin/comments/1ucp6kd/adobe_updates_in_cwindowsinstaller/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/zh-TW-4-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/zh-TW-4-light.svg"><img src="docs/quotes/zh-TW-4-light.svg" width="400" alt="BSRider, r/sysadmin（譯自英文原帖）：我會建議用 InstallerClean [...]，它有純命令列版本（想要圖形介面的話有免安裝版），可以直接用排定的工作寫成指令碼執行 [...]"></picture></a>
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/zh-TW-5-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/zh-TW-5-light.svg"><img src="docs/quotes/zh-TW-5-light.svg" width="400" alt="leehelck4606, YouTube（譯自英文原帖）：用這個找回了 4 gb。不多，但積少成多。"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/zh-TW-6-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/zh-TW-6-light.svg"><img src="docs/quotes/zh-TW-6-light.svg" width="400" alt="一位 Ko-fi 支持者（譯自英文原帖）：謝謝這個應用程式！現在我的筆電可以繼續用了！"></picture></a>
+</p>
 
 ## 螢幕擷取畫面
 
@@ -167,7 +179,7 @@
 
 Windows Installer 安裝一個程式時，會把安裝程式的一份副本留在 `C:\Windows\Installer` 裡；當一個修補程式登錄到某個程式上時，也會留下那個修補程式的副本。日後修復、更新或解除安裝這個軟體時，靠的就是這些副本，這也是為什麼安裝早就結束了，它們卻還留在那裡。兩種副本最後都進了這個資料夾：`.msi` 安裝程式；以及 `.msp` 修補程式，修補程式是替您已經裝好的程式做更新，而不是把它整個換掉。
 
-InstallerClean 只會出於兩個原因之一提供某個檔案。
+InstallerClean 只會出於兩個原因之一，把某個檔案列為可安全刪除。
 
 **孤立**的意思是，這台電腦上沒有任何東西認領這個檔案。沒有任何已安裝的產品、也沒有任何已登錄的修補程式指名這個檔案。
 
@@ -181,13 +193,13 @@ InstallerClean 判定這兩者的方向正好相反，而且只有前一種才�
 
 **把記錄和它的檔案對起來。** 一筆記錄是用路徑來指名它的快取檔案的，而同一個資料夾在這些記錄裡不一定寫成同一個樣子。所以 InstallerClean 不相信這個寫法，而是問 Windows 每一筆記錄裡的路徑實際指向哪裡，再拿這個結果和資料夾裡列出的那些檔案比對。仍然沒人認領的，還要再經過一次完全不靠名稱的比對：它開啟檔案，請 Windows 辨識這是哪一個檔案，這樣同一個檔案的兩個不同名稱就會被認出是同一個檔案。
 
-**對不起來的記錄。** 如果 Windows 不肯說某筆記錄裡的路徑指向哪裡，或者辨識不出路徑盡頭的那個檔案，InstallerClean 就不知道那筆記錄說的是哪個檔案，而它列出的任何一個檔案都可能就是那一個。某個程式可能安裝了不只一次時也一樣，因為那時它分不清哪個快取檔案屬於哪一份安裝。遇到上述任何一種情況，它這一次就不會提供任何靠列出資料夾找到的檔案。一筆指向早已不在的檔案的記錄則是另一回事：已經沒有東西讓它去指了，所以它說的不可能是資料夾裡還在的任何一個檔案。
+**對不起來的記錄。** 如果 Windows 不肯說某筆記錄裡的路徑指向哪裡，或者辨識不出路徑盡頭的那個檔案，InstallerClean 就不知道那筆記錄說的是哪個檔案，而它列出的任何一個檔案都可能就是那一個。某個程式可能安裝了不只一次時也一樣，因為那時它分不清哪個快取檔案屬於哪一份安裝。遇到上述任何一種情況，它這一次就不會把任何靠列出資料夾找到的檔案列為可安全刪除。一筆指向早已不在的檔案的記錄則是另一回事：已經沒有東西讓它去指了，所以它說的不可能是資料夾裡還在的任何一個檔案。
 
-**從另一頭問起。** 孤立是靠「沒有」來判定的，而「沒有」也可能表示應用程式沒找到那筆記錄。所以在提供一個 `.msi` 安裝程式之前，InstallerClean 會開啟這個檔案，讀出檔案本身帶著的產品代碼，再問 Windows 那個產品是否已安裝。如果已安裝，這個檔案就留下，不管掃描的其他部分找到了什麼。這項檢查只能把檔案從清單上拿掉。它給出的任何答案，都不會把檔案放上去。
+**從另一頭問起。** 孤立是靠「沒有」來判定的，而「沒有」也可能表示應用程式沒找到那筆記錄。所以在把一個 `.msi` 安裝程式列為可安全刪除之前，InstallerClean 會開啟這個檔案，讀出檔案本身帶著的產品代碼，再問 Windows 那個產品是否已安裝。如果已安裝，這個檔案就留下，不管掃描的其他部分找到了什麼。這項檢查只能把檔案從清單上拿掉。它給出的任何答案，都不會把檔案放上去。
 
-**`.msp` 修補程式是怎麼判定的。** 修補程式不會被開啟來詢問它屬於哪個程式。真正起決定作用的，是一筆修補程式登錄會在兩個地方指名它的快取檔案：登錄到每個產品上的那些修補程式；以及記錄這台電腦上全部修補程式登錄的那一份登錄清單。只有這兩處都沒有指名它時，一個修補程式才會被當作孤立檔案提供出來。
+**`.msp` 修補程式是怎麼判定的。** 修補程式不會被開啟來詢問它屬於哪個程式。真正起決定作用的，是一筆修補程式登錄會在兩個地方指名它的快取檔案：登錄到每個產品上的那些修補程式；以及記錄這台電腦上全部修補程式登錄的那一份登錄清單。只有這兩處都沒有指名它時，一個修補程式才會被列為可安全刪除。
 
-**已被取代的修補程式哪裡不一樣。** 上面這些它一項都不經過，因為它不是一個沒人認領的檔案。Windows 有它的記錄，而正是那筆記錄說它已經被取代了。這裡的風險是另一種：一個修補程式可以登錄到好幾個程式上，而其中只有一個已經用不到它了。所以只有在以下幾點全部成立時，一個已被取代的修補程式才會被提供出來：Windows 記錄它無法解除安裝；它登錄到的每一個程式都問過了；這些程式沒有一個還套用著它；而且這些程式沒有一個還持有 Windows 說可以解除安裝的修補程式。最後這一條之所以存在，是因為在某個程式上復原一個修補程式，可能會回頭去找那個較舊的檔案。上述任何一點得不到答案，檔案就留下。
+**已被取代的修補程式哪裡不一樣。** 上面這些它一項都不經過，因為它不是一個沒人認領的檔案。Windows 有它的記錄，而正是那筆記錄說它已經被取代了。這裡的風險是另一種：一個修補程式可以登錄到好幾個程式上，而其中只有一個已經用不到它了。所以只有在以下幾點全部成立時，一個已被取代的修補程式才會被列為可安全刪除：Windows 記錄它無法解除安裝；它登錄到的每一個程式都問過了；這些程式沒有一個還套用著它；而且這些程式沒有一個還持有 Windows 說可以解除安裝的修補程式。最後這一條之所以存在，是因為在某個程式上復原一個修補程式，可能會回頭去找那個較舊的檔案。上述任何一點得不到答案，檔案就留下。
 
 <details>
 <summary>這裡用到的 Windows Installer 呼叫</summary>
@@ -207,9 +219,9 @@ InstallerClean 判定這兩者的方向正好相反，而且只有前一種才�
 
 三種版本，任選其一：
 
-- **Portable**（`InstallerClean-portable.exe`）：單一檔案，.NET 10 執行階段就包在裡面。不用安裝，也沒有解除安裝程式：按兩下就能執行。把檔案留著下次再用，或用完就刪掉。
-- **Setup**（`InstallerClean-3.7.0-setup.exe`）：一般的 Windows 安裝程式，內附 .NET 10 執行階段。會在「開始」功能表加入一個項目，解除安裝也乾乾淨淨。收在「程式集」裡，半年後也好找；如果您經常裝了又解除安裝軟體，要更常用它也方便。
-- **CLI**（`installerclean-cli.exe`）：單獨的命令列版本，一個檔案，執行階段就包在裡面。不用安裝，也沒有解除安裝程式。把它放到用戶端上，跑一次掃描或清理，再刪掉。它是為指令碼、排程工作和大量部署而做的，適合只想執行這些操作、又不想在用戶端裝桌面應用程式的情況。參數和結束代碼請見[命令列](#命令列)。
+- **Portable**（`InstallerClean-portable.exe`）：單一檔案。不用安裝，也沒有解除安裝程式：按兩下就能執行。把檔案留著下次再用，或用完就刪掉。
+- **Setup**（`InstallerClean-3.7.0-setup.exe`）：一般的 Windows 安裝程式。會在「開始」功能表加入一個項目，解除安裝也乾乾淨淨。收在「程式集」裡，半年後也好找；如果您經常裝了又解除安裝軟體，要更常用它也方便。
+- **CLI**（`installerclean-cli.exe`）：單獨的命令列版本，一個檔案。不用安裝，也沒有解除安裝程式。把它放到用戶端上，跑一次掃描或清理，再刪掉。它是為指令碼、排程工作和大量部署而做的，適合只想執行這些操作、又不想在用戶端裝桌面應用程式的情況。參數和結束代碼請見[命令列](#命令列)。
 
 從 2.2.0 起，安裝版和可攜版的檔名都帶有版本號，下載下來的副本永遠說得清自己是哪一版；命令列版則保留單純的 `installerclean-cli.exe` 檔名，這樣指向它的排程工作和指令碼在更新後依然能用。
 
@@ -236,7 +248,7 @@ InstallerClean 沒有簽章。在執行它之前，您可以檢查這些：
 - 每個下載檔案的 SHA-256 都列在它的發行頁面上。
 - VirusTotal：每個版本在發出之前都會先掃描，發行頁面上附有每個下載檔案逐一引擎的完整結果。
 - 原始碼就在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)。掃描、查詢、移動、刪除、設定和待重新啟動這幾項服務都由一套自動化測試涵蓋，每次推送到 `main` 以及每個 pull request 都會在 Windows 上執行，本頁頂端的 CI 徽章會顯示結果。
-- 發行版本的建置是確定性的：相同的原始碼、相同的 SDK 和相同的發行參數會產生相同的位元組，而且除非每一項建置輸入都和該標籤的原始碼一致，否則一個版本無法加上標籤。所以您可以簽出標籤、自己建置一次，再把雜湊值和公布的比對。每個版本的發行說明都附有您需要的資訊：建置時用的 SDK 版本，以及任何不是用預設值建置的下載檔案所用的發行參數。安裝程式是例外：它是由 Inno Setup 而不是 SDK 編譯的，而且會把建置的年份寫進檔案本身，所以要重現它的雜湊值，還需要相同的 Inno 版本和相同的年份。
+- 發行版本的建置是確定性的：相同的原始碼、相同的 SDK 和相同的發行參數會產生相同的位元組，而且除非每一項建置輸入都和該標籤的原始碼一致，否則一個版本無法加上標籤。所以您可以簽出標籤、自己建置一次，再把雜湊值和公布的比對。每個版本的發行說明都附有您需要的資訊：建置時用的 SDK 版本，以及任何不是用預設值建置的下載檔案所用的發行參數。安裝程式是由 Inno Setup 而不是 SDK 編譯的，所以要重現它的雜湊值，還需要相同的 Inno Setup 版本，並透過 `scripts/compile-setup.ps1` 編譯；這個指令碼會為安裝程式封裝的每個檔案標上該次提交的日期和時間。
 - 在 GitHub、MajorGeeks 和 Softpedia 上累計 <!-- downloads-start -->142,000+<!-- downloads-end --> 次下載。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 會在虛擬機器中測試每一個送審的版本，只有通過他們的審查才會收錄。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認證 100% 乾淨" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 審查過它，並認證它不含間諜軟體、廣告軟體和病毒。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 免費獎，認證不含間諜軟體、廣告軟體和病毒" width="190"></a>
@@ -251,7 +263,7 @@ InstallerClean 沒有簽章。在執行它之前，您可以檢查這些：
 
 **為什麼 Windows 說「發行者不明」？** InstallerClean 沒有程式碼簽章，而 Windows 會替從網路下載的檔案加上標記，所以第一次執行時，SmartScreen 通常會顯示「Windows 已保護您的電腦」，發行者則列為不明。付費的簽章憑證每年都要花錢，我寧可讓應用程式保持免費，也不想花這筆錢，所以我向免費替開源軟體簽章的 SignPath Foundation 提出申請，InstallerClean 也已獲准（請見[程式碼簽署原則](#程式碼簽署原則)）。憑證還沒有核發，所以目前請按「**其他資訊**」，再按「**仍要執行**」。這麼做是安全的：原始碼是公開的，每個版本都有 VirusTotal 連結和 SHA-256 雜湊值，您可以先檢查。
 
-**能在 Windows 7 或 8 上使用嗎？** 不能。它需要 Windows 10 版本 1607 或更新版本，這是 .NET 10 執行階段支援的最舊版本。安裝程式在更舊的系統上會拒絕安裝，可攜版也無法啟動。
+**能在 Windows 7 或 8 上使用嗎？** 不能。它需要 Windows 10 版本 1607 或更新版本，或是 Windows 11。安裝程式在更舊的系統上會拒絕安裝，可攜版和命令列版則會說明這一點，然後停止執行。
 
 ## 命令列
 
@@ -267,6 +279,7 @@ InstallerClean 沒有簽章。在執行它之前，您可以檢查這些：
 | `/m 路徑` | 先掃描，再把它們移到 `路徑`。路徑裡有空格的話請加上引號。 | |
 | `--help` | 印出用法說明，並以 `0` 結束。 | `/?`、`-h` |
 | `--version` | 印出版本，並以 `0` 結束。 | `-v` |
+| `--notices` | 印出 InstallerClean 內含之第三方作品的聲明與授權條款，並以 `0` 結束。 | |
 
 參數不區分大小寫，所以 `/S` 和 `/D` 跟 `/s` 和 `/d` 一樣可用。每次執行只能用一個參數：它們不能合併使用，而且 `/s` 和 `/d` 後面不接任何東西。
 
@@ -298,7 +311,7 @@ InstallerClean 沒有簽章。在執行它之前，您可以檢查這些：
 | `4000` | 嚴重失敗 |
 | `3000` | 通知：掃描無法交代每一個已安裝的產品 |
 | `3001` | 通知：Windows 預期應該存在的檔案不在資料夾中 |
-| `3002` | 通知：有檔案被保留下來，沒有提供 |
+| `3002` | 通知：InstallerClean 無法確定的檔案已原樣保留 |
 
 `3000` 這一段是通知而不是結果，不算作一次執行的結果。執行沒有出錯時，項目類型是「資訊」，出了錯則是「警告」。**事件記錄檔一律是英文**，不管電腦的顯示語言是什麼，這樣用已知的字句搜尋才有穩定的目標。經過翻譯的是主控台：它跟隨電腦本身的語言，大小和日期也採用所在地區的寫法。
 
@@ -354,7 +367,7 @@ InstallerClean 的設計目標，是完全可以只用鍵盤和螢幕閱讀程�
 - **朗讀程式與語音存取。** 每個控制項都有標籤，按鈕上看得到的字，就是用語音啟動它時要說的字。移動或刪除完成時，結果會朗讀出來。
 - **為閱讀而設計。** 整個深色主題的文字都符合 WCAG AA 對比標準。
 
-如果這裡有任何地方妨礙到您，請[提出 issue](../../issues)。協助工具的問題是 bug，不是少見的特殊情況。
+如果這裡有任何地方妨礙到您，請[提出 issue](../../issues)。我把協助工具的問題當作 bug 來處理。
 
 ## 程式碼簽署原則
 
@@ -366,7 +379,7 @@ InstallerClean 已獲 [SignPath Foundation](https://signpath.org) 接受，可�
 
 ## 隱私權
 
-InstallerClean 在一台電腦上第一次執行完成時，結果畫面上會有一個「傳送匿名報告」方塊，關閉這個畫面時報告就會送出，除非您取消勾選。每台電腦最多只會有一份報告。如果 Windows 設定的國家或地區是歐盟成員國、冰島、列支敦斯登或挪威，或者 InstallerClean 讀不到這項設定，這個方塊一開始就是未勾選的。報告的內容是：掃描找到了什麼、保留了什麼以及原因、您是移動還是刪除、這次釋放了多少、花了多久、有什麼失敗了，再加上應用程式的版本、您閱讀它時用的語言、Windows 設定的語言，以及您的 Windows 版本。沒有檔名，沒有資料夾名稱，沒有帳戶名稱，沒有任何能辨識您電腦的東西，也沒有任何能把兩份報告連在一起的東西。方塊旁邊的小「i」會列出報告包含哪些內容，「查看傳送的確切內容」則會把報告本身顯示給您看。本頁頂端的圖表就是根據這些報告畫出來的，所以任何人都能看到大家實際拿回了多少空間。這些報告也讓我知道，這個應用程式在我自己以外的電腦上是否正常運作，以及它保留了些什麼。
+InstallerClean 在一台電腦上第一次執行完成時，結果畫面上會有一個「傳送匿名報告」方塊，關閉這個畫面時報告就會送出，除非您取消勾選。每台電腦最多只會有一份報告。報告的內容是：掃描找到了什麼、原樣保留了什麼以及原因、您是移動還是刪除、這次釋放了多少、花了多久、有什麼失敗了，再加上應用程式的版本、您閱讀它時用的語言、Windows 設定的語言、您的 Windows 版本，以及為這份報告隨機產生的一個代碼，這樣同一份報告即使傳送了不只一次，也只會被計算一次。沒有檔名，沒有資料夾名稱，沒有帳戶名稱，沒有任何能辨識您電腦的東西，也沒有任何能把兩份報告連在一起的東西。方塊旁邊的小「i」會列出報告包含哪些內容，「查看傳送的確切內容」則會把報告本身顯示給您看。本頁頂端的圖表就是根據這些報告畫出來的，所以任何人都能看到大家實際拿回了多少空間。這些報告也讓我知道，這個應用程式在我自己以外的電腦上是否正常運作，以及它原樣保留了些什麼。
 
 沒有廣告。其他的連線只有應用程式啟動時的版本檢查（向 GitHub 發出一個要求，可以在「關於」視窗中關掉），以及連到 GitHub 和贊助頁面的按鈕，贊助全憑您的心意。完整的[隱私權政策](PRIVACY.md)（英文）。
 
@@ -400,7 +413,7 @@ InstallerClean 在一台電腦上第一次執行完成時，結果畫面上會�
 |---|---|---|
 | 最近更新 | 2026（持續維護中） | 2016 年 3 月 3 日 |
 | 原始碼 | 開源（Apache 2.0） | 不開源 |
-| 執行階段 | .NET 10（獨立式） | .NET Framework 4.5.2 + VBScript |
+| 執行階段 | .NET Framework 4.8 | .NET Framework 4.5.2 + VBScript |
 | API | `msi.dll` 中的 Windows Installer API（同一處理程序內） | Windows Installer COM（另一處理程序，透過 VBScript） |
 | 已被取代的修補程式 | 從 Windows 的修補程式記錄中辨識出來 | 和沒人認領的檔案不加區分 |
 | Adobe 檔案 | 偵測出已被取代的修補程式並加上標示 | 依名稱篩選排除，預設開啟 |
@@ -414,7 +427,7 @@ InstallerClean 在一台電腦上第一次執行完成時，結果畫面上會�
 
 如果那個資料夾裡真的少了一個檔案，那個檔案所屬的程式照樣能正常執行。但當您試著更新或解除安裝那個程式時，多半會失敗。Windows 去找這個檔案，找不到，這一步就停住了。
 
-InstallerClean 的全部用意，就是只提供*不*需要的檔案讓您移動或刪除；不過它確實知道哪些檔案不見了，所以只要找到，就會用一個警告三角形標示出來，並附上一個指向這裡的連結。想修復那個程式，可以這樣做：
+InstallerClean 只會把*不*需要的檔案列為可安全刪除；不過它確實知道哪些檔案不見了，所以只要找到，就會用一個警告三角形標示出來，並附上一個指向這裡的連結。想修復那個程式，可以這樣做：
 
 - 查出您已安裝的那個程式的版本號碼（設定 > 應用程式 > 已安裝的應用程式）
 - 從程式的開發者下載**那個版本**的安裝程式。較新的版本不行，先解除安裝也不行：兩者都得先移除已經裝好的那一份才能繼續，而移除正是需要那個遺失檔案的步驟。
@@ -456,7 +469,8 @@ InstallerClean 的全部用意，就是只提供*不*需要的檔案讓您移動
 
 ## 系統需求
 
-- Windows 10（版本 1607 / 組建 14393 或更新版本，這是 .NET 10 執行階段支援的最舊版本）或 Windows 11
+- Windows 10（版本 1607 / 組建 14393 或更新版本）或 Windows 11
+- .NET Framework 4.8：Windows 10 從版本 1903 起就內建，Windows 11 一直都有。在更早、沒有它的 Windows 10 上，安裝程式和應用程式都會說明這一點，並附上 Microsoft 下載頁面的連結。
 - 64 位元 Windows。安裝程式不會安裝到 32 位元系統上，並且會明確告訴您。
 - 系統管理員權限，安裝程式和應用程式都需要（`C:\Windows\Installer` 只有系統管理員能存取）
 
@@ -497,6 +511,8 @@ InstallerClean 提供 17 種語言，每一種都涵蓋它的全部：應用程�
 ## 授權條款
 
 [Apache 2.0](LICENSE)
+
+InstallerClean 包含來自其他專案的字型、圖示和程式碼，各自適用自己的授權條款，全部列在 [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES) 中。每個下載都附有該檔案的內容：應用程式在「關於」視窗裡透過「第三方聲明」連結顯示它，`installerclean-cli --notices` 會把它印出來。
 
 ---
 

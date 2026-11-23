@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Lisensi: Apache 2.0"></a>
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet-framework/net48"><img src="https://img.shields.io/badge/.NET_Framework-4.8-purple.svg" alt=".NET Framework 4.8"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="Rilis GitHub"></a>
@@ -36,8 +36,8 @@
 <!-- reports-stats-end -->
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang terus terisi saat Anda memasang dan memperbarui perangkat lunak. Setelah pemindaian singkat, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda memindahkannya ke tempat lain atau menghapusnya untuk mengosongkan ruang di drive C: Anda.
-- **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. Kalau begitu, InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman untuk dihapus.
-- **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang dikirim lewat aplikasi (terima kasih, semuanya). Dari <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Itu file yang mungkin tidak Anda ketahui keberadaannya dan hanya memakan ruang. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> dari *semua* mesin mengosongkan lebih dari 5 GB, dan banyak orang mengosongkan ratusan GB. Pada dasarnya, makin banyak perangkat lunak berbasis MSI yang Anda pasang, makin banyak file tidak diperlukan yang Anda miliki. Begitu menjalankan InstallerClean, Anda akan tahu.
+- **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan memberi tahu Anda mana yang aman untuk dihapus.
+- **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang dikirim lewat aplikasi (terima kasih, semuanya). Dari <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Itu file yang mungkin tidak Anda ketahui keberadaannya dan hanya memakan ruang. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> dari *semua* mesin mengosongkan lebih dari 5 GB, dan sebagian mengosongkan ratusan GB. Makin banyak perangkat lunak berbasis MSI yang Anda pasang, makin banyak file tidak diperlukan yang Anda miliki.
   <!-- reports-scaled-start -->
   <details>
   <summary><kbd>Klik untuk melihat</kbd> seperti apa diagramnya jika laporan itu gambaran persis dari semua 142.145 unduhan</summary>
@@ -50,7 +50,7 @@
   </p>
   </details>
   <!-- reports-scaled-end -->
-- **Apakah aman:** Ya. Yang disentuhnya hanya file di `C:\Windows\Installer`. Aplikasi menanyakan kepada Windows Installer apa yang masih diperlukan, dan membaca catatan yang sama dari registri juga. InstallerClean baru menawarkan sebuah file kalau tidak ada program terpasang di mesin ini yang mengakuinya, atau kalau patch yang lebih baru sudah menggantikannya dan tidak ada program di sini yang bisa kembali ke yang lama. Apa pun yang tidak bisa dijawab dengan jelas, ditahannya. [Selengkapnya di bawah](#cara-kerjanya).
+- **Apakah aman:** Ya. Yang disentuhnya hanya file di `C:\Windows\Installer`. Aplikasi menanyakan kepada Windows Installer apa yang masih diperlukan, dan membaca catatan yang sama dari registri juga. InstallerClean baru mencantumkan sebuah file sebagai aman dihapus kalau tidak ada program terpasang di mesin ini yang mengakuinya, atau kalau patch yang lebih baru sudah menggantikannya dan tidak ada program di sini yang bisa kembali ke yang lama. Apa pun yang tidak bisa dijawab dengan jelas, dibiarkannya apa adanya. [Selengkapnya di bawah](#cara-kerjanya).
 - **Tidak ada apa pun soal Anda:** Sumber terbuka (Apache 2.0). Tanpa akun, tanpa iklan, tanpa pelacakan, tidak ada yang berjalan di latar belakang. Aplikasi memeriksa GitHub untuk versi yang lebih baru saat Anda menjalankannya, dan itu bisa Anda matikan, lalu saat pertama kali selesai berjalan di sebuah PC, aplikasi mengirim satu laporan anonim tentang bagaimana prosesnya berjalan, kecuali Anda menghapus centang kotak di layar hasil.
 - **Dapatkan:** [Unduh rilis terbaru](../../releases/latest). Jalankan; lewati [peringatan apa pun yang ditampilkan Windows](#unknown-publisher) dan [permintaan administrator](#admin). Pindahkan atau hapus apa yang ditemukannya. Selesai.
 
@@ -61,6 +61,7 @@
 - [Folder yang tak pernah diberitahukan kepada Anda](#folder-yang-tak-pernah-diberitahukan-kepada-anda)
 - [Mencari bantuan](#mencari-bantuan)
 - [Apa yang dilakukan InstallerClean](#apa-yang-dilakukan-installerclean)
+- [Apa kata orang](#apa-kata-orang)
 - [Tangkapan layar](#tangkapan-layar)
 - [Cara kerjanya](#cara-kerjanya)
 - [Unduh](#unduh)
@@ -90,7 +91,7 @@ Saat patch yang lebih baru menggantikan yang lama, keduanya tetap ada. Begitu pu
 
 Ini bukan file sementara yang muncul kembali dengan sendirinya. Ini benar-benar cuma beban mati: penginstal lama dari perangkat lunak yang Anda copot bertahun-tahun lalu dan patch yang sudah diganti berkali-kali. Begitu hilang, file-file ini tidak akan kembali.
 
-**Jika Anda mencari cara mudah untuk mengosongkan ruang disk di Windows, folder ini tempat yang baik untuk memulai.** InstallerClean menemukan file yang tidak diperlukan dan menghapusnya dengan aman.
+InstallerClean menemukan file yang tidak diperlukan dan menghapusnya dengan aman.
 
 ## Mencari bantuan
 
@@ -108,9 +109,20 @@ Nasihat standar mencampuradukkan dua hal yang berbeda. Menghapus file secara sem
 
 1. **Memindai** `C:\Windows\Installer` untuk mencari file `.msi` dan `.msp`
 2. **Menanyakan** kepada Windows Installer apa yang masih diperlukan, dan membaca catatan yang sama dari registri juga
-3. **Menahan** apa pun yang tidak bisa dipastikan oleh kedua pembacaan itu
+3. **Membiarkan apa adanya** setiap file yang masih diperlukan sebuah program, dan apa pun yang tidak bisa dipastikan oleh kedua pembacaan itu
 4. **Memberi tahu berapa banyak yang bisa Anda kosongkan**, dan berapa banyak yang dibiarkannya apa adanya, dengan jendela detail opsional yang mendaftar setiap file
 5. **Menghapus file yang tidak diperlukan**: pindahkan ke folder cadangan pilihan Anda, atau hapus permanen
+
+## Apa kata orang
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/id-1-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/id-1-light.svg"><img src="docs/quotes/id-1-light.svg" width="400" alt="Legally_Alienated, YouTube (diterjemahkan dari teks asli bahasa Inggris): Wah, barusan berhasil mengosongkan hampir 200GB ruang disk - aku menghabiskan berjam-jam mencari tahu ke mana perginya ruang disk di PC-ku yang hampir 10 tahun - sekarang aku tahu dan bisa membereskannya, makasih banyak"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/id-2-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/id-2-light.svg"><img src="docs/quotes/id-2-light.svg" width="400" alt="Seorang pendukung Ko-fi (diterjemahkan dari teks asli bahasa Inggris): Mudah dipasang dan dipakai, dan petunjuknya jelas. Kerja bagus!"></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/id-3-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/id-3-light.svg"><img src="docs/quotes/id-3-light.svg" width="400" alt="Seorang pendukung Ko-fi (diterjemahkan dari teks asli bahasa Inggris): Menghemat 12 GB dalam 1 menit. Mantap."></picture></a>
+  <a href="https://www.reddit.com/r/sysadmin/comments/1ucp6kd/adobe_updates_in_cwindowsinstaller/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/id-4-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/id-4-light.svg"><img src="docs/quotes/id-4-light.svg" width="400" alt="BSRider, r/sysadmin (diterjemahkan dari teks asli bahasa Inggris): Saya sarankan pakai InstallerClean [...] karena ada opsi CLI saja (atau portable kalau mau GUI) yang bisa langsung di-script lewat tugas terjadwal [...]"></picture></a>
+  <a href="https://www.youtube.com/watch?v=cRTUhWCEs-c"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/id-5-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/id-5-light.svg"><img src="docs/quotes/id-5-light.svg" width="400" alt="leehelck4606, YouTube (diterjemahkan dari teks asli bahasa Inggris): aku dapat kembali 4 gb pakai ini. nggak banyak, tapi lumayan."></picture></a>
+  <a href="https://ko-fi.com/nofaff"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/quotes/id-6-dark.svg"><source media="(prefers-color-scheme: light)" srcset="docs/quotes/id-6-light.svg"><img src="docs/quotes/id-6-light.svg" width="400" alt="Seorang pendukung Ko-fi (diterjemahkan dari teks asli bahasa Inggris): Terima kasih untuk aplikasinya! Sekarang laptopku bisa terus dipakai!"></picture></a>
+</p>
 
 ## Tangkapan layar
 
@@ -167,7 +179,7 @@ Nasihat standar mencampuradukkan dua hal yang berbeda. Menghapus file secara sem
 
 Ketika Windows Installer memasang sebuah program, ia menyimpan salinan penginstalnya di `C:\Windows\Installer`, dan ketika sebuah patch didaftarkan untuk sebuah program, ia menyimpan salinan patch itu juga. Salinan-salinan itulah yang dipakainya ketika kelak ia memperbaiki, memperbarui atau mencopot perangkat lunak tersebut, dan karena itulah semuanya tetap ada lama setelah pemasangan selesai. Kedua jenis salinan berakhir di folder ini: penginstal `.msi`; dan patch `.msp`, yang memperbarui program yang sudah Anda punya alih-alih menggantinya.
 
-InstallerClean menawarkan sebuah file karena salah satu dari dua alasan.
+InstallerClean mencantumkan sebuah file sebagai aman dihapus karena salah satu dari dua alasan.
 
 **Terisolasi** berarti tidak ada apa pun di mesin ini yang mengakui file tersebut. Tidak ada satu pun produk terpasang atau patch terdaftar yang menyebutnya.
 
@@ -181,13 +193,13 @@ InstallerClean menyelesaikan keduanya dari arah yang berlawanan, dan hanya yang 
 
 **Mencocokkan sebuah catatan dengan file-nya.** Sebuah catatan menyebut file cache-nya sebagai sebuah jalur, dan folder yang sama tidak selalu dieja sama di dalam catatan-catatan itu. Jadi alih-alih memercayai ejaannya, InstallerClean bertanya kepada Windows ke mana sebenarnya setiap jalur yang tercatat itu menunjuk, lalu membandingkannya dengan file yang sudah didaftar InstallerClean di folder tadi. Apa pun yang masih tak diakui mendapat perbandingan kedua yang sama sekali tidak lewat nama: aplikasi membuka file-nya dan meminta Windows mengidentifikasinya, sehingga dua nama berbeda untuk satu file yang sama dikenali sebagai satu file.
 
-**Catatan yang tidak bisa dicocokkan.** Kalau Windows tidak mau mengatakan ke mana sebuah jalur yang tercatat menunjuk, atau file di ujung jalur itu tidak bisa diidentifikasi, InstallerClean tidak tahu file mana yang dimaksud catatan tersebut, dan file mana pun yang sudah didaftar InstallerClean bisa jadi file itu. Hal yang sama berlaku kalau sebuah program mungkin dipasang lebih dari sekali, karena aplikasi lalu tidak bisa membedakan file cache mana milik salinan yang mana. Kalau salah satu keadaan itu terjadi, aplikasi tidak menawarkan satu pun file yang ditemukannya dengan mendaftar folder pada kesempatan tersebut. Catatan yang menunjuk ke file yang sudah hilang berbeda halnya: tidak ada lagi yang tersisa untuk dimaksudkannya, jadi catatan itu tidak mungkin berbicara tentang file mana pun yang masih ada di folder.
+**Catatan yang tidak bisa dicocokkan.** Kalau Windows tidak mau mengatakan ke mana sebuah jalur yang tercatat menunjuk, atau file di ujung jalur itu tidak bisa diidentifikasi, InstallerClean tidak tahu file mana yang dimaksud catatan tersebut, dan file mana pun yang sudah didaftar InstallerClean bisa jadi file itu. Hal yang sama berlaku kalau sebuah program mungkin dipasang lebih dari sekali, karena aplikasi lalu tidak bisa membedakan file cache mana milik salinan yang mana. Kalau salah satu keadaan itu terjadi, aplikasi pada kesempatan tersebut tidak mencantumkan satu pun file yang ditemukannya dengan mendaftar folder sebagai aman dihapus. Catatan yang menunjuk ke file yang sudah hilang berbeda halnya: tidak ada lagi yang tersisa untuk dimaksudkannya, jadi catatan itu tidak mungkin berbicara tentang file mana pun yang masih ada di folder.
 
-**Bertanya dari ujung yang lain.** File terisolasi ditentukan oleh sebuah ketiadaan, dan sebuah ketiadaan juga bisa berarti aplikasi gagal menemukan catatannya. Jadi sebelum menawarkan sebuah penginstal `.msi`, InstallerClean membuka file-nya, membaca kode produk yang dibawa file itu sendiri, dan menanyakan kepada Windows apakah produk tersebut terpasang. Kalau terpasang, file-nya tetap, apa pun yang ditemukan sisa pemindaian. Pemeriksaan itu hanya bisa mengeluarkan file dari daftar. Tidak ada jawaban yang bisa memasukkannya.
+**Bertanya dari ujung yang lain.** File terisolasi ditentukan oleh sebuah ketiadaan, dan sebuah ketiadaan juga bisa berarti aplikasi gagal menemukan catatannya. Jadi sebelum mencantumkan sebuah penginstal `.msi` sebagai aman dihapus, InstallerClean membuka file-nya, membaca kode produk yang dibawa file itu sendiri, dan menanyakan kepada Windows apakah produk tersebut terpasang. Kalau terpasang, file-nya tetap, apa pun yang ditemukan sisa pemindaian. Pemeriksaan itu hanya bisa mengeluarkan file dari daftar. Tidak ada jawaban yang bisa memasukkannya.
 
-**Apa yang menentukan sebuah patch `.msp`.** Sebuah patch tidak dibuka lalu ditanya milik program mana. Yang menentukannya justru bahwa sebuah pendaftaran patch menyebut file cache-nya di dua tempat: patch yang terdaftar untuk tiap produk; dan satu daftar registri berisi setiap pendaftaran patch di mesin ini. Sebuah patch baru ditawarkan sebagai terisolasi kalau tidak satu pun dari kedua tempat itu menyebut file cache tersebut.
+**Apa yang menentukan sebuah patch `.msp`.** Sebuah patch tidak dibuka lalu ditanya milik program mana. Yang menentukannya justru bahwa sebuah pendaftaran patch menyebut file cache-nya di dua tempat: patch yang terdaftar untuk tiap produk; dan satu daftar registri berisi setiap pendaftaran patch di mesin ini. Sebuah patch baru dicantumkan sebagai aman dihapus kalau tidak satu pun dari kedua tempat itu menyebut file cache tersebut.
 
-**Bedanya pada patch yang digantikan.** Patch itu tidak melalui satu pun dari semua di atas, karena ia bukan file yang tak diakui. Windows punya catatan tentangnya, dan catatan itulah yang mengatakan bahwa ia sudah diganti. Risikonya berbeda: sebuah patch bisa terdaftar untuk beberapa program sekaligus, dan baru satu di antaranya yang selesai dengannya. Jadi sebuah patch yang digantikan baru ditawarkan kalau Windows mencatat bahwa patch itu tidak bisa dicopot, setiap program yang mendaftarkannya sudah ditanya, tidak satu pun dari program itu masih menerapkannya, dan tidak satu pun memegang patch yang menurut Windows bisa dicopot. Syarat terakhir ada di sana karena membatalkan sebuah patch pada sebuah program bisa mencari kembali file yang lama. Kalau ada satu saja dari itu yang tidak bisa dijawab, file-nya tetap.
+**Bedanya pada patch yang digantikan.** Patch itu tidak melalui satu pun dari semua di atas, karena ia bukan file yang tak diakui. Windows punya catatan tentangnya, dan catatan itulah yang mengatakan bahwa ia sudah diganti. Risikonya berbeda: sebuah patch bisa terdaftar untuk beberapa program sekaligus, dan baru satu di antaranya yang selesai dengannya. Jadi sebuah patch yang digantikan baru dicantumkan sebagai aman dihapus kalau Windows mencatat bahwa patch itu tidak bisa dicopot, setiap program yang mendaftarkannya sudah ditanya, tidak satu pun dari program itu masih menerapkannya, dan tidak satu pun memegang patch yang menurut Windows bisa dicopot. Syarat terakhir ada di sana karena membatalkan sebuah patch pada sebuah program bisa mencari kembali file yang lama. Kalau ada satu saja dari itu yang tidak bisa dijawab, file-nya tetap.
 
 <details>
 <summary>Panggilan Windows Installer yang dipakainya</summary>
@@ -207,9 +219,9 @@ Meski begitu, aplikasi menganjurkan Anda memindahkan file ke folder cadangan (di
 
 Tiga varian, pilih salah satu:
 
-- **Portable** (`InstallerClean-portable.exe`): satu file, dengan runtime .NET 10 di dalamnya. Tanpa pemasangan, tanpa pencopotan: klik dua kali dan aplikasi berjalan. Simpan file-nya di suatu tempat untuk lain kali, atau hapus setelah Anda selesai.
-- **Setup** (`InstallerClean-3.7.0-setup.exe`): penginstal Windows biasa dengan runtime .NET 10 di dalamnya. Menambahkan entri di menu Mulai dan bisa dicopot dengan bersih. Tertata rapi di daftar Program agar mudah ditemukan enam bulan dari sekarang, atau dijalankan lebih sering dari itu kalau Anda banyak memasang dan mencopot perangkat lunak.
-- **CLI** (`installerclean-cli.exe`): versi baris perintah tersendiri, satu file dengan runtime di dalamnya. Tanpa pemasangan, tanpa pencopotan. Taruh di sebuah komputer klien, jalankan pemindaian atau pembersihan, lalu hapus. Dibuat untuk skrip, tugas terjadwal dan penyebaran massal, ketika yang Anda inginkan adalah operasinya tanpa aplikasi desktop di klien. Lihat [Baris perintah](#baris-perintah) untuk argumen dan kode keluar.
+- **Portable** (`InstallerClean-portable.exe`): satu file. Tanpa pemasangan, tanpa pencopotan: klik dua kali dan aplikasi berjalan. Simpan file-nya di suatu tempat untuk lain kali, atau hapus setelah Anda selesai.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): penginstal Windows biasa. Menambahkan entri di menu Mulai dan bisa dicopot dengan bersih. Tertata rapi di daftar Program agar mudah ditemukan enam bulan dari sekarang, atau dijalankan lebih sering dari itu kalau Anda banyak memasang dan mencopot perangkat lunak.
+- **CLI** (`installerclean-cli.exe`): versi baris perintah tersendiri, satu file. Tanpa pemasangan, tanpa pencopotan. Taruh di sebuah komputer klien, jalankan pemindaian atau pembersihan, lalu hapus. Dibuat untuk skrip, tugas terjadwal dan penyebaran massal, ketika yang Anda inginkan adalah operasinya tanpa aplikasi desktop di klien. Lihat [Baris perintah](#baris-perintah) untuk argumen dan kode keluar.
 
 Mulai 2.2.0, nama file setup dan portabel memuat nomor versinya, sehingga salinan yang diunduh selalu menyebutkan dirinya apa; CLI tetap memakai nama polos `installerclean-cli.exe` agar tugas terjadwal dan skrip yang menunjuk ke sana tetap berjalan dari satu pembaruan ke pembaruan berikutnya.
 
@@ -236,7 +248,7 @@ InstallerClean tidak ditandatangani. Berikut yang bisa Anda periksa sebelum menj
 - SHA-256 setiap unduhan ada di halaman rilisnya.
 - VirusTotal: setiap build dipindai sebelum dirilis, dan halaman rilis memuat hasil lengkap per mesin pemindai untuk tiap unduhan.
 - Kode sumbernya ada di sini, di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Layanan pindai, kueri, pindah, hapus, pengaturan dan mulai-ulang-tertunda dicakup oleh rangkaian pengujian otomatis yang berjalan di Windows pada setiap push ke `main` dan pada setiap pull request, dan lencana CI di bagian atas halaman ini melaporkan hasilnya.
-- Build rilis bersifat deterministik: kode sumber yang sama, SDK yang sama dan flag publish yang sama menghasilkan byte yang sama, dan sebuah rilis tidak bisa diberi tag kecuali setiap masukan build cocok dengan kode sumber pada tag tersebut. Jadi Anda bisa checkout tag itu, membangunnya sendiri, lalu membandingkan hash-nya dengan yang dipublikasikan. Catatan tiap rilis memuat apa yang Anda perlukan untuk itu: versi SDK yang dipakai membangunnya, dan flag publish untuk unduhan mana pun yang tidak dibangun dengan flag bawaan. Setup adalah pengecualiannya: ia dikompilasi oleh Inno Setup dan bukan oleh SDK, dan menanamkan tahun pembuatan ke dalam dirinya sendiri, jadi mereproduksi hash-nya juga memerlukan versi Inno yang sama dan tahun kalender yang sama.
+- Build rilis bersifat deterministik: kode sumber yang sama, SDK yang sama dan flag publish yang sama menghasilkan byte yang sama, dan sebuah rilis tidak bisa diberi tag kecuali setiap masukan build cocok dengan kode sumber pada tag tersebut. Jadi Anda bisa checkout tag itu, membangunnya sendiri, lalu membandingkan hash-nya dengan yang dipublikasikan. Catatan tiap rilis memuat apa yang Anda perlukan untuk itu: versi SDK yang dipakai membangunnya, dan flag publish untuk unduhan mana pun yang tidak dibangun dengan flag bawaan. Setup dikompilasi oleh Inno Setup dan bukan oleh SDK, jadi mereproduksi hash-nya juga memerlukan versi Inno Setup yang sama dan kompilasi melalui `scripts/compile-setup.ps1`, yang memberi setiap file yang dikemas setup tanggal dan waktu commit.
 - <!-- downloads-start -->142.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya kalau lolos tinjauan mereka.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Disertifikasi MajorGeeks 100% bersih" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) meninjaunya dan menyatakannya bebas spyware, adware dan virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Penghargaan Softpedia 100% gratis, disertifikasi tanpa spyware, tanpa adware dan tanpa virus" width="190"></a>
@@ -251,7 +263,7 @@ InstallerClean tidak ditandatangani. Berikut yang bisa Anda periksa sebelum menj
 
 **Mengapa Windows mengatakan "Unknown publisher"?** InstallerClean tidak ditandatangani secara digital, dan Windows menandai file yang diunduh dari internet, sehingga pada kali pertama dijalankan SmartScreen biasanya menampilkan "Windows protected your PC" dengan penerbit tertera sebagai tidak dikenal. Sertifikat penandatanganan berbayar memakan biaya setiap tahun dan saya lebih memilih aplikasinya tetap gratis daripada membayarnya, jadi saya mengajukan permohonan ke SignPath Foundation, yang menandatangani perangkat lunak sumber terbuka secara cuma-cuma, dan InstallerClean sudah diterima (lihat [Kebijakan penandatanganan kode](#kebijakan-penandatanganan-kode)). Sertifikatnya belum diterbitkan jadi, untuk sekarang, klik **More info**, lalu **Run anyway**. Aman untuk dilakukan: kode sumbernya publik, dan tiap rilis punya tautan VirusTotal serta hash SHA-256 yang bisa Anda periksa lebih dulu.
 
-**Apakah berfungsi di Windows 7 atau 8?** Tidak. Aplikasi memerlukan Windows 10 versi 1607 atau yang lebih baru, build tertua yang didukung runtime .NET 10. Setup menolak memasang di versi yang lebih lama dan build portabel tidak akan mau dijalankan.
+**Apakah berfungsi di Windows 7 atau 8?** Tidak. Aplikasi memerlukan Windows 10 versi 1607 atau yang lebih baru, atau Windows 11. Setup menolak memasang di versi yang lebih lama, dan versi portabel serta baris perintah mengatakannya lalu berhenti.
 
 ## Baris perintah
 
@@ -267,6 +279,7 @@ InstallerClean tidak ditandatangani. Berikut yang bisa Anda periksa sebelum menj
 | `/m JALUR` | Pindai, lalu pindahkan ke `JALUR`. Apit dengan tanda kutip kalau ada spasi di dalamnya. | |
 | `--help` | Cetak cara pakai lalu keluar dengan `0`. | `/?`, `-h` |
 | `--version` | Cetak versi lalu keluar dengan `0`. | `-v` |
+| `--notices` | Cetak pemberitahuan dan lisensi karya pihak ketiga di dalam InstallerClean, lalu keluar dengan `0`. | |
 
 Flag tidak membedakan huruf besar dan kecil, jadi `/S` dan `/D` berfungsi sama seperti `/s` dan `/d`. Hanya satu flag per proses: flag tidak bisa digabungkan, dan `/s` serta `/d` tidak menerima apa pun sesudahnya.
 
@@ -298,7 +311,7 @@ Setiap proses menulis satu entri hasil ke log Application, dan bisa menambahkan 
 | `4000` | Kegagalan total |
 | `3000` | Pemberitahuan: pemindaian tidak bisa mendata setiap produk yang terpasang |
 | `3001` | Pemberitahuan: file yang diharapkan Windows tidak ada di folder |
-| `3002` | Pemberitahuan: ada file yang ditahan alih-alih ditawarkan |
+| `3002` | Pemberitahuan: ada file yang tidak bisa dipastikan InstallerClean sehingga dibiarkan apa adanya |
 
 Rentang `3000` adalah pemberitahuan dan bukan hasil, dan tidak dihitung sebagai hasil proses. Jenis entrinya adalah Information kalau tidak ada yang salah dengan prosesnya dan Warning kalau ada. **Log peristiwa selalu dalam bahasa Inggris**, apa pun bahasa tampilan mesinnya, sehingga pencarian pada frasa yang sudah diketahui punya sasaran yang stabil. Yang diterjemahkan adalah konsolnya: ia mengikuti bahasa mesin itu sendiri, dan menulis ukuran serta tanggal menurut wilayahnya.
 
@@ -354,7 +367,7 @@ InstallerClean dibuat agar sepenuhnya bisa digunakan dari keyboard dan dengan pe
 - **Narator dan Akses Suara.** Setiap kontrol diberi label, dan kata yang terlihat pada sebuah tombol adalah kata yang mengaktifkannya lewat suara. Saat Pindahkan atau Hapus selesai, hasilnya dibacakan.
 - **Dirancang untuk dibaca.** Teks memenuhi kontras WCAG AA di seluruh tema gelap.
 
-Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues). Masalah aksesibilitas adalah bug, bukan kasus pinggiran.
+Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues). Saya memperlakukan masalah aksesibilitas sebagai bug.
 
 ## Kebijakan penandatanganan kode
 
@@ -366,7 +379,7 @@ Setelah diterbitkan, tiap rilis akan mencantumkan baris yang diminta SignPath: f
 
 ## Privasi
 
-Saat InstallerClean pertama kali selesai berjalan di sebuah PC, layar hasilnya memiliki kotak "Kirim laporan anonim", dan laporan itu terkirim ketika Anda menutup layar tersebut, kecuali Anda menghapus centangnya. Tidak pernah ada lebih dari satu laporan untuk setiap PC. Kotak itu awalnya tidak dicentang jika Windows diatur ke negara di Uni Eropa, Islandia, Liechtenstein, atau Norwegia, atau jika InstallerClean tidak bisa membaca pengaturan itu. Laporan itu berisi: apa yang ditemukan pemindaian, apa yang ditahannya dan mengapa, apakah Anda memindahkan atau menghapus, berapa banyak yang dikosongkan, berapa lama waktunya, dan apa pun yang gagal, berikut versi aplikasi, bahasa yang Anda pakai untuk membacanya, bahasa yang diatur di Windows, dan versi Windows Anda. Tanpa nama file, tanpa nama folder, tanpa nama akun, tidak ada yang mengidentifikasi mesin Anda dan tidak ada yang bisa mengaitkan dua laporan satu sama lain. Huruf "i" kecil di samping kotak itu mencantumkan isi laporan, dan "Lihat persis apa yang dikirim" menampilkan laporan itu sendiri. Dari laporan-laporan inilah diagram di bagian atas halaman ini digambar, sehingga siapa pun bisa melihat berapa banyak ruang yang benar-benar didapat kembali oleh orang-orang. Laporan-laporan itu juga memberi tahu saya apakah aplikasinya berfungsi, dan apa yang ditahannya, di mesin selain milik saya sendiri.
+Saat InstallerClean pertama kali selesai berjalan di sebuah PC, layar hasilnya memiliki kotak "Kirim laporan anonim", dan laporan itu terkirim ketika Anda menutup layar tersebut, kecuali Anda menghapus centangnya. Tidak pernah ada lebih dari satu laporan untuk setiap PC. Laporan itu berisi: apa yang ditemukan pemindaian, apa yang dibiarkannya apa adanya dan mengapa, apakah Anda memindahkan atau menghapus, berapa banyak yang dikosongkan, berapa lama waktunya, dan apa pun yang gagal, berikut versi aplikasi, bahasa yang Anda pakai untuk membacanya, bahasa yang diatur di Windows, versi Windows Anda, dan kode acak yang dibuat untuk laporan itu, supaya hanya dihitung sekali kalau terkirim lebih dari sekali. Tanpa nama file, tanpa nama folder, tanpa nama akun, tidak ada yang mengidentifikasi mesin Anda dan tidak ada yang bisa mengaitkan dua laporan satu sama lain. Huruf "i" kecil di samping kotak itu mencantumkan isi laporan, dan "Lihat persis apa yang dikirim" menampilkan laporan itu sendiri. Dari laporan-laporan inilah diagram di bagian atas halaman ini digambar, sehingga siapa pun bisa melihat berapa banyak ruang yang benar-benar didapat kembali oleh orang-orang. Laporan-laporan itu juga memberi tahu saya apakah aplikasinya berfungsi, dan apa yang dibiarkannya apa adanya, di mesin selain milik saya sendiri.
 
 Tanpa iklan. Satu-satunya koneksi lain adalah pemeriksaan versi saat aplikasi dimulai (satu permintaan ke GitHub yang bisa Anda matikan di jendela Tentang) dan tombol-tombol yang menautkan ke GitHub dan ke halaman tempat Anda bisa berdonasi kalau sedang berbaik hati. [Kebijakan privasi](PRIVACY.md) selengkapnya (dalam bahasa Inggris).
 
@@ -400,7 +413,7 @@ Perbedaan antara kedua alat di sini adalah apa yang masing-masing tanyakan kepad
 |---|---|---|
 | Terakhir diperbarui | 2026 (aktif) | 3 Maret 2016 |
 | Kode sumber | Sumber terbuka (Apache 2.0) | Sumber tertutup |
-| Runtime | .NET 10 (mandiri) | .NET Framework 4.5.2 + VBScript |
+| Runtime | .NET Framework 4.8 | .NET Framework 4.5.2 + VBScript |
 | API | Windows Installer API di `msi.dll` (dalam proses) | Windows Installer COM (di luar proses, via VBScript) |
 | Patch yang digantikan | Dikenali dari catatan patch milik Windows | Tidak dibedakan dari file yang tidak diakui |
 | File Adobe | Patch yang digantikan dideteksi dan dilabeli | Dikecualikan oleh filter nama, aktif secara bawaan |
@@ -414,7 +427,7 @@ Pembersihan Disk, Sensor Penyimpanan, CCleaner dan BleachBit tidak membersihkan 
 
 Kalau memang ada file yang hilang dari folder itu, program pemiliknya tetap berjalan normal. Tetapi ketika Anda mencoba memperbarui atau mencopot program tersebut, kemungkinan besar prosesnya gagal. Windows mencari file itu, tidak menemukannya, dan langkahnya berhenti.
 
-Seluruh tujuan InstallerClean adalah hanya menawarkan pemindahan atau penghapusan file yang *tidak* diperlukan, tetapi aplikasi memang tahu kapan sebuah file hilang, jadi ia menandai setiap file yang ditemukannya dengan segitiga peringatan dan tautan yang menunjuk ke sini. Inilah yang harus dilakukan untuk mencoba memperbaiki programnya:
+InstallerClean mencantumkan sebuah file sebagai aman dihapus hanya kalau file itu *tidak* diperlukan, tetapi aplikasi memang tahu kapan sebuah file hilang, jadi ia menandai setiap file yang ditemukannya dengan segitiga peringatan dan tautan yang menunjuk ke sini. Inilah yang harus dilakukan untuk mencoba memperbaiki programnya:
 
 - Cari tahu nomor versi program yang terpasang itu (Pengaturan, Aplikasi, Aplikasi terinstal)
 - Unduh penginstal **untuk versi itu** dari pembuatnya. Yang lebih baru tidak akan berhasil, begitu pula mencopot lebih dulu: keduanya harus menghapus apa yang terpasang sebelum bisa melanjutkan, dan penghapusan itulah langkah yang membutuhkan file yang hilang tadi.
@@ -456,7 +469,8 @@ Kalau InstallerClean suatu hari menjadi penyebab hilangnya sebuah file, saya ing
 
 ## Persyaratan
 
-- Windows 10 (versi 1607 / build 14393 atau lebih baru, yang tertua yang didukung runtime .NET 10) atau Windows 11
+- Windows 10 (versi 1607 / build 14393 atau lebih baru) atau Windows 11
+- .NET Framework 4.8, yang sudah disertakan Windows 10 sejak versi 1903 dan selalu ada di Windows 11. Di Windows 10 yang lebih lama tanpa .NET Framework 4.8, setup dan aplikasi mengatakannya lalu menautkan ke unduhan dari Microsoft.
 - Windows 64-bit. Setup tidak akan mau memasang di Windows 32-bit dan akan memberi tahu Anda.
 - Hak istimewa administrator, untuk setup dan untuk aplikasinya (`C:\Windows\Installer` hanya untuk admin)
 
@@ -497,6 +511,8 @@ Kalau InstallerClean mengosongkan sedikit ruang dan Anda sedang berbaik hati, sa
 ## Lisensi
 
 [Apache 2.0](LICENSE)
+
+InstallerClean menyertakan font, ikon, dan kode dari proyek lain, masing-masing dengan lisensinya sendiri, semuanya tercantum di [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Setiap unduhan menyertakan teks file itu: aplikasi menampilkannya dari jendela Tentang, dan `installerclean-cli --notices` mencetaknya.
 
 ---
 
