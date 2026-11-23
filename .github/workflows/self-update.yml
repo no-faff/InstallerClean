@@ -179,7 +179,9 @@ jobs:
         run: choco install innosetup --version=6.7.1 --no-progress -y
 
       # Each setup is compiled from the script of the tree whose exes it carries: the old
-      # one from the tag, the newer from this commit.
+      # one from the tag, the newer from this commit. The extracted tag has no git history,
+      # so the old compile is given the tag's commit time from this checkout's; a script
+      # that does not read CommitTime ignores it.
       - name: Compile the old and the newer setup
         if: matrix.route == 'setup'
         shell: pwsh
@@ -187,12 +189,12 @@ jobs:
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
           if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
+          $oldCommitTime = ./scripts/compile-setup.ps1 -PrintCommitTime -Commit $env:OLD_TAG
           Push-Location $env:OLD_TREE
-          & $iscc "/DAppVersion=$env:OLD_VERSION" installer\InstallerClean.iss
+          & $iscc "/DAppVersion=$env:OLD_VERSION" "/DCommitTime=$oldCommitTime" installer\InstallerClean.iss
           if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed for the old version." }
           Pop-Location
-          & $iscc "/DAppVersion=$env:NEWER_VERSION" installer\InstallerClean.iss
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed for the newer version." }
+          ./scripts/compile-setup.ps1
           foreach ($path in "$env:OLD_TREE/publish/InstallerClean-$env:OLD_VERSION-setup.exe", "publish/InstallerClean-$env:NEWER_VERSION-setup.exe") {
             if (-not (Test-Path $path)) { throw "$path was not written." }
           }

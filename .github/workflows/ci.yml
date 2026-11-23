@@ -934,22 +934,18 @@ jobs:
 
       - name: Compile the installer
         if: success() || failure()
-        run: |
-          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
-                  Select-Object -First 1 -ExpandProperty FullName
-          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
-          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
-                     Where-Object { $_ } | Select-Object -First 1
-          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
-          & $iscc "/DAppVersion=$version" installer\InstallerClean.iss | Tee-Object -Variable compileOutput
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $warnings = @($compileOutput | Where-Object { $_ -like 'Warning: *' })
-          if ($warnings.Count -gt 0) {
-            ''
-            'ISCC printed these warnings, and any warning fails this step:'
-            $warnings
-            exit 1
-          }
+        shell: pwsh
+        run: ./scripts/compile-setup.ps1 -FailOnWarning
+
+      # Compiles the setup twice more around the same files, after setting each file it
+      # packs to another last-write time, as another build of this commit writes them,
+      # and compares the first of the two with the setup the step above compiled, byte
+      # for byte. The second, compiled with the commit time a day later, has to come out
+      # different: that is the control, and it shows the commit time reaches the bytes.
+      - name: Check a second compile of the setup gives the same bytes
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-reproducible-build.ps1 -Setup
 
       # The seven language gates run last, and each runs even when one before it
       # has failed. Every one is named below, because a gate left out of the list

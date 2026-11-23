@@ -20,8 +20,17 @@
 # apart (its control is a copy of the first Core assembly with one byte changed) fails the
 # step.
 #
+# With -Setup it checks the setup instead, run after the setup has been compiled once through
+# scripts/compile-setup.ps1. It copies that setup aside, sets every file the [Files] section of
+# installer/InstallerClean.iss packs to a last-write time a day earlier, as another build of the
+# same commit would leave them, compiles the setup again into a folder of its own and compares
+# the two byte for byte. The control is a third compile with the commit time a day later, which
+# has to come out different. A setup missing from either compile, a [Files] source that is not
+# there, or a control that comes out the same fails the step.
+#
 # Run from the repo root after the two merged builds: pwsh scripts/check-reproducible-build.ps1
-param([string]$PublishRoot = 'publish')
+# and after the setup is compiled: pwsh scripts/check-reproducible-build.ps1 -Setup
+param([string]$PublishRoot = 'publish', [switch]$Setup)
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Reflection.Metadata
@@ -35,6 +44,23 @@ public static class ByteCount
         int length = System.Math.Min(a.Length, b.Length);
         for (int i = 0; i < length; i++) { if (a[i] != b[i]) count++; }
         return count;
+    }
+
+    // Where the bytes differ, as up to max runs of "offset+length" in hex, offsets into the
+    // shorter length.
+    public static string Runs(byte[] a, byte[] b, int max)
+    {
+        var runs = new System.Collections.Generic.List<string>();
+        int length = System.Math.Min(a.Length, b.Length);
+        int i = 0;
+        while (i < length && runs.Count < max)
+        {
+            if (a[i] == b[i]) { i++; continue; }
+            int start = i;
+            while (i < length && a[i] != b[i]) i++;
+            runs.Add(string.Format("0x{0:x}+{1}", start, i - start));
+        }
+        return string.Join(", ", runs);
     }
 }
 '@
@@ -104,6 +130,7 @@ function Same-Bytes([string]$label, [string]$first, [string]$secondPath, [bool]$
   Write-Host "    first:  $($a.Length) bytes, SHA-256 $hashA"
   Write-Host "    second: $($b.Length) bytes, SHA-256 $hashB"
   Write-Host "    $differing of the first $([Math]::Min($a.Length, $b.Length)) bytes differ"
+  if ($differing) { Write-Host "    where they differ (the first ten runs): $([ByteCount]::Runs($a, $b, 10))" }
   if (-not $assembly) { return $false }
   try {
     $typesA = Read-Types $first
@@ -191,7 +218,74 @@ function Invoke-Check {
   }
 }
 
-try { Invoke-Check }
+# Every file the [Files] section of the setup script packs, by its path from the repo root.
+function Setup-Sources {
+  $script = 'installer/InstallerClean.iss'
+  $lines = Get-Content -LiteralPath $script
+  $publishDir = $lines | ForEach-Object { if ($_ -match '^#define PublishDir "(.+)"$') { $Matches[1] } } | Select-Object -First 1
+  if (-not $publishDir) { Fail "$script defines no PublishDir the check can read"; return @() }
+  $inFiles = $false
+  $sources = foreach ($line in $lines) {
+    if ($line -match '^\[(.+)\]$') { $inFiles = $Matches[1] -eq 'Files'; continue }
+    if (-not $inFiles -or $line -notmatch '^Source: "([^"]+)"') { continue }
+    $written = $Matches[1]
+    $source = $written.Replace('{#PublishDir}', $publishDir)
+    if ($source.Contains('{')) { Fail "$($script): a [Files] Source the check cannot resolve: $written"; continue }
+    Join-Path 'installer' $source
+  }
+  if (-not $sources) { Fail "$script has no [Files] Source the check can read" }
+  @($sources)
+}
+
+# The setup check, run with -Setup.
+function Invoke-SetupCheck {
+  $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+  $first = "$PublishRoot/InstallerClean-$version-setup.exe"
+  if (-not (Test-Path -LiteralPath $first -PathType Leaf)) { Fail "there is no first setup to compare (looked for: $first); run this after the setup is compiled"; return }
+  New-Item -ItemType Directory -Force -Path $copies, "$second/again", "$second/control" | Out-Null
+  $copy = Join-Path $copies (Split-Path -Leaf $first)
+  Copy-Item -LiteralPath $first -Destination $copy
+  Write-Host "The first setup: $first"
+
+  $sources = Setup-Sources
+  if ($failures.Count) { return }
+  $other = [DateTime]::UtcNow.AddDays(-1)
+  Write-Host "Every file the setup packs, set to a last-write time of $($other.ToString('u')):"
+  foreach ($source in $sources) {
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { Fail "the setup packs $source, which is not there"; continue }
+    (Get-Item -LiteralPath $source).LastWriteTimeUtc = $other
+    Write-Host "  $source"
+  }
+  if ($failures.Count) { return }
+
+  $commitTime = & ./scripts/compile-setup.ps1 -PrintCommitTime
+  $controlTime = [DateTime]::ParseExact($commitTime, 'yyyy-MM-ddTHH:mm:ss', [System.Globalization.CultureInfo]::InvariantCulture).AddDays(1).ToString(
+    'yyyy-MM-ddTHH:mm:ss', [System.Globalization.CultureInfo]::InvariantCulture)
+  foreach ($compile in @(
+      @{ Dir = "$second/again"; Time = $commitTime; Label = 'The second compile, with the commit time' }
+      @{ Dir = "$second/control"; Time = $controlTime; Label = 'The control, compiled with the commit time a day later' })) {
+    Write-Host "$($compile.Label):"
+    & ./scripts/compile-setup.ps1 -OutputDir $compile.Dir -CommitTime $compile.Time -FailOnWarning
+    if ($LASTEXITCODE -ne 0) { Fail "the compile into $($compile.Dir) failed with exit code $LASTEXITCODE"; return }
+    $path = Join-Path $compile.Dir (Split-Path -Leaf $first)
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Fail "the compile wrote no setup at $path"; return }
+  }
+
+  $name = Split-Path -Leaf $first
+  Write-Host 'The control against the first setup:'
+  if (Same-Bytes 'the control setup' $copy "$second/control/$name" $false) {
+    Fail 'a setup compiled with a commit time a day later came out the same as the first'
+    return
+  }
+  Write-Host '  reported, as it should be'
+  Write-Host 'The two compiles with the commit time compared:'
+  if (-not (Same-Bytes 'setup' $copy "$second/again/$name" $false)) {
+    Fail 'two compiles of the setup for this commit gave different bytes'
+  }
+}
+
+try { if ($Setup) { Invoke-SetupCheck } else { Invoke-Check } }
 finally { Remove-Item -Recurse -Force -LiteralPath $copies, $second -ErrorAction SilentlyContinue }
 if ($failures.Count) { exit 1 }
-Write-Host 'Two builds of this commit gave the same bytes for every file compared.'
+if ($Setup) { Write-Host 'Two compiles of the setup for this commit gave the same bytes.' }
+else { Write-Host 'Two builds of this commit gave the same bytes for every file compared.' }

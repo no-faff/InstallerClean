@@ -6,8 +6,9 @@
 ; Uninstall\InstallerClean_is1. Changing AppId breaks Add/Remove
 ; Programs continuity across versions.
 ;
-; AppVersion is passed in by CI and by the release script, both reading it
-; from Directory.Build.props: "ISCC.exe /DAppVersion=X.Y.Z ...". A compile
+; AppVersion is passed in by scripts/compile-setup.ps1, which CI and the release
+; build both run, reading it from Directory.Build.props:
+; "ISCC.exe /DAppVersion=X.Y.Z ...". A compile
 ; without it fails here rather than falling back, and there is deliberately no
 ; fallback to add: any hand-maintained default tracks the shipping version only
 ; until the version bump that forgets it, and a stale one produces a setup whose
@@ -18,9 +19,21 @@
 #ifndef AppVersion
   #error AppVersion is not defined. Pass it on the command line, reading the value from Directory.Build.props: ISCC.exe /DAppVersion=X.Y.Z installer\InstallerClean.iss
 #endif
-; Copyright year comes from the build clock (compile-time) so the
-; notice never goes stale.
-#define CurrentYear GetDateTimeString('yyyy','','')
+; CommitTime is the UTC time of the commit being built, as yyyy-mm-ddThh:mm:ss,
+; passed in by scripts/compile-setup.ps1, which reads it from git. It is the date
+; and time of every packed file (TouchDate and TouchTime below) and the copyright
+; year, so the setup holds nothing taken from the clock or from when a file was
+; written, and two compiles of one commit give the same bytes. A compile without
+; it fails here, as one without AppVersion does.
+#ifndef CommitTime
+  #error CommitTime is not defined. Compile through scripts/compile-setup.ps1, or pass the commit's UTC time: ISCC.exe /DCommitTime=yyyy-mm-ddThh:mm:ss ...
+#endif
+#if Len(CommitTime) != 19 || Copy(CommitTime, 11, 1) != "T"
+  #error CommitTime must be the commit's UTC time as yyyy-mm-ddThh:mm:ss.
+#endif
+#define CommitDate Copy(CommitTime, 1, 10)
+#define CommitClock Copy(CommitTime, 12, 8)
+#define CommitYear Copy(CommitTime, 1, 4)
 ; The publisher name and repo URL each appear in several directives below;
 ; defined once here so they cannot drift apart.
 #define MyCompany "No Faff"
@@ -96,14 +109,14 @@ CloseApplications=no
 AppPublisher={#MyCompany}
 AppPublisherURL={#MyRepoUrl}
 AppSupportURL={#MyRepoUrl}/discussions
-AppCopyright=(c) {#CurrentYear} {#MyCompany}
+AppCopyright=(c) {#CommitYear} {#MyCompany}
 ; Win32 VS_FIXEDFILEINFO is a four-part version; AppVersion is three,
 ; so VersionInfoVersion / VersionInfoProductVersion pad with .0.
 VersionInfoVersion={#AppVersion}.0
 VersionInfoProductVersion={#AppVersion}.0
 VersionInfoProductName=InstallerClean
 VersionInfoCompany={#MyCompany}
-VersionInfoCopyright=(c) {#CurrentYear} {#MyCompany}
+VersionInfoCopyright=(c) {#CommitYear} {#MyCompany}
 VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
@@ -116,6 +129,16 @@ DefaultGroupName=InstallerClean
 UninstallDisplayName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
 OutputDir={#PublishDir}
+; Setup stores a date and time for each packed file and gives it to the installed
+; copy. Inno takes it from the source file's last-write time; every [Files] entry
+; carries the touch flag, which replaces it with TouchDate and TouchTime at compile
+; time, so it is the commit's. The value is stored as UTC, which is what CommitTime
+; is, so the installed file carries the commit's moment in every time zone. An entry
+; added without touch packs its file's own last-write time, and CI's setup
+; comparison, which compiles again after setting those times back, fails on it.
+TimeStampsInUTC=yes
+TouchDate={#CommitDate}
+TouchTime={#CommitClock}
 ; The version is part of the download's name, so a setup exe sitting in a
 ; Downloads folder months later says which release it is before anybody opens
 ; its properties. The release pipeline builds the same name from the same
@@ -173,30 +196,30 @@ SignedUninstallerDir={#UninstallerSignatureDir}
 #include "InstallerClean_Languages.iss"
 
 [Files]
-Source: "{#PublishDir}\window\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\window\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion touch
 ; The merged exe's .exe.config carries the supportedRuntime line that names .NET
 ; Framework 4.8. The setup's copy in Program Files ships it; the portable and
 ; command-line downloads are the exe alone. A drive-by download cannot write this
 ; folder.
-Source: "{#PublishDir}\window\InstallerClean.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\window\InstallerClean.exe.config"; DestDir: "{app}"; Flags: ignoreversion touch
 ; CLI is a .NET console exe published from src/InstallerClean.Cli;
 ; ships alongside the GUI so PowerShell and cmd block on the process
 ; subsystem naturally.
-Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\cli\installerclean-cli.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion touch
+Source: "{#PublishDir}\cli\installerclean-cli.exe.config"; DestDir: "{app}"; Flags: ignoreversion touch
 ; pad.xml's Distribution_Permissions requires the Apache 2.0 licence text to
 ; travel alongside any redistributed binary, so Setup installs it too.
 ; DestName gives the installed copy a .txt extension so a double-click opens it
 ; in Notepad; a bare "LICENSE" with no extension makes Windows show the "how do
 ; you want to open this file?" picker instead.
-Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
+Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion touch
 ; Same argument, for what is redistributed rather than what is licensed: the GUI
 ; embeds the fonts and icons THIRD-PARTY-NOTICES names, each under its own
 ; licence, InstallerClean.Core carries the code it names from the .NET runtime,
 ; and this setup compiles in the wizard translations carried under
 ; installer\Languages. The DestName trick is the LICENSE one and is needed for
 ; the same reason.
-Source: "..\THIRD-PARTY-NOTICES"; DestDir: "{app}"; DestName: "THIRD-PARTY-NOTICES.txt"; Flags: ignoreversion
+Source: "..\THIRD-PARTY-NOTICES"; DestDir: "{app}"; DestName: "THIRD-PARTY-NOTICES.txt"; Flags: ignoreversion touch
 
 [UninstallDelete]
 ; A file [Code] renamed aside and left: an earlier one still running when the

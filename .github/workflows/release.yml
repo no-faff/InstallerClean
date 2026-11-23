@@ -203,18 +203,13 @@ jobs:
 
       # Unsigned, the setup is compiled once around the merged exes, with
       # UninstallerSignatureDir left undefined, so it embeds an unsigned
-      # uninstaller: the compile CI runs on every push.
+      # uninstaller: the compile CI runs on every push. The script gives it the
+      # commit's time as every packed file's date, so each run of one commit
+      # writes the same setup.
       - name: Compile the installer around the unsigned executables
         if: inputs.signing_policy == 'unsigned'
-        run: |
-          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
-                  Select-Object -First 1 -ExpandProperty FullName
-          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
-          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
-                     Where-Object { $_ } | Select-Object -First 1
-          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
-          & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
+        shell: pwsh
+        run: ./scripts/compile-setup.ps1
 
       # THE FIRST SIGNING ROUND. The three exes go up under distinct names
       # because two of them are called InstallerClean.exe, and they come back
@@ -250,9 +245,10 @@ jobs:
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
                      Where-Object { $_ } | Select-Object -First 1
           if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
+          $commitTime = ./scripts/compile-setup.ps1 -PrintCommitTime
           $dir = Join-Path $env:GITHUB_WORKSPACE 'signing\uninstaller'
           New-Item -ItemType Directory -Force -Path $dir | Out-Null
-          $output = & $iscc "/DAppVersion=$version" "/DUninstallerSignatureDir=$dir" installer\InstallerClean.iss 2>&1 | ForEach-Object { "$_" }
+          $output = & $iscc "/DAppVersion=$version" "/DCommitTime=$commitTime" "/DUninstallerSignatureDir=$dir" installer\InstallerClean.iss 2>&1 | ForEach-Object { "$_" }
           $exitCode = $LASTEXITCODE
           $output | ForEach-Object { Write-Host $_ }
           if ($exitCode -eq 0) { throw "The compiler finished a setup with no signed uninstaller to embed." }
@@ -334,16 +330,8 @@ jobs:
 
       - name: Compile the installer around the signed executables and uninstaller
         if: inputs.signing_policy != 'unsigned'
-        run: |
-          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
-                  Select-Object -First 1 -ExpandProperty FullName
-          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
-          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
-                     Where-Object { $_ } | Select-Object -First 1
-          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
-          $dir = Join-Path $env:GITHUB_WORKSPACE 'signing\uninstaller'
-          & $iscc "/DAppVersion=$version" "/DUninstallerSignatureDir=$dir" installer\InstallerClean.iss
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
+        shell: pwsh
+        run: ./scripts/compile-setup.ps1 -UninstallerSignatureDir (Join-Path $env:GITHUB_WORKSPACE 'signing\uninstaller')
 
       # THE SECOND SIGNING ROUND, the setup on its own.
       - name: Stage the setup for signing
