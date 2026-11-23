@@ -133,31 +133,47 @@ public class FrameworkTasksTests
         Assert.False(default(CancellationTokenRegistration).Unregister());
     }
 
+    // The callback is held until the test lets it go, or for twice the bound, so an Unregister
+    // that waited for it cannot return inside the bound the test gives it. The cancel and the
+    // Unregister each run on a thread of their own: started on the pool, either can wait
+    // seconds for a thread while the callback holds one and the rest of the run holds others.
     [Fact]
     public void Unregister_returns_at_once_while_the_callback_runs_on_another_thread()
     {
         using var cts = new CancellationTokenSource();
         using var entered = new ManualResetEventSlim();
         using var release = new ManualResetEventSlim();
+        var finished = false;
         var registration = cts.Token.Register(() =>
         {
             entered.Set();
-            release.Wait(Bound);
+            release.Wait(Bound + Bound);
+            Volatile.Write(ref finished, true);
         });
-        var cancelling = Task.Run(cts.Cancel);
+        var cancelling = new Thread(cts.Cancel) { IsBackground = true };
+        cancelling.Start();
         try
         {
             Assert.True(entered.Wait(Bound));
 
-            var unregistering = Task.Run(() => registration.Unregister());
+            bool? answer = null;
+            Exception? thrown = null;
+            var unregistering = new Thread(() =>
+            {
+                try { answer = registration.Unregister(); }
+                catch (Exception e) { thrown = e; }
+            }) { IsBackground = true };
+            unregistering.Start();
 
-            Assert.True(unregistering.Wait(TimeSpan.FromSeconds(2)), "Unregister waited for the running callback");
-            Assert.False(unregistering.Result);
+            Assert.True(unregistering.Join(Bound), "Unregister waited for the running callback");
+            Assert.Null(thrown);
+            Assert.False(Volatile.Read(ref finished), "the callback had finished before Unregister returned");
+            Assert.Equal(false, answer);
         }
         finally
         {
             release.Set();
-            cancelling.Wait(Bound);
+            cancelling.Join(Bound);
         }
     }
 
