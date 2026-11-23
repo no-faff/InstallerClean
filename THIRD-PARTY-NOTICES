@@ -361,7 +361,7 @@ alone.
   Microsoft.Extensions.DependencyInjection.Abstractions  11.0.0   both
   System.Buffers                                         4.6.1    both
   System.ComponentModel.Annotations                      5.0.0    window
-  System.IO.Abstractions                                 23.0.1   both
+  System.IO.Abstractions                                 23.1.0   both
   System.IO.Pipelines                                    11.0.0   both
   System.Memory                                          4.6.3    both
   System.Numerics.Vectors                                4.6.1    both
@@ -369,9 +369,9 @@ alone.
   System.Text.Encodings.Web                              11.0.0   both
   System.Text.Json                                       11.0.0   both
   System.Threading.Tasks.Extensions                      4.6.3    both
-  TestableIO.System.IO.Abstractions                      23.0.1   both
-  TestableIO.System.IO.Abstractions.Wrappers             23.0.1   both
-  Testably.Abstractions.FileSystem.Interface             11.0.0   both
+  TestableIO.System.IO.Abstractions                      23.1.0   both
+  TestableIO.System.IO.Abstractions.Wrappers             23.1.0   both
+  Testably.Abstractions.FileSystem.Interface             11.1.0   both
 
 The packages from Microsoft
 ---------------------------
@@ -403,13 +403,13 @@ System.IO.Abstractions
 ----------------------
 
 System.IO.Abstractions, TestableIO.System.IO.Abstractions and
-TestableIO.System.IO.Abstractions.Wrappers, 23.0.1.
+TestableIO.System.IO.Abstractions.Wrappers, 23.1.0.
 
   https://github.com/TestableIO/System.IO.Abstractions
 
 Their package metadata declares "Copyright © Tatham Oddie & friends
 2010-2026". Their licence, LICENSE in that repository at the commit the
-packages were built from (c12f3b1dd05fb5728f838a9bfcf5203d9c4eeb67):
+packages were built from (7f444c9d8202f9abad854d6ee8c5554ccdad737d):
 
   The MIT License (MIT)
 
@@ -438,13 +438,13 @@ packages were built from (c12f3b1dd05fb5728f838a9bfcf5203d9c4eeb67):
 Testably.Abstractions.FileSystem.Interface
 ------------------------------------------
 
-Testably.Abstractions.FileSystem.Interface, 11.0.0.
+Testably.Abstractions.FileSystem.Interface, 11.1.0.
 
   https://github.com/Testably/Testably.Abstractions
 
 Its package metadata declares "Copyright (c) 2024- 2026 Testably". Its
 licence, LICENSE in that repository at the commit the package was built from
-(ae901911f9dafb826fc40b564c1053743105e2ec):
+(6ffef067536270495eaa91cc4dd52c364745a721):
 
   MIT License
 
