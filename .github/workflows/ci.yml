@@ -2568,9 +2568,13 @@ jobs:
       # Wine's packages are kept between runs, because Ubuntu's mirror serves them at speeds
       # that vary from run to run. The package index is still fetched fresh every run, and apt
       # checks each kept file against it and fetches again any that does not match.
-      - name: Name the runner image the packages are kept for
+      - name: Name the runner image and the machine it runs on
         id: image
-        run: echo "version=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+          # The machine is printed so the time the steps below take can be read against it.
+          lscpu | command grep -E '^(Model name|CPU\(s\)):'
+          free -h | head -2
 
       - name: Restore the Wine packages from an earlier run
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
