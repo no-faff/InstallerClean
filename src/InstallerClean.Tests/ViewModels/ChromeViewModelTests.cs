@@ -323,6 +323,35 @@ public class ChromeViewModelTests
     }
 
     [Fact]
+    public async Task The_card_s_release_link_is_in_use_only_while_the_card_is_up()
+    {
+        // Continue without updating takes the card away and leaves the link's conditions as
+        // they were, so the card's link is disabled then and is no Tab stop, while the
+        // notice's opens.
+        CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"));
+        var vm = CreateViewModel();
+        await vm.RunAutomaticUpdateCheckAsync();
+        Assert.True(vm.ShowsReleaseLink);
+        Assert.False(vm.OpenReleasePageOnCardCommand.CanExecute(null));
+
+        vm.OfferUpdate();
+
+        Assert.True(vm.OpenReleasePageOnCardCommand.CanExecute(null));
+        vm.OpenReleasePageOnCardCommand.Execute(null);
+        _windowService.Received(1).OpenUrl(ReleasesPage);
+
+        var raised = 0;
+        vm.OpenReleasePageOnCardCommand.CanExecuteChanged += (_, _) => raised++;
+        vm.ContinueWithoutUpdatingCommand.Execute(null);
+
+        Assert.True(raised > 0);
+        Assert.False(vm.OpenReleasePageOnCardCommand.CanExecute(null));
+        vm.OpenReleasePageOnCardCommand.Execute(null);
+        _windowService.Received(1).OpenUrl(ReleasesPage);
+        Assert.True(vm.OpenReleasePageCommand.CanExecute(null));
+    }
+
+    [Fact]
     public async Task OpenReleasePage_opens_the_found_versions_release_page_after_the_automatic_check()
     {
         CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"));
@@ -1147,6 +1176,32 @@ public class ChromeViewModelTests
 
         _windowService.Received(1).OpenUrl("https://go.microsoft.com/fwlink/?linkid=2088631");
         _windowService.DidNotReceive().OpenUrl(ReleasesPage);
+    }
+
+    [Fact]
+    public async Task The_card_s_NET_Framework_link_is_in_use_only_while_the_card_is_up()
+    {
+        var vm = CreateRequirementsViewModel();
+        RequirementsAnswer(UpdateRefusal.NeedsNetFramework48);
+        await vm.RunAutomaticUpdateCheckAsync();
+        Assert.True(vm.ShowsNetFrameworkLink);
+        Assert.False(vm.OpenNetFrameworkDownloadOnCardCommand.CanExecute(null));
+
+        vm.OfferUpdate();
+
+        Assert.True(vm.OpenNetFrameworkDownloadOnCardCommand.CanExecute(null));
+        vm.OpenNetFrameworkDownloadOnCardCommand.Execute(null);
+        _windowService.Received(1).OpenUrl("https://go.microsoft.com/fwlink/?linkid=2088631");
+
+        var raised = 0;
+        vm.OpenNetFrameworkDownloadOnCardCommand.CanExecuteChanged += (_, _) => raised++;
+        vm.ContinueWithoutUpdatingCommand.Execute(null);
+
+        Assert.True(raised > 0);
+        Assert.False(vm.OpenNetFrameworkDownloadOnCardCommand.CanExecute(null));
+        vm.OpenNetFrameworkDownloadOnCardCommand.Execute(null);
+        _windowService.Received(1).OpenUrl("https://go.microsoft.com/fwlink/?linkid=2088631");
+        Assert.True(vm.OpenNetFrameworkDownloadCommand.CanExecute(null));
     }
 
     [Fact]

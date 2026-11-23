@@ -1670,7 +1670,7 @@
                                    HorizontalAlignment="Center" Margin="0,8,0,8"
                                    Visibility="{Binding Chrome.ShowsReleaseLink, Converter={StaticResource BoolToVis}}">
                             <Hyperlink x:Name="UpdateOfferDownloadLink"
-                                       Command="{Binding Chrome.OpenReleasePageCommand}"
+                                       Command="{Binding Chrome.OpenReleasePageOnCardCommand}"
                                        Style="{StaticResource SubtleLink}"
                                        AutomationProperties.Name="{loc:Translate Automation.UpdateNotice.Download}"><Run Text="{loc:Translate UpdateNotice.Download}"/></Hyperlink>
                         </TextBlock>
@@ -1679,7 +1679,7 @@
                                    HorizontalAlignment="Center" Margin="0,8,0,8"
                                    Visibility="{Binding Chrome.ShowsNetFrameworkLink, Converter={StaticResource BoolToVis}}">
                             <Hyperlink x:Name="UpdateOfferNetFrameworkLink"
-                                       Command="{Binding Chrome.OpenNetFrameworkDownloadCommand}"
+                                       Command="{Binding Chrome.OpenNetFrameworkDownloadOnCardCommand}"
                                        Style="{StaticResource SubtleLink}"
                                        AutomationProperties.Name="{loc:Translate Automation.UpdateNotice.DownloadNetFramework48}"><Run Text="{loc:Translate UpdateNotice.DownloadNetFramework48}"/></Hyperlink>
                         </TextBlock>

@@ -227,7 +227,9 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [NotifyCanExecuteChangedFor(nameof(OpenReleasesCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenWhatsNewCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenWhatsNewOnCardCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenReleasePageOnCardCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadOnCardCommand))]
     [NotifyCanExecuteChangedFor(nameof(UpdateNowCommand))]
     private bool _hasNewerVersion;
 
@@ -244,7 +246,9 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(ShowsReleaseLink))]
     [NotifyPropertyChangedFor(nameof(ShowsNetFrameworkLink))]
     [NotifyCanExecuteChangedFor(nameof(OpenReleasePageCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenReleasePageOnCardCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadOnCardCommand))]
     [NotifyCanExecuteChangedFor(nameof(UpdateNowCommand))]
     private UpdateRefusal? _newerVersionRefusal;
 
@@ -361,6 +365,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(HasUpdateFailure))]
     [NotifyPropertyChangedFor(nameof(ShowsReleaseLink))]
     [NotifyCanExecuteChangedFor(nameof(OpenReleasePageCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenReleasePageOnCardCommand))]
     private string _updateFailureText = string.Empty;
 
     /// <summary>Whether the notice shows the line saying an update failed.</summary>
@@ -407,6 +412,8 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ContinueWithoutUpdatingCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenWhatsNewOnCardCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenReleasePageOnCardCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadOnCardCommand))]
     private bool _isOfferingUpdate;
 
     /// <summary>
@@ -652,7 +659,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Opens the newer version's release page; bound to the link on the notice at the top of the
-    /// main window and on the card saying a newer version is available. The
+    /// main window (the card's has <see cref="OpenReleasePageOnCard"/>). The
     /// CanExecute is the link's tab-order gate, not politeness: WPF's keyboard navigation descends into a collapsed TextBlock
     /// regardless of visibility (a TextBlock is an IContentHost) and admits a
     /// content element on Focusable, IsTabStop and IsEnabled alone, content
@@ -666,6 +673,23 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private void OpenReleasePage()
     {
         if (ShowsReleaseLink && NewerVersion is { } version)
+            _windowService.OpenUrl(UpdateCheckService.ReleasePageUrl(version));
+    }
+
+    /// <summary>Whether the card saying a newer version is available is up, with the link to the release page.</summary>
+    private bool ShowsReleaseLinkOnCard => IsOfferingUpdate && ShowsReleaseLink;
+
+    /// <summary>
+    /// The link to the newer version's release page on the card saying a newer version is
+    /// available: the same page as <see cref="OpenReleasePage"/>, which the notice's link
+    /// opens. Enabled only while the card is up, for the reason <see cref="OpenReleasePage"/>
+    /// gives, since Continue without updating takes the card away and leaves the link's
+    /// conditions as they were.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(ShowsReleaseLinkOnCard))]
+    private void OpenReleasePageOnCard()
+    {
+        if (ShowsReleaseLinkOnCard && NewerVersion is { } version)
             _windowService.OpenUrl(UpdateCheckService.ReleasePageUrl(version));
     }
 
@@ -704,13 +728,30 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Downloads Microsoft's .NET Framework 4.8 installer in the browser; bound to the link
-    /// on the card and the notice. Disabled wherever the link is not shown, for the reason
+    /// on the notice (the card's has <see cref="OpenNetFrameworkDownloadOnCard"/>). Disabled
+    /// wherever the link is not shown, for the reason
     /// <see cref="OpenReleasePage"/> gives.
     /// </summary>
     [RelayCommand(CanExecute = nameof(ShowsNetFrameworkLink))]
     private void OpenNetFrameworkDownload()
     {
         if (ShowsNetFrameworkLink)
+            _windowService.OpenUrl(UpdateManifest.NetFramework48DownloadUrl);
+    }
+
+    /// <summary>Whether the card saying a newer version is available is up, with the link to Microsoft's installer.</summary>
+    private bool ShowsNetFrameworkLinkOnCard => IsOfferingUpdate && ShowsNetFrameworkLink;
+
+    /// <summary>
+    /// The link to Microsoft's .NET Framework 4.8 installer on the card saying a newer
+    /// version is available: the same download as <see cref="OpenNetFrameworkDownload"/>.
+    /// Enabled only while the card is up, for the reason <see cref="OpenReleasePageOnCard"/>
+    /// gives.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(ShowsNetFrameworkLinkOnCard))]
+    private void OpenNetFrameworkDownloadOnCard()
+    {
+        if (ShowsNetFrameworkLinkOnCard)
             _windowService.OpenUrl(UpdateManifest.NetFramework48DownloadUrl);
     }
 
