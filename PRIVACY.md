@@ -1,6 +1,6 @@
 # InstallerClean privacy policy
 
-Last updated 3 November 2026.
+Last updated 23 November 2026.
 
 InstallerClean never collects anything that could identify you, your PC or your files. No ads, no tracking. It can send me one anonymous report of how its first run on your PC went, which you can stop by unticking a box, or by answering no in the command-line tool, and it checks GitHub for updates, which you can turn off. That's all it sends.
 
@@ -62,6 +62,7 @@ The Leave a tip buttons open the tip page, nofaff.netlify.app/support, in your b
 In `%LOCALAPPDATA%\InstallerClean`, for your Windows account:
 
 - `settings.json`: the folder you chose for Move, the language you picked, whether the update check is on, and whether your report has been sent or is waiting to be.
+- `newest-version-run.txt`: the newest version of InstallerClean run in your account, so that InstallerClean can say once that it has been updated.
 - `crash.log`: details of any error, with the one before kept as `crash.log.old`.
 
 On a PC where an earlier version kept these files in `%LOCALAPPDATA%\NoFaff\InstallerClean`, InstallerClean moves them here the first time it starts.

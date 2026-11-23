@@ -338,6 +338,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking the download... | İndirilen dosya denetleniyor... |
 | The update couldn't be downloaded. | Güncelleştirme indirilemedi. |
 | The update couldn't be installed. | Güncelleştirme yüklenemedi. |
+| InstallerClean has been updated to {0}. | InstallerClean {0} sürümüne güncellendi. |
+| What's new | Yenilikler |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub'a ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Güncelleştirme denetimi, GitHub'ın sürümler sayfası yerine bir hata aldı. Daha sonra yeniden deneyin ya da [sürümler sayfasını] tarayıcınızda açın. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Güncelleştirme denetimi, GitHub'ın yanıtından hangi sürümün en yeni olduğunu anlayamadı. Daha sonra yeniden deneyin ya da [sürümler sayfasını] tarayıcınızda açın. |
@@ -416,6 +418,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean'in içerdiği yazı tiplerinin, simgelerin ve kodun lisanslarını gösterir. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | İşaretliyse InstallerClean, çalıştırdığınızda github üzerinde daha yeni bir sürüm olup olmadığını denetler. |
 | Download it from github | github'dan indirin |
+| Opens InstallerClean's releases on github in your browser, newest first. | github üzerindeki InstallerClean sürümlerini en yenisi başta olmak üzere tarayıcınızda açar. |
 | Download .NET Framework 4.8 from Microsoft | .NET Framework 4.8'i Microsoft'tan indirin |
 | Copy the command | Komutu kopyala |
 | Scoop's update command | Scoop güncelleme komutu |

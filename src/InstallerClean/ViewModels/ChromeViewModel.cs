@@ -194,6 +194,23 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _updateNoticeText = string.Empty;
 
     /// <summary>
+    /// The line saying InstallerClean has been updated to this version, set at the
+    /// first start of this version in this Windows account
+    /// (<see cref="ShowUpdatedAtStart"/>). Empty otherwise.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowsUpdatedNotice))]
+    [NotifyCanExecuteChangedFor(nameof(OpenReleasesCommand))]
+    private string _updatedNoticeText = string.Empty;
+
+    /// <summary>
+    /// Whether the line saying InstallerClean has been updated shows at the top of the
+    /// main window, with What's new beside it, for the rest of the session. The notice
+    /// saying a newer version is available takes its place wherever a check finds one.
+    /// </summary>
+    public bool ShowsUpdatedNotice => UpdatedNoticeText.Length > 0 && !HasNewerVersion;
+
+    /// <summary>
     /// Set once a check has found a newer version, and held for the session. It
     /// shows the notice at the top of the main window. A later check failing leaves
     /// it set; only a check answering that this build is the newest clears it. A bool
@@ -205,7 +222,9 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(ShowsReleaseLink))]
     [NotifyPropertyChangedFor(nameof(ShowsScoopCommand))]
     [NotifyPropertyChangedFor(nameof(ShowsNetFrameworkLink))]
+    [NotifyPropertyChangedFor(nameof(ShowsUpdatedNotice))]
     [NotifyCanExecuteChangedFor(nameof(OpenReleasePageCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenReleasesCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadCommand))]
     [NotifyCanExecuteChangedFor(nameof(UpdateNowCommand))]
     private bool _hasNewerVersion;
@@ -416,6 +435,25 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// where the check finds the newer version.
     /// </summary>
     public void ShowUpdateFailedAtStart() => UpdateFailureText = Strings.UpdateNotice_InstallFailed;
+
+    /// <summary>
+    /// Sets the line saying InstallerClean has been updated to <paramref name="version"/>,
+    /// on the start that is the first of this version in this Windows account, and on the
+    /// start that follows a language change in a session that showed it.
+    /// </summary>
+    public void ShowUpdatedAtStart(string version) =>
+        UpdatedNoticeText = string.Format(Strings.UpdateNotice_Updated, version);
+
+    /// <summary>
+    /// What's new: opens the list of every release, newest first, in the browser. Enabled
+    /// only where the link shows, for the reason <see cref="OpenReleasePage"/> gives.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(ShowsUpdatedNotice))]
+    private void OpenReleases()
+    {
+        if (ShowsUpdatedNotice)
+            _windowService.OpenUrl(UpdateCheckService.ReleasesListUrl);
+    }
 
     /// <summary>
     /// The automatic check, completing once it has answered, given up, found the check

@@ -546,6 +546,9 @@ const MAP = {
   'About.Link.Notices': `Уведомления третьих сторон`,
   'Automation.About.Notices.HelpText': `Показывает лицензии шрифтов, значков и кода, входящих в InstallerClean.`,
   'Startup.NeedsWindows10Version1607': `Для InstallerClean нужна Windows 10 версии 1607 или новее либо Windows 11.`,
+  'UpdateNotice.Updated': `InstallerClean обновлён до версии {0}.`,
+  'UpdateNotice.WhatsNew': `Что нового`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Открывает выпуски InstallerClean на github в вашем браузере, начиная с самого нового.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT

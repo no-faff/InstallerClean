@@ -582,6 +582,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  Muestra los avisos de terceros`,
   'Startup.NeedsWindows10Version1607': `InstallerClean necesita Windows 10 versión 1607 o posterior, o Windows 11.`,
   'Cli.ReportCancelledWhileSending': `Cancelado mientras se enviaba el informe. Puede que haya llegado de todos modos.`,
+  'UpdateNotice.Updated': `InstallerClean se ha actualizado a la versión {0}.`,
+  'UpdateNotice.WhatsNew': `Novedades`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Abre las versiones de InstallerClean en github en tu navegador, de la más reciente a la más antigua.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

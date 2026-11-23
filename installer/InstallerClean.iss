@@ -91,11 +91,12 @@ SetupMutex={#SetupMutexName}
 ; aside instead, which Windows allows while it runs.
 CloseApplications=no
 ; %LOCALAPPDATA%\InstallerClean\ user data (settings.json,
-; last-run.json, settings.json.bad on a corrupt-and-recovered run,
-; crash.log, crash.log.old once the log has rotated) survives
-; uninstall by design: the saved move destination, and settings.json's
-; record of whether this account's report has gone or is still waiting
-; to go, carry across upgrades.
+; last-run.json, newest-version-run.txt, settings.json.bad on a
+; corrupt-and-recovered run, crash.log, crash.log.old once the log has
+; rotated) survives uninstall by design: the saved move destination,
+; settings.json's record of whether this account's report has gone or is
+; still waiting to go, and the record of the newest version run in the
+; account, carry across upgrades.
 ; The CLI's Application event-log source, registered on its first run at
 ; HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\InstallerClean,
 ; survives too, and no [Registry] or [UninstallDelete] entry should be added

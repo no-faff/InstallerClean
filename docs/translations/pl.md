@@ -347,6 +347,8 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Checking the download... | Sprawdzanie pobranego pliku... |
 | The update couldn't be downloaded. | Nie udało się pobrać aktualizacji. |
 | The update couldn't be installed. | Nie udało się zainstalować aktualizacji. |
+| InstallerClean has been updated to {0}. | InstallerClean został zaktualizowany do wersji {0}. |
+| What's new | Co nowego |
 | Couldn't reach GitHub. Check your internet connection and try again. | Nie udało się połączyć z GitHub. Sprawdź połączenie internetowe i spróbuj ponownie. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Sprawdzanie aktualizacji otrzymało błąd zamiast strony wydań GitHub. Spróbuj ponownie później lub otwórz [stronę wydań] w przeglądarce. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Sprawdzanie aktualizacji nie mogło ustalić na podstawie odpowiedzi GitHub, która wersja jest najnowsza. Spróbuj ponownie później lub otwórz [stronę wydań] w przeglądarce. |
@@ -425,6 +427,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Pokazuje licencje czcionek, ikon i kodu, które zawiera InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na githubie, czy jest nowsza wersja. |
 | Download it from github | Pobierz z githuba |
+| Opens InstallerClean's releases on github in your browser, newest first. | Otwiera wydania InstallerClean na githubie w twojej przeglądarce, od najnowszego. |
 | Download .NET Framework 4.8 from Microsoft | Pobierz .NET Framework 4.8 ze strony Microsoftu |
 | Copy the command | Kopiuj polecenie |
 | Scoop's update command | Polecenie aktualizacji Scoop |

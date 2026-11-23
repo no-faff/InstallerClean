@@ -674,6 +674,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  Вивести повідомлення третіх сторін`,
   'Startup.NeedsWindows10Version1607': `Для InstallerClean потрібна Windows 10 версії 1607 або новішої чи Windows 11.`,
   'Cli.ReportCancelledWhileSending': `Скасовано під час надсилання звіту. Він усе одно міг дійти.`,
+  'UpdateNotice.Updated': `InstallerClean оновлено до версії {0}.`,
+  'UpdateNotice.WhatsNew': `Що нового`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Відкриває випуски InstallerClean на github у вашому браузері, починаючи з найновішого.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

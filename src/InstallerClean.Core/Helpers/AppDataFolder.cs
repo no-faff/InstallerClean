@@ -4,11 +4,11 @@ namespace InstallerClean.Helpers;
 
 /// <summary>
 /// The app's own folder for the Windows account it runs as,
-/// <c>%LOCALAPPDATA%\InstallerClean</c>, which holds settings.json, last-run.json and
-/// crash.log. The first time a process asks for <see cref="Location"/>,
-/// <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>, where earlier versions keep the same
-/// files, is moved here, so every caller is answered with the folder its files are
-/// actually in.
+/// <c>%LOCALAPPDATA%\InstallerClean</c>, which holds settings.json, last-run.json,
+/// newest-version-run.txt and crash.log. The first time a process asks for
+/// <see cref="Location"/>, <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>, where earlier
+/// versions keep the same files, is moved here, so every caller is answered with the
+/// folder its files are actually in.
 /// </summary>
 /// <remarks>
 /// The move happens inside the first ask rather than in either host's startup, so it

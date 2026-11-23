@@ -346,6 +346,11 @@
     available, the visible UpdateNotice.Download cased for speech for the reason
     Automation.CheckForUpdates.HelpText carries. The same words as the link.</comment>
   </data>
+  <data name="Automation.UpdateNotice.WhatsNew.HelpText" xml:space="preserve">
+    <value>Abre as versões do InstallerClean no github no seu navegador, da mais recente para a mais antiga.</value>
+    <comment>Screen-reader help on the link UpdateNotice.WhatsNew, cased for speech for the reason
+    Automation.CheckForUpdates.HelpText carries.</comment>
+  </data>
   <data name="Automation.UpdateNotice.DownloadNetFramework48" xml:space="preserve">
     <value>Baixe o .NET Framework 4.8 no site da Microsoft</value>
     <comment>Screen-reader name of the link UpdateNotice.DownloadNetFramework48. The same words as the link.</comment>
@@ -1563,6 +1568,14 @@ Detalhes em {1}.</value></data>
   <data name="UpdateNotice.InstallFailed" xml:space="preserve">
     <value>Não foi possível instalar a atualização.</value>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
+  </data>
+  <data name="UpdateNotice.Updated" xml:space="preserve">
+    <value>O InstallerClean foi atualizado para a versão {0}.</value>
+    <comment>A line at the top of the main window, the first time this version runs in a Windows account where an earlier version ran, followed by the link UpdateNotice.WhatsNew. It shows for that session and is gone at the next start. {0} = this version's number, as 3.8.0.</comment>
+  </data>
+  <data name="UpdateNotice.WhatsNew" xml:space="preserve">
+    <value>Novidades</value>
+    <comment>A link that opens InstallerClean's releases on GitHub in the browser, every release newest first with what each one changed. Beside UpdateNotice.Updated. Keep it short, as a link label.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Não foi possível acessar o GitHub. Verifique a sua conexão com a internet e tente de novo.</value></data>
   <!-- The next two are shown in the update check's warning box. The phrase in

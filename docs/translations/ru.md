@@ -348,6 +348,8 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Checking the download... | Проверка скачанного файла... |
 | The update couldn't be downloaded. | Не удалось скачать обновление. |
 | The update couldn't be installed. | Не удалось установить обновление. |
+| InstallerClean has been updated to {0}. | InstallerClean обновлён до версии {0}. |
+| What's new | Что нового |
 | Couldn't reach GitHub. Check your internet connection and try again. | Не удалось подключиться к GitHub. Проверьте подключение к интернету и повторите попытку. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Проверка обновлений получила ошибку вместо страницы выпусков GitHub. Повторите попытку позже или откройте [страницу выпусков] в браузере. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Проверка обновлений не смогла определить по ответу GitHub, какая версия самая новая. Повторите попытку позже или откройте [страницу выпусков] в браузере. |
@@ -426,6 +428,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Показывает лицензии шрифтов, значков и кода, входящих в InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Если флажок установлен, InstallerClean при запуске проверяет на github наличие более новой версии. |
 | Download it from github | Скачать с github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Открывает выпуски InstallerClean на github в вашем браузере, начиная с самого нового. |
 | Download .NET Framework 4.8 from Microsoft | Скачать .NET Framework 4.8 с сайта Microsoft |
 | Copy the command | Копировать команду |
 | Scoop's update command | Команда обновления Scoop |

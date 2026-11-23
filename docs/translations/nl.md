@@ -340,6 +340,8 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Checking the download... | Download controleren... |
 | The update couldn't be downloaded. | De update kon niet worden gedownload. |
 | The update couldn't be installed. | De update kon niet worden geïnstalleerd. |
+| InstallerClean has been updated to {0}. | InstallerClean is bijgewerkt naar {0}. |
+| What's new | Wat is er nieuw |
 | Couldn't reach GitHub. Check your internet connection and try again. | Kon GitHub niet bereiken. Controleer je internetverbinding en probeer het opnieuw. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | De updatecontrole ontving een fout in plaats van de releasepagina van GitHub. Probeer het later opnieuw, of open [de releasepagina] in je browser. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | De updatecontrole kon uit het antwoord van GitHub niet opmaken welke versie de nieuwste is. Probeer het later opnieuw, of open [de releasepagina] in je browser. |
@@ -418,6 +420,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Toont de licenties van de lettertypen, pictogrammen en code die InstallerClean bevat. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Als dit is aangevinkt, kijkt InstallerClean bij het starten op github of er een nieuwere versie is. |
 | Download it from github | Download het van github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Opent de releases van InstallerClean op github in je browser, de nieuwste eerst. |
 | Download .NET Framework 4.8 from Microsoft | Download .NET Framework 4.8 van Microsoft |
 | Copy the command | De opdracht kopiëren |
 | Scoop's update command | Bijwerkopdracht van Scoop |

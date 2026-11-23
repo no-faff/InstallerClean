@@ -340,6 +340,8 @@ Where French needs a different form of a line for some counts, the form is in a 
 | Checking the download... | Vérification du téléchargement... |
 | The update couldn't be downloaded. | La mise à jour n'a pas pu être téléchargée. |
 | The update couldn't be installed. | La mise à jour n'a pas pu être installée. |
+| InstallerClean has been updated to {0}. | InstallerClean a été mis à jour vers la version {0}. |
+| What's new | Nouveautés |
 | Couldn't reach GitHub. Check your internet connection and try again. | Impossible de joindre GitHub. Vérifiez votre connexion internet et réessayez. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | La vérification des mises à jour a reçu une erreur au lieu de la page des versions de GitHub. Réessayez plus tard, ou ouvrez [la page des versions] dans votre navigateur. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | La vérification des mises à jour n'a pas pu déterminer, d'après la réponse de GitHub, quelle est la version la plus récente. Réessayez plus tard, ou ouvrez [la page des versions] dans votre navigateur. |
@@ -418,6 +420,7 @@ Where French needs a different form of a line for some counts, the form is in a 
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Affiche les licences des polices, des icônes et du code inclus dans InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Si la case est cochée, InstallerClean recherche une version plus récente sur github à son lancement. |
 | Download it from github | Le télécharger sur github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Ouvre les versions d'InstallerClean sur github dans votre navigateur, de la plus récente à la plus ancienne. |
 | Download .NET Framework 4.8 from Microsoft | Télécharger .NET Framework 4.8 sur le site de Microsoft |
 | Copy the command | Copier la commande |
 | Scoop's update command | Commande de mise à jour de Scoop |

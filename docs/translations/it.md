@@ -340,6 +340,8 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Checking the download... | Verifica del download... |
 | The update couldn't be downloaded. | Non è stato possibile scaricare l'aggiornamento. |
 | The update couldn't be installed. | Non è stato possibile installare l'aggiornamento. |
+| InstallerClean has been updated to {0}. | InstallerClean è stato aggiornato alla versione {0}. |
+| What's new | Novità |
 | Couldn't reach GitHub. Check your internet connection and try again. | Impossibile raggiungere GitHub. Controlla la connessione internet e riprova. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Il controllo degli aggiornamenti ha ricevuto un errore invece della pagina delle release di GitHub. Riprova più tardi, o apri [la pagina delle release] nel browser. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Il controllo degli aggiornamenti non è riuscito a capire dalla risposta di GitHub quale sia la versione più recente. Riprova più tardi, o apri [la pagina delle release] nel browser. |
@@ -418,6 +420,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Mostra le licenze di caratteri, icone e codice inclusi in InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se selezionata, all'avvio InstallerClean verifica su github se è disponibile una versione più recente. |
 | Download it from github | Scaricalo da github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Apre le release di InstallerClean su github nel browser, dalla più recente. |
 | Download .NET Framework 4.8 from Microsoft | Scarica .NET Framework 4.8 da Microsoft |
 | Copy the command | Copia il comando |
 | Scoop's update command | Comando di aggiornamento di Scoop |

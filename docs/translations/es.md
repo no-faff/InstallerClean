@@ -340,6 +340,8 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Checking the download... | Comprobando la descarga... |
 | The update couldn't be downloaded. | No se pudo descargar la actualización. |
 | The update couldn't be installed. | No se pudo instalar la actualización. |
+| InstallerClean has been updated to {0}. | InstallerClean se ha actualizado a la versión {0}. |
+| What's new | Novedades |
 | Couldn't reach GitHub. Check your internet connection and try again. | No se pudo conectar con GitHub. Comprueba tu conexión a internet y vuelve a intentarlo. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | La comprobación de actualizaciones recibió un error en lugar de la página de versiones de GitHub. Vuelve a intentarlo más tarde o abre [la página de versiones] en tu navegador. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | La comprobación de actualizaciones no pudo saber, a partir de la respuesta de GitHub, cuál es la versión más reciente. Vuelve a intentarlo más tarde o abre [la página de versiones] en tu navegador. |
@@ -418,6 +420,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Muestra las licencias de las fuentes, los iconos y el código que incluye InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Si está marcada, InstallerClean busca en github una versión más reciente cuando lo ejecutas. |
 | Download it from github | Descárgalo de github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Abre las versiones de InstallerClean en github en tu navegador, de la más reciente a la más antigua. |
 | Download .NET Framework 4.8 from Microsoft | Descarga .NET Framework 4.8 de Microsoft |
 | Copy the command | Copiar el comando |
 | Scoop's update command | Comando de actualización de Scoop |

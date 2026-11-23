@@ -138,6 +138,7 @@ public static class Strings
     public static string Automation_UpdateNotice_Download => Get("Automation.UpdateNotice.Download");
     public static string Automation_UpdateNotice_DownloadNetFramework48 => Get("Automation.UpdateNotice.DownloadNetFramework48");
     public static string Automation_UpdateNotice_ScoopCommand => Get("Automation.UpdateNotice.ScoopCommand");
+    public static string Automation_UpdateNotice_WhatsNew_HelpText => Get("Automation.UpdateNotice.WhatsNew.HelpText");
     public static string Automation_ViewOrphanedFiles => Get("Automation.ViewOrphanedFiles");
     public static string Automation_ViewOrphanedFiles_HelpText => Get("Automation.ViewOrphanedFiles.HelpText");
     public static string Automation_ViewRegisteredFiles => Get("Automation.ViewRegisteredFiles");
@@ -609,6 +610,8 @@ public static class Strings
     public static string UpdateNotice_Scoop => Get("UpdateNotice.Scoop");
     public static string UpdateNotice_ScoopGlobal => Get("UpdateNotice.ScoopGlobal");
     public static string UpdateNotice_UpdateNow => Get("UpdateNotice.UpdateNow");
+    public static string UpdateNotice_Updated => Get("UpdateNotice.Updated");
+    public static string UpdateNotice_WhatsNew => Get("UpdateNotice.WhatsNew");
     public static string Version_Display => Get("Version.Display");
     public static string Window_About_Title => Get("Window.About.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");

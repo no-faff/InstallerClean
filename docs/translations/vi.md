@@ -338,6 +338,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking the download... | Đang kiểm tra bản tải về... |
 | The update couldn't be downloaded. | Không thể tải về bản cập nhật. |
 | The update couldn't be installed. | Không thể cài đặt bản cập nhật. |
+| InstallerClean has been updated to {0}. | InstallerClean đã được cập nhật lên phiên bản {0}. |
+| What's new | Có gì mới |
 | Couldn't reach GitHub. Check your internet connection and try again. | Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Lần kiểm tra cập nhật đã nhận về một lỗi thay vì trang phát hành của GitHub. Hãy thử lại sau, hoặc mở [trang phát hành] trong trình duyệt của bạn. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Lần kiểm tra cập nhật không xác định được phiên bản nào là mới nhất từ phản hồi của GitHub. Hãy thử lại sau, hoặc mở [trang phát hành] trong trình duyệt của bạn. |
@@ -416,6 +418,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó. |
 | Download it from github | Tải về từ github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Mở các bản phát hành của InstallerClean trên github trong trình duyệt của bạn, bản mới nhất trước. |
 | Download .NET Framework 4.8 from Microsoft | Tải .NET Framework 4.8 về từ Microsoft |
 | Copy the command | Sao chép lệnh |
 | Scoop's update command | Lệnh cập nhật của Scoop |

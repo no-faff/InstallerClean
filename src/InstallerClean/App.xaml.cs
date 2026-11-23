@@ -510,6 +510,13 @@ public partial class App : Application
                 return;
             }
 
+            // The record of the newest version run in this Windows account, read before
+            // anything this start does writes settings.json or last-run.json, whose presence
+            // is what shows an earlier version ran where there is no record. This version is
+            // recorded only as the main window is built, below.
+            var versionRecord = new NewestVersionRecord();
+            var versionReading = versionRecord.Read(NewestVersionRecord.Running());
+
             // What an update left behind, in the background: what a replace left beside this
             // exe, and the folder a newer setup ran from. After the signal, and only once this
             // version's own code is running, so a newer version that never starts never
@@ -610,6 +617,16 @@ public partial class App : Application
                     viewModel.Chrome.IsOfferingUpdate ? Task.CompletedTask : viewModel.ScanCardDecided,
                     Task.Delay(ease));
             }
+
+            // This version is recorded as run once the start has come this far, so a start
+            // closed before the main window shows says InstallerClean has been updated at the
+            // next one. The line is set before the window is built, which reads it out. A
+            // start following a language change carries on its session, so it shows the line
+            // wherever that session still did.
+            if (versionRecord.Record(versionReading)
+                || (StartedAfterLanguageChange(e.Args) && args.Any(a =>
+                    string.Equals(a, SaidUpdatedArgument, StringComparison.OrdinalIgnoreCase))))
+                viewModel.Chrome.ShowUpdatedAtStart(versionReading.Running.ToString(3));
 
             var window = new MainWindow(viewModel);
             Application.Current.MainWindow = window;
@@ -946,6 +963,10 @@ public partial class App : Application
     /// </summary>
     public void RelaunchForLanguageChange()
     {
+        // Carried only while the line still shows: a check that found a newer version
+        // since has put the notice in its place.
+        var saidUpdated = _services?.GetService<MainViewModel>()?.Chrome.ShowsUpdatedNotice == true;
+
         // Nulled so OnExit's own _services?.Dispose() is a no-op rather than a
         // second teardown; the flush obligation stays in the one place that has
         // always held it, MainViewModel.Dispose.
@@ -956,7 +977,9 @@ public partial class App : Application
 
         var exePath = Environment.ProcessPath;
         if (exePath is not null)
-            Process.Start(new ProcessStartInfo(exePath, LanguageChangedArgument) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(exePath,
+                saidUpdated ? $"{LanguageChangedArgument} {SaidUpdatedArgument}" : LanguageChangedArgument)
+            { UseShellExecute = true });
 
         Shutdown();
     }
@@ -968,6 +991,14 @@ public partial class App : Application
     /// where its check finds one. It changes nothing else.
     /// </summary>
     private const string LanguageChangedArgument = "/languagechanged";
+
+    /// <summary>
+    /// What the language relaunch passes beside <see cref="LanguageChangedArgument"/>
+    /// where the line saying InstallerClean has been updated still shows in the session
+    /// it carries on, so the new process shows it too, its own start having found this
+    /// version already recorded.
+    /// </summary>
+    private const string SaidUpdatedArgument = "/saidupdated";
 
     private static bool StartedAfterLanguageChange(string[] args) =>
         args.Any(a => string.Equals(a, LanguageChangedArgument, StringComparison.OrdinalIgnoreCase));

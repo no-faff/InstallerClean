@@ -340,6 +340,8 @@ Where German needs a different form of a line for some counts, the form is in a 
 | Checking the download... | Download wird geprüft... |
 | The update couldn't be downloaded. | Das Update konnte nicht heruntergeladen werden. |
 | The update couldn't be installed. | Das Update konnte nicht installiert werden. |
+| InstallerClean has been updated to {0}. | InstallerClean wurde auf {0} aktualisiert. |
+| What's new | Neuigkeiten |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub war nicht erreichbar. Prüfe deine Internetverbindung und versuch es erneut. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Die Update-Prüfung hat statt der Releases-Seite von GitHub einen Fehler erhalten. Versuch es später erneut oder öffne [die Releases-Seite] in deinem Browser. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Die Update-Prüfung konnte der Antwort von GitHub nicht entnehmen, welche Version die neueste ist. Versuch es später erneut oder öffne [die Releases-Seite] in deinem Browser. |
@@ -418,6 +420,7 @@ Where German needs a different form of a line for some counts, the form is in a 
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Zeigt die Lizenzen der Schriften, Symbole und des Codes, die InstallerClean enthält. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Wenn aktiviert, sucht InstallerClean beim Start auf github nach einer neueren Version. |
 | Download it from github | Von github herunterladen |
+| Opens InstallerClean's releases on github in your browser, newest first. | Öffnet die Releases von InstallerClean auf github in deinem Browser, das neueste zuerst. |
 | Download .NET Framework 4.8 from Microsoft | .NET Framework 4.8 von Microsoft herunterladen |
 | Copy the command | Befehl kopieren |
 | Scoop's update command | Aktualisierungsbefehl für Scoop |

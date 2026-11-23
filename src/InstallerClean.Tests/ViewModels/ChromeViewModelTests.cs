@@ -332,6 +332,49 @@ public class ChromeViewModelTests
         _windowService.Received(1).OpenUrl(ReleasesPage);
     }
 
+    // ---- The line saying InstallerClean has been updated ----
+
+    // Where What's new goes: every release, newest first, written out rather than built.
+    private const string ReleasesList = "https://github.com/no-faff/InstallerClean/releases";
+
+    [Fact]
+    public void The_updated_line_shows_once_set_at_start_and_What_s_new_opens_the_releases()
+    {
+        var vm = CreateViewModel();
+        var raised = 0;
+        vm.OpenReleasesCommand.CanExecuteChanged += (_, _) => raised++;
+        Assert.False(vm.ShowsUpdatedNotice);
+        Assert.False(vm.OpenReleasesCommand.CanExecute(null));
+
+        vm.ShowUpdatedAtStart("3.8.0");
+
+        Assert.True(vm.ShowsUpdatedNotice);
+        Assert.True(vm.OpenReleasesCommand.CanExecute(null));
+        Assert.True(raised > 0);
+        vm.OpenReleasesCommand.Execute(null);
+        _windowService.Received(1).OpenUrl(ReleasesList);
+        Assert.Equal(string.Format(Strings.UpdateNotice_Updated, "3.8.0"), vm.UpdatedNoticeText);
+    }
+
+    [Fact]
+    public async Task A_newer_version_found_takes_the_updated_line_s_place()
+    {
+        CheckAnswers(new UpdateAvailable("3.8.0", "9.9.9"));
+        var vm = CreateViewModel();
+        vm.ShowUpdatedAtStart("3.8.0");
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        await vm.RunAutomaticUpdateCheckAsync();
+
+        Assert.True(vm.HasNewerVersion);
+        Assert.False(vm.ShowsUpdatedNotice);
+        Assert.Contains(nameof(ChromeViewModel.ShowsUpdatedNotice), changed);
+        Assert.False(vm.OpenReleasesCommand.CanExecute(null));
+        vm.OpenReleasesCommand.Execute(null);
+        _windowService.DidNotReceive().OpenUrl(ReleasesList);
+    }
+
     // ---- Update now ----
 
     private readonly IAppUpdater _updater = Substitute.For<IAppUpdater>();

@@ -86,6 +86,13 @@ public sealed class UpdateCheckService : IUpdateCheckService
     public static string ReleasePageUrl(string version) =>
         $"https://github.com/no-faff/InstallerClean/releases/tag/v{version}";
 
+    /// <summary>
+    /// Every release, newest first, each with its notes: what What's new opens. Somebody
+    /// several releases behind finds every release since theirs on it, and somebody one
+    /// behind finds that one at the top.
+    /// </summary>
+    public const string ReleasesListUrl = "https://github.com/no-faff/InstallerClean/releases";
+
     private static readonly Uri ReleasesPage = new(ReleasesPageUrl);
 
     // How a crash.log entry for a failed check opens. It names what was asked

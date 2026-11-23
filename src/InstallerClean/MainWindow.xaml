@@ -248,6 +248,35 @@
                 </DockPanel>
             </Border>
 
+            <!-- InstallerClean has been updated to this version, on the first start of this
+                 version in this Windows account, for that session, with What's new beside it.
+                 In the notice's place and its panel, and gone wherever a check finds a newer
+                 version, which the notice then says instead. The code-behind reads the line
+                 out where it would read the notice. -->
+            <Border Grid.Row="0" Style="{StaticResource UpdateNoticePanel}"
+                    Margin="{StaticResource GapBottom.Lg}"
+                    Visibility="{Binding Chrome.ShowsUpdatedNotice, Converter={StaticResource BoolToVis}}">
+                <DockPanel>
+                    <Path DockPanel.Dock="Left" Data="{StaticResource Icon.Update}"
+                          Stroke="{StaticResource Link.Rest}" StrokeThickness="2" Fill="{x:Null}"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                          Width="{a11y:TextScaled 20}" Height="{a11y:TextScaled 20}" Stretch="Uniform"
+                          VerticalAlignment="Top" Margin="{StaticResource GapRight.Sm}"/>
+                    <WrapPanel>
+                        <TextBlock x:Name="UpdatedNoticeLine" Text="{Binding Chrome.UpdatedNoticeText}"
+                                   Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}"
+                                   TextWrapping="Wrap" Margin="0,0,16,0" VerticalAlignment="Center"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <TextBlock FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap" VerticalAlignment="Center">
+                            <Hyperlink x:Name="UpdatedNoticeWhatsNewLink"
+                                       Command="{Binding Chrome.OpenReleasesCommand}"
+                                       Style="{StaticResource SubtleLink}"
+                                       AutomationProperties.HelpText="{loc:Translate Automation.UpdateNotice.WhatsNew.HelpText}"><Run Text="{loc:Translate UpdateNotice.WhatsNew}"/></Hyperlink>
+                        </TextBlock>
+                    </WrapPanel>
+                </DockPanel>
+            </Border>
+
             <!-- Context: scan results. The explanation and counts sit in
                  a star row inside a ScrollViewer (NOT a StackPanel row: a
                  vertical StackPanel measures children at infinite height,

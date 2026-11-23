@@ -338,6 +338,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking the download... | ダウンロードしたファイルを確認中... |
 | The update couldn't be downloaded. | 更新をダウンロードできませんでした。 |
 | The update couldn't be installed. | 更新をインストールできませんでした。 |
+| InstallerClean has been updated to {0}. | InstallerClean は {0} に更新されました。 |
+| What's new | 更新内容 |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub に到達できませんでした。インターネット接続を確認して再試行してください。 |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | 更新の確認で、GitHub のリリースページではなくエラーを受け取りました。後でもう一度試すか、ブラウザーで[リリースページ]を開いてください。 |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | 更新の確認で、GitHub の応答からどのバージョンが最新かを判断できませんでした。後でもう一度試すか、ブラウザーで[リリースページ]を開いてください。 |
@@ -416,6 +418,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。 |
 | If ticked, InstallerClean checks github for a newer version when you run it. | チェックを入れると、InstallerClean は起動時に github で新しいバージョンを確認します。 |
 | Download it from github | github からダウンロード |
+| Opens InstallerClean's releases on github in your browser, newest first. | ブラウザで github の InstallerClean のリリース一覧を新しい順に開きます。 |
 | Download .NET Framework 4.8 from Microsoft | Microsoft から .NET Framework 4.8 をダウンロード |
 | Copy the command | コマンドをコピー |
 | Scoop's update command | Scoop の更新コマンド |

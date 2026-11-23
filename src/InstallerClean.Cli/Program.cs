@@ -566,6 +566,13 @@ internal static class Program
             UpdateStagingFolder.RemoveLeftovers(UpdateStagingFolder.DefaultRoot);
         }
 
+        // On an account's first run, this version is recorded as run, so the window opening
+        // later as the same version does not take what this run writes for an earlier
+        // version's. A run standing for another copy is a newer version that has not yet
+        // taken that copy's place, so it leaves the record alone.
+        if (s_standsFor is null)
+            new NewestVersionRecord().RecordFirstRun(NewestVersionRecord.Running());
+
         var update = cts.IsCancellationRequested
             ? UpdateConclusion.GoesOn
             : RunUpdate(arg, args, invocation, updateHost, cts.Token);
@@ -670,7 +677,7 @@ internal static class Program
         if (!report.CanAsk || token.IsCancellationRequested) return;
         var offer = new ConsoleReportOffer(
             console, resultLog, settings,
-            PathText.Combine(AppDataFolder.Location, "last-run.json"),
+            PathText.Combine(AppDataFolder.Location, ResultLogService.FileName),
             ReadmeLinks.For("reports-stats", Localisation.UiCulture),
             () => CancelKey.Process.Closing,
             CommandLineUpdate.ControlCBound,

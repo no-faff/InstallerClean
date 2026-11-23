@@ -338,6 +338,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking the download... | 내려받은 파일을 확인하는 중... |
 | The update couldn't be downloaded. | 업데이트를 내려받지 못했습니다. |
 | The update couldn't be installed. | 업데이트를 설치하지 못했습니다. |
+| InstallerClean has been updated to {0}. | InstallerClean이 {0} 버전으로 업데이트되었습니다. |
+| What's new | 변경 사항 |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | 업데이트 확인에서 GitHub의 릴리스 페이지 대신 오류를 받았습니다. 나중에 다시 시도하거나 브라우저에서 [릴리스 페이지]를 여세요. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | 업데이트 확인에서 GitHub의 응답으로는 어느 버전이 최신인지 알 수 없었습니다. 나중에 다시 시도하거나 브라우저에서 [릴리스 페이지]를 여세요. |
@@ -416,6 +418,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean에 포함된 글꼴, 아이콘, 코드의 라이선스를 표시합니다. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다. |
 | Download it from github | github에서 내려받기 |
+| Opens InstallerClean's releases on github in your browser, newest first. | 브라우저에서 github의 InstallerClean 릴리스 목록을 최신순으로 엽니다. |
 | Download .NET Framework 4.8 from Microsoft | Microsoft에서 .NET Framework 4.8 내려받기 |
 | Copy the command | 명령 복사 |
 | Scoop's update command | Scoop 업데이트 명령 |

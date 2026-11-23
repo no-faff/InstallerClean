@@ -663,6 +663,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  Affiche les avis de tiers`,
   'Startup.NeedsWindows10Version1607': `InstallerClean nécessite Windows 10 version 1607 ou ultérieure, ou Windows 11.`,
   'Cli.ReportCancelledWhileSending': `Annulé pendant l’envoi du rapport. Il est peut-être parvenu quand même.`,
+  'UpdateNotice.Updated': `InstallerClean a été mis à jour vers la version {0}.`,
+  'UpdateNotice.WhatsNew': `Nouveautés`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Ouvre les versions d'InstallerClean sur github dans votre navigateur, de la plus récente à la plus ancienne.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

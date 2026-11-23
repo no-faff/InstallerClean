@@ -35,7 +35,10 @@ public sealed class SettingsService : ISettingsService
     // the update-check opt-out on the dispatcher.
     private readonly object _ioGate = new();
 
-    public SettingsService() : this(PathText.Combine(AppDataFolder.Location, "settings.json")) { }
+    /// <summary>The settings' file name in the app's folder (<see cref="AppDataFolder"/>).</summary>
+    internal const string FileName = "settings.json";
+
+    public SettingsService() : this(PathText.Combine(AppDataFolder.Location, FileName)) { }
 
     internal SettingsService(string settingsFile)
     {

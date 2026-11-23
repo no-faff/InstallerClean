@@ -338,6 +338,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking the download... | Memeriksa unduhan... |
 | The update couldn't be downloaded. | Pembaruan tidak dapat diunduh. |
 | The update couldn't be installed. | Pembaruan tidak dapat dipasang. |
+| InstallerClean has been updated to {0}. | InstallerClean telah diperbarui ke versi {0}. |
+| What's new | Yang baru |
 | Couldn't reach GitHub. Check your internet connection and try again. | Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | Pemeriksaan pembaruan menerima kesalahan alih-alih halaman rilis GitHub. Coba lagi nanti, atau buka [halaman rilis] di browser Anda. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | Pemeriksaan pembaruan tidak bisa mengetahui versi mana yang terbaru dari jawaban GitHub. Coba lagi nanti, atau buka [halaman rilis] di browser Anda. |
@@ -416,6 +418,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Menampilkan lisensi font, ikon, dan kode yang disertakan dalam InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya. |
 | Download it from github | Unduh dari github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Membuka rilis InstallerClean di github melalui browser Anda, mulai dari yang terbaru. |
 | Download .NET Framework 4.8 from Microsoft | Unduh .NET Framework 4.8 dari Microsoft |
 | Copy the command | Salin perintah |
 | Scoop's update command | Perintah pembaruan Scoop |

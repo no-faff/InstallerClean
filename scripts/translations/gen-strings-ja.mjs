@@ -581,6 +581,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  サードパーティ通知を表示`,
   'Startup.NeedsWindows10Version1607': `InstallerClean には Windows 10 バージョン 1607 以降、または Windows 11 が必要です。`,
   'Cli.ReportCancelledWhileSending': `レポートの送信中にキャンセルされました。レポートはそれでも届いている可能性があります。`,
+  'UpdateNotice.Updated': `InstallerClean は {0} に更新されました。`,
+  'UpdateNotice.WhatsNew': `更新内容`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `ブラウザで github の InstallerClean のリリース一覧を新しい順に開きます。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

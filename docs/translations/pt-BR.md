@@ -340,6 +340,8 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | Checking the download... | Verificando o download... |
 | The update couldn't be downloaded. | Não foi possível baixar a atualização. |
 | The update couldn't be installed. | Não foi possível instalar a atualização. |
+| InstallerClean has been updated to {0}. | O InstallerClean foi atualizado para a versão {0}. |
+| What's new | Novidades |
 | Couldn't reach GitHub. Check your internet connection and try again. | Não foi possível acessar o GitHub. Verifique a sua conexão com a internet e tente de novo. |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | A verificação de atualizações recebeu um erro em vez da página de versões do GitHub. Tente de novo mais tarde, ou abra [a página de versões] no navegador. |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | A verificação de atualizações não conseguiu saber, pela resposta do GitHub, qual é a versão mais recente. Tente de novo mais tarde, ou abra [a página de versões] no navegador. |
@@ -418,6 +420,7 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Mostra as licenças das fontes, dos ícones e do código que o InstallerClean inclui. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se marcada, o InstallerClean consulta o github em busca de uma versão mais recente quando você o executa. |
 | Download it from github | Baixe no github |
+| Opens InstallerClean's releases on github in your browser, newest first. | Abre as versões do InstallerClean no github no seu navegador, da mais recente para a mais antiga. |
 | Download .NET Framework 4.8 from Microsoft | Baixe o .NET Framework 4.8 no site da Microsoft |
 | Copy the command | Copiar o comando |
 | Scoop's update command | Comando de atualização do Scoop |

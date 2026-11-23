@@ -6,6 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- The first time a newer version of InstallerClean opens in a Windows account where an earlier version ran, a line at the top of the main window says InstallerClean has been updated to that version, with a What's new link to InstallerClean's releases on GitHub, newest first. It shows for that session. The newest version run in the account is recorded in newest-version-run.txt, beside settings.json.
 - About has a Third-party notices link, which opens the notices and licences for the fonts, icons and code libraries InstallerClean includes in a window of their own. `installerclean-cli --notices` prints the same text. Every copy carries it inside itself.
 
 ### Changed

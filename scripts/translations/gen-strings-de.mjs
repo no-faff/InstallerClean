@@ -673,6 +673,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  Die Hinweise zu Drittanbietern ausgeben`,
   'Startup.NeedsWindows10Version1607': `InstallerClean benötigt Windows 10 ab Version 1607 oder Windows 11.`,
   'Cli.ReportCancelledWhileSending': `Beim Senden des Berichts abgebrochen. Er kann trotzdem angekommen sein.`,
+  'UpdateNotice.Updated': `InstallerClean wurde auf {0} aktualisiert.`,
+  'UpdateNotice.WhatsNew': `Neuigkeiten`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Öffnet die Releases von InstallerClean auf github in deinem Browser, das neueste zuerst.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

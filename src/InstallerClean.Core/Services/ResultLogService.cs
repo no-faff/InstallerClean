@@ -78,7 +78,10 @@ public sealed class ResultLogService : IResultLogService
         MaxResponseContentBufferSize = 4 * 1024,
     };
 
-    public ResultLogService() : this(PathText.Combine(AppDataFolder.Location, "last-run.json")) { }
+    /// <summary>The report's file name in the app's folder (<see cref="AppDataFolder"/>).</summary>
+    internal const string FileName = "last-run.json";
+
+    public ResultLogService() : this(PathText.Combine(AppDataFolder.Location, FileName)) { }
 
     /// <summary>
     /// Test seam, mirroring <see cref="SettingsService"/>'s next door: points

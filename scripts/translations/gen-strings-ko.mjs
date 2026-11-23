@@ -656,6 +656,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  타사 고지 사항 출력`,
   'Startup.NeedsWindows10Version1607': `InstallerClean에는 Windows 10 버전 1607 이상 또는 Windows 11이 필요합니다.`,
   'Cli.ReportCancelledWhileSending': `보고서를 보내는 중에 취소되었습니다. 보고서가 이미 도착했을 수도 있습니다.`,
+  'UpdateNotice.Updated': `InstallerClean이 {0} 버전으로 업데이트되었습니다.`,
+  'UpdateNotice.WhatsNew': `변경 사항`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `브라우저에서 github의 InstallerClean 릴리스 목록을 최신순으로 엽니다.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

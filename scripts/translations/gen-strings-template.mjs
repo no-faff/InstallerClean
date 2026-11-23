@@ -719,6 +719,9 @@ const MAP = {
   'Error.NothingRemoved': `Nothing has been removed.`,
   'Error.NothingOfferedNothingRemoved': `No file has been listed as safe to delete and nothing has been removed.`,
   'Cli.ReportCancelledWhileSending': `Cancelled while sending the report. It may have arrived anyway.`,
+  'UpdateNotice.Updated': `InstallerClean has been updated to {0}.`,
+  'UpdateNotice.WhatsNew': `What's new`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Opens InstallerClean's releases on github in your browser, newest first.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -37,11 +37,12 @@ public partial class MainWindow : Window
     private bool _missingFromDiskToAnnounce;
 
     /// <summary>
-    /// Whether the notice saying a newer version is available appeared while something
-    /// stood in front of the main window and waits to be read, first, at the next point
-    /// the window is in front, as the two warnings above do. Not set where the card a
-    /// scan puts up carries the notice, since the card reads it out with its outcome.
-    /// See <see cref="OnNewerVersionFound"/>, which sets it.
+    /// Whether the notice saying a newer version is available, or the line saying
+    /// InstallerClean has been updated in its place, appeared while something stood in
+    /// front of the main window and waits to be read, first, at the next point the
+    /// window is in front, as the two warnings above do. Not set where the card a scan
+    /// puts up carries the notice, since the card reads it out with its outcome. See
+    /// <see cref="OnNewerVersionFound"/>, which sets it.
     /// </summary>
     private bool _updateNoticeToAnnounce;
 
@@ -78,9 +79,11 @@ public partial class MainWindow : Window
         _missingFromDiskToAnnounce = _vm.Scan.HasMissingFromDisk;
         // The automatic update check has answered by now. Where it found a newer
         // version the window opens with the card saying so, which says the same two
-        // lines. Otherwise the notice at the top is read first, ahead of the replay
-        // below, or as the startup card closes where one is up.
-        _updateNoticeToAnnounce = _vm.Chrome.HasNewerVersion && !_vm.Chrome.IsOfferingUpdate;
+        // lines. Otherwise the notice at the top, or the line saying InstallerClean has
+        // been updated, is read first, ahead of the replay below, or as the startup card
+        // closes where one is up.
+        _updateNoticeToAnnounce = (_vm.Chrome.HasNewerVersion || _vm.Chrome.ShowsUpdatedNotice)
+            && !_vm.Chrome.IsOfferingUpdate;
         if (_vm.Chrome.IsOfferingUpdate)
             ShowUpdateOffer();
         else
@@ -618,10 +621,16 @@ public partial class MainWindow : Window
     /// <summary>
     /// Reads out the notice's lines at the top of the main window: its two lines, then on
     /// a copy installed by Scoop the line saying how to update it, whose spoken name
-    /// carries the command.
+    /// carries the command. Where the line saying InstallerClean has been updated stands
+    /// there instead, that line.
     /// </summary>
     private void AnnounceUpdateNotice()
     {
+        if (_vm.Chrome.ShowsUpdatedNotice)
+        {
+            AnnounceLiveRegion(UpdatedNoticeLine, () => _vm.Chrome.ShowsUpdatedNotice);
+            return;
+        }
         AnnounceLiveRegion(UpdateNoticeLead, () => _vm.Chrome.HasNewerVersion);
         AnnounceLiveRegion(UpdateNoticeDetail, () => _vm.Chrome.HasNewerVersion);
         if (_vm.Chrome.ShowsScoopCommand)

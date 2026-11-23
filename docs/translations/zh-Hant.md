@@ -338,6 +338,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checking the download... | 正在檢查下載的檔案... |
 | The update couldn't be downloaded. | 無法下載更新。 |
 | The update couldn't be installed. | 無法安裝更新。 |
+| InstallerClean has been updated to {0}. | InstallerClean 已更新至 {0} 版。 |
+| What's new | 更新內容 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 無法連線到 GitHub。請檢查您的網際網路連線，然後再試一次。 |
 | The update check received an error instead of GitHub's releases page. Try again later, or open [the releases page] in your browser. | 更新檢查收到的是一個錯誤，而不是 GitHub 的發行頁面。請稍後再試，或在瀏覽器中開啟[發行頁面]。 |
 | The update check couldn't tell which version is the newest from GitHub's answer. Try again later, or open [the releases page] in your browser. | 更新檢查無法從 GitHub 的回應中判斷哪個版本是最新的。請稍後再試，或在瀏覽器中開啟[發行頁面]。 |
@@ -416,6 +418,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Shows the licences of the fonts, icons and code InstallerClean includes. | 顯示 InstallerClean 所含字型、圖示和程式碼的授權條款。 |
 | If ticked, InstallerClean checks github for a newer version when you run it. | 勾選後，InstallerClean 每次執行時都會在 github 上檢查是否有較新的版本。 |
 | Download it from github | 從 github 下載 |
+| Opens InstallerClean's releases on github in your browser, newest first. | 在瀏覽器中開啟 github 上 InstallerClean 的所有發行版本，最新的在前。 |
 | Download .NET Framework 4.8 from Microsoft | 從 Microsoft 下載 .NET Framework 4.8 |
 | Copy the command | 複製命令 |
 | Scoop's update command | Scoop 更新命令 |

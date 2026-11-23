@@ -568,6 +568,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  顯示第三方聲明`,
   'Startup.NeedsWindows10Version1607': `InstallerClean 需要 Windows 10 版本 1607 或更新版本，或 Windows 11。`,
   'Cli.ReportCancelledWhileSending': `傳送報告時已取消。報告仍可能已送達。`,
+  'UpdateNotice.Updated': `InstallerClean 已更新至 {0} 版。`,
+  'UpdateNotice.WhatsNew': `更新內容`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `在瀏覽器中開啟 github 上 InstallerClean 的所有發行版本，最新的在前。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

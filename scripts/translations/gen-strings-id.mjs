@@ -680,6 +680,9 @@ const MAP = {
   'Cli.Help.Notices': `  installerclean-cli --notices  Cetak pemberitahuan pihak ketiga`,
   'Startup.NeedsWindows10Version1607': `InstallerClean memerlukan Windows 10 versi 1607 atau yang lebih baru, atau Windows 11.`,
   'Cli.ReportCancelledWhileSending': `Dibatalkan saat laporan dikirim. Laporan mungkin tetap sampai.`,
+  'UpdateNotice.Updated': `InstallerClean telah diperbarui ke versi {0}.`,
+  'UpdateNotice.WhatsNew': `Yang baru`,
+  'Automation.UpdateNotice.WhatsNew.HelpText': `Membuka rilis InstallerClean di github melalui browser Anda, mulai dari yang terbaru.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,
