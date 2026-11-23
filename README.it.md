@@ -37,10 +37,10 @@
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che si riempie man mano che installi e aggiorni software. Dopo una scansione rapida ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia spostarli altrove oppure eliminarli per liberare spazio sull'unità C:.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. InstallerClean sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice quali puoi rimuovere in sicurezza.
-- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e alcuni hanno liberato centinaia di GB. Più software basato su MSI installi, più file non necessari avrai.
+- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->21,5%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e alcuni hanno liberato centinaia di GB. Più software basato su MSI installi, più file non necessari avrai.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 142.145 download</summary>
+  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 142.459 download</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-it-scaled-dark.svg" />
