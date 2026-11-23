@@ -59,6 +59,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | Guide and FAQ | Hướng dẫn và câu hỏi thường gặp |
+| What's new in this version | Có gì mới trong phiên bản này |
 | Report a problem | Báo cáo vấn đề |
 | Third-party notices | Thông báo của bên thứ ba |
 | Check for updates automatically | Tự động kiểm tra cập nhật |
@@ -414,6 +415,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Kiểm tra cập nhật |
 | Checks github's releases page for a newer version. | Kiểm tra trang phát hành của github xem có phiên bản mới hơn không. |
 | Opens the readme on github in your browser. | Mở readme trên github trong trình duyệt của bạn. |
+| Opens this version's release page on github in your browser. | Mở trang của phiên bản này trên github trong trình duyệt của bạn. |
 | Opens the issue tracker on github.com in your browser. | Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó. |

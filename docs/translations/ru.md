@@ -61,6 +61,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | English | Русский |
 | --- | --- |
 | Guide and FAQ | Руководство и частые вопросы |
+| What's new in this version | Что нового в этой версии |
 | Report a problem | Сообщить о проблеме |
 | Third-party notices | Уведомления третьих сторон |
 | Check for updates automatically | Автоматически проверять обновления |
@@ -424,6 +425,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Check for updates | Проверить обновления |
 | Checks github's releases page for a newer version. | Проверяет на странице выпусков github, есть ли более новая версия. |
 | Opens the readme on github in your browser. | Открывает readme на github в вашем браузере. |
+| Opens this version's release page on github in your browser. | Открывает страницу этой версии на github в вашем браузере. |
 | Opens the issue tracker on github.com in your browser. | Открывает список проблем (Issues) на github.com в вашем браузере. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Показывает лицензии шрифтов, значков и кода, входящих в InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Если флажок установлен, InstallerClean при запуске проверяет на github наличие более новой версии. |

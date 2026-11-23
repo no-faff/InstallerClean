@@ -8932,6 +8932,42 @@
       "vi": "eb08fcc3822dde52",
       "zh-Hans": "eb08fcc3822dde52",
       "zh-Hant": "eb08fcc3822dde52"
+    },
+    "About.Link.WhatsNew": {
+      "de": "58f56e4f79a227a0",
+      "es": "58f56e4f79a227a0",
+      "fr": "58f56e4f79a227a0",
+      "id": "58f56e4f79a227a0",
+      "it": "58f56e4f79a227a0",
+      "ja": "58f56e4f79a227a0",
+      "ko": "58f56e4f79a227a0",
+      "nl": "58f56e4f79a227a0",
+      "pl": "58f56e4f79a227a0",
+      "pt-BR": "58f56e4f79a227a0",
+      "ru": "58f56e4f79a227a0",
+      "tr": "58f56e4f79a227a0",
+      "uk": "58f56e4f79a227a0",
+      "vi": "58f56e4f79a227a0",
+      "zh-Hans": "58f56e4f79a227a0",
+      "zh-Hant": "58f56e4f79a227a0"
+    },
+    "Automation.About.WhatsNew.HelpText": {
+      "de": "b2ebe565933d2c6a",
+      "es": "b2ebe565933d2c6a",
+      "fr": "b2ebe565933d2c6a",
+      "id": "b2ebe565933d2c6a",
+      "it": "b2ebe565933d2c6a",
+      "ja": "b2ebe565933d2c6a",
+      "ko": "b2ebe565933d2c6a",
+      "nl": "b2ebe565933d2c6a",
+      "pl": "b2ebe565933d2c6a",
+      "pt-BR": "b2ebe565933d2c6a",
+      "ru": "b2ebe565933d2c6a",
+      "tr": "b2ebe565933d2c6a",
+      "uk": "b2ebe565933d2c6a",
+      "vi": "b2ebe565933d2c6a",
+      "zh-Hans": "b2ebe565933d2c6a",
+      "zh-Hant": "b2ebe565933d2c6a"
     }
   }
 }

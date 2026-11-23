@@ -25,10 +25,13 @@
             <!-- Version -->
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
-            <!-- The four link lines (guide, issue tracker, licence, notices) at
-                 a tighter 6 apart: all four render as links, so they read as
-                 one block, and the wider gaps either side separate that block
-                 from the version above and the checkbox below. -->
+            <!-- The five link lines (guide, this version's release page, issue
+                 tracker, licence, notices) at a tighter 6 apart: all five render
+                 as links, so they read as one block, and the wider gaps either
+                 side separate that block from the version above and the checkbox
+                 below. -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
@@ -105,14 +108,24 @@
                        AutomationProperties.HelpText="{loc:Translate Automation.About.Guide.HelpText}"><Run Text="{loc:Translate About.Link.Guide}"/></Hyperlink>
         </TextBlock>
 
+        <!-- This version's own release page on GitHub, which says what the version
+             changed. The address names the version shown above, so it is set in
+             code-behind (UpdateCheckService.ThisVersionReleasePageUrl). -->
         <TextBlock Grid.Row="7" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
+            <Hyperlink x:Name="WhatsNewLink"
+                       Click="Hyperlink_Click"
+                       Style="{StaticResource SubtleLink}"
+                       AutomationProperties.HelpText="{loc:Translate Automation.About.WhatsNew.HelpText}"><Run Text="{loc:Translate About.Link.WhatsNew}"/></Hyperlink>
+        </TextBlock>
+
+        <TextBlock Grid.Row="9" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/issues"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}"
                        AutomationProperties.HelpText="{loc:Translate Automation.About.ReportProblem.HelpText}"><Run Text="{loc:Translate About.Link.ReportProblem}"/></Hyperlink>
         </TextBlock>
 
-        <TextBlock Grid.Row="9" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
+        <TextBlock Grid.Row="11" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}"
@@ -122,7 +135,7 @@
         <!-- The notices of the third-party work inside the app, from the copy of
              THIRD-PARTY-NOTICES this exe carries, in a window of its own: the
              one link here that stays inside the app. -->
-        <TextBlock Grid.Row="11" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
+        <TextBlock Grid.Row="13" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink Click="NoticesClick"
                        Style="{StaticResource SubtleLink}"
                        AutomationProperties.HelpText="{loc:Translate Automation.About.Notices.HelpText}"><Run Text="{loc:Translate About.Link.Notices}"/></Hyperlink>
@@ -139,7 +152,7 @@
              Checked/Unchecked are attached in code-behind, not here: the
              constructor's own assignment of IsChecked would otherwise fire
              the handler and write the setting back on every open. -->
-        <CheckBox Grid.Row="13" x:Name="AutoUpdateCheckBox"
+        <CheckBox Grid.Row="15" x:Name="AutoUpdateCheckBox"
                   HorizontalAlignment="Left"
                   Content="{loc:Translate About.AutoUpdateCheck}"
                   AutomationProperties.HelpText="{loc:Translate Automation.AutoUpdateCheck.HelpText}"/>
@@ -149,7 +162,7 @@
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
              Text.Body matches MOVE LOCATION and the registered-
              window PRODUCTS / PATCHES / PRODUCT DETAILS labels. -->
-        <TextBlock Grid.Row="15" Text="{loc:Translate Section.SayThanks}"
+        <TextBlock Grid.Row="17" Text="{loc:Translate Section.SayThanks}"
                    Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
@@ -171,7 +184,7 @@
              margin of the last (or only) line, so an unwrapped row is exactly as
              tall as it was before. Tab order is untouched: a WrapPanel lays out
              in tree order, so star, tip, Close still runs across then down. -->
-        <Grid Grid.Row="17">
+        <Grid Grid.Row="19">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

@@ -61,6 +61,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | English | Українська |
 | --- | --- |
 | Guide and FAQ | Посібник і поширені запитання |
+| What's new in this version | Що нового в цій версії |
 | Report a problem | Повідомити про проблему |
 | Third-party notices | Повідомлення третіх сторін |
 | Check for updates automatically | Автоматично перевіряти оновлення |
@@ -426,6 +427,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | Check for updates | Перевірити оновлення |
 | Checks github's releases page for a newer version. | Перевіряє на сторінці випусків github, чи є новіша версія. |
 | Opens the readme on github in your browser. | Відкриває readme на github у вашому браузері. |
+| Opens this version's release page on github in your browser. | Відкриває сторінку цієї версії на github у вашому браузері. |
 | Opens the issue tracker on github.com in your browser. | Відкриває список проблем (Issues) на github.com у вашому браузері. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Показує ліцензії шрифтів, значків і коду, що входять до InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії. |

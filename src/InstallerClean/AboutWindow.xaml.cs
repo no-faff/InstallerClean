@@ -27,6 +27,9 @@ public partial class AboutWindow : Window
         // README file, and the link has to follow the one on screen.
         GuideLink.NavigateUri = new Uri(ReadmeLinks.Home(Localisation.UiCulture));
 
+        // Set here too: the address names the version shown above, which is this build's.
+        WhatsNewLink.NavigateUri = new Uri(UpdateCheckService.ThisVersionReleasePageUrl());
+
         // Painted from disk, then subscribed. Assigning IsChecked raises
         // Checked, so a handler already attached in XAML would write the
         // setting straight back on every open, and Update is a load, a temp

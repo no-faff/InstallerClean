@@ -88,6 +88,15 @@ public sealed class UpdateCheckService : IUpdateCheckService
         $"https://github.com/no-faff/InstallerClean/releases/tag/v{version}";
 
     /// <summary>
+    /// The release page of this build's own version, which About's "What's new in this
+    /// version" opens: the version About shows above it, as three numbers, whatever a
+    /// Debug build's pretend-version switch says for the check.
+    /// </summary>
+    public static string ThisVersionReleasePageUrl() =>
+        ReleasePageUrl(FormatVersion(NormaliseToBuild(
+            Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0))));
+
+    /// <summary>
     /// Every release, newest first, each with its notes: what What's new opens on the card,
     /// the notice, the line saying InstallerClean has been updated and the command line.
     /// Somebody several releases behind finds every release since theirs on it, and

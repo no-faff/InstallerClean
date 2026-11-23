@@ -61,6 +61,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | English | Italiano |
 | --- | --- |
 | Guide and FAQ | Guida e domande frequenti (FAQ) |
+| What's new in this version | Novità di questa versione |
 | Report a problem | Segnala un problema |
 | Third-party notices | Avvisi di terze parti |
 | Check for updates automatically | Controlla automaticamente gli aggiornamenti |
@@ -416,6 +417,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Check for updates | Controlla aggiornamenti |
 | Checks github's releases page for a newer version. | Verifica sulla pagina release di github se esiste una versione più recente. |
 | Opens the readme on github in your browser. | Apre readme su github nel browser. |
+| Opens this version's release page on github in your browser. | Apre la pagina di questa versione su github nel browser. |
 | Opens the issue tracker on github.com in your browser. | Apre elenco problemi (issue) in github.com nel browser. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Mostra le licenze di caratteri, icone e codice inclusi in InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se selezionata, all'avvio InstallerClean verifica su github se è disponibile una versione più recente. |

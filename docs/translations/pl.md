@@ -61,6 +61,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | English | Polski |
 | --- | --- |
 | Guide and FAQ | Przewodnik i FAQ |
+| What's new in this version | Co nowego w tej wersji |
 | Report a problem | Zgłoś problem |
 | Third-party notices | Uwagi dotyczące innych firm |
 | Check for updates automatically | Automatycznie sprawdzaj aktualizacje |
@@ -423,6 +424,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Check for updates | Sprawdź aktualizacje |
 | Checks github's releases page for a newer version. | Sprawdza na stronie wydań githuba, czy jest nowsza wersja. |
 | Opens the readme on github in your browser. | Otwiera readme na githubie w twojej przeglądarce. |
+| Opens this version's release page on github in your browser. | Otwiera stronę tej wersji na githubie w twojej przeglądarce. |
 | Opens the issue tracker on github.com in your browser. | Otwiera listę zgłoszeń (Issues) na github.com w twojej przeglądarce. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Pokazuje licencje czcionek, ikon i kodu, które zawiera InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na githubie, czy jest nowsza wersja. |

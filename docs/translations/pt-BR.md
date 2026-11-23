@@ -61,6 +61,7 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | English | Português (Brasil) |
 | --- | --- |
 | Guide and FAQ | Guia e perguntas frequentes |
+| What's new in this version | Novidades desta versão |
 | Report a problem | Relatar um problema |
 | Third-party notices | Avisos de terceiros |
 | Check for updates automatically | Verificar atualizações automaticamente |
@@ -416,6 +417,7 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | Check for updates | Verificar atualizações |
 | Checks github's releases page for a newer version. | Consulta a página de versões do github em busca de uma versão mais recente. |
 | Opens the readme on github in your browser. | Abre o readme no github no seu navegador. |
+| Opens this version's release page on github in your browser. | Abre a página desta versão no github no seu navegador. |
 | Opens the issue tracker on github.com in your browser. | Abre o rastreador de problemas (Issues) em github.com no seu navegador. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Mostra as licenças das fontes, dos ícones e do código que o InstallerClean inclui. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se marcada, o InstallerClean consulta o github em busca de uma versão mais recente quando você o executa. |

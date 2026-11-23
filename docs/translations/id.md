@@ -59,6 +59,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Guide and FAQ | Panduan dan FAQ |
+| What's new in this version | Yang baru di versi ini |
 | Report a problem | Laporkan masalah |
 | Third-party notices | Pemberitahuan pihak ketiga |
 | Check for updates automatically | Periksa pembaruan secara otomatis |
@@ -414,6 +415,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Periksa pembaruan |
 | Checks github's releases page for a newer version. | Memeriksa halaman rilis github untuk mencari versi yang lebih baru. |
 | Opens the readme on github in your browser. | Membuka readme di github melalui browser Anda. |
+| Opens this version's release page on github in your browser. | Membuka halaman rilis versi ini di github melalui browser Anda. |
 | Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui browser Anda. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Menampilkan lisensi font, ikon, dan kode yang disertakan dalam InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya. |

@@ -699,6 +699,8 @@ const MAP = {
   'UpdateNotice.Updated': `InstallerClean został zaktualizowany do wersji {0}.`,
   'UpdateNotice.WhatsNew': `Co nowego`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `Otwiera wydania InstallerClean na githubie w twojej przeglądarce, od najnowszego.`,
+  'About.Link.WhatsNew': `Co nowego w tej wersji`,
+  'Automation.About.WhatsNew.HelpText': `Otwiera stronę tej wersji na githubie w twojej przeglądarce.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -59,6 +59,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Guide and FAQ | 안내서 및 자주 묻는 질문 |
+| What's new in this version | 이 버전의 변경 사항 |
 | Report a problem | 문제 신고 |
 | Third-party notices | 타사 고지 사항 |
 | Check for updates automatically | 자동으로 업데이트 확인 |
@@ -414,6 +415,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 업데이트 확인 |
 | Checks github's releases page for a newer version. | github의 릴리스 페이지에서 새 버전이 있는지 확인합니다. |
 | Opens the readme on github in your browser. | 브라우저에서 github의 readme를 엽니다. |
+| Opens this version's release page on github in your browser. | 브라우저에서 github의 이 버전 릴리스 페이지를 엽니다. |
 | Opens the issue tracker on github.com in your browser. | 브라우저에서 github.com의 이슈 트래커를 엽니다. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean에 포함된 글꼴, 아이콘, 코드의 라이선스를 표시합니다. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다. |

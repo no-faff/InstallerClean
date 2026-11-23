@@ -59,6 +59,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 繁體中文 |
 | --- | --- |
 | Guide and FAQ | 指南與常見問題 |
+| What's new in this version | 此版本的更新內容 |
 | Report a problem | 回報問題 |
 | Third-party notices | 第三方聲明 |
 | Check for updates automatically | 自動檢查更新 |
@@ -414,6 +415,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 檢查更新 |
 | Checks github's releases page for a newer version. | 在 github 的發行頁面上檢查是否有較新的版本。 |
 | Opens the readme on github in your browser. | 在瀏覽器中開啟 github 上的 readme。 |
+| Opens this version's release page on github in your browser. | 在瀏覽器中開啟 github 上此版本的發行頁面。 |
 | Opens the issue tracker on github.com in your browser. | 在瀏覽器中開啟 github.com 上的問題追蹤頁面（Issues）。 |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | 顯示 InstallerClean 所含字型、圖示和程式碼的授權條款。 |
 | If ticked, InstallerClean checks github for a newer version when you run it. | 勾選後，InstallerClean 每次執行時都會在 github 上檢查是否有較新的版本。 |

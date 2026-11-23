@@ -584,6 +584,8 @@ Ayrıntılar şuraya yazıldı:
   'UpdateNotice.Updated': `InstallerClean {0} sürümüne güncellendi.`,
   'UpdateNotice.WhatsNew': `Yenilikler`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `github üzerindeki InstallerClean sürümlerini en yenisi başta olmak üzere tarayıcınızda açar.`,
+  'About.Link.WhatsNew': `Bu sürümdeki yenilikler`,
+  'Automation.About.WhatsNew.HelpText': `github üzerindeki bu sürümün sayfasını tarayıcınızda açar.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

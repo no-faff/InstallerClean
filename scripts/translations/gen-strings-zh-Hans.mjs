@@ -563,6 +563,8 @@ const MAP = {
   'UpdateNotice.Updated': `InstallerClean 已更新到 {0} 版。`,
   'UpdateNotice.WhatsNew': `更新内容`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `在浏览器中打开 github 上 InstallerClean 的所有发布版本，最新的在前。`,
+  'About.Link.WhatsNew': `此版本的更新内容`,
+  'Automation.About.WhatsNew.HelpText': `在浏览器中打开 github 上此版本的发布页面。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

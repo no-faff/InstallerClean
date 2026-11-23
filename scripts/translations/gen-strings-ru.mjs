@@ -549,6 +549,8 @@ const MAP = {
   'UpdateNotice.Updated': `InstallerClean обновлён до версии {0}.`,
   'UpdateNotice.WhatsNew': `Что нового`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `Открывает выпуски InstallerClean на github в вашем браузере, начиная с самого нового.`,
+  'About.Link.WhatsNew': `Что нового в этой версии`,
+  'Automation.About.WhatsNew.HelpText': `Открывает страницу этой версии на github в вашем браузере.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT

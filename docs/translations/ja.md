@@ -59,6 +59,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Guide and FAQ | ガイドとよくある質問 |
+| What's new in this version | このバージョンの更新内容 |
 | Report a problem | 問題を報告 |
 | Third-party notices | サードパーティ通知 |
 | Check for updates automatically | 更新を自動的に確認する |
@@ -414,6 +415,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 更新の確認 |
 | Checks github's releases page for a newer version. | github のリリースページで新しいバージョンがあるかどうかを確認します。 |
 | Opens the readme on github in your browser. | ブラウザで github の readme を開きます。 |
+| Opens this version's release page on github in your browser. | ブラウザで github のこのバージョンのリリースページを開きます。 |
 | Opens the issue tracker on github.com in your browser. | ブラウザで github.com の Issue トラッカーを開きます。 |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。 |
 | If ticked, InstallerClean checks github for a newer version when you run it. | チェックを入れると、InstallerClean は起動時に github で新しいバージョンを確認します。 |

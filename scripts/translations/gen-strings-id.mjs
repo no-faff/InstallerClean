@@ -683,6 +683,8 @@ const MAP = {
   'UpdateNotice.Updated': `InstallerClean telah diperbarui ke versi {0}.`,
   'UpdateNotice.WhatsNew': `Yang baru`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `Membuka rilis InstallerClean di github melalui browser Anda, mulai dari yang terbaru.`,
+  'About.Link.WhatsNew': `Yang baru di versi ini`,
+  'Automation.About.WhatsNew.HelpText': `Membuka halaman rilis versi ini di github melalui browser Anda.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

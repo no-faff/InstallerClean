@@ -66,6 +66,7 @@ public static class Strings
     public static string About_Link_Guide => Get("About.Link.Guide");
     public static string About_Link_Notices => Get("About.Link.Notices");
     public static string About_Link_ReportProblem => Get("About.Link.ReportProblem");
+    public static string About_Link_WhatsNew => Get("About.Link.WhatsNew");
     public static string Action_About => Get("Action.About");
     public static string Action_BackupFolderPlaceholder => Get("Action.BackupFolderPlaceholder");
     public static string Action_Browse => Get("Action.Browse");
@@ -91,6 +92,7 @@ public static class Strings
     public static string Automation_About_Guide_HelpText => Get("Automation.About.Guide.HelpText");
     public static string Automation_About_Notices_HelpText => Get("Automation.About.Notices.HelpText");
     public static string Automation_About_ReportProblem_HelpText => Get("Automation.About.ReportProblem.HelpText");
+    public static string Automation_About_WhatsNew_HelpText => Get("Automation.About.WhatsNew.HelpText");
     public static string Automation_AutoUpdateCheck_HelpText => Get("Automation.AutoUpdateCheck.HelpText");
     public static string Automation_BackupFolder => Get("Automation.BackupFolder");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");

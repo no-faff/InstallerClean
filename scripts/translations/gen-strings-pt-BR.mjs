@@ -663,6 +663,8 @@ const MAP = {
   'UpdateNotice.Updated': `O InstallerClean foi atualizado para a versão {0}.`,
   'UpdateNotice.WhatsNew': `Novidades`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `Abre as versões do InstallerClean no github no seu navegador, da mais recente para a mais antiga.`,
+  'About.Link.WhatsNew': `Novidades desta versão`,
+  'Automation.About.WhatsNew.HelpText': `Abre a página desta versão no github no seu navegador.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.

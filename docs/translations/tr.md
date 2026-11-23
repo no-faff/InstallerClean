@@ -59,6 +59,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Guide and FAQ | Kılavuz ve SSS |
+| What's new in this version | Bu sürümdeki yenilikler |
 | Report a problem | Sorun bildir |
 | Third-party notices | Üçüncü taraf bildirimleri |
 | Check for updates automatically | Güncelleştirmeleri otomatik olarak denetle |
@@ -414,6 +415,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Güncelleştirmeleri denetle |
 | Checks github's releases page for a newer version. | github üzerindeki sürümler sayfasında daha yeni bir sürüm olup olmadığını denetler. |
 | Opens the readme on github in your browser. | github üzerindeki readme'yi tarayıcınızda açar. |
+| Opens this version's release page on github in your browser. | github üzerindeki bu sürümün sayfasını tarayıcınızda açar. |
 | Opens the issue tracker on github.com in your browser. | github.com üzerindeki sorun izleyiciyi (Issues) tarayıcınızda açar. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean'in içerdiği yazı tiplerinin, simgelerin ve kodun lisanslarını gösterir. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | İşaretliyse InstallerClean, çalıştırdığınızda github üzerinde daha yeni bir sürüm olup olmadığını denetler. |

@@ -659,6 +659,8 @@ const MAP = {
   'UpdateNotice.Updated': `InstallerClean이 {0} 버전으로 업데이트되었습니다.`,
   'UpdateNotice.WhatsNew': `변경 사항`,
   'Automation.UpdateNotice.WhatsNew.HelpText': `브라우저에서 github의 InstallerClean 릴리스 목록을 최신순으로 엽니다.`,
+  'About.Link.WhatsNew': `이 버전의 변경 사항`,
+  'Automation.About.WhatsNew.HelpText': `브라우저에서 github의 이 버전 릴리스 페이지를 엽니다.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

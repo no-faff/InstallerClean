@@ -366,6 +366,18 @@ public class UpdateCheckServiceTests
     }
 
     [Fact]
+    public void ThisVersionReleasePageUrl_is_the_tag_page_of_the_version_this_build_carries()
+    {
+        // About's "What's new in this version" opens this. The version is read here from the
+        // assembly the app ships as, and the address written out, so a link to the list, to
+        // /latest or to another version fails here.
+        var version = typeof(UpdateCheckService).Assembly.GetName().Version!;
+        Assert.Equal(
+            $"https://github.com/no-faff/InstallerClean/releases/tag/v{version.Major}.{version.Minor}.{version.Build}",
+            UpdateCheckService.ThisVersionReleasePageUrl());
+    }
+
+    [Fact]
     public void ReleasesListUrl_is_every_release_of_this_project_over_https()
     {
         // What's new opens this, from an elevated process. Pinned so a typo, an http://

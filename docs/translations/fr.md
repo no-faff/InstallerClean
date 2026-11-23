@@ -61,6 +61,7 @@ Where French needs a different form of a line for some counts, the form is in a 
 | English | Français |
 | --- | --- |
 | Guide and FAQ | Guide et FAQ |
+| What's new in this version | Nouveautés de cette version |
 | Report a problem | Signaler un problème |
 | Third-party notices | Avis de tiers |
 | Check for updates automatically | Rechercher des mises à jour automatiquement |
@@ -416,6 +417,7 @@ Where French needs a different form of a line for some counts, the form is in a 
 | Check for updates | Rechercher des mises à jour |
 | Checks github's releases page for a newer version. | Vérifie sur la page des versions de github s'il existe une version plus récente. |
 | Opens the readme on github in your browser. | Ouvre le readme sur github dans votre navigateur. |
+| Opens this version's release page on github in your browser. | Ouvre la page de cette version sur github dans votre navigateur. |
 | Opens the issue tracker on github.com in your browser. | Ouvre le suivi des problèmes (Issues) sur github.com dans votre navigateur. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Affiche les licences des polices, des icônes et du code inclus dans InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Si la case est cochée, InstallerClean recherche une version plus récente sur github à son lancement. |

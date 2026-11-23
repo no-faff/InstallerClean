@@ -61,6 +61,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | English | Nederlands |
 | --- | --- |
 | Guide and FAQ | Handleiding en FAQ |
+| What's new in this version | Wat is er nieuw in deze versie |
 | Report a problem | Een probleem melden |
 | Third-party notices | Kennisgevingen van derden |
 | Check for updates automatically | Automatisch controleren op updates |
@@ -416,6 +417,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Check for updates | Controleren op updates |
 | Checks github's releases page for a newer version. | Kijkt op de releasepagina van github of er een nieuwere versie is. |
 | Opens the readme on github in your browser. | Opent het readme-bestand op github in je browser. |
+| Opens this version's release page on github in your browser. | Opent de pagina van deze versie op github in je browser. |
 | Opens the issue tracker on github.com in your browser. | Opent de issue-tracker op github.com in je browser. |
 | Shows the licences of the fonts, icons and code InstallerClean includes. | Toont de licenties van de lettertypen, pictogrammen en code die InstallerClean bevat. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Als dit is aangevinkt, kijkt InstallerClean bij het starten op github of er een nieuwere versie is. |

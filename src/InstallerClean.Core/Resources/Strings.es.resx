@@ -233,6 +233,10 @@
     <value>Guía y preguntas frecuentes</value>
     <comment>About-window link to the README in the app's display language.</comment>
   </data>
+  <data name="About.Link.WhatsNew" xml:space="preserve">
+    <value>Novedades de esta versión</value>
+    <comment>About-window link to this version's own release page on GitHub, which says what the version changed. Under About.Link.Guide.</comment>
+  </data>
   <data name="About.Link.ReportProblem" xml:space="preserve">
     <value>Informar de un problema</value>
     <comment>About-window link to the GitHub issue tracker.</comment>
@@ -325,6 +329,10 @@
     Names the document rather than repeating the link's own label, so the
     description adds what the name has not already said. Cased for speech for
     the reason Automation.CheckForUpdates.HelpText carries.</comment>
+  </data>
+  <data name="Automation.About.WhatsNew.HelpText" xml:space="preserve">
+    <value>Abre la página de esta versión en github en tu navegador.</value>
+    <comment>Screen-reader help on the About window's "What's new in this version" link. Cased for speech for the reason Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>Abre el rastreador de problemas (Issues) en github.com en tu navegador.</value>
