@@ -1610,7 +1610,7 @@ jobs:
             $report = Join-Path $folder 'last-run.json'
             if (Test-Path $report) { $left += "A window left a report waiting: $report." } else { "  no $report" }
             $settings = Join-Path $folder 'settings.json'
-            if ((Test-Path $settings) -and ((Get-Content -Raw $settings) -match '"reportToSend"\s*:\s*true')) {
+            if ((Test-Path $settings) -and ((Get-Content -Raw $settings) -match '"reportSendPending"\s*:\s*true')) {
               $left += "A window marked a report to send in $settings."
             }
           }
