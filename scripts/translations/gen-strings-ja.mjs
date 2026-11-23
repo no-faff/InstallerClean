@@ -524,7 +524,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `ドライブまたは共有を待機中`,
   'Completion.RecentChange.Singular': `1 個のファイル({2})は、スキャン開始後に変更されたと Windows が示しているため、そのままにしました。何かのインストールや更新が行われていた場合は、それが終わってからもう一度スキャンしてください。`,
   'Completion.RecentChange.Plural': `{0} 個の{1}({2})は、スキャン開始後に変更されたと Windows が示しているため、そのままにしました。何かのインストールや更新が行われていた場合は、それが終わってからもう一度スキャンしてください。`,
-  'UpdateNotice.Available': `InstallerClean {0} が利用可能です。`,
+  'UpdateNotice.Available': `InstallerClean {0} が利用可能です。お使いのバージョンは {1} です。`,
   'UpdateNotice.Download': `GitHub からダウンロード`,
   'Automation.UpdateNotice.Download': `github からダウンロード`,
   'UpdateNotice.Recommended': `最新バージョンの使用を強くおすすめします。`,

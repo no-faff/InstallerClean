@@ -323,7 +323,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Check for updates | Controlla aggiornamenti |
 | Checking... | Controllo aggiornamenti... |
 | Up to date. | Versione aggiornata. |
-| InstallerClean {0} is available. | È disponibile InstallerClean {0}. |
+| InstallerClean {0} is available. You have {1}. | È disponibile InstallerClean {0}. Hai la versione {1}. |
 | It's strongly recommended to use the latest version. | Si consiglia vivamente di usare la versione più recente. |
 | Download it from GitHub | Scaricalo da GitHub |
 | Download .NET Framework 4.8 from Microsoft | Scarica .NET Framework 4.8 da Microsoft |

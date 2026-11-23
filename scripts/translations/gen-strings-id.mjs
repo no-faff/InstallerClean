@@ -623,7 +623,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Menunggu drive atau berbagi jaringan`,
   'Completion.RecentChange.Singular': `Satu file ({2}) dibiarkan apa adanya karena Windows menunjukkan bahwa file itu berubah setelah pemindaian dimulai. Kalau ada yang sedang dipasang atau diperbarui, pindai lagi setelah selesai.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) dibiarkan apa adanya karena Windows menunjukkan bahwa file-file itu berubah setelah pemindaian dimulai. Kalau ada yang sedang dipasang atau diperbarui, pindai lagi setelah selesai.`,
-  'UpdateNotice.Available': `InstallerClean {0} tersedia.`,
+  'UpdateNotice.Available': `InstallerClean {0} tersedia. Anda memakai versi {1}.`,
   'UpdateNotice.Download': `Unduh dari GitHub`,
   'Automation.UpdateNotice.Download': `Unduh dari github`,
   'UpdateNotice.Recommended': `Sangat disarankan untuk memakai versi terbaru.`,

@@ -243,7 +243,11 @@ internal sealed class CommandLineUpdate
 
         var current = available.CurrentVersion;
         var latest = available.LatestVersion;
-        _host.WriteLine(string.Format(Strings.UpdateNotice_Available, latest));
+        // What's new goes straight under the line naming the newer version in every case,
+        // so where a person is asked, the question stays last.
+        _host.WriteLine(string.Format(Strings.UpdateNotice_Available, latest, current));
+        _host.WriteLine(string.Format(Strings.Cli_UpdateDownloadLink,
+            Strings.UpdateNotice_WhatsNew, UpdateCheckService.ReleasesListUrl));
 
         if (!AppCopy.CanUpdateItself(_updater.Kind))
             return CannotUpdateItself(current, latest, token);
@@ -461,8 +465,10 @@ internal sealed class CommandLineUpdate
             // The download's own read of the release's file ruled this copy out, where the
             // read before the question could not be made. Nothing was downloaded. Where the
             // question was asked, the line naming the newer version is said again, since the
-            // reason follows it.
-            if (asked) _host.WriteLine(string.Format(Strings.UpdateNotice_Available, latest));
+            // reason follows it. What's new is not said again: each reason is followed by a
+            // link of its own, the newer version's release page or Microsoft's .NET Framework
+            // 4.8 installer.
+            if (asked) _host.WriteLine(string.Format(Strings.UpdateNotice_Available, latest, current));
             return Refused(refused.Refusal, current, latest, token);
         }
         catch (Exception ex)

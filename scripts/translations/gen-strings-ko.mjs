@@ -599,7 +599,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `드라이브 또는 공유를 기다리는 중`,
   'Completion.RecentChange.Singular': `파일 하나({2})는 Windows에서 검사가 시작된 뒤에 변경된 것으로 표시되어 그대로 두었습니다. 무언가가 설치나 업데이트 중이었다면, 끝난 뒤에 다시 검사하세요.`,
   'Completion.RecentChange.Plural': `{1} {0}개({2})는 Windows에서 검사가 시작된 뒤에 변경된 것으로 표시되어 그대로 두었습니다. 무언가가 설치나 업데이트 중이었다면, 끝난 뒤에 다시 검사하세요.`,
-  'UpdateNotice.Available': `InstallerClean {0} 버전을 사용할 수 있습니다.`,
+  'UpdateNotice.Available': `InstallerClean {0} 버전을 사용할 수 있습니다. 현재 버전은 {1}입니다.`,
   'UpdateNotice.Download': `GitHub에서 내려받기`,
   'Automation.UpdateNotice.Download': `github에서 내려받기`,
   'UpdateNotice.Recommended': `최신 버전을 사용할 것을 강력히 권장합니다.`,

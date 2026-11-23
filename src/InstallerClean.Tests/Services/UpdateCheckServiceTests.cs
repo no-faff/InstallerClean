@@ -357,12 +357,22 @@ public class UpdateCheckServiceTests
     [Fact]
     public void ReleasePageUrl_is_the_versions_own_tag_page_on_this_project_over_https()
     {
-        // Every link to a newer version opens this, from an elevated process, and
-        // only the version's three numbers feed it. Pinned so a typo or an http://
+        // Every link to download a newer version opens this, from an elevated process,
+        // and only the version's three numbers feed it. Pinned so a typo or an http://
         // slip in a later edit fails CI rather than the browser.
         Assert.Equal(
             "https://github.com/no-faff/InstallerClean/releases/tag/v3.6.0",
             UpdateCheckService.ReleasePageUrl("3.6.0"));
+    }
+
+    [Fact]
+    public void ReleasesListUrl_is_every_release_of_this_project_over_https()
+    {
+        // What's new opens this, from an elevated process. Pinned so a typo, an http://
+        // slip or the /latest redirect in its place fails CI rather than the browser.
+        Assert.Equal(
+            "https://github.com/no-faff/InstallerClean/releases",
+            UpdateCheckService.ReleasesListUrl);
     }
 
     /// <summary>

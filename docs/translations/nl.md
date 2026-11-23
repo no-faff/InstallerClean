@@ -323,7 +323,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Check for updates | Controleren op updates |
 | Checking... | Controleren... |
 | Up to date. | Je bent bij. |
-| InstallerClean {0} is available. | InstallerClean {0} is beschikbaar. |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} is beschikbaar. Je hebt {1}. |
 | It's strongly recommended to use the latest version. | Het wordt sterk aangeraden om de nieuwste versie te gebruiken. |
 | Download it from GitHub | Download het van GitHub |
 | Download .NET Framework 4.8 from Microsoft | Download .NET Framework 4.8 van Microsoft |

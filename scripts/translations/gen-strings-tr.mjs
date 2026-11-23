@@ -524,7 +524,7 @@ Ayrıntılar şuraya yazıldı:
   'Automation.Scroll.Waiting': `Bir sürücü veya paylaşım bekleniyor`,
   'Completion.RecentChange.Singular': `Bir dosya ({2}), Windows'a göre tarama başladıktan sonra değiştiği için olduğu gibi bırakıldı. Bir şey kuruluyor ya da güncelleniyorduysa, bittiğinde yeniden tarayın.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}), Windows'a göre tarama başladıktan sonra değiştikleri için olduğu gibi bırakıldı. Bir şey kuruluyor ya da güncelleniyorduysa, bittiğinde yeniden tarayın.`,
-  'UpdateNotice.Available': `InstallerClean {0} sürümü mevcut.`,
+  'UpdateNotice.Available': `InstallerClean {0} sürümü mevcut. Sizdeki sürüm {1}.`,
   'UpdateNotice.Download': `GitHub'dan indirin`,
   'Automation.UpdateNotice.Download': `github'dan indirin`,
   'UpdateNotice.Recommended': `En son sürümü kullanmanız önemle tavsiye edilir.`,

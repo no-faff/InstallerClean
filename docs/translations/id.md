@@ -321,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Periksa pembaruan |
 | Checking... | Memeriksa... |
 | Up to date. | Sudah versi terbaru. |
-| InstallerClean {0} is available. | InstallerClean {0} tersedia. |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} tersedia. Anda memakai versi {1}. |
 | It's strongly recommended to use the latest version. | Sangat disarankan untuk memakai versi terbaru. |
 | Download it from GitHub | Unduh dari GitHub |
 | Download .NET Framework 4.8 from Microsoft | Unduh .NET Framework 4.8 dari Microsoft |

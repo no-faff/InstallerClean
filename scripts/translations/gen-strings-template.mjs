@@ -661,7 +661,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Waiting for a drive or share`,
   'Completion.RecentChange.Singular': `One file ({2}) was left alone because Windows shows it changed after the scan started. If something was installing or updating, scan again once it has finished.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) were left alone because Windows shows they changed after the scan started. If something was installing or updating, scan again once it has finished.`,
-  'UpdateNotice.Available': `InstallerClean {0} is available.`,
+  'UpdateNotice.Available': `InstallerClean {0} is available. You have {1}.`,
   'UpdateNotice.Download': `Download it from GitHub`,
   'Automation.UpdateNotice.Download': `Download it from github`,
   'UpdateNotice.Recommended': `It's strongly recommended to use the latest version.`,

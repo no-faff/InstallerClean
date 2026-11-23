@@ -525,7 +525,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Esperando a una unidad o recurso compartido`,
   'Completion.RecentChange.Singular': `Se ha dejado en paz un archivo ({2}) porque Windows indica que cambió después de que empezara el análisis. Si algo se estaba instalando o actualizando, vuelve a analizar cuando haya terminado.`,
   'Completion.RecentChange.Plural': `Se han dejado en paz {0} {1} ({2}) porque Windows indica que cambiaron después de que empezara el análisis. Si algo se estaba instalando o actualizando, vuelve a analizar cuando haya terminado.`,
-  'UpdateNotice.Available': `Está disponible InstallerClean {0}.`,
+  'UpdateNotice.Available': `Está disponible InstallerClean {0}. Tienes la versión {1}.`,
   'UpdateNotice.Download': `Descárgalo de GitHub`,
   'Automation.UpdateNotice.Download': `Descárgalo de github`,
   'UpdateNotice.Recommended': `Se recomienda encarecidamente usar la versión más reciente.`,

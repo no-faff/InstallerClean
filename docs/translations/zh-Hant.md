@@ -321,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 檢查更新 |
 | Checking... | 正在檢查... |
 | Up to date. | 已是最新版本。 |
-| InstallerClean {0} is available. | 已推出 InstallerClean {0} 版。 |
+| InstallerClean {0} is available. You have {1}. | 已推出 InstallerClean {0} 版。目前版本為 {1}。 |
 | It's strongly recommended to use the latest version. | 強烈建議使用最新版本。 |
 | Download it from GitHub | 從 GitHub 下載 |
 | Download .NET Framework 4.8 from Microsoft | 從 Microsoft 下載 .NET Framework 4.8 |

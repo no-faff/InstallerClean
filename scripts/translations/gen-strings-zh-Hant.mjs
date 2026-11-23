@@ -511,7 +511,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `正在等候磁碟機或共用資料夾`,
   'Completion.RecentChange.Singular': `已原樣保留 1 個檔案（{2}），因為 Windows 顯示它在掃描開始後被變更過。如果當時有安裝或更新正在進行，請等它完成後再掃描一次。`,
   'Completion.RecentChange.Plural': `已原樣保留 {0} 個{1}（{2}），因為 Windows 顯示它們在掃描開始後被變更過。如果當時有安裝或更新正在進行，請等它完成後再掃描一次。`,
-  'UpdateNotice.Available': `已推出 InstallerClean {0} 版。`,
+  'UpdateNotice.Available': `已推出 InstallerClean {0} 版。目前版本為 {1}。`,
   'UpdateNotice.Download': `從 GitHub 下載`,
   'Automation.UpdateNotice.Download': `從 github 下載`,
   'UpdateNotice.Recommended': `強烈建議使用最新版本。`,

@@ -323,7 +323,7 @@ Where German needs a different form of a line for some counts, the form is in a 
 | Check for updates | Nach Updates suchen |
 | Checking... | Wird geprüft... |
 | Up to date. | Auf dem neuesten Stand. |
-| InstallerClean {0} is available. | InstallerClean {0} ist verfügbar. |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} ist verfügbar. Du hast {1}. |
 | It's strongly recommended to use the latest version. | Es wird dringend empfohlen, die neueste Version zu verwenden. |
 | Download it from GitHub | Von GitHub herunterladen |
 | Download .NET Framework 4.8 from Microsoft | .NET Framework 4.8 von Microsoft herunterladen |

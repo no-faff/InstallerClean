@@ -323,7 +323,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Check for updates | Buscar actualizaciones |
 | Checking... | Buscando... |
 | Up to date. | Estás al día. |
-| InstallerClean {0} is available. | Está disponible InstallerClean {0}. |
+| InstallerClean {0} is available. You have {1}. | Está disponible InstallerClean {0}. Tienes la versión {1}. |
 | It's strongly recommended to use the latest version. | Se recomienda encarecidamente usar la versión más reciente. |
 | Download it from GitHub | Descárgalo de GitHub |
 | Download .NET Framework 4.8 from Microsoft | Descarga .NET Framework 4.8 de Microsoft |

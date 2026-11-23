@@ -330,7 +330,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Check for updates | Sprawdź aktualizacje |
 | Checking... | Sprawdzanie... |
 | Up to date. | Wszystko aktualne. |
-| InstallerClean {0} is available. | Dostępna jest wersja InstallerClean {0}. |
+| InstallerClean {0} is available. You have {1}. | Dostępna jest wersja InstallerClean {0}. Masz wersję {1}. |
 | It's strongly recommended to use the latest version. | Zdecydowanie zaleca się korzystanie z najnowszej wersji. |
 | Download it from GitHub | Pobierz z GitHuba |
 | Download .NET Framework 4.8 from Microsoft | Pobierz .NET Framework 4.8 ze strony Microsoftu |

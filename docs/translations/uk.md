@@ -333,7 +333,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | Check for updates | Перевірити оновлення |
 | Checking... | Перевірка... |
 | Up to date. | Актуальна версія. |
-| InstallerClean {0} is available. | Доступна версія InstallerClean {0}. |
+| InstallerClean {0} is available. You have {1}. | Доступна версія InstallerClean {0}. У вас версія {1}. |
 | It's strongly recommended to use the latest version. | Настійно рекомендуємо використовувати найновішу версію. |
 | Download it from GitHub | Завантажити з GitHub |
 | Download .NET Framework 4.8 from Microsoft | Завантажити .NET Framework 4.8 з сайту Microsoft |

@@ -321,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 更新の確認 |
 | Checking... | 確認中... |
 | Up to date. | 最新です。 |
-| InstallerClean {0} is available. | InstallerClean {0} が利用可能です。 |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} が利用可能です。お使いのバージョンは {1} です。 |
 | It's strongly recommended to use the latest version. | 最新バージョンの使用を強くおすすめします。 |
 | Download it from GitHub | GitHub からダウンロード |
 | Download .NET Framework 4.8 from Microsoft | Microsoft から .NET Framework 4.8 をダウンロード |

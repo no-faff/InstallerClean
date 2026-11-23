@@ -88,7 +88,9 @@ public class ChromeViewModelTests
         await vm.RunAutomaticUpdateCheckAsync();
 
         Assert.True(vm.HasNewerVersion);
-        Assert.Equal(string.Format(Strings.UpdateNotice_Available, "9.9.9"), vm.UpdateNoticeText);
+        // Written out, so a placeholder left out of the resx or the versions the wrong way
+        // round fails here.
+        Assert.Equal("InstallerClean 9.9.9 is available. You have 2.1.0.", vm.UpdateNoticeText);
         Assert.Equal(1, found);
         // A check nobody asked for opens no window over whatever the user was
         // doing, and the status line beside the button stays empty.
@@ -180,7 +182,7 @@ public class ChromeViewModelTests
         Assert.Contains(Strings.UpdateCheck_Status_Checking, seen);
         Assert.Equal(string.Empty, vm.UpdateStatusText);
         Assert.True(vm.HasNewerVersion);
-        Assert.Equal(string.Format(Strings.UpdateNotice_Available, "9.9.9"), vm.UpdateNoticeText);
+        Assert.Equal(string.Format(Strings.UpdateNotice_Available, "9.9.9", "2.1.0"), vm.UpdateNoticeText);
         _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
         _dialogService.DidNotReceive().ShowWarningWithLink(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
@@ -373,6 +375,84 @@ public class ChromeViewModelTests
         Assert.False(vm.OpenReleasesCommand.CanExecute(null));
         vm.OpenReleasesCommand.Execute(null);
         _windowService.DidNotReceive().OpenUrl(ReleasesList);
+    }
+
+    // ---- What's new on the card and the notice ----
+
+    [Fact]
+    public async Task What_s_new_on_the_card_and_the_notice_opens_the_releases_once_a_newer_version_is_found()
+    {
+        CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"));
+        var vm = CreateViewModel();
+        var raised = 0;
+        vm.OpenWhatsNewCommand.CanExecuteChanged += (_, _) => raised++;
+        Assert.False(vm.OpenWhatsNewCommand.CanExecute(null));
+        vm.OpenWhatsNewCommand.Execute(null);
+        _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
+
+        await vm.RunAutomaticUpdateCheckAsync();
+
+        Assert.True(vm.OpenWhatsNewCommand.CanExecute(null));
+        Assert.True(raised > 0);
+        vm.OpenWhatsNewCommand.Execute(null);
+        _windowService.Received(1).OpenUrl(ReleasesList);
+    }
+
+    [Fact]
+    public async Task What_s_new_on_the_card_and_the_notice_goes_with_them_when_this_build_is_found_current()
+    {
+        CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"), new UpToDate("2.1.0"));
+        var vm = CreateViewModel();
+        await vm.RunAutomaticUpdateCheckAsync();
+        Assert.True(vm.OpenWhatsNewCommand.CanExecute(null));
+
+        await vm.CheckForUpdatesCommand.ExecuteAsync(null);
+
+        Assert.False(vm.HasNewerVersion);
+        Assert.False(vm.OpenWhatsNewCommand.CanExecute(null));
+        vm.OpenWhatsNewCommand.Execute(null);
+        _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task What_s_new_on_the_card_is_in_use_only_while_the_card_is_up()
+    {
+        // Continue without updating takes the card away and leaves the newer version found,
+        // so the card's link is disabled then and is no Tab stop, while the notice's opens.
+        CheckAnswers(new UpdateAvailable("2.1.0", "9.9.9"));
+        var vm = CreateViewModel();
+        await vm.RunAutomaticUpdateCheckAsync();
+        Assert.False(vm.OpenWhatsNewOnCardCommand.CanExecute(null));
+
+        vm.OfferUpdate();
+
+        Assert.True(vm.OpenWhatsNewOnCardCommand.CanExecute(null));
+        vm.OpenWhatsNewOnCardCommand.Execute(null);
+        _windowService.Received(1).OpenUrl(ReleasesList);
+
+        var raised = 0;
+        vm.OpenWhatsNewOnCardCommand.CanExecuteChanged += (_, _) => raised++;
+        vm.ContinueWithoutUpdatingCommand.Execute(null);
+
+        Assert.True(raised > 0);
+        Assert.False(vm.OpenWhatsNewOnCardCommand.CanExecute(null));
+        vm.OpenWhatsNewOnCardCommand.Execute(null);
+        _windowService.Received(1).OpenUrl(ReleasesList);
+        Assert.True(vm.OpenWhatsNewCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void What_s_new_on_the_card_and_the_notice_stays_out_of_use_beside_the_updated_line()
+    {
+        // The updated line has its own command; the card's and the notice's link sits in a
+        // collapsed panel then, so its command is disabled and it is no Tab stop.
+        var vm = CreateViewModel();
+
+        vm.ShowUpdatedAtStart("3.8.0");
+
+        Assert.True(vm.OpenReleasesCommand.CanExecute(null));
+        Assert.False(vm.OpenWhatsNewCommand.CanExecute(null));
+        Assert.False(vm.OpenWhatsNewOnCardCommand.CanExecute(null));
     }
 
     // ---- Update now ----
@@ -800,7 +880,7 @@ public class ChromeViewModelTests
         var needsNetFramework = refusal == UpdateRefusal.NeedsNetFramework48;
         Assert.True(vm.HasNewerVersion);
         Assert.True(vm.IsUpdateRefused);
-        Assert.Equal(string.Format(Strings.UpdateNotice_Available, "9.9.9"), vm.UpdateNoticeText);
+        Assert.Equal(string.Format(Strings.UpdateNotice_Available, "9.9.9", "2.1.0"), vm.UpdateNoticeText);
         Assert.Equal(RefusalLine(refusal), vm.UpdateNoticeDetailText);
         Assert.False(vm.ShowsUpdateNow);
         Assert.False(vm.UpdateNowCommand.CanExecute(null));

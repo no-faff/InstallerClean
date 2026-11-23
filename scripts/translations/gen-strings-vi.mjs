@@ -598,7 +598,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Đang chờ ổ đĩa hoặc chia sẻ mạng`,
   'Completion.RecentChange.Singular': `Một tệp ({2}) đã được để nguyên vì Windows cho thấy nó đã thay đổi sau khi bắt đầu quét. Nếu khi đó có gì đang cài đặt hoặc cập nhật, hãy quét lại khi việc đó xong.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) đã được để nguyên vì Windows cho thấy chúng đã thay đổi sau khi bắt đầu quét. Nếu khi đó có gì đang cài đặt hoặc cập nhật, hãy quét lại khi việc đó xong.`,
-  'UpdateNotice.Available': `Đã có InstallerClean {0}.`,
+  'UpdateNotice.Available': `Đã có InstallerClean {0}. Bạn đang dùng {1}.`,
   'UpdateNotice.Download': `Tải về từ GitHub`,
   'Automation.UpdateNotice.Download': `Tải về từ github`,
   'UpdateNotice.Recommended': `Chúng tôi đặc biệt khuyên bạn dùng phiên bản mới nhất.`,

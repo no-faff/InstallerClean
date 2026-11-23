@@ -321,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 업데이트 확인 |
 | Checking... | 확인 중... |
 | Up to date. | 최신 버전입니다. |
-| InstallerClean {0} is available. | InstallerClean {0} 버전을 사용할 수 있습니다. |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} 버전을 사용할 수 있습니다. 현재 버전은 {1}입니다. |
 | It's strongly recommended to use the latest version. | 최신 버전을 사용할 것을 강력히 권장합니다. |
 | Download it from GitHub | GitHub에서 내려받기 |
 | Download .NET Framework 4.8 from Microsoft | Microsoft에서 .NET Framework 4.8 내려받기 |

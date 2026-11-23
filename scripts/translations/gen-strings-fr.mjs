@@ -606,7 +606,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `En attente d'un lecteur ou d'un partage`,
   'Completion.RecentChange.Singular': `Un fichier ({2}) a été laissé de côté parce que Windows indique qu'il a changé après le début de l'analyse. Si quelque chose était en cours d'installation ou de mise à jour, relancez une analyse une fois que c'est terminé.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) ont été laissés de côté parce que Windows indique qu'ils ont changé après le début de l'analyse. Si quelque chose était en cours d'installation ou de mise à jour, relancez une analyse une fois que c'est terminé.`,
-  'UpdateNotice.Available': `InstallerClean {0} est disponible.`,
+  'UpdateNotice.Available': `InstallerClean {0} est disponible. Vous avez la version {1}.`,
   'UpdateNotice.Download': `Le télécharger sur GitHub`,
   'Automation.UpdateNotice.Download': `Le télécharger sur github`,
   'UpdateNotice.Recommended': `Il est vivement recommandé d'utiliser la dernière version.`,

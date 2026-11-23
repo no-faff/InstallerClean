@@ -321,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Güncelleştirmeleri denetle |
 | Checking... | Denetleniyor... |
 | Up to date. | Güncel. |
-| InstallerClean {0} is available. | InstallerClean {0} sürümü mevcut. |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} sürümü mevcut. Sizdeki sürüm {1}. |
 | It's strongly recommended to use the latest version. | En son sürümü kullanmanız önemle tavsiye edilir. |
 | Download it from GitHub | GitHub'dan indirin |
 | Download .NET Framework 4.8 from Microsoft | .NET Framework 4.8'i Microsoft'tan indirin |

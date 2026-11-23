@@ -503,7 +503,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `正在等待驱动器或共享`,
   'Completion.RecentChange.Singular': `已原样保留 1 个文件（{2}），因为 Windows 显示它在扫描开始后发生了更改。如果当时有安装或更新正在进行，请等它完成后重新扫描。`,
   'Completion.RecentChange.Plural': `已原样保留 {0} 个{1}（{2}），因为 Windows 显示它们在扫描开始后发生了更改。如果当时有安装或更新正在进行，请等它完成后重新扫描。`,
-  'UpdateNotice.Available': `InstallerClean {0} 版现已推出。`,
+  'UpdateNotice.Available': `InstallerClean {0} 版现已推出。当前版本为 {1}。`,
   'UpdateNotice.Download': `从 GitHub 下载`,
   'Automation.UpdateNotice.Download': `从 github 下载`,
   'UpdateNotice.Recommended': `强烈建议使用最新版本。`,

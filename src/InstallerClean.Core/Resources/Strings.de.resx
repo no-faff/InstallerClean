@@ -1502,8 +1502,8 @@ Details in {1}.</value></data>
        finds a newer version, and the notice at the top of the main window once a
        check has found one. -->
   <data name="UpdateNotice.Available" xml:space="preserve">
-    <value>InstallerClean {0} ist verfügbar.</value>
-    <comment>The first line of the card and of the notice. {0} = the newer version number, as 3.5.0.</comment>
+    <value>InstallerClean {0} ist verfügbar. Du hast {1}.</value>
+    <comment>The first line of the card and of the notice, and the command line's first line where a newer version is found. {0} = the newer version number, as 3.9.0. {1} = the version of the copy running, as 3.8.0.</comment>
   </data>
   <data name="UpdateNotice.Recommended" xml:space="preserve">
     <value>Es wird dringend empfohlen, die neueste Version zu verwenden.</value>
@@ -1575,7 +1575,7 @@ Details in {1}.</value></data>
   </data>
   <data name="UpdateNotice.WhatsNew" xml:space="preserve">
     <value>Neuigkeiten</value>
-    <comment>A link that opens InstallerClean's releases on GitHub in the browser, every release newest first with what each one changed. Beside UpdateNotice.Updated. Keep it short, as a link label.</comment>
+    <comment>A link that opens InstallerClean's releases on GitHub in the browser, every release newest first with what each one changed. Beside UpdateNotice.Updated, and on the card and the notice saying a newer version is available, after their other steps. On the command line it is the label in Cli.UpdateDownloadLink, before the address. Keep it short, as a link label.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub war nicht erreichbar. Prüfe deine Internetverbindung und versuch es erneut.</value></data>
   <!-- The next two are shown in the update check's warning box. The phrase in
@@ -2267,11 +2267,14 @@ Führe InstallerClean erneut als Administrator aus.</value></data>
        run the command and then put itself in this copy's place. 0 = the command it runs,
        /s, /d or /m, as typed and left as written; 1 = its version. -->
   <data name="Cli.UpdateRunningNewer" xml:space="preserve"><value>{0} wird mit InstallerClean {1} ausgeführt. Sobald der Lauf beendet ist, ersetzt diese Version diese Kopie.</value></data>
-  <!-- Where a newer version is out and this copy cannot update itself (a build from source,
-       or a copy that cannot tell from the setup's record whether the setup installed it), or
-       the newer version's release rules this copy out. 0 = the link's words,
-       UpdateNotice.Download or UpdateNotice.DownloadNetFramework48; 1 = the address it
-       downloads from, printed as written. The punctuation between them is this language's own. -->
+  <!-- A link on the command line, as words and an address. Where a newer version is out it
+       follows UpdateNotice.Available with UpdateNotice.WhatsNew and the address of every
+       release. Where this copy cannot update itself (a build from source, or a copy that cannot
+       tell from the setup's record whether the setup installed it), or the newer version's
+       release rules this copy out, it gives UpdateNotice.Download or
+       UpdateNotice.DownloadNetFramework48 and the address that downloads from. 0 = the link's
+       words; 1 = the address, printed as written. The punctuation between them is this
+       language's own. -->
   <data name="Cli.UpdateDownloadLink" xml:space="preserve"><value>{0}: {1}</value></data>
   <!-- In place of UpdateNotice.NeedsNetFramework48 on the command line, where the newer
        version's release says the command line's download needs .NET Framework 4.8 and the

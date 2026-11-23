@@ -578,7 +578,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Wachten op een schijf of share`,
   'Completion.RecentChange.Singular': `Eén bestand ({2}) is ongemoeid gelaten omdat Windows aangeeft dat het is gewijzigd nadat de scan was begonnen. Als er iets aan het installeren of bijwerken was, scan dan opnieuw zodra het klaar is.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) zijn ongemoeid gelaten omdat Windows aangeeft dat ze zijn gewijzigd nadat de scan was begonnen. Als er iets aan het installeren of bijwerken was, scan dan opnieuw zodra het klaar is.`,
-  'UpdateNotice.Available': `InstallerClean {0} is beschikbaar.`,
+  'UpdateNotice.Available': `InstallerClean {0} is beschikbaar. Je hebt {1}.`,
   'UpdateNotice.Download': `Download het van GitHub`,
   'Automation.UpdateNotice.Download': `Download het van github`,
   'UpdateNotice.Recommended': `Het wordt sterk aangeraden om de nieuwste versie te gebruiken.`,

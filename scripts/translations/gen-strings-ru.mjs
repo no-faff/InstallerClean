@@ -518,7 +518,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Ожидание диска или сетевого ресурса`,
   'Completion.RecentChange.Singular': `Один файл ({2}) оставлен без изменений, потому что, по данным Windows, он изменился после начала сканирования. Если что-то устанавливалось или обновлялось, повторите сканирование, когда это закончится.`,
   'Completion.RecentChange.Plural': `InstallerClean оставил без изменений {0} {1} ({2}), потому что, по данным Windows, они изменились после начала сканирования. Если что-то устанавливалось или обновлялось, повторите сканирование, когда это закончится.`,
-  'UpdateNotice.Available': `Доступна версия InstallerClean {0}.`,
+  'UpdateNotice.Available': `Доступна версия InstallerClean {0}. У вас версия {1}.`,
   'UpdateNotice.Download': `Скачать с GitHub`,
   'Automation.UpdateNotice.Download': `Скачать с github`,
   'UpdateNotice.Recommended': `Настоятельно рекомендуется использовать последнюю версию.`,

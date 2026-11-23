@@ -603,7 +603,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Aguardando uma unidade ou compartilhamento`,
   'Completion.RecentChange.Singular': `Um arquivo ({2}) foi deixado de lado porque o Windows indica que ele mudou depois que a análise começou. Se algo estava sendo instalado ou atualizado, faça uma nova análise quando terminar.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) foram deixados de lado porque o Windows indica que eles mudaram depois que a análise começou. Se algo estava sendo instalado ou atualizado, faça uma nova análise quando terminar.`,
-  'UpdateNotice.Available': `O InstallerClean {0} está disponível.`,
+  'UpdateNotice.Available': `O InstallerClean {0} está disponível. Você tem a versão {1}.`,
   'UpdateNotice.Download': `Baixe no GitHub`,
   'Automation.UpdateNotice.Download': `Baixe no github`,
   'UpdateNotice.Recommended': `É altamente recomendável usar a versão mais recente.`,

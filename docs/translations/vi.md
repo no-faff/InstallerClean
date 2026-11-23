@@ -321,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Kiểm tra cập nhật |
 | Checking... | Đang kiểm tra... |
 | Up to date. | Đã cập nhật. |
-| InstallerClean {0} is available. | Đã có InstallerClean {0}. |
+| InstallerClean {0} is available. You have {1}. | Đã có InstallerClean {0}. Bạn đang dùng {1}. |
 | It's strongly recommended to use the latest version. | Chúng tôi đặc biệt khuyên bạn dùng phiên bản mới nhất. |
 | Download it from GitHub | Tải về từ GitHub |
 | Download .NET Framework 4.8 from Microsoft | Tải .NET Framework 4.8 về từ Microsoft |

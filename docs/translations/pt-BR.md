@@ -323,7 +323,7 @@ Where Brazilian Portuguese needs a different form of a line for some counts, the
 | Check for updates | Verificar atualizações |
 | Checking... | Verificando... |
 | Up to date. | Tudo atualizado. |
-| InstallerClean {0} is available. | O InstallerClean {0} está disponível. |
+| InstallerClean {0} is available. You have {1}. | O InstallerClean {0} está disponível. Você tem a versão {1}. |
 | It's strongly recommended to use the latest version. | É altamente recomendável usar a versão mais recente. |
 | Download it from GitHub | Baixe no GitHub |
 | Download .NET Framework 4.8 from Microsoft | Baixe o .NET Framework 4.8 no site da Microsoft |

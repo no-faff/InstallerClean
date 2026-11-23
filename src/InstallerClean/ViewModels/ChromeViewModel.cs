@@ -187,9 +187,9 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _updateStatusText = string.Empty;
 
     /// <summary>
-    /// The notice's first line, naming the newer version a check found. Set before
-    /// <see cref="HasNewerVersion"/>, so the line is whole by the time the notice
-    /// shows.
+    /// The first line of the card and of the notice, naming the newer version a check
+    /// found and the version running. Set before <see cref="HasNewerVersion"/>, so the
+    /// line is whole by the time the notice shows.
     /// </summary>
     [ObservableProperty] private string _updateNoticeText = string.Empty;
 
@@ -225,6 +225,8 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(ShowsUpdatedNotice))]
     [NotifyCanExecuteChangedFor(nameof(OpenReleasePageCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenReleasesCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenWhatsNewCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenWhatsNewOnCardCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenNetFrameworkDownloadCommand))]
     [NotifyCanExecuteChangedFor(nameof(UpdateNowCommand))]
     private bool _hasNewerVersion;
@@ -404,6 +406,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ContinueWithoutUpdatingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenWhatsNewOnCardCommand))]
     private bool _isOfferingUpdate;
 
     /// <summary>
@@ -445,13 +448,46 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         UpdatedNoticeText = string.Format(Strings.UpdateNotice_Updated, version);
 
     /// <summary>
-    /// What's new: opens the list of every release, newest first, in the browser. Enabled
-    /// only where the link shows, for the reason <see cref="OpenReleasePage"/> gives.
+    /// What's new on the line saying InstallerClean has been updated: opens the list of
+    /// every release, newest first, in the browser. Enabled only where the line shows, for
+    /// the reason <see cref="OpenReleasePage"/> gives. The notice and the card carry
+    /// commands of their own (<see cref="OpenWhatsNew"/>, <see cref="OpenWhatsNewOnCard"/>):
+    /// each is enabled only while its own surface shows, since one command enabled for
+    /// several would leave an enabled link inside whichever of them is collapsed.
     /// </summary>
     [RelayCommand(CanExecute = nameof(ShowsUpdatedNotice))]
     private void OpenReleases()
     {
         if (ShowsUpdatedNotice)
+            _windowService.OpenUrl(UpdateCheckService.ReleasesListUrl);
+    }
+
+    /// <summary>
+    /// What's new on the notice at the top of the main window: opens the list of every
+    /// release, newest first, in the browser, after whatever else the notice offers.
+    /// Enabled wherever a check has found a newer version, which is where the notice
+    /// shows, for the reason <see cref="OpenReleasePage"/> gives.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(HasNewerVersion))]
+    private void OpenWhatsNew()
+    {
+        if (HasNewerVersion)
+            _windowService.OpenUrl(UpdateCheckService.ReleasesListUrl);
+    }
+
+    /// <summary>Whether the card saying a newer version is available is up, with its What's new.</summary>
+    private bool ShowsWhatsNewOnCard => IsOfferingUpdate && HasNewerVersion;
+
+    /// <summary>
+    /// What's new on the card saying a newer version is available: the same list as
+    /// <see cref="OpenWhatsNew"/>. Enabled only while the card is up, for the reason
+    /// <see cref="OpenReleasePage"/> gives, since Continue without updating takes the card
+    /// away and leaves the newer version found.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(ShowsWhatsNewOnCard))]
+    private void OpenWhatsNewOnCard()
+    {
+        if (ShowsWhatsNewOnCard)
             _windowService.OpenUrl(UpdateCheckService.ReleasesListUrl);
     }
 
@@ -693,7 +729,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         NewerVersionRefusal = refusal;
         if (refusal is not null)
             UpdateFailureText = string.Empty;
-        UpdateNoticeText = string.Format(Strings.UpdateNotice_Available, available.LatestVersion);
+        UpdateNoticeText = string.Format(Strings.UpdateNotice_Available, available.LatestVersion, available.CurrentVersion);
         HasNewerVersion = true;
         NewerVersionFound?.Invoke(this, EventArgs.Empty);
     }

@@ -331,7 +331,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Check for updates | Проверка обновлений |
 | Checking... | Проверка... |
 | Up to date. | Установлена последняя версия. |
-| InstallerClean {0} is available. | Доступна версия InstallerClean {0}. |
+| InstallerClean {0} is available. You have {1}. | Доступна версия InstallerClean {0}. У вас версия {1}. |
 | It's strongly recommended to use the latest version. | Настоятельно рекомендуется использовать последнюю версию. |
 | Download it from GitHub | Скачать с GitHub |
 | Download .NET Framework 4.8 from Microsoft | Скачать .NET Framework 4.8 с сайта Microsoft |

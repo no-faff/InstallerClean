@@ -172,9 +172,10 @@
                  found one, in every state of the window, above everything else and
                  outside the region that scrolls, so it stays in view at any text
                  size. Its Update now, Scoop's update command or its link is the first
-                 Tab stop in the window's content. The code-behind reads its lines out,
-                 ahead of the rest of the window as it is drawn. The link's spoken name
-                 is its own words cased for speech. -->
+                 Tab stop in the window's content, and What's new the notice's last. The code-behind
+                 reads its lines out, ahead of the rest of the window as it is drawn. The
+                 release link's spoken name is its own words cased for speech; What's new
+                 says where it goes in its help text. -->
             <Border Grid.Row="0" Style="{StaticResource UpdateNoticePanel}"
                     Margin="{StaticResource GapBottom.Lg}"
                     Visibility="{Binding Chrome.HasNewerVersion, Converter={StaticResource BoolToVis}}">
@@ -219,8 +220,10 @@
                         <!-- Update now wherever the app can update itself; the link where it
                              cannot or the newer version's release rules this copy out, and
                              beside Update now after an update that failed; the link to
-                             Microsoft's .NET Framework 4.8 installer alone where the release
-                             says this copy's download needs it and the PC does not have it. -->
+                             Microsoft's .NET Framework 4.8 installer in place of both where the
+                             release says this copy's download needs it and the PC does not have
+                             it. What's new comes last in every case, opening the list of every
+                             release, newest first. -->
                         <WrapPanel Margin="{StaticResource GapTop.Sm}">
                             <Button x:Name="UpdateNowButton" Style="{StaticResource CompactAccentPill}"
                                     Content="{loc:Translate UpdateNotice.UpdateNow}"
@@ -228,7 +231,7 @@
                                     Margin="0,4,16,0" VerticalAlignment="Center"
                                     Visibility="{Binding Chrome.ShowsUpdateNow, Converter={StaticResource BoolToVis}}"/>
                             <TextBlock FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
-                                       Margin="0,4,0,0" VerticalAlignment="Center"
+                                       Margin="0,4,16,0" VerticalAlignment="Center"
                                        Visibility="{Binding Chrome.ShowsReleaseLink, Converter={StaticResource BoolToVis}}">
                                 <Hyperlink x:Name="UpdateNoticeDownloadLink"
                                            Command="{Binding Chrome.OpenReleasePageCommand}"
@@ -236,12 +239,19 @@
                                            AutomationProperties.Name="{loc:Translate Automation.UpdateNotice.Download}"><Run Text="{loc:Translate UpdateNotice.Download}"/></Hyperlink>
                             </TextBlock>
                             <TextBlock FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
-                                       Margin="0,4,0,0" VerticalAlignment="Center"
+                                       Margin="0,4,16,0" VerticalAlignment="Center"
                                        Visibility="{Binding Chrome.ShowsNetFrameworkLink, Converter={StaticResource BoolToVis}}">
                                 <Hyperlink x:Name="UpdateNoticeNetFrameworkLink"
                                            Command="{Binding Chrome.OpenNetFrameworkDownloadCommand}"
                                            Style="{StaticResource SubtleLink}"
                                            AutomationProperties.Name="{loc:Translate Automation.UpdateNotice.DownloadNetFramework48}"><Run Text="{loc:Translate UpdateNotice.DownloadNetFramework48}"/></Hyperlink>
+                            </TextBlock>
+                            <TextBlock FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                       Margin="0,4,0,0" VerticalAlignment="Center">
+                                <Hyperlink x:Name="UpdateNoticeWhatsNewLink"
+                                           Command="{Binding Chrome.OpenWhatsNewCommand}"
+                                           Style="{StaticResource SubtleLink}"
+                                           AutomationProperties.HelpText="{loc:Translate Automation.UpdateNotice.WhatsNew.HelpText}"><Run Text="{loc:Translate UpdateNotice.WhatsNew}"/></Hyperlink>
                             </TextBlock>
                         </WrapPanel>
                     </StackPanel>
@@ -1600,7 +1610,7 @@
              lines of the notice, Update now or the link where the app cannot update
              itself or the newer version's release rules this copy out, the second line
              then saying why, or in place of both the link to Microsoft's .NET Framework
-             4.8 installer where that is why, and Continue without updating, which takes
+             4.8 installer where that is why, What's new, and Continue without updating, which takes
              the card away and shows the scan. On a copy installed by Scoop, Scoop's update command and Copy take
              Update now's place, with the link under them. After an update that failed it
              carries the line saying what failed and the link under Update now. The same
@@ -1644,8 +1654,8 @@
                          installed by Scoop, Scoop's update command and Copy, which takes the
                          accent, with the line saying the copy failed under them; the link to
                          the release page, or to Microsoft's .NET Framework 4.8 installer where
-                         that is why the card has no Update now, as large as Continue; then
-                         Continue without updating. -->
+                         that is why the card has no Update now, as large as Continue; What's
+                         new, in every case, the same size; then Continue without updating. -->
                     <StackPanel Margin="0,20,0,0">
                         <Button x:Name="UpdateOfferUpdateNowButton" Style="{StaticResource AccentPill}"
                                 Content="{loc:Translate UpdateNotice.UpdateNow}"
@@ -1672,6 +1682,14 @@
                                        Command="{Binding Chrome.OpenNetFrameworkDownloadCommand}"
                                        Style="{StaticResource SubtleLink}"
                                        AutomationProperties.Name="{loc:Translate Automation.UpdateNotice.DownloadNetFramework48}"><Run Text="{loc:Translate UpdateNotice.DownloadNetFramework48}"/></Hyperlink>
+                        </TextBlock>
+                        <TextBlock FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"
+                                   TextWrapping="Wrap" TextAlignment="Center"
+                                   HorizontalAlignment="Center" Margin="0,8,0,8">
+                            <Hyperlink x:Name="UpdateOfferWhatsNewLink"
+                                       Command="{Binding Chrome.OpenWhatsNewOnCardCommand}"
+                                       Style="{StaticResource SubtleLink}"
+                                       AutomationProperties.HelpText="{loc:Translate Automation.UpdateNotice.WhatsNew.HelpText}"><Run Text="{loc:Translate UpdateNotice.WhatsNew}"/></Hyperlink>
                         </TextBlock>
                         <Button x:Name="UpdateOfferContinueButton" Style="{StaticResource GhostPill}"
                                 Content="{loc:Translate UpdateNotice.ContinueWithoutUpdating}"

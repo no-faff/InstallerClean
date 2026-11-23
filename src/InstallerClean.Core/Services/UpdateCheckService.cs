@@ -76,8 +76,9 @@ public sealed class UpdateCheckService : IUpdateCheckService
         "https://github.com/no-faff/InstallerClean/releases/latest";
 
     /// <summary>
-    /// The release page of <paramref name="version"/>, which every link to a newer
-    /// version opens: the card's and the notice's, and the command line's. The check
+    /// The release page of <paramref name="version"/>, where its downloads are, which
+    /// every link to download a newer version opens: the card's and the notice's, and the
+    /// command line's. The check
     /// holds a version as its three numbers and the project's tags are "v" and those
     /// numbers, as the downloads' addresses are (<see cref="AppCopy.DownloadAddress"/>).
     /// The page names the version the card names, where the /latest redirect would move
@@ -87,9 +88,10 @@ public sealed class UpdateCheckService : IUpdateCheckService
         $"https://github.com/no-faff/InstallerClean/releases/tag/v{version}";
 
     /// <summary>
-    /// Every release, newest first, each with its notes: what What's new opens. Somebody
-    /// several releases behind finds every release since theirs on it, and somebody one
-    /// behind finds that one at the top.
+    /// Every release, newest first, each with its notes: what What's new opens on the card,
+    /// the notice, the line saying InstallerClean has been updated and the command line.
+    /// Somebody several releases behind finds every release since theirs on it, and
+    /// somebody one behind finds that one at the top.
     /// </summary>
     public const string ReleasesListUrl = "https://github.com/no-faff/InstallerClean/releases";
 

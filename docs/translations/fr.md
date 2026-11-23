@@ -323,7 +323,7 @@ Where French needs a different form of a line for some counts, the form is in a 
 | Check for updates | Rechercher des mises à jour |
 | Checking... | Vérification... |
 | Up to date. | À jour. |
-| InstallerClean {0} is available. | InstallerClean {0} est disponible. |
+| InstallerClean {0} is available. You have {1}. | InstallerClean {0} est disponible. Vous avez la version {1}. |
 | It's strongly recommended to use the latest version. | Il est vivement recommandé d'utiliser la dernière version. |
 | Download it from GitHub | Le télécharger sur GitHub |
 | Download .NET Framework 4.8 from Microsoft | Télécharger .NET Framework 4.8 sur le site de Microsoft |

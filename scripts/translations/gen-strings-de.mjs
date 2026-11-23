@@ -616,7 +616,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Warten auf ein Laufwerk oder eine Freigabe`,
   'Completion.RecentChange.Singular': `Eine Datei ({2}) wurde unangetastet gelassen, weil Windows anzeigt, dass sie sich nach dem Start des Scans geändert hat. Falls gerade etwas installiert oder aktualisiert wurde, scanne erneut, sobald das fertig ist.`,
   'Completion.RecentChange.Plural': `{0} {1} ({2}) wurden unangetastet gelassen, weil Windows anzeigt, dass sie sich nach dem Start des Scans geändert haben. Falls gerade etwas installiert oder aktualisiert wurde, scanne erneut, sobald das fertig ist.`,
-  'UpdateNotice.Available': `InstallerClean {0} ist verfügbar.`,
+  'UpdateNotice.Available': `InstallerClean {0} ist verfügbar. Du hast {1}.`,
   'UpdateNotice.Download': `Von GitHub herunterladen`,
   'Automation.UpdateNotice.Download': `Von github herunterladen`,
   'UpdateNotice.Recommended': `Es wird dringend empfohlen, die neueste Version zu verwenden.`,

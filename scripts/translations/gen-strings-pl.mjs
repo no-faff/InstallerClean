@@ -639,7 +639,7 @@ const MAP = {
   'Automation.Scroll.Waiting': `Oczekiwanie na dysk lub udział`,
   'Completion.RecentChange.Singular': `Pozostawiono bez zmian jeden plik ({2}), ponieważ Windows pokazuje, że zmienił się po rozpoczęciu skanowania. Jeśli coś się instalowało lub aktualizowało, przeskanuj ponownie, gdy to się skończy.`,
   'Completion.RecentChange.Plural': `Pozostawiono bez zmian {0} {1} ({2}), ponieważ Windows pokazuje, że zmieniły się po rozpoczęciu skanowania. Jeśli coś się instalowało lub aktualizowało, przeskanuj ponownie, gdy to się skończy.`,
-  'UpdateNotice.Available': `Dostępna jest wersja InstallerClean {0}.`,
+  'UpdateNotice.Available': `Dostępna jest wersja InstallerClean {0}. Masz wersję {1}.`,
   'UpdateNotice.Download': `Pobierz z GitHuba`,
   'Automation.UpdateNotice.Download': `Pobierz z githuba`,
   'UpdateNotice.Recommended': `Zdecydowanie zaleca się korzystanie z najnowszej wersji.`,
