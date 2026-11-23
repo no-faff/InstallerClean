@@ -2565,12 +2565,43 @@ jobs:
           test -f publish/window/InstallerClean.exe
           rm -f publish/window/InstallerClean.exe.config
 
+      # Wine's packages are kept between runs, because Ubuntu's mirror serves them at speeds
+      # that vary from run to run. The package index is still fetched fresh every run, and apt
+      # checks each kept file against it and fetches again any that does not match.
+      - name: Name the runner image the packages are kept for
+        id: image
+        run: echo "version=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Wine packages from an earlier run
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: wine-debs-${{ steps.image.outputs.version }}-wine64-wine32-winetricks-xvfb-xauth-cabextract
+
       - name: Install Wine and winetricks
         run: |
+          mkdir -p ~/apt-archives/partial
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends wine64 wine32:i386 winetricks xvfb xauth cabextract
+          # A stalled mirror ends the attempt after ten minutes, and a second stall fails the job.
+          install() {
+            sudo timeout 600 apt-get install -y --no-install-recommends \
+              -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true \
+              wine64 wine32:i386 winetricks xvfb xauth cabextract
+          }
+          install || { echo "::warning::The Ubuntu mirror stalled or failed. Trying once more."; install; } \
+            || { echo "::error::The Ubuntu mirror stalled or failed twice, so Wine could not be installed."; exit 1; }
+          sudo rm -f ~/apt-archives/lock
+          sudo chown -R "$USER" ~/apt-archives
           wine --version
+
+      # winetricks checks each download against the checksum it holds for it, and a kept file
+      # that does not match is fetched again.
+      - name: Restore the .NET Framework installers from an earlier run
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/winetricks
+          key: winetricks-${{ matrix.framework }}-20240105
 
       - name: Install ${{ matrix.framework }} into a 64-bit prefix
         env:
