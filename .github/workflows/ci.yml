@@ -1624,16 +1624,10 @@ jobs:
         run: |
           choco install innosetup --version=6.7.1 --no-progress -y
           if ($LASTEXITCODE -ne 0) { throw "Inno Setup did not install." }
-          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
-                  Select-Object -First 1 -ExpandProperty FullName
-          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
+          ./scripts/compile-setup.ps1 -FailOnWarning
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
                      Where-Object { $_ } | Select-Object -First 1
-          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
-          & $iscc "/DAppVersion=$version" installer\InstallerClean.iss | Tee-Object -Variable compileOutput
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed." }
-          $warnings = @($compileOutput | Where-Object { $_ -like 'Warning: *' })
-          if ($warnings.Count -gt 0) { $warnings; throw "ISCC printed warnings, which fail the compile in build-and-test too." }
           "SETUP_VERSION=$version" | Add-Content $env:GITHUB_ENV
 
       # The setup is copied alone into a folder of its own, as a download sits in
