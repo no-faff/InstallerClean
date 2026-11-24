@@ -17,8 +17,8 @@
 //   Window style cannot do it: an implicit style matches its exact type, and
 //   every window in the app is a class derived from Window. A window built in C# alone has
 //   no root tag to read, so every C# class derived from Window, directly or
-//   through another, must be the x:Class of such a file, and C# constructs no
-//   Window itself.
+//   through another, must be the x:Class of such a file, and the app's C#
+//   constructs no Window itself. A test may: a window a test builds is never shown.
 //
 //   A popup. A ToolTip and a ContextMenu open in a popup with no parent, so
 //   they inherit nothing from the window that opens them. Every Style targeting
@@ -357,8 +357,10 @@ const isWindowType = (type) =>
   type.replace(/\?$/, '').replace(/^(?:global::)?System\.Windows\./, '') === 'Window';
 
 // A Window built in C# by name. A class derived from Window is held above to being
-// the x:Class of a XAML root, so building one by name builds that window.
+// the x:Class of a XAML root, so building one by name builds that window. The tests
+// are left out, as they are from the target-typed sweep below.
 for (const [file, text, lineAt] of csTexts) {
+  if (file.startsWith(`${SRC}/InstallerClean.Tests/`)) continue;
   for (const m of text.matchAll(/\bnew\s+(?:global::)?(?:System\.Windows\.)?Window\s*[({]/g)) {
     problems.push(`${file}:${lineAt(m.index)}: constructs a Window in C#, which has no root tag to carry the font`);
   }
