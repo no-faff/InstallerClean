@@ -100,9 +100,10 @@ internal static class DetailWindowSizing
     /// the main window is on: the card's MinWidth and MaxWidth come from
     /// <see cref="CardWidths"/> with <see cref="WorkAreaWidthLimit"/> as the limit,
     /// and the window's MaxHeight is <see cref="WorkAreaHeightLimit"/>. Both are
-    /// taken again when the text size changes while the window is shown. A shown
-    /// window grows from a fixed top-left when its card grows, so each change of
-    /// its size goes through <see cref="NudgeIntoWorkArea"/> too.
+    /// taken again when the text size changes while the window is shown. Each change
+    /// of a shown window's size keeps the window's centre where it was, through
+    /// <see cref="KeepCentreWhenResized"/>, so a dialog opened over the main window
+    /// stays centred over it as its card grows or shrinks.
     /// <paramref name="minimumWidth"/> and <paramref name="maximumWidth"/> are the
     /// card's widths at 100% text scale, and the card carries no width of its own
     /// in XAML, so these are the only ones it has.
@@ -120,7 +121,30 @@ internal static class DetailWindowSizing
 
         Apply();
         window.OnTextScaleChangeWhileShown(Apply);
-        window.NudgeIntoWorkAreaWhenResized();
+        window.SizeChanged += (_, e) => KeepCentreWhenResized(window, e);
+    }
+
+    /// <summary>
+    /// Moves a shown <paramref name="window"/> by half the change in its size, so its
+    /// centre stays where it was, and then holds it inside its monitor's work area on
+    /// every side. WPF keeps a window's top-left fixed when its size changes, which
+    /// leaves a window that sizes to its content off-centre once it shrinks, and can
+    /// carry its bottom or right edge out of the work area once it grows. The first
+    /// size a window takes, before it is placed, is left alone, so the placement its
+    /// <see cref="Window.WindowStartupLocation"/> asks for stands. A window with no
+    /// handle yet, or an unresolvable monitor, is left where it is.
+    /// </summary>
+    public static void KeepCentreWhenResized(Window window, SizeChangedEventArgs e)
+    {
+        if (!window.IsLoaded || e.PreviousSize.Width <= 0 || e.PreviousSize.Height <= 0
+            || double.IsNaN(window.Left) || double.IsNaN(window.Top)
+            || !TryWorkArea(window, out var work))
+            return;
+
+        var left = window.Left + (e.PreviousSize.Width - e.NewSize.Width) / 2;
+        var top = window.Top + (e.PreviousSize.Height - e.NewSize.Height) / 2;
+        window.Left = Math.Max(work.Left, Math.Min(left, work.Right - e.NewSize.Width));
+        window.Top = Math.Max(work.Top, Math.Min(top, work.Bottom - e.NewSize.Height));
     }
 
     /// <summary>
@@ -244,27 +268,39 @@ internal static class DetailWindowSizing
     /// </summary>
     public static void NudgeIntoWorkArea(Window window)
     {
-        var hwnd = new WindowInteropHelper(window).Handle;
-        if (hwnd == IntPtr.Zero || double.IsNaN(window.Left) || double.IsNaN(window.Top))
+        if (double.IsNaN(window.Left) || double.IsNaN(window.Top) || !TryWorkArea(window, out var work))
             return;
+
+        if (window.Left + window.ActualWidth > work.Right)
+            window.Left = Math.Max(work.Left, work.Right - window.ActualWidth);
+        if (window.Top + window.ActualHeight > work.Bottom)
+            window.Top = Math.Max(work.Top, work.Bottom - window.ActualHeight);
+    }
+
+    /// <summary>
+    /// The work area of the monitor <paramref name="window"/> is on, in the units
+    /// Window.Left and Window.Top are expressed in. False while the window has no
+    /// handle, or when Windows names no monitor for it.
+    /// </summary>
+    private static bool TryWorkArea(Window window, out Rect work)
+    {
+        work = Rect.Empty;
+        var hwnd = new WindowInteropHelper(window).Handle;
+        if (hwnd == IntPtr.Zero)
+            return false;
 
         var monitor = User32.MonitorFromWindow(hwnd, User32.MONITOR_DEFAULTTONEAREST);
         var info = new User32.MONITORINFO { cbSize = Unsafe.SizeOf<User32.MONITORINFO>() };
         if (monitor == IntPtr.Zero || !User32.GetMonitorInfo(monitor, ref info))
-            return;
+            return false;
 
         // rcWork is device pixels; the window's DPI scale converts to
         // the units Window.Left/Top are expressed in.
         var dpi = VisualTreeHelper.GetDpi(window);
-        var workLeft = info.rcWork.Left / dpi.DpiScaleX;
-        var workTop = info.rcWork.Top / dpi.DpiScaleY;
-        var workRight = info.rcWork.Right / dpi.DpiScaleX;
-        var workBottom = info.rcWork.Bottom / dpi.DpiScaleY;
-
-        if (window.Left + window.ActualWidth > workRight)
-            window.Left = Math.Max(workLeft, workRight - window.ActualWidth);
-        if (window.Top + window.ActualHeight > workBottom)
-            window.Top = Math.Max(workTop, workBottom - window.ActualHeight);
+        work = new Rect(
+            new Point(info.rcWork.Left / dpi.DpiScaleX, info.rcWork.Top / dpi.DpiScaleY),
+            new Point(info.rcWork.Right / dpi.DpiScaleX, info.rcWork.Bottom / dpi.DpiScaleY));
+        return true;
     }
 
     private static (double Width, double Height) WorkArea(Window? reference)
