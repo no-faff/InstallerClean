@@ -88,8 +88,8 @@ public partial class AboutWindow : Window
     /// for the same reason.
     ///
     /// The constructor resolves the work area against the owner-to-be (the
-    /// main window); a live text-scale change re-resolves against the
-    /// actual owner.
+    /// main window); the bounds are taken again against the actual owner once
+    /// the window has its handle, and at each live text-scale change.
     /// </summary>
     private void ApplyScaledBounds()
     {
@@ -171,5 +171,4 @@ public partial class AboutWindow : Window
 
     private void DonateClick(object sender, RoutedEventArgs e) =>
         UrlLauncher.OpenUrl(SupportLink.TipPage(_windowsRegion));
-
 }

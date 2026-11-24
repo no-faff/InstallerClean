@@ -6,7 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Fixed
 
-- A Move or Delete confirmation, a message, the report or the third-party notices, open while the Windows text size changes, grows or shrinks about its centre, so it stays centred over the main window and inside the screen. It kept its top-left corner where it was, so a smaller text size left it off-centre.
+- A Move or Delete confirmation, a message, the report or the third-party notices, open while the Windows text size changes, grows or shrinks about its centre, so it stays centred over the window it opened from and inside the screen. It kept its top-left corner where it was, so a smaller text size left it off-centre.
 
 ## [3.8.0] - 2026-11-23
 

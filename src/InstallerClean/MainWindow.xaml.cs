@@ -125,8 +125,8 @@ public partial class MainWindow : Window
         // under the custom WindowChrome, leaving unpainted black along the
         // bottom and right edges. With no handle yet this resolves against
         // the primary work area, where CenterScreen opens the window
-        // anyway; a live text-scale change re-resolves against the actual
-        // monitor.
+        // anyway; the bounds are taken again against the actual monitor once
+        // the window has its handle, and at each live text-scale change.
         ApplyWorkAreaBounds();
         this.OnTextScaleChangeWhileShown(ApplyWorkAreaBounds);
 

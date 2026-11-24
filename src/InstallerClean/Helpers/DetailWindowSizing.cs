@@ -102,8 +102,10 @@ internal static class DetailWindowSizing
     /// and the window's MaxHeight is <see cref="WorkAreaHeightLimit"/>. Both are
     /// taken again when the text size changes while the window is shown. Each change
     /// of a shown window's size keeps the window's centre where it was, through
-    /// <see cref="KeepCentreWhenResized"/>, so a dialog opened over the main window
-    /// stays centred over it as its card grows or shrinks.
+    /// <see cref="KeepCentreWhenResized"/>, so a dialog keeps its centre over the
+    /// window it opened from as its card grows or shrinks. Once the window is placed,
+    /// <see cref="NudgeIntoWorkArea"/> brings back an edge its placement left outside
+    /// the work area.
     /// <paramref name="minimumWidth"/> and <paramref name="maximumWidth"/> are the
     /// card's widths at 100% text scale, and the card carries no width of its own
     /// in XAML, so these are the only ones it has.
@@ -121,16 +123,18 @@ internal static class DetailWindowSizing
 
         Apply();
         window.OnTextScaleChangeWhileShown(Apply);
+        window.Loaded += (_, _) => NudgeIntoWorkArea(window);
         window.SizeChanged += (_, e) => KeepCentreWhenResized(window, e);
     }
 
     /// <summary>
     /// Moves a shown <paramref name="window"/> by half the change in its size, so its
-    /// centre stays where it was, and then holds it inside its monitor's work area on
-    /// every side. WPF keeps a window's top-left fixed when its size changes, which
-    /// leaves a window that sizes to its content off-centre once it shrinks, and can
-    /// carry its bottom or right edge out of the work area once it grows. The first
-    /// size a window takes, before it is placed, is left alone, so the placement its
+    /// centre stays where it was. WPF keeps a window's top-left fixed when its size
+    /// changes, which leaves a window that sizes to its content off-centre once it
+    /// shrinks. An edge the change carries out of the work area of the window's
+    /// monitor is brought back to it; an edge already outside it, as on a window the
+    /// user has dragged across two monitors, stays where it is. The sizes a window
+    /// takes before it is loaded are left alone, so the placement its
     /// <see cref="Window.WindowStartupLocation"/> asks for stands. A window with no
     /// handle yet, or an unresolvable monitor, is left where it is.
     /// </summary>
@@ -141,15 +145,32 @@ internal static class DetailWindowSizing
             || !TryWorkArea(window, out var work))
             return;
 
-        var left = window.Left + (e.PreviousSize.Width - e.NewSize.Width) / 2;
-        var top = window.Top + (e.PreviousSize.Height - e.NewSize.Height) / 2;
-        window.Left = Math.Max(work.Left, Math.Min(left, work.Right - e.NewSize.Width));
-        window.Top = Math.Max(work.Top, Math.Min(top, work.Bottom - e.NewSize.Height));
+        window.Left = Recentred(window.Left, e.PreviousSize.Width, e.NewSize.Width, work.Left, work.Right);
+        window.Top = Recentred(window.Top, e.PreviousSize.Height, e.NewSize.Height, work.Top, work.Bottom);
     }
 
     /// <summary>
-    /// Runs <paramref name="apply"/> each time the text size changes, from the moment
-    /// <paramref name="window"/> has a handle until it closes. The subscription to
+    /// The start of a span that was <paramref name="previousLength"/> long at
+    /// <paramref name="start"/> and is now <paramref name="newLength"/> long, moved by
+    /// half the change so its centre stays put. Where that carries its far end past
+    /// <paramref name="workEnd"/>, or its near end before <paramref name="workStart"/>,
+    /// and that end was inside before, the end is brought back to the work area, the
+    /// near end winning where both cross. All values in device-independent units.
+    /// </summary>
+    public static double Recentred(
+        double start, double previousLength, double newLength, double workStart, double workEnd)
+    {
+        var moved = start + (previousLength - newLength) / 2;
+        if (moved + newLength > workEnd && start + previousLength <= workEnd)
+            moved = workEnd - newLength;
+        if (moved < workStart && start >= workStart)
+            moved = workStart;
+        return moved;
+    }
+
+    /// <summary>
+    /// Runs <paramref name="apply"/> once when <paramref name="window"/> has a handle,
+    /// and again each time the text size changes until it closes. The subscription to
     /// <see cref="AccessibilitySettings.Current"/>, which lives as long as the app, is
     /// taken only once the window is shown, so a window built and never shown is not
     /// kept alive by it.
@@ -162,7 +183,11 @@ internal static class DetailWindowSizing
                 apply();
         }
 
-        window.SourceInitialized += (_, _) => AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
+        window.SourceInitialized += (_, _) =>
+        {
+            apply();
+            AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
+        };
         window.Closed += (_, _) => AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
     }
 
