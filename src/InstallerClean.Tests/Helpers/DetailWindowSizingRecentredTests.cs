@@ -45,6 +45,21 @@ public class DetailWindowSizingRecentredTests
     }
 
     [Fact]
+    public void A_far_edge_flush_with_the_work_area_or_a_rounding_past_it_is_held_there()
+    {
+        // 400 high ending at 1000, and at 1000.3, growing to 500.
+        Assert.Equal(500.0, DetailWindowSizing.Recentred(600, 400, 500, 0, 1000));
+        Assert.Equal(500.0, DetailWindowSizing.Recentred(600.3, 400, 500, 0, 1000));
+    }
+
+    [Fact]
+    public void A_near_edge_flush_with_the_work_area_or_a_rounding_before_it_is_held_there()
+    {
+        Assert.Equal(0.0, DetailWindowSizing.Recentred(0, 400, 500, 0, 1000));
+        Assert.Equal(0.0, DetailWindowSizing.Recentred(-0.3, 400, 500, 0, 1000));
+    }
+
+    [Fact]
     public void A_window_wider_than_the_work_area_keeps_its_near_edge_inside()
     {
         Assert.Equal(0.0, DetailWindowSizing.Recentred(100, 800, 1200, 0, 1000));

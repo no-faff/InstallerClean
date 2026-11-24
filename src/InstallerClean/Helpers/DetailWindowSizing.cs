@@ -104,8 +104,8 @@ internal static class DetailWindowSizing
     /// of a shown window's size keeps the window's centre where it was, through
     /// <see cref="KeepCentreWhenResized"/>, so a dialog keeps its centre over the
     /// window it opened from as its card grows or shrinks. Once the window is placed,
-    /// <see cref="NudgeIntoWorkArea"/> brings back an edge its placement left outside
-    /// the work area.
+    /// <see cref="PlaceInsideWorkArea"/> brings back any edge its placement left
+    /// outside the work area.
     /// <paramref name="minimumWidth"/> and <paramref name="maximumWidth"/> are the
     /// card's widths at 100% text scale, and the card carries no width of its own
     /// in XAML, so these are the only ones it has.
@@ -123,7 +123,7 @@ internal static class DetailWindowSizing
 
         Apply();
         window.OnTextScaleChangeWhileShown(Apply);
-        window.Loaded += (_, _) => NudgeIntoWorkArea(window);
+        window.Loaded += (_, _) => PlaceInsideWorkArea(window);
         window.SizeChanged += (_, e) => KeepCentreWhenResized(window, e);
     }
 
@@ -136,11 +136,14 @@ internal static class DetailWindowSizing
     /// user has dragged across two monitors, stays where it is. The sizes a window
     /// takes before it is loaded are left alone, so the placement its
     /// <see cref="Window.WindowStartupLocation"/> asks for stands. A window with no
-    /// handle yet, or an unresolvable monitor, is left where it is.
+    /// handle yet, or an unresolvable monitor, is left where it is. Only a window the
+    /// user cannot resize is moved: on one the user drags to a new size, moving it
+    /// would pull the edge the user is not dragging.
     /// </summary>
     public static void KeepCentreWhenResized(Window window, SizeChangedEventArgs e)
     {
-        if (!window.IsLoaded || e.PreviousSize.Width <= 0 || e.PreviousSize.Height <= 0
+        if (window.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip
+            || !window.IsLoaded || e.PreviousSize.Width <= 0 || e.PreviousSize.Height <= 0
             || double.IsNaN(window.Left) || double.IsNaN(window.Top)
             || !TryWorkArea(window, out var work))
             return;
@@ -155,22 +158,47 @@ internal static class DetailWindowSizing
     /// half the change so its centre stays put. Where that carries its far end past
     /// <paramref name="workEnd"/>, or its near end before <paramref name="workStart"/>,
     /// and that end was inside before, the end is brought back to the work area, the
-    /// near end winning where both cross. All values in device-independent units.
+    /// near end winning where both cross. An end within <see cref="EdgeTolerance"/>
+    /// past the work-area edge counts as inside, so a window placed flush against the
+    /// edge, which rounding to device pixels can leave a fraction over it, is held
+    /// there. All values in device-independent units.
     /// </summary>
     public static double Recentred(
         double start, double previousLength, double newLength, double workStart, double workEnd)
     {
         var moved = start + (previousLength - newLength) / 2;
-        if (moved + newLength > workEnd && start + previousLength <= workEnd)
+        if (moved + newLength > workEnd && start + previousLength <= workEnd + EdgeTolerance)
             moved = workEnd - newLength;
-        if (moved < workStart && start >= workStart)
+        if (moved < workStart && start >= workStart - EdgeTolerance)
             moved = workStart;
         return moved;
     }
 
     /// <summary>
-    /// Runs <paramref name="apply"/> once when <paramref name="window"/> has a handle,
-    /// and again each time the text size changes until it closes. The subscription to
+    /// How far past a work-area edge a window's edge may sit and still count as
+    /// inside it: half a device pixel at 100% display scale.
+    /// </summary>
+    private const double EdgeTolerance = 0.5;
+
+    /// <summary>
+    /// Moves <paramref name="window"/> so that every edge is inside its monitor's
+    /// work area, the left and top edges winning where the window is larger than
+    /// the work area, so its title bar stays reachable. A window with no handle yet,
+    /// or an unresolvable monitor, is left where it is.
+    /// </summary>
+    public static void PlaceInsideWorkArea(Window window)
+    {
+        if (double.IsNaN(window.Left) || double.IsNaN(window.Top) || !TryWorkArea(window, out var work))
+            return;
+
+        window.Left = Math.Max(work.Left, Math.Min(window.Left, work.Right - window.ActualWidth));
+        window.Top = Math.Max(work.Top, Math.Min(window.Top, work.Bottom - window.ActualHeight));
+    }
+
+    /// <summary>
+    /// Runs <paramref name="apply"/> each time the text size changes while
+    /// <paramref name="window"/> is shown, and once when it gets its handle if the
+    /// text size has changed since this was called. The subscription to
     /// <see cref="AccessibilitySettings.Current"/>, which lives as long as the app, is
     /// taken only once the window is shown, so a window built and never shown is not
     /// kept alive by it.
@@ -183,10 +211,12 @@ internal static class DetailWindowSizing
                 apply();
         }
 
+        var factorWhenBuilt = AccessibilitySettings.Current.TextScaleFactor;
         window.SourceInitialized += (_, _) =>
         {
-            apply();
             AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
+            if (AccessibilitySettings.Current.TextScaleFactor != factorWhenBuilt)
+                apply();
         };
         window.Closed += (_, _) => AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
     }
