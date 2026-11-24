@@ -48,13 +48,10 @@ public partial class AboutWindow : Window
 
         ApplyScaledBounds();
         this.OnTextScaleChangeWhileShown(ApplyScaledBounds);
-        // SizeChanged fires when the height-sized window grows: a live
-        // text-scale increase re-applies the bounds and the content grows
-        // with the larger type. The window grows down from a fixed
-        // top-left, and the nudge brings the Close row back inside the
-        // work area. NoResize means SizeChanged never fires for a user
-        // drag-resize.
-        this.NudgeIntoWorkAreaWhenResized();
+        // A live text-scale change re-applies the bounds and the height-sized
+        // window grows or shrinks with the type, keeping its centre and with
+        // its Close row held inside the work area.
+        this.KeepCentreAcrossTextScaleChanges();
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();

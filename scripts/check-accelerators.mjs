@@ -35,6 +35,7 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { supportedLanguages } from './supported-languages.mjs';
+import { lineIndex } from './source-files.mjs';
 
 const DIR = 'src/InstallerClean.Core/Resources';
 
@@ -236,20 +237,6 @@ const xamlFiles = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e)
   e.isDirectory() ? (['bin', 'obj'].includes(e.name) ? [] : xamlFiles(join(dir, e.name)))
     : e.name.endsWith('.xaml') ? [join(dir, e.name)] : []);
 const blankComments = (t) => t.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '));
-// The line a character offset falls on, counted from 1: the offsets at which each
-// line starts are taken once per text, and the line is found by halving.
-const lineFinder = (text) => {
-  const starts = [0];
-  for (let i = text.indexOf('\n'); i !== -1; i = text.indexOf('\n', i + 1)) starts.push(i + 1);
-  return (offset) => {
-    let low = 0, high = starts.length - 1;
-    while (low < high) {
-      const mid = (low + high + 1) >> 1;
-      if (starts[mid] <= offset) low = mid; else high = mid - 1;
-    }
-    return low + 1;
-  };
-};
 const wrappingTemplates = (text) => {
   const ok = new Set();
   for (const m of text.matchAll(/<DataTemplate\s+x:Key="([^"]+)"\s*>([\s\S]*?)<\/DataTemplate>/g))
@@ -260,7 +247,7 @@ let sitesChecked = 0;
 const consumerProblems = [];
 for (const file of xamlFiles(XAML_ROOT)) {
   const text = blankComments(readFileSync(file, 'utf8'));
-  const lineAt = lineFinder(text);
+  const lineAt = lineIndex(text);
   const templates = wrappingTemplates(text);
   for (const tag of text.matchAll(/<([\w:.]+)\b([^<>]*?)\/?>/g)) {
     const [, element, attributes] = tag;
@@ -299,7 +286,7 @@ const KEYLESS_REQUIRED = [
 const keylessSites = [];
 for (const file of xamlFiles(XAML_ROOT)) {
   const text = blankComments(readFileSync(file, 'utf8'));
-  const lineAt = lineFinder(text);
+  const lineAt = lineIndex(text);
   for (const tag of text.matchAll(/<([\w:.]+)\b([^<>]*?)\/?>/g)) {
     const [, element, attributes] = tag;
     const line = lineAt(tag.index);

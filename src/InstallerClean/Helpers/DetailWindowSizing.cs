@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
@@ -100,12 +101,9 @@ internal static class DetailWindowSizing
     /// the main window is on: the card's MinWidth and MaxWidth come from
     /// <see cref="CardWidths"/> with <see cref="WorkAreaWidthLimit"/> as the limit,
     /// and the window's MaxHeight is <see cref="WorkAreaHeightLimit"/>. Both are
-    /// taken again when the text size changes while the window is shown. Each change
-    /// of a shown window's size keeps the window's centre where it was, through
-    /// <see cref="KeepCentreWhenResized"/>, so a dialog keeps its centre over the
-    /// window it opened from as its card grows or shrinks. Once the window is placed,
-    /// <see cref="PlaceInsideWorkArea"/> brings back any edge its placement left
-    /// outside the work area.
+    /// taken again when the text size changes while the window is shown, and the
+    /// window keeps its centre where it was as its card grows or shrinks, through
+    /// <see cref="KeepCentreAcrossTextScaleChanges"/>.
     /// <paramref name="minimumWidth"/> and <paramref name="maximumWidth"/> are the
     /// card's widths at 100% text scale, and the card carries no width of its own
     /// in XAML, so these are the only ones it has.
@@ -123,33 +121,64 @@ internal static class DetailWindowSizing
 
         Apply();
         window.OnTextScaleChangeWhileShown(Apply);
-        window.Loaded += (_, _) => PlaceInsideWorkArea(window);
-        window.SizeChanged += (_, e) => KeepCentreWhenResized(window, e);
+        window.KeepCentreAcrossTextScaleChanges();
     }
 
     /// <summary>
-    /// Moves a shown <paramref name="window"/> by half the change in its size, so its
-    /// centre stays where it was. WPF keeps a window's top-left fixed when its size
-    /// changes, which leaves a window that sizes to its content off-centre once it
-    /// shrinks. An edge the change carries out of the work area of the window's
-    /// monitor is brought back to it; an edge already outside it, as on a window the
-    /// user has dragged across two monitors, stays where it is. The sizes a window
-    /// takes before it is loaded are left alone, so the placement its
-    /// <see cref="Window.WindowStartupLocation"/> asks for stands. A window with no
-    /// handle yet, or an unresolvable monitor, is left where it is. Only a window the
-    /// user cannot resize is moved: on one the user drags to a new size, moving it
+    /// Keeps a dialog that sizes to its content centred where it was when a change of
+    /// the text size grows or shrinks it. WPF keeps a window's top-left fixed when its
+    /// size changes, which leaves such a window off-centre once it shrinks. Each size
+    /// change that follows a text-size change moves the window by half the change,
+    /// through <see cref="Recentred"/>; any other, such as Windows rescaling the window
+    /// as it is dragged onto a monitor with another display scale, leaves it where it
+    /// is. Once the window is placed, <see cref="PlaceInsideWorkArea"/> brings back
+    /// any edge its placement left outside the work area.
+    /// The sizes a window takes before it is loaded are left alone, so the placement
+    /// its <see cref="Window.WindowStartupLocation"/> asks for stands. Only a window
+    /// the user cannot resize is moved: on one the user drags to a new size, moving it
     /// would pull the edge the user is not dragging.
     /// </summary>
-    public static void KeepCentreWhenResized(Window window, SizeChangedEventArgs e)
+    public static void KeepCentreAcrossTextScaleChanges(this Window window)
     {
-        if (window.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip
-            || !window.IsLoaded || e.PreviousSize.Width <= 0 || e.PreviousSize.Height <= 0
-            || double.IsNaN(window.Left) || double.IsNaN(window.Top)
-            || !TryWorkArea(window, out var work))
+        if (window.ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip)
             return;
 
-        window.Left = Recentred(window.Left, e.PreviousSize.Width, e.NewSize.Width, work.Left, work.Right);
-        window.Top = Recentred(window.Top, e.PreviousSize.Height, e.NewSize.Height, work.Top, work.Bottom);
+        // True from a text-size change until the layout it starts has run: layout runs
+        // at Render priority, ahead of the Loaded-priority call that clears it.
+        var textScaleChanged = false;
+        // The unrounded position this last gave the window. Windows reports a window's
+        // position back in whole device pixels, so moving on from the reported position
+        // would let the centre drift by up to half a pixel at each change.
+        (double Left, double Top)? lastSet = null;
+
+        window.OnTextScaleChangeWhileShown(() =>
+        {
+            textScaleChanged = true;
+            window.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => textScaleChanged = false));
+        });
+        window.Loaded += (_, _) =>
+        {
+            PlaceInsideWorkArea(window);
+            lastSet = null;
+        };
+        window.SizeChanged += (_, e) =>
+        {
+            if (!textScaleChanged || !window.IsLoaded
+                || e.PreviousSize.Width <= 0 || e.PreviousSize.Height <= 0
+                || double.IsNaN(window.Left) || double.IsNaN(window.Top)
+                || !TryWorkArea(window, out var work))
+                return;
+
+            var (left, top) = lastSet is { } set
+                && Math.Abs(set.Left - window.Left) < 1 && Math.Abs(set.Top - window.Top) < 1
+                ? set
+                : (window.Left, window.Top);
+            left = Recentred(left, e.PreviousSize.Width, e.NewSize.Width, work.Left, work.Right);
+            top = Recentred(top, e.PreviousSize.Height, e.NewSize.Height, work.Top, work.Bottom);
+            window.Left = left;
+            window.Top = top;
+            lastSet = (left, top);
+        };
     }
 
     /// <summary>
@@ -196,11 +225,12 @@ internal static class DetailWindowSizing
     }
 
     /// <summary>
-    /// Runs <paramref name="apply"/> each time the text size changes while
-    /// <paramref name="window"/> is shown, and once when it gets its handle if the
-    /// text size has changed since this was called. The subscription to
+    /// Runs <paramref name="apply"/> each time the text size changes, from when
+    /// <paramref name="window"/> gets its handle until it closes, and once when it
+    /// gets its handle if the text size has changed since this was called. On a window
+    /// that already has its handle the subscription is taken at once. The subscription to
     /// <see cref="AccessibilitySettings.Current"/>, which lives as long as the app, is
-    /// taken only once the window is shown, so a window built and never shown is not
+    /// taken no earlier than the handle, so a window built and never shown is not
     /// kept alive by it.
     /// </summary>
     public static void OnTextScaleChangeWhileShown(this Window window, Action apply)
@@ -211,6 +241,13 @@ internal static class DetailWindowSizing
                 apply();
         }
 
+        window.Closed += (_, _) => AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
+        if (new WindowInteropHelper(window).Handle != IntPtr.Zero)
+        {
+            AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
+            return;
+        }
+
         var factorWhenBuilt = AccessibilitySettings.Current.TextScaleFactor;
         window.SourceInitialized += (_, _) =>
         {
@@ -218,7 +255,6 @@ internal static class DetailWindowSizing
             if (AccessibilitySettings.Current.TextScaleFactor != factorWhenBuilt)
                 apply();
         };
-        window.Closed += (_, _) => AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
     }
 
     /// <summary>

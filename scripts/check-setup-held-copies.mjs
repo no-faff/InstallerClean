@@ -36,6 +36,7 @@
 import { readFileSync } from 'node:fs';
 import { readCSharp } from './csharp-source.mjs';
 import { readIss } from './iss-source.mjs';
+import { lineIndex } from './source-files.mjs';
 
 const SETUP_FILE = 'installer/InstallerClean.iss';
 const CODE_FILE = 'src/InstallerClean.Core/Services/ExeReplacement.cs';
@@ -127,7 +128,7 @@ for (const l of lines) {
 // each aside and the completed install clears what earlier setups left of each. Its
 // entries run from 0 with no gap, and both loops run to AppFileCount, which counts them.
 const text = lines.map((l) => l.text).join('\n');
-const lineAt = (index) => setupSource.slice(0, index).split('\n').length;
+const lineAt = lineIndex(setupSource);
 const held = new Map();
 const appFile = setupSource.match(/function\s+AppFile\s*\(\s*I\s*:\s*Integer\s*\)\s*:\s*String\s*;[\s\S]*?\nend;/i);
 if (!appFile) problems.push(`${SETUP_FILE}: no 'function AppFile(I: Integer): String;' found`);
@@ -167,8 +168,9 @@ if (!holdAll || !everyFile(String.raw`Result\s*:=\s*HoldAside\s*\(\s*AppFile\s*\
 // path the file was held aside from.
 const renames = [...text.matchAll(/RenameAside\s*\(\s*([^,()]+?)\s*,\s*([^,()]+?)\s*,\s*'\{#(\w+)\}'\s*\)/g)];
 if (renames.length === 0) problems.push(`${SETUP_FILE}: no RenameAside(..., ..., '{#...}') call found; the check has read nothing`);
+const textLineAt = lineIndex(text);
 for (const m of renames) {
-  const line = text.slice(0, m.index).split('\n').length;
+  const line = textLineAt(m.index);
   console.log(`${SETUP_FILE}:${line}: renames ${m[1]} to a free ${m[3]} name of ${m[2]}`);
   const base = m[2].replace(/\s+/g, '');
   if (m[3] === 'HeldSuffix' && base !== m[1].replace(/\s+/g, '')) {
