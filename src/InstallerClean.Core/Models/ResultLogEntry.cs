@@ -43,13 +43,12 @@ public sealed record ResultLogEntry(
     /// supersededCount; receivers must branch on this version before
     /// reading either field.
     ///
-    /// Schema 3 added an optional per-code count map to each error bucket,
-    /// carrying the shell HRESULTs behind two delete-only categories. Delete
-    /// no longer goes through the shell, so those two categories and the map
-    /// with them stopped being produced: a schema-3 report from that change
-    /// on carries the same error categories as a Move and no <c>codes</c>
-    /// field at all. Both are subtractions from an allowlisting receiver's
-    /// point of view, which is why the version did not move for them.
+    /// Schema 3 adds an optional per-code count map to each error bucket,
+    /// carrying the shell HRESULTs behind two delete-only categories. A
+    /// schema-3 report carries those two categories and the map, or neither:
+    /// without them it carries the same error categories as a Move and no
+    /// <c>codes</c> field at all. Both are subtractions from an allowlisting
+    /// receiver's point of view, so the version does not move for them.
     ///
     /// SCHEMA 4 IS THE FIRST BUMP THAT IS NOT A SHAPE CHANGE FOR ITS OWN SAKE.
     /// The payload carries what varies BETWEEN machines: a <c>machine</c> object of shape
@@ -59,15 +58,14 @@ public sealed record ResultLogEntry(
     /// answer. <c>pendingReboot</c> leaves, being structurally forced on any run
     /// that could act and unvarying across every report received.
     ///
-    /// SIX OF THOSE KEYS WENT AGAIN IN 3.0.0 AND THE VERSION DID NOT MOVE, on the
-    /// schema-3 precedent above: the identity pass's three scan-time outcomes, its
-    /// instance-transform count, and two of the re-verify's five held-back causes
-    /// all stopped being produced when the check that produced them was removed. Two
-    /// arrived in the same release, under <c>machine</c>, counting the products
-    /// installed as a second instance of themselves and the products that would not
-    /// answer that question. A KEY THAT CEASES TO BE PRODUCED IS A SUBTRACTION; A
-    /// KEY WHOSE MEANING CHANGES IS NOT, which is why the missing-files split was
-    /// added beside its total rather than over it.
+    /// A SCHEMA-4 REPORT TAKES ONE OF TWO SHAPES, on the schema-3 precedent above. In
+    /// the second, six of those keys are absent: the identity pass's three scan-time
+    /// outcomes, its instance-transform count, and two of the re-verify's five
+    /// held-back causes. Two keys under <c>machine</c> are present in it instead,
+    /// counting the products installed as a second instance of themselves and the
+    /// products that would not answer that question. A KEY THAT CEASES TO BE PRODUCED
+    /// IS A SUBTRACTION; A KEY WHOSE MEANING CHANGES IS NOT, which is why the
+    /// missing-files split sits beside its total rather than over it.
     ///
     /// SCHEMA 5 ADDS KEYS AND TAKES NONE AWAY: the registry side's failed reads under
     /// <c>machine</c>; under <c>scan</c> the seven arms of the withholding split that
