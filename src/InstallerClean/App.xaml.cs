@@ -905,7 +905,7 @@ public partial class App : Application
 
         AccessibilitySettings.Current.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
+            if (AccessibilitySettings.IsTextScaleChange(e))
                 ScaleTypeTokens();
         };
     }

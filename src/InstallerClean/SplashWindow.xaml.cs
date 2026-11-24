@@ -74,7 +74,7 @@ public partial class SplashWindow : Window
         // The window grows down from a fixed top-left when a live text-size change
         // enlarges its text, so each change of its size brings it back inside the
         // work area. NoResize means SizeChanged never fires for a user drag-resize.
-        SizeChanged += (_, _) => DetailWindowSizing.NudgeIntoWorkArea(this);
+        this.NudgeIntoWorkAreaWhenResized();
 
         this.SuppressFocusVisualOnDeactivation();
         // Loaded fires after the visual tree is realised, so Focus()

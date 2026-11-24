@@ -128,14 +128,14 @@ public partial class MainWindow : Window
         // anyway; a live text-scale change re-resolves against the actual
         // monitor.
         ApplyWorkAreaBounds();
-        AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
+        this.OnTextScaleChangeWhileShown(ApplyWorkAreaBounds);
 
         // A live text-scale increase re-applies the scaled bounds and
         // the shown window grows down and right from its fixed
         // top-left, which can push the action rows off the work area
         // even though the size clamps hold. NoResize means SizeChanged
         // only ever fires for that growth, never a user drag-resize.
-        SizeChanged += OnWindowSizeChanged;
+        this.NudgeIntoWorkAreaWhenResized();
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
@@ -284,15 +284,6 @@ public partial class MainWindow : Window
         TooltipPlacement.WidenToWindow(CompletionDonateToolTip, Width, ToolTipEdgeMargin);
     }
 
-    private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
-            ApplyWorkAreaBounds();
-    }
-
-    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
-        => DetailWindowSizing.NudgeIntoWorkArea(this);
-
     private void OnClosing(object? sender, CancelEventArgs e)
     {
         // IsMoveOrDeleteRunning, which is true from the first line of the Move or
@@ -346,8 +337,6 @@ public partial class MainWindow : Window
         CompletionCard.SizeChanged -= OnReportPanelSurroundsSizeChanged;
         Deactivated -= OnDeactivatedDuringUpdateCheck;
         Activated -= OnActivatedDuringUpdateCheck;
-        AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
-        SizeChanged -= OnWindowSizeChanged;
         Closing -= OnClosing;
         Closed -= OnClosed;
     }

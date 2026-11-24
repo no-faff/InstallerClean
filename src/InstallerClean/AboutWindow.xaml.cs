@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Windows;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
@@ -48,14 +47,14 @@ public partial class AboutWindow : Window
             DonateToolTip, this, ToolTipAnchor.Left, ToolTipEdgeMargin);
 
         ApplyScaledBounds();
-        AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
+        this.OnTextScaleChangeWhileShown(ApplyScaledBounds);
         // SizeChanged fires when the height-sized window grows: a live
         // text-scale increase re-applies the bounds and the content grows
         // with the larger type. The window grows down from a fixed
         // top-left, and the nudge brings the Close row back inside the
         // work area. NoResize means SizeChanged never fires for a user
         // drag-resize.
-        SizeChanged += OnWindowSizeChanged;
+        this.NudgeIntoWorkAreaWhenResized();
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
@@ -105,15 +104,6 @@ public partial class AboutWindow : Window
         MinHeight = DetailWindowSizing.ClampHeightToWorkArea(reference, 400 * factor, 0);
         MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(reference);
     }
-
-    private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
-            ApplyScaledBounds();
-    }
-
-    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
-        => DetailWindowSizing.NudgeIntoWorkArea(this);
 
     // How close a tooltip may come to either edge of this window, as in the main
     // window.
@@ -182,10 +172,4 @@ public partial class AboutWindow : Window
     private void DonateClick(object sender, RoutedEventArgs e) =>
         UrlLauncher.OpenUrl(SupportLink.TipPage(_windowsRegion));
 
-    protected override void OnClosed(EventArgs e)
-    {
-        AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
-        SizeChanged -= OnWindowSizeChanged;
-        base.OnClosed(e);
-    }
 }

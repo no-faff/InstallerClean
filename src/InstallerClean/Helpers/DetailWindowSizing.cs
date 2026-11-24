@@ -100,7 +100,7 @@ internal static class DetailWindowSizing
     /// the main window is on: the card's MinWidth and MaxWidth come from
     /// <see cref="CardWidths"/> with <see cref="WorkAreaWidthLimit"/> as the limit,
     /// and the window's MaxHeight is <see cref="WorkAreaHeightLimit"/>. Both are
-    /// taken again when the text size changes, until the window closes. A shown
+    /// taken again when the text size changes while the window is shown. A shown
     /// window grows from a fixed top-left when its card grows, so each change of
     /// its size goes through <see cref="NudgeIntoWorkArea"/> too.
     /// <paramref name="minimumWidth"/> and <paramref name="maximumWidth"/> are the
@@ -118,23 +118,38 @@ internal static class DetailWindowSizing
             window.MaxHeight = WorkAreaHeightLimit(reference);
         }
 
+        Apply();
+        window.OnTextScaleChangeWhileShown(Apply);
+        window.NudgeIntoWorkAreaWhenResized();
+    }
+
+    /// <summary>
+    /// Runs <paramref name="apply"/> each time the text size changes, from the moment
+    /// <paramref name="window"/> has a handle until it closes. The subscription to
+    /// <see cref="AccessibilitySettings.Current"/>, which lives as long as the app, is
+    /// taken only once the window is shown, so a window built and never shown is not
+    /// kept alive by it.
+    /// </summary>
+    public static void OnTextScaleChangeWhileShown(this Window window, Action apply)
+    {
         void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
-                Apply();
+            if (AccessibilitySettings.IsTextScaleChange(e))
+                apply();
         }
 
-        void OnWindowSizeChanged(object sender, SizeChangedEventArgs e) => NudgeIntoWorkArea(window);
-
-        Apply();
-        AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
-        window.SizeChanged += OnWindowSizeChanged;
-        window.Closed += (_, _) =>
-        {
-            AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
-            window.SizeChanged -= OnWindowSizeChanged;
-        };
+        window.SourceInitialized += (_, _) => AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
+        window.Closed += (_, _) => AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
     }
+
+    /// <summary>
+    /// Sends each change of <paramref name="window"/>'s size through
+    /// <see cref="NudgeIntoWorkArea"/>. A shown window that sizes to its content
+    /// grows down and right from a fixed top-left, which can carry its bottom or
+    /// right edge out of the work area.
+    /// </summary>
+    public static void NudgeIntoWorkAreaWhenResized(this Window window)
+        => window.SizeChanged += (_, _) => NudgeIntoWorkArea(window);
 
     /// <summary>
     /// The widest a card may be in a room <paramref name="roomWidth"/> wide when it
@@ -148,9 +163,9 @@ internal static class DetailWindowSizing
     /// Holds a card that sits over the window's content inside the room
     /// <paramref name="room"/> gives it, less the card's own left and right margins:
     /// the card's MinWidth and MaxWidth come from <see cref="CardWidths"/> with that
-    /// width as the limit. Both are taken again when the room changes size or the
-    /// text size changes, until the window closes, and not while the room has not
-    /// been laid out. <paramref name="minimumWidth"/> and
+    /// width as the limit. Both are taken at once, and again when the room's width
+    /// changes or the text size changes while the window is shown, and never while
+    /// the room has not been laid out. <paramref name="minimumWidth"/> and
     /// <paramref name="maximumWidth"/> are the card's widths at 100% text scale,
     /// and the card carries no width of its own in XAML.
     /// </summary>
@@ -167,25 +182,9 @@ internal static class DetailWindowSizing
                 RoomLimit(room.ActualWidth, card.Margin.Left + card.Margin.Right));
         }
 
-        void OnRoomSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (e.WidthChanged)
-                Apply();
-        }
-
-        void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
-                Apply();
-        }
-
-        room.SizeChanged += OnRoomSizeChanged;
-        AccessibilitySettings.Current.PropertyChanged += OnSettingsChanged;
-        window.Closed += (_, _) =>
-        {
-            room.SizeChanged -= OnRoomSizeChanged;
-            AccessibilitySettings.Current.PropertyChanged -= OnSettingsChanged;
-        };
+        Apply();
+        OnRoomWidthChange(window, room, Apply);
+        window.OnTextScaleChangeWhileShown(Apply);
     }
 
     /// <summary>
@@ -199,19 +198,35 @@ internal static class DetailWindowSizing
     /// <summary>
     /// Holds the MinWidth the XAML gives <paramref name="element"/> inside the room
     /// <paramref name="room"/> gives it, less the element's own left and right
-    /// margins, through <see cref="HeldMinimum"/>. Taken again whenever the room's
-    /// width changes, until the window closes, and not while the room has not been
-    /// laid out. Suits a MinWidth that does not scale with the text size; one that
+    /// margins, through <see cref="HeldMinimum"/>. Taken at once, and again whenever
+    /// the room's width changes until the window closes, and never while the room has
+    /// not been laid out. Suits a MinWidth that does not scale with the text size; one that
     /// does goes through <see cref="KeepCardInsideRoom"/>.
     /// </summary>
     public static void KeepMinWidthInsideRoom(this Window window, FrameworkElement element, FrameworkElement room)
     {
         var minimum = element.MinWidth;
 
+        void Apply()
+        {
+            if (room.ActualWidth > 0)
+                element.MinWidth = HeldMinimum(minimum, room.ActualWidth, element.Margin.Left + element.Margin.Right);
+        }
+
+        Apply();
+        OnRoomWidthChange(window, room, Apply);
+    }
+
+    /// <summary>
+    /// Runs <paramref name="apply"/> each time <paramref name="room"/>'s width
+    /// changes, until <paramref name="window"/> closes.
+    /// </summary>
+    private static void OnRoomWidthChange(Window window, FrameworkElement room, Action apply)
+    {
         void OnRoomSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (e.WidthChanged && room.ActualWidth > 0)
-                element.MinWidth = HeldMinimum(minimum, room.ActualWidth, element.Margin.Left + element.Margin.Right);
+            if (e.WidthChanged)
+                apply();
         }
 
         room.SizeChanged += OnRoomSizeChanged;

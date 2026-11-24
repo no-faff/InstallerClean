@@ -76,6 +76,13 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Whether <paramref name="e"/> reports a change of <see cref="TextScaleFactor"/>:
+    /// it names that property, or names none, which stands for every property.
+    /// </summary>
+    public static bool IsTextScaleChange(PropertyChangedEventArgs e)
+        => e.PropertyName is null or nameof(TextScaleFactor);
+
     private void Refresh()
     {
         // SystemEvents can raise off the dispatcher thread, so the read is
