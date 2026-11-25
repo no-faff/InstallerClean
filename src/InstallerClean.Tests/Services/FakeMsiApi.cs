@@ -137,6 +137,27 @@ internal sealed class FakeMsiApi : IMsiApi
     /// </summary>
     public uint? RetrySidLengthSeen { get; private set; }
 
+    /// <summary>
+    /// The machine's lists of installed programs, walked as Windows Installer walks them,
+    /// in place of <see cref="Products"/> where set. A walk across every context and
+    /// account reads them in this order; a walk naming one context reads that context's
+    /// lists, and one naming an account as well reads that account's alone.
+    ///
+    /// An entry is a registry key name. A packed program code gives that program's row,
+    /// in the list's context and account. A longer name answers MoreData, the retry with a
+    /// larger SID buffer MoreData again, and every later index of the same walk
+    /// InvalidParameter. A shorter name answers Success and writes no code, and the walk
+    /// reads on after it.
+    /// </summary>
+    public List<FakeProductList>? ProductLists { get; set; }
+
+    /// <summary>
+    /// A return the walk of one list alone answers at its first index, keyed by its context
+    /// and account: how a fixture builds a list Windows refuses when it is asked for on its
+    /// own.
+    /// </summary>
+    public Dictionary<(MsiInstallContext Context, string? Sid), uint> ProductListRefusals { get; } = new();
+
     private readonly HashSet<uint> _sidRetried = new();
 
     private readonly Dictionary<(MsiWalk Walk, string? ProductCode, uint Index), (uint Error, int Calls)> _passing = new();
@@ -316,6 +337,8 @@ internal sealed class FakeMsiApi : IMsiApi
         }
 
         if (PassingErrorAt(MsiWalk.Products, null, index, out var passingProduct)) return passingProduct;
+        if (ProductLists is not null)
+            return WalkProductLists(userSid, context, index, installedProductCode, out installedContext, sid, ref sidLength);
         if (NeverEndProducts)
         {
             WriteCode(installedProductCode, "{FFFFFFFF-0000-0000-0000-000000000000}");
@@ -342,6 +365,39 @@ internal sealed class FakeMsiApi : IMsiApi
                 for (var i = 0; i < walked.Sid.Length && i < sid.Length; i++) sid[i] = walked.Sid[i];
                 sidLength = (uint)walked.Sid.Length;
             }
+        }
+        return Success;
+    }
+
+    private uint WalkProductLists(string? userSid, MsiInstallContext context, uint index,
+        char[]? installedProductCode, out MsiInstallContext installedContext, char[]? sid, ref uint sidLength)
+    {
+        installedContext = MsiInstallContext.Machine;
+        if (index == 0 && ProductListRefusals.TryGetValue((context, userSid), out var refused)) return refused;
+        var entries = new List<(string Name, FakeProductList List)>();
+        foreach (var list in ProductLists!)
+        {
+            if ((context & list.Context) == 0) continue;
+            if (list.Context == MsiInstallContext.Machine ? userSid is not null && userSid != "S-1-1-0"
+                    : userSid != "S-1-1-0" && !string.Equals(userSid, list.Sid, StringComparison.OrdinalIgnoreCase))
+                continue;
+            foreach (var name in list.Names) entries.Add((name, list));
+        }
+
+        var stop = entries.FindIndex(e => e.Name.Length > 32);
+        if (stop >= 0 && index > stop) return InvalidParameter;
+        if (index >= entries.Count) return NoMoreItems;
+
+        var (entry, owner) = entries[(int)index];
+        if (entry.Length > 32) return MoreData;
+        if (entry.Length < 32) return Success;
+
+        WriteCode(installedProductCode, InstallerQueryService.UnpackRegistryProductCode(entry) ?? entry);
+        installedContext = owner.Context;
+        if (owner.Sid is not null && sid is not null)
+        {
+            for (var i = 0; i < owner.Sid.Length && i < sid.Length; i++) sid[i] = owner.Sid[i];
+            sidLength = (uint)owner.Sid.Length;
         }
         return Success;
     }
@@ -549,5 +605,36 @@ internal sealed class FakeMsiApi : IMsiApi
         for (int i = 0; i < n; i++) value[i] = val[i];
         valueLength = (uint)val.Length;
         return Success;
+    }
+}
+
+/// <summary>One list of installed programs for <see cref="FakeMsiApi.ProductLists"/>.</summary>
+internal sealed record FakeProductList(MsiInstallContext Context, string? Sid, List<string> Names);
+
+/// <summary>
+/// The lists <see cref="FakeMsiApi.ProductLists"/> holds, read by name as
+/// <see cref="RegistryProductLists"/> reads the registry. <see cref="NamesInstead"/>
+/// answers in place of a list's own names, null among them for a list that will not read,
+/// and <see cref="AccountsInstead"/> in place of the accounts.
+/// </summary>
+internal sealed class FakeProductLists(FakeMsiApi msi) : IProductLists
+{
+    public Dictionary<(MsiInstallContext Context, string? Sid), List<string>?> NamesInstead { get; } = new();
+
+    /// <summary>Accounts given in place of those the lists hold, per context.</summary>
+    public Dictionary<MsiInstallContext, List<string>?> AccountsInstead { get; } = new();
+
+    public IReadOnlyList<string>? Accounts(MsiInstallContext context, CancellationToken ct) =>
+        AccountsInstead.TryGetValue(context, out var instead)
+            ? instead
+            : msi.ProductLists!.Where(l => l.Context == context && l.Sid is not null)
+                .Select(l => l.Sid!).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+    public IReadOnlyList<string>? Names(MsiInstallContext context, string? sid, CancellationToken ct)
+    {
+        if (NamesInstead.TryGetValue((context, sid), out var instead)) return instead;
+        var list = msi.ProductLists!.FirstOrDefault(l => l.Context == context
+            && string.Equals(l.Sid, sid, StringComparison.OrdinalIgnoreCase));
+        return list is null ? Array.Empty<string>() : list.Names;
     }
 }

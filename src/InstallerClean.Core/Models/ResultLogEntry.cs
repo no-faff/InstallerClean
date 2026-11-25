@@ -952,8 +952,9 @@ public sealed record MachineInfo(
 /// Products whose records came back short. An exact per-product tally.
 /// </param>
 /// <param name="SkippedProductRowCount">
-/// Rows the product walk passed without reading. This code always sends zero: the
-/// walk refuses the scan on a row it cannot read, and a refused scan sends no report.
+/// Rows the product walk passed without reading. This code always sends zero: a row
+/// the walk cannot read ends it, and the scan then either settles the list that row
+/// sits in by name or refuses, and a refused scan sends no report.
 /// Counted inside <paramref name="UnreadableProductCount"/> as well.
 /// </param>
 /// <param name="UnclaimedProductFileCount">

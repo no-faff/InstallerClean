@@ -44,6 +44,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private readonly IPackageIdentityReader _identityReader;
 
+    private readonly IProductLists _productLists;
+
     /// <summary>
     /// The wait before a Windows Installer list is walked again
     /// (<see cref="WalkRestarts"/>). Null waits on the scan's own token, so a cancel ends
@@ -738,7 +740,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <see cref="PendingRebootService"/> taking <c>IRegistryReader</c> /
     /// <c>IMutexProbe</c>.
     /// </summary>
-    public InstallerQueryService(IMsiApi msi) : this(msi, ReadRegistryFallback) { }
+    public InstallerQueryService(IMsiApi msi)
+        : this(msi, ReadRegistryFallback, productLists: RegistryProductLists.Instance) { }
 
     /// <summary>
     /// A constructor for a graph that does not say which account the process runs as. The
@@ -746,7 +749,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// listing stands in for its patch list (<see cref="ListingCoversTheWalk"/>).
     /// </summary>
     public InstallerQueryService(IMsiApi msi, IPackageIdentityReader identityReader)
-        : this(msi, ReadRegistryFallback, null, identityReader) { }
+        : this(msi, ReadRegistryFallback, null, identityReader, RegistryProductLists.Instance) { }
 
     /// <summary>
     /// Production constructor for the composed graph: DI supplies the three seams. The
@@ -756,7 +759,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     public InstallerQueryService(IMsiApi msi, IPackageIdentityReader identityReader,
         IRunningAccount runningAccount)
         : this(msi, (claimed, ct) => ReadRegistryFallback(claimed, SidOrNull(runningAccount), ct),
-            null, identityReader) { }
+            null, identityReader, RegistryProductLists.Instance) { }
 
     /// <summary>
     /// The account <paramref name="runningAccount"/> names, or null where reading it throws.
@@ -792,13 +795,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// declared no targets, which is the same as the file being absent and is what
     /// those tests already assume; the tests whose subject IS route B inject one.
     /// </param>
+    /// <param name="productLists">
+    /// The lists Windows Installer walks, read by name where the product walk stops at an
+    /// entry that did not read (<see cref="WalkEachList"/>). Null reads none, so such a
+    /// walk refuses the scan.
+    /// </param>
     internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback,
-        Action<Exception>? crashLogSink = null, IPackageIdentityReader? identityReader = null)
+        Action<Exception>? crashLogSink = null, IPackageIdentityReader? identityReader = null,
+        IProductLists? productLists = null)
     {
         _msi = msi;
         _readFallback = readFallback;
         _crashLogSink = crashLogSink;
         _identityReader = identityReader ?? NoPackageIdentity.Instance;
+        _productLists = productLists ?? NoProductLists.Instance;
     }
 
     /// <summary>
@@ -854,7 +864,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // The restarts this scan shares among every list it walks.
         var restarts = WalkRestarts.For(ct, WalkPause);
 
-        var (products, unreadableRows) = EnumerateProducts(restarts, ct);
+        var enumerated = EnumerateProducts(restarts, ct);
+        var products = enumerated.Products;
+        var unreadableRows = enumerated.UnreadableRows;
 
         // Installed products this scan could not read in full are counted once the
         // registry has been read, below (unreadableProducts): one for each installation
@@ -1231,9 +1243,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // whose claims are short by at least one. Both leave the same hole, a
         // claim that never reached the merge, so both count the product once.
         // It starts from the product rows the walk passed without reading, which
-        // is zero on every walk that returns: the walk refuses the scan on such a
-        // row. Seeding from the walk's own count keeps a row it ever passed inside
-        // this figure.
+        // is zero on every walk that returns: such a row ends the walk, and the list
+        // it sits in is then settled by name or the scan refuses (EnumerateProducts).
+        // Seeding from the walk's own count keeps a row it ever passed inside this
+        // figure.
         //
         // A PROGRAM WHOSE ONLY SHORT READ IS OF A PATCH WHOSE REGISTRATION HAS GONE IS
         // NOT ONE (LostNoRecord): no record names a cached file for that patch, so no
@@ -1260,7 +1273,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             FoldVerdict(apiPatchSets, pairing.ProductCode, ProductPatchSet.Unestablished);
         }
 
-        var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, restarts, ct);
+        // The codes a list whose walk stopped names are asked about again with the registry's
+        // own, so one Windows would not answer about when the list was settled withholds here.
+        var missed = LocateProductsTheEnumerationMissed(
+            products, CodesToAsk(fallback.RegistryProductCodes, enumerated.NamedByStoppedLists), restarts, ct);
 
         // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. A product it
         // lost is recovered by name above, through ResolveProductInstances, which asks
@@ -1549,7 +1565,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             recoveredPatchSetUnestablished,
             fallback.PatchListFailures,
             shortInstallations.Sum(installation =>
-                installation.LostPatchRecords.Count(lost => RegistrationHasGone(lost, fallback))));
+                installation.LostPatchRecords.Count(lost => RegistrationHasGone(lost, fallback))),
+            enumerated.StoppedLists,
+            enumerated.UnnamedListEntries,
+            enumerated.FoundByCode);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -5735,30 +5754,273 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// The walk reads rows until Windows reports the end of the list, and a row it
     /// cannot read stops it. A walk such a row stops is made again from the first
     /// index (<see cref="WalkRestarts"/>), and the first that reaches the end is the
-    /// list. Where none does, the scan refuses as the first walk ended: with
+    /// list.
+    ///
+    /// WHERE NONE DOES, EACH LIST IS WALKED ON ITS OWN (<see cref="WalkEachList"/>). An entry
+    /// that does not read stops the walk of the list it sits in, and the other lists read to
+    /// their end. The list that stopped is read by name, and every program named in it after
+    /// the entry is put to Windows by code, each installation Windows lists joining the rows.
+    /// Where that cannot be done in full, the scan refuses as the first walk ended: with
     /// <c>Error.MsiNonSuccess</c> for a row that did not read.
+    ///
     /// <c>UnreadableRows</c> counts the rows the walk passed without reading, so it is
     /// zero on every walk that returns. It seeds <c>unreadableProducts</c> and the
     /// census carries it as <see cref="EnumerationCensus.SkippedProductRows"/>.
     /// </summary>
-    private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows)
-        EnumerateProducts(WalkRestarts restarts, CancellationToken ct)
+    private ProductWalk EnumerateProducts(WalkRestarts restarts, CancellationToken ct)
     {
-        var walk = restarts.Walk(() => WalkProducts(ct), walked => !walked.StoppedAtARow);
-        if (walk.Refusal is not null) throw walk.Refusal;
+        var walk = restarts.Walk(() => WalkProducts(AllUsersSid, MsiInstallContext.All, ct),
+            walked => !walked.StoppedAtARow);
+        if (walk.Refusal is null) return new ProductWalk(walk.Products, walk.UnreadableRows, null, 0, 0, 0);
+        if (!walk.RowUnread) throw walk.Refusal();
 
-        return (walk.Products, walk.UnreadableRows);
+        // A list walked on its own that Windows refused for another reason refuses with
+        // that reason; anything else that leaves a list unsettled refuses as the first
+        // walk ended.
+        return WalkEachList(walk.Products, restarts, ct, out var otherRefusal)
+            ?? throw (otherRefusal ?? walk.Refusal)();
     }
 
     /// <summary>
-    /// One walk of the product list from index 0, for <see cref="EnumerateProducts"/>.
-    /// <c>Refusal</c> is null where the walk ran to the end of the list, and otherwise
-    /// the exception the scan refuses with where no walk does. <c>StoppedAtARow</c> is
-    /// true where a row that did not read ended the walk, and false where it reached the
-    /// end or spent the index budget.
+    /// What <see cref="EnumerateProducts"/> established.
+    /// </summary>
+    /// <param name="Products">
+    /// Every installation the walks listed, and every installation Windows listed when asked
+    /// by code about a program named after the entry in a list whose walk stopped. The
+    /// product loop asks each of them every question, whichever way it was found.
+    /// </param>
+    /// <param name="NamedByStoppedLists">
+    /// Every program code named in a list whose walk stopped at an entry that did not read,
+    /// null where no walk stopped. Each is asked about by code again beside the registry's own
+    /// (<see cref="CodesToAsk"/>), which is what withholds on one Windows will not answer about.
+    /// </param>
+    /// <param name="StoppedLists">The lists whose walk stopped at an entry that did not read.</param>
+    /// <param name="UnnamedListEntries">
+    /// Entries in those lists whose name is not a program code. No Windows Installer call
+    /// can name such an entry, as every one takes a product or patch code and none packs to
+    /// that name, so it decides nothing: the cached files any program has are recorded under
+    /// <c>UserData</c>, which the registry fallback claims by path whatever the key above
+    /// them is called.
+    /// </param>
+    /// <param name="FoundByCode">
+    /// The installations in <paramref name="Products"/> that no walk returned and Windows
+    /// listed when asked by code about a program named after the entry in a stopped list.
+    /// </param>
+    private sealed record ProductWalk(
+        List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products,
+        int UnreadableRows,
+        IReadOnlyCollection<string>? NamedByStoppedLists,
+        int StoppedLists,
+        int UnnamedListEntries,
+        int FoundByCode);
+
+    /// <summary>
+    /// The products, walked one list at a time, after the walk of every list at once stopped
+    /// at an entry that did not read; null where that does not settle every list, and the
+    /// scan then refuses.
+    ///
+    /// The per-machine list is walked alone. Each per-user context is walked across every
+    /// account, and where that walk stops, once per account. A walk that reaches the end of
+    /// its list gives its rows. A walk that stops at an entry that did not read is settled
+    /// against the list it walked (<see cref="SettleAgainstList"/>). Any other stop refuses.
+    ///
+    /// EVERY ROW THE WALK OF EVERY LIST AT ONCE RETURNED MUST BE AMONG THE ROWS FOUND HERE,
+    /// and every row a per-user context's walk across its accounts returned among that
+    /// context's per-account rows. A row found once and not again means a list was walked
+    /// that is not accounted for here, and the scan refuses. So does a walk across accounts
+    /// that stopped where no account's own walk stops: the entry it stopped at is in a list
+    /// no account read here holds.
+    ///
+    /// EVERY PROGRAM NAMED AFTER THE ENTRY IN A LIST THAT STOPPED IS THEN ASKED ABOUT BY CODE
+    /// (<see cref="ResolveProductInstances"/>), and each installation Windows lists for it that
+    /// no walk returned is added to the rows. Asked by code, Windows answers about a program
+    /// whatever its list holds ahead of it, so those are the rows the walk would have
+    /// returned, and the product loop reads them as it reads every other. A code Windows will
+    /// not answer about adds nothing here and is asked again by the recovery, which withholds
+    /// on it (<see cref="ProductWalk.NamedByStoppedLists"/>).
+    ///
+    /// <paramref name="otherRefusal"/> is the refusal of a walk that ended for a reason other
+    /// than a row that did not read, refused access among them, where that is what ended
+    /// it; the caller refuses with it.
+    /// </summary>
+    private ProductWalk? WalkEachList(
+        List<(string ProductCode, string? UserSid, MsiInstallContext Context)> walkedAtOnce,
+        WalkRestarts restarts, CancellationToken ct, out Func<Exception>? otherRefusal)
+    {
+        otherRefusal = null;
+        Func<Exception>? endedBy = null;
+        var found = new List<(string ProductCode, string? UserSid, MsiInstallContext Context)>();
+        var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var namedAfterTheEntry = new List<string>();
+        var stopped = 0;
+        var unnamed = 0;
+
+        bool WalkOne(string? sid, MsiInstallContext context,
+            List<(string ProductCode, string? UserSid, MsiInstallContext Context)> into)
+        {
+            var walk = restarts.Walk(() => WalkProducts(sid, context, ct), walked => !walked.StoppedAtARow);
+            if (walk.Refusal is null)
+            {
+                into.AddRange(walk.Products);
+                return true;
+            }
+            if (!walk.RowUnread)
+            {
+                endedBy = walk.Refusal;
+                return false;
+            }
+
+            var names = _productLists.Names(context, sid, ct);
+            if (!SettleAgainstList(walk.Products, names, out var codes)) return false;
+
+            into.AddRange(walk.Products);
+            for (var i = 0; i < codes.Count; i++)
+            {
+                if (codes[i] is not { } code) continue;
+                named.Add(code);
+                if (i > walk.Products.Count && !namedAfterTheEntry.Contains(code, StringComparer.OrdinalIgnoreCase))
+                    namedAfterTheEntry.Add(code);
+            }
+            unnamed += codes.Count(code => code is null);
+            stopped++;
+            return true;
+        }
+
+        if (!WalkOne(null, MsiInstallContext.Machine, found))
+        {
+            otherRefusal = endedBy;
+            return null;
+        }
+
+        foreach (var context in new[] { MsiInstallContext.UserManaged, MsiInstallContext.UserUnmanaged })
+        {
+            ct.ThrowIfCancellationRequested();
+            var acrossAccounts = restarts.Walk(() => WalkProducts(AllUsersSid, context, ct),
+                walked => !walked.StoppedAtARow);
+            if (acrossAccounts.Refusal is null)
+            {
+                found.AddRange(acrossAccounts.Products);
+                continue;
+            }
+            if (!acrossAccounts.RowUnread)
+            {
+                otherRefusal = acrossAccounts.Refusal;
+                return null;
+            }
+
+            var accounts = _productLists.Accounts(context, ct);
+            if (accounts is null) return null;
+
+            var stoppedBefore = stopped;
+            var perAccount = new List<(string ProductCode, string? UserSid, MsiInstallContext Context)>();
+            foreach (var account in accounts)
+            {
+                if (WalkOne(account, context, perAccount)) continue;
+                otherRefusal = endedBy;
+                return null;
+            }
+
+            if (stopped == stoppedBefore || !EveryRowAmong(acrossAccounts.Products, perAccount)) return null;
+            found.AddRange(perAccount);
+        }
+
+        if (!EveryRowAmong(walkedAtOnce, found)) return null;
+
+        // THESE ASKS HAVE A RESTART BUDGET OF THEIR OWN. The recovery asks each of these codes
+        // again, and the scan's keyed reads after it share the scan's budget; spent here, it
+        // would leave those reads made once.
+        var rows = new HashSet<string>(found.Select(RowKey), StringComparer.Ordinal);
+        var asks = WalkRestarts.For(ct, WalkPause);
+        var foundByCode = 0;
+        foreach (var code in namedAfterTheEntry)
+        {
+            ct.ThrowIfCancellationRequested();
+            var resolved = ResolveProductInstances(_msi, code, asks);
+            if (resolved.Unaskable) continue;
+            foreach (var (sid, context) in resolved.Instances)
+            {
+                if (!rows.Add(RowKey((code, sid, context)))) continue;
+                found.Add((code, sid, context));
+                foundByCode++;
+            }
+        }
+
+        return new ProductWalk(found, 0, named, stopped, unnamed, foundByCode);
+    }
+
+    /// <summary>
+    /// Whether a walk that stopped at an entry that did not read is accounted for by the
+    /// list it walked: the rows it returned are, in order, the codes of the names in
+    /// <paramref name="names"/> up to the first name that is not a program code, and that
+    /// name is where it stopped. <paramref name="codes"/> is every name unpacked, null for a
+    /// name that is not a program code.
+    ///
+    /// THIS IS WHAT SHOWS THE LIST READ BY NAME IS THE LIST THE WALK READ. Do not drop it or
+    /// loosen it to a count: the rows a list gives come in the order of its key names, so a
+    /// list that is not the one walked, or a walk that stopped anywhere but at a name that
+    /// is no code, does not match it, and the scan refuses.
+    /// </summary>
+    internal static bool SettleAgainstList(
+        IReadOnlyList<(string ProductCode, string? UserSid, MsiInstallContext Context)> rows,
+        IReadOnlyList<string>? names, out List<string?> codes)
+    {
+        codes = new List<string?>();
+        if (names is null) return false;
+
+        foreach (var name in names) codes.Add(UnpackRegistryProductCode(name));
+
+        var firstUnnamed = codes.IndexOf(null);
+        if (firstUnnamed < 0 || rows.Count != firstUnnamed) return false;
+        for (var i = 0; i < firstUnnamed; i++)
+            if (!string.Equals(rows[i].ProductCode, codes[i], StringComparison.OrdinalIgnoreCase))
+                return false;
+
+        return true;
+    }
+
+    /// <summary>Whether every row in <paramref name="rows"/> is also in <paramref name="among"/>.</summary>
+    private static bool EveryRowAmong(
+        IEnumerable<(string ProductCode, string? UserSid, MsiInstallContext Context)> rows,
+        IEnumerable<(string ProductCode, string? UserSid, MsiInstallContext Context)> among)
+    {
+        var have = new HashSet<string>(among.Select(RowKey), StringComparer.Ordinal);
+        return rows.All(row => have.Contains(RowKey(row)));
+    }
+
+    /// <summary>One installation's code, account and context, as one key whatever their case.</summary>
+    private static string RowKey((string ProductCode, string? UserSid, MsiInstallContext Context) row) =>
+        row.ProductCode.ToUpperInvariant() + "|" + (row.UserSid ?? "").ToUpperInvariant() + "|" + (uint)row.Context;
+
+    /// <summary>
+    /// The codes the recovery asks about by code: the registry's own, and those a list whose
+    /// walk stopped names. Null only where neither source has anything, as
+    /// <see cref="LocateProductsTheEnumerationMissed"/> reads null.
+    /// </summary>
+    private static IReadOnlyCollection<string>? CodesToAsk(
+        IReadOnlyCollection<string>? registryCodes, IReadOnlyCollection<string>? namedByStoppedLists)
+    {
+        if (namedByStoppedLists is null || namedByStoppedLists.Count == 0) return registryCodes;
+        if (registryCodes is null) return namedByStoppedLists;
+
+        var both = new HashSet<string>(registryCodes, StringComparer.OrdinalIgnoreCase);
+        both.UnionWith(namedByStoppedLists);
+        return both;
+    }
+
+    /// <summary>
+    /// One walk of the product list for <paramref name="userSid"/> in
+    /// <paramref name="context"/> from index 0, for <see cref="EnumerateProducts"/> and
+    /// <see cref="WalkEachList"/>. <c>Refusal</c> is null where the walk ran to the end of
+    /// the list, and otherwise makes the exception the scan refuses with where no walk does.
+    /// It is made only where it is thrown, so a walk whose list is then settled by name
+    /// formats no message.
+    /// <c>StoppedAtARow</c> is true where a row ended the walk, refused access included, and
+    /// false where it reached the end or spent the index budget. <c>RowUnread</c> is true
+    /// where a row that did not read ended it.
     /// </summary>
     private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows,
-        Exception? Refusal, bool StoppedAtARow) WalkProducts(CancellationToken ct)
+        Func<Exception>? Refusal, bool StoppedAtARow, bool RowUnread) WalkProducts(
+        string? userSid, MsiInstallContext context, CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var productCode = new char[Msi.GuidBufferLength];
@@ -5802,8 +6064,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             var error = _msi.EnumProducts(
                 productCode: null,
-                userSid: AllUsersSid,
-                context: MsiInstallContext.All,
+                userSid: userSid,
+                context: context,
                 index: index,
                 installedProductCode: productCode,
                 installedContext: out var installedContext,
@@ -5829,8 +6091,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                 error = _msi.EnumProducts(
                     productCode: null,
-                    userSid: AllUsersSid,
-                    context: MsiInstallContext.All,
+                    userSid: userSid,
+                    context: context,
                     index: index,
                     installedProductCode: productCode,
                     installedContext: out installedContext,
@@ -5851,7 +6113,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             if (error == MsiError.AccessDenied)
-                return (results, unreadableRows, new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved), true);
+                return (results, unreadableRows, () => new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved), true, false);
 
             lastError = error;
 
@@ -5898,9 +6160,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // reached the end either, and would otherwise be refused under the message
         // for a list that never ended.
         if (unreadableRows > 0)
-            return (results, unreadableRows, new LocalisedInvalidOperationException(
+            return (results, unreadableRows, () => new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiNonSuccess, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), true);
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), true, true);
 
         // Hitting the index cap is not a clean end: the enumeration ran out of
         // budget rather than reporting NoMoreItems, so everything past the cap
@@ -5913,11 +6175,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the error code is the last row's, which is Success whenever the list
         // simply never terminated.
         if (!reachedEnd)
-            return (results, unreadableRows, new LocalisedInvalidOperationException(
+            return (results, unreadableRows, () => new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), false);
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), false, false);
 
-        return (results, unreadableRows, null, false);
+        return (results, unreadableRows, null, false, false);
     }
 
     /// <summary>

@@ -131,7 +131,9 @@ public record InstallerQueryResult(
 /// </param>
 /// <param name="SkippedProductRows">
 /// Rows the product walk passed without reading, one per row. It is zero on every
-/// scan that produces a result: the walk refuses the scan on a row it cannot read.
+/// scan that produces a result: a row the walk cannot read ends it, and the scan then
+/// either settles the list that row sits in by name (<see cref="StoppedProductLists"/>)
+/// or refuses.
 /// <see cref="UnreadableProducts"/> is seeded from it, so a row the walk ever passed
 /// would count there as well.
 /// </param>
@@ -530,7 +532,19 @@ public readonly record struct EnumerationCensus(
     // the registry's listing of the patch keys under the program's account, read to its
     // end, holds no key for the patch. Such a pairing names no cached file, so nothing
     // is withheld for it and its product is not counted in UnreadableProducts.
-    int PatchesListedWithoutRegistrationCount = 0)
+    int PatchesListedWithoutRegistrationCount = 0,
+    // StoppedProductLists: the lists of installed programs whose walk stopped at an entry
+    // that did not read, and which were settled by reading the list by name and asking
+    // Windows about each program code after the entry. Zero on a machine whose list reads
+    // whole.
+    int StoppedProductLists = 0,
+    // UnnamedProductListEntries: the entries in those lists whose name is not a program
+    // code. Windows Installer has no call that names such an entry, so it decides nothing.
+    int UnnamedProductListEntries = 0,
+    // StoppedListInstallations: installations no walk returned that Windows listed when
+    // asked by code about a program named after the entry in a stopped list. Each is read
+    // by the product loop as a walked installation is, and none is in RecoveredProductCount.
+    int StoppedListInstallations = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
