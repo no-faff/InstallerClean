@@ -37,10 +37,10 @@
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, który zapełnia się, gdy instalujesz i aktualizujesz oprogramowanie. Po szybkim skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala przenieść je gdzie indziej albo usunąć, żeby zwolnić miejsce na dysku C:.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i mówi ci, które z nich możesz bezpiecznie usunąć.
-- **Ile miejsca:** Wykres powyżej pokazuje wyniki opcjonalnych raportów wysłanych z aplikacji (dzięki wszystkim). Wśród tych <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end -->, które zwolniły miejsce, mediana zwolnionego miejsca to <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. To pliki, o których istnieniu pewnie nie masz pojęcia i które po prostu zajmują miejsce. <!-- reports-over5gb-start -->21,2%<!-- reports-over5gb-end --> *wszystkich* maszyn odzyskało ponad 5 GB, a niektórzy zwolnili setki GB. Im więcej oprogramowania opartego na MSI instalujesz, tym więcej niepotrzebnych plików będziesz mieć.
+- **Ile miejsca:** Wykres powyżej pokazuje wyniki opcjonalnych raportów wysłanych z aplikacji (dzięki wszystkim). Wśród tych <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end -->, które zwolniły miejsce, mediana zwolnionego miejsca to <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. To pliki, o których istnieniu pewnie nie masz pojęcia i które po prostu zajmują miejsce. <!-- reports-over5gb-start -->21,1%<!-- reports-over5gb-end --> *wszystkich* maszyn odzyskało ponad 5 GB, a niektórzy zwolnili setki GB. Im więcej oprogramowania opartego na MSI instalujesz, tym więcej niepotrzebnych plików będziesz mieć.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Kliknij, aby zobaczyć</kbd>, jak wyglądałby wykres, gdyby raporty były dokładnym obrazem wszystkich pobrań (146 623)</summary>
+  <summary><kbd>Kliknij, aby zobaczyć</kbd>, jak wyglądałby wykres, gdyby raporty były dokładnym obrazem wszystkich pobrań (146 809)</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pl-scaled-dark.svg" />
