@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.8.0-blue" alt="Релиз на GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-146k-brightgreen" alt="Всего загрузок"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-147k-brightgreen" alt="Всего загрузок"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -40,7 +40,7 @@
 - **Сколько места:** На диаграмме выше — результаты необязательных отчётов, отправленных из приложения (всем спасибо). Среди тех <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end -->, у которых место освободилось, медиана освобождённого — <!-- reports-median-start -->1,5 ГБ<!-- reports-median-end -->. Это файлы, о существовании которых вы, скорее всего, и не знали, а они просто занимают место. <!-- reports-over5gb-start -->21,1 %<!-- reports-over5gb-end --> *всех* машин освободили больше 5 ГБ, а некоторые освободили сотни ГБ. Чем больше программ на основе MSI вы ставите, тем больше у вас будет ненужных файлов.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Нажмите, чтобы увидеть</kbd>, как выглядела бы диаграмма, если бы отчёты точно отражали все загрузки (их 146 809)</summary>
+  <summary><kbd>Нажмите, чтобы увидеть</kbd>, как выглядела бы диаграмма, если бы отчёты точно отражали все загрузки (их 147 172)</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ru-scaled-dark.svg" />
@@ -249,7 +249,7 @@ InstallerClean не подписан. Вот что можно проверит�
 - VirusTotal: каждая сборка сканируется перед выпуском, и на странице выпуска есть полный результат по каждому движку для каждой загрузки.
 - Исходный код здесь, на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Службы сканирования, запросов, перемещения, удаления, настроек и проверки отложенной перезагрузки покрыты набором автоматических тестов, который выполняется на Windows при каждой отправке в `main` и при каждом пул-реквесте, а значок CI вверху этой страницы показывает результат.
 - Сборки выпусков детерминированы: одни и те же исходники, тот же SDK и те же флаги публикации дают одни и те же байты, а поставить тег на выпуск нельзя, пока все входные данные сборки не совпадают с исходным кодом на этом теге. Так что вы можете переключиться на тег, собрать всё сами и сверить хеши с опубликованными. В примечаниях к каждому выпуску есть всё, что для этого нужно: версия SDK, с которой собран выпуск, и флаги публикации для любой загрузки, собранной не со значениями по умолчанию. Установщик компилирует Inno Setup, а не SDK, поэтому для воспроизведения его хеша нужны ещё та же версия Inno Setup и сборка через `scripts/compile-setup.ps1`, который ставит каждому упакованному в установщик файлу дату и время коммита.
-- <!-- downloads-start -->146 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
+- <!-- downloads-start -->147 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: сертифицировано как 100 % чистое" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверила InstallerClean и подтвердила, что в нём нет ни шпионского, ни рекламного ПО, ни вирусов.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Награда Softpedia «100 % бесплатно»: подтверждено отсутствие шпионского и рекламного ПО и вирусов" width="190"></a>
 
