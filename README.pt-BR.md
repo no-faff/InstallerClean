@@ -40,7 +40,7 @@
 - **Quanto espaço:** O gráfico acima mostra os resultados dos relatórios opcionais enviados pelo aplicativo (obrigado a todos). Dos <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> que liberaram espaço, a mediana liberada é <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. São arquivos que você provavelmente nem sabia que existiam, só ocupando espaço. <!-- reports-over5gb-start -->21,0%<!-- reports-over5gb-end --> de *todas* as máquinas recuperaram mais de 5 GB, e algumas pessoas liberaram centenas de GB. Quanto mais programas baseados em MSI você instala, mais arquivos desnecessários vai ter.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Clique para ver</kbd> como o gráfico ficaria se os relatórios fossem um retrato exato de todos os 148.060 downloads</summary>
+  <summary><kbd>Clique para ver</kbd> como o gráfico ficaria se os relatórios fossem um retrato exato de todos os 148.187 downloads</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pt-BR-scaled-dark.svg" />

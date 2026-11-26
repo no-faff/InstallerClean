@@ -40,7 +40,7 @@
 - **Wie viel Platz:** Das Diagramm oben zeigt die Ergebnisse der optionalen Berichte, die über die App gesendet wurden (danke an alle). Bei den <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end -->, die Speicherplatz freigegeben haben, liegt der Median des Freigegebenen bei <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Das sind Dateien, von denen du wahrscheinlich nichts wusstest und die einfach nur Platz belegen. <!-- reports-over5gb-start -->21,0 %<!-- reports-over5gb-end --> *aller* Rechner haben mehr als 5 GB zurückgeholt, und manche haben Hunderte GB freigegeben. Je mehr MSI-basierte Software du installierst, desto mehr nicht benötigte Dateien hast du.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Klick hier</kbd>, um zu sehen, wie das Diagramm aussähe, wenn die Berichte ein genaues Abbild aller 148.060 Downloads wären</summary>
+  <summary><kbd>Klick hier</kbd>, um zu sehen, wie das Diagramm aussähe, wenn die Berichte ein genaues Abbild aller 148.187 Downloads wären</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-de-scaled-dark.svg" />
