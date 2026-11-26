@@ -40,7 +40,7 @@
 - **How much space:** The chart above shows the results of the optional reports sent in via the app (thanks, everyone). Of the <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> that freed space, the median reclaimed is <!-- reports-median-start -->1.5 GB<!-- reports-median-end -->. That's files you probably didn't know existed just sitting there taking up space. <!-- reports-over5gb-start -->21.0%<!-- reports-over5gb-end --> of *all* machines reclaimed 5 GB or more, and some freed hundreds of GB. The more MSI-based software you install, the more unneeded files you'll have.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 148,021 downloads</summary>
+  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 148,060 downloads</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-scaled-dark.svg" />

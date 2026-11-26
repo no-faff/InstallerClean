@@ -40,7 +40,7 @@
 - **Ile miejsca:** Wykres powyżej pokazuje wyniki opcjonalnych raportów wysłanych z aplikacji (dzięki wszystkim). Wśród tych <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end -->, które zwolniły miejsce, mediana zwolnionego miejsca to <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. To pliki, o których istnieniu pewnie nie masz pojęcia i które po prostu zajmują miejsce. <!-- reports-over5gb-start -->21,0%<!-- reports-over5gb-end --> *wszystkich* maszyn odzyskało ponad 5 GB, a niektórzy zwolnili setki GB. Im więcej oprogramowania opartego na MSI instalujesz, tym więcej niepotrzebnych plików będziesz mieć.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Kliknij, aby zobaczyć</kbd>, jak wyglądałby wykres, gdyby raporty były dokładnym obrazem wszystkich pobrań (148 021)</summary>
+  <summary><kbd>Kliknij, aby zobaczyć</kbd>, jak wyglądałby wykres, gdyby raporty były dokładnym obrazem wszystkich pobrań (148 060)</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pl-scaled-dark.svg" />

@@ -40,7 +40,7 @@
 - **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang dikirim lewat aplikasi (terima kasih, semuanya). Dari <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Itu file yang mungkin tidak Anda ketahui keberadaannya dan hanya memakan ruang. <!-- reports-over5gb-start -->21,0%<!-- reports-over5gb-end --> dari *semua* mesin mengosongkan lebih dari 5 GB, dan sebagian mengosongkan ratusan GB. Makin banyak perangkat lunak berbasis MSI yang Anda pasang, makin banyak file tidak diperlukan yang Anda miliki.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Klik untuk melihat</kbd> seperti apa diagramnya jika laporan itu gambaran persis dari semua 148.021 unduhan</summary>
+  <summary><kbd>Klik untuk melihat</kbd> seperti apa diagramnya jika laporan itu gambaran persis dari semua 148.060 unduhan</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-id-scaled-dark.svg" />
