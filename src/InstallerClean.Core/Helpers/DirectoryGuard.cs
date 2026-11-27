@@ -203,6 +203,79 @@ internal static class DirectoryGuard
             Ntdll.FILE_CREATE, Ntdll.FILE_DIRECTORY_FILE, securityDescriptor, out status);
 
     /// <summary>
+    /// Creates the file <paramref name="leaf"/> inside <paramref name="directory"/>, where
+    /// nothing has that name, and answers a handle on it with <paramref name="access"/>,
+    /// shared for reading alone, so nothing else writes, renames or deletes the file while
+    /// the handle is open. Null where the create fails, a name already there among the
+    /// causes, with the NTSTATUS in <paramref name="status"/>.
+    /// </summary>
+    internal static SafeFileHandle? CreateChildFileHeld(
+        SafeFileHandle directory, string leaf, uint access, out int status) =>
+        OpenChildNoFollow(
+            directory, leaf, access, Kernel32.FILE_SHARE_READ,
+            Ntdll.FILE_CREATE, Ntdll.FILE_NON_DIRECTORY_FILE, IntPtr.Zero, out status);
+
+    /// <summary>
+    /// Renames the file <paramref name="file"/> names to <paramref name="name"/>, through
+    /// its handle, replacing nothing. <paramref name="name"/> is a leaf inside the
+    /// directory <paramref name="relativeTo"/> names where that is given, so the file lands
+    /// in the directory that handle was opened on and not in one put in its place under
+    /// the same name; with no directory it is a full path. False where Windows refuses,
+    /// with its error in <paramref name="failureCode"/>.
+    ///
+    /// A NAME RELATIVE TO A DIRECTORY GOES THROUGH NTDLL. The Win32 call completes a name
+    /// that is not a full path from the process's current directory before the kernel
+    /// sees it, so it cannot carry a leaf beside a directory handle; the ntdll call takes
+    /// the buffer as it is. A full path goes through the Win32 call, which turns it into
+    /// the form the kernel reads.
+    /// </summary>
+    internal static unsafe bool RenameByHandle(
+        SafeFileHandle file, SafeFileHandle? relativeTo, string name, out int failureCode)
+    {
+        failureCode = 0;
+
+        // FILE_RENAME_INFO as the x64 headers lay it out: the replace flag at byte 0, the
+        // directory handle at 8, the name's length in bytes at 16 and the name from 20.
+        // The buffer starts zeroed, which is the flag saying that nothing is replaced and,
+        // with no directory, a null handle.
+        const int DirectoryOffset = 8, LengthOffset = 16, NameOffset = 20;
+        var nameBytes = name.Length * sizeof(char);
+        var size = Math.Max(NameOffset + nameBytes + sizeof(char), NameOffset + sizeof(int) + IntPtr.Size);
+        var buffer = Marshal.AllocHGlobal(size);
+        var directoryHeld = false;
+        try
+        {
+            new Span<byte>((void*)buffer, size).Clear();
+            if (relativeTo is not null)
+            {
+                relativeTo.DangerousAddRef(ref directoryHeld);
+                Marshal.WriteIntPtr(buffer, DirectoryOffset, relativeTo.DangerousGetHandle());
+            }
+            Marshal.WriteInt32(buffer, LengthOffset, nameBytes);
+            fixed (char* characters = name)
+                Buffer.MemoryCopy(characters, (byte*)buffer + NameOffset, nameBytes, nameBytes);
+
+            if (relativeTo is not null)
+            {
+                var status = Ntdll.NtSetInformationFile(
+                    file, out _, buffer, (uint)size, Ntdll.FileRenameInformation);
+                if (status >= 0) return true;
+                failureCode = (int)Ntdll.RtlNtStatusToDosError(status);
+                return false;
+            }
+
+            if (Kernel32.SetFileRenameInfo(file, Kernel32.FileRenameInfo, buffer, (uint)size)) return true;
+            failureCode = Marshal.GetLastWin32Error();
+            return false;
+        }
+        finally
+        {
+            if (directoryHeld) relativeTo!.DangerousRelease();
+            Marshal.FreeHGlobal(buffer);
+        }
+    }
+
+    /// <summary>
     /// Opens the child folder <paramref name="leaf"/> inside <paramref name="directory"/>
     /// to remove it: for listing and reading its owner and list, and with delete access,
     /// resolved against that handle and without following a link in <paramref name="leaf"/>.

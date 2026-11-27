@@ -90,6 +90,8 @@ public static class CoreComposition
         // File-mutating services.
         services.AddSingleton<IFileSystemScanService, FileSystemScanService>();
         services.AddSingleton<IDestinationGuard, HandleDestinationGuard>();
+        // Holds a file open to the app alone and renames it through that handle.
+        services.AddSingleton<IInHandFolder, HandleInHandFolder>();
         services.AddSingleton<IMoveFilesService, MoveFilesService>();
         services.AddSingleton<IDeleteFilesService, DeleteFilesService>();
 

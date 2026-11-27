@@ -6,9 +6,10 @@ using InstallerClean.Interop.Native;
 namespace InstallerClean.Services;
 
 /// <summary>
-/// The four acts a Move makes on its destination: the creation of a folder, a write
-/// test, the discarding of a copy a half-completed move left, and the removal of a
-/// folder the Move created. The creation says from the create itself whether it made the
+/// The acts a Move makes on its destination: the creation of a folder, a write
+/// test, the discarding of a copy a half-completed move left, the removal of a
+/// folder the Move created, the opening of the folder for the length of the batch, and
+/// the creation of a copy in it. The creation of a folder says from the create itself whether it made the
 /// folder. The user may pick a folder another account can write, so the write test, the
 /// discard and the removal are each reached in a way that a folder swapped in under the
 /// same name part way through cannot redirect. The removal reaches the folder through
@@ -57,6 +58,86 @@ public interface IDestinationGuard
     /// answers false and removes nothing. Answers false too where the folder is not empty.
     /// </summary>
     bool TryRemoveEmptyFolder(string folder, string existingAncestor);
+
+    /// <summary>
+    /// Opens <paramref name="folder"/> for the length of a Move, so that each file sent
+    /// into it lands in the folder that was opened and not in one put in its place under
+    /// the same name. Null where it cannot be opened, with the Win32 cause in
+    /// <paramref name="failureCode"/>.
+    /// </summary>
+    DestinationFolder? Open(string folder, out int failureCode);
+
+    /// <summary>
+    /// Creates a new, empty file in <paramref name="destination"/> under a temporary name
+    /// of the guard's own, for a copy to be written into. Null where it cannot be
+    /// created, with the Win32 cause in <paramref name="failureCode"/>.
+    /// </summary>
+    ICopyTarget? CreateCopy(DestinationFolder destination, out int failureCode);
+}
+
+/// <summary>
+/// A Move's destination folder, opened once for the batch
+/// (<see cref="IDestinationGuard.Open"/>). The app's guard holds a handle on the folder,
+/// and every act made with this lands relative to that handle; the test seam's carries
+/// the path alone.
+/// </summary>
+public sealed class DestinationFolder : IDisposable
+{
+    internal DestinationFolder(string path, Microsoft.Win32.SafeHandles.SafeFileHandle? handle)
+    {
+        Path = path;
+        Handle = handle;
+    }
+
+    /// <summary>The folder's path, as the caller gave it.</summary>
+    public string Path { get; }
+
+    /// <summary>The handle on the folder, where the guard that opened it holds one.</summary>
+    internal Microsoft.Win32.SafeHandles.SafeFileHandle? Handle { get; }
+
+    public void Dispose() => Handle?.Dispose();
+}
+
+/// <summary>
+/// A copy being written into a Move's destination, under a temporary name that cannot be
+/// taken for a finished file. Disposing of it before <see cref="Finish"/> has answered
+/// <see cref="CopyFinish.Finished"/> removes the temporary file.
+/// </summary>
+public interface ICopyTarget : IDisposable
+{
+    /// <summary>
+    /// Where the copy's bytes are written, from the start, each write going straight to
+    /// the file. The target owns it and closes it: a caller writes to it and does not
+    /// dispose of it.
+    /// </summary>
+    Stream Content { get; }
+
+    /// <summary>
+    /// Finishes the copy: writes everything through to the device, checks that the file
+    /// is <paramref name="expectedLength"/> bytes long, gives it
+    /// <paramref name="attributes"/> and <paramref name="lastWriteTime"/> (a FILETIME),
+    /// and renames it to <paramref name="name"/> in the destination, replacing nothing.
+    /// Any answer but <see cref="CopyFinish.Finished"/> leaves the temporary file for
+    /// <see cref="IDisposable.Dispose"/> to remove, with the Win32 cause, where there is
+    /// one, in <paramref name="failureCode"/>.
+    /// </summary>
+    CopyFinish Finish(string name, long expectedLength, FileAttributes attributes, long lastWriteTime, out int failureCode);
+}
+
+/// <summary>What <see cref="ICopyTarget.Finish"/> did.</summary>
+public enum CopyFinish
+{
+    /// <summary>A step failed. First member so that it is what the type's own zero carries.</summary>
+    Failed,
+
+    /// <summary>The copy is whole and under its real name, and both have been written through to the device.</summary>
+    Finished,
+
+    /// <summary>The copy is not the length of the file it was made from.</summary>
+    LengthDiffers,
+
+    /// <summary>Something already has the real name in the destination.</summary>
+    NameTaken,
 }
 
 /// <summary>What <see cref="IDestinationGuard.TryCreateFolder"/> found.</summary>
@@ -116,6 +197,161 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
         var leaf = PathText.GetFileName(destinationPath);
         if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(leaf)) return false;
         return DirectoryGuard.TryDiscardChildCopy(folder, leaf, out failureCode);
+    }
+
+    public DestinationFolder? Open(string folder, out int failureCode)
+    {
+        var handle = DirectoryGuard.OpenDirectoryFollow(folder, out failureCode);
+        if (handle is not null) return new DestinationFolder(folder, handle);
+
+        // A folder that was not asked of Windows at all, an empty path among them, has
+        // no error of Windows' own, and 0 would read as success.
+        if (failureCode == 0) failureCode = Kernel32.ERROR_INVALID_PARAMETER;
+        return null;
+    }
+
+    /// <summary>
+    /// What the copy's handle asks for: to write the file's bytes and attributes, to read
+    /// its attributes back, and to delete it, which the rename to its real name and the
+    /// removal of a copy that is not finished both need.
+    /// </summary>
+    internal const uint CopyAccess =
+        Kernel32.GENERIC_WRITE | Kernel32.FILE_READ_ATTRIBUTES | Kernel32.FILE_WRITE_ATTRIBUTES | Ntdll.DELETE;
+
+    /// <summary>
+    /// The name a copy is written under until it is finished: the app's own prefix, a
+    /// random part and <c>.tmp</c>, which no cached file is named.
+    /// </summary>
+    internal static string TemporaryCopyName() => "InstallerClean-copying-" + Guid.NewGuid().ToString("N") + ".tmp";
+
+    public ICopyTarget? CreateCopy(DestinationFolder destination, out int failureCode)
+    {
+        failureCode = 0;
+        if (destination.Handle is not { } folder)
+        {
+            failureCode = Kernel32.ERROR_INVALID_PARAMETER;
+            return null;
+        }
+
+        var temporary = TemporaryCopyName();
+        var handle = DirectoryGuard.CreateChildFileHeld(folder, temporary, CopyAccess, out var status);
+        if (handle is null)
+        {
+            failureCode = (int)Ntdll.RtlNtStatusToDosError(status);
+            return null;
+        }
+        return new CopyTarget(handle, destination, temporary);
+    }
+
+    private sealed class CopyTarget : ICopyTarget
+    {
+        private readonly Microsoft.Win32.SafeHandles.SafeFileHandle _handle;
+        private readonly DestinationFolder _destination;
+        private readonly string _temporary;
+        private readonly FileStream _content;
+        private bool _finished;
+
+        public CopyTarget(
+            Microsoft.Win32.SafeHandles.SafeFileHandle handle, DestinationFolder destination, string temporary)
+        {
+            _handle = handle;
+            _destination = destination;
+            _temporary = temporary;
+
+            // No buffer of the stream's own: a write that fails is the caller's to hear
+            // of when it is made, and nothing is left for the close to write.
+            _content = StorageHelpers.UnbufferedWriter(handle);
+        }
+
+        public Stream Content => _content;
+
+        public unsafe CopyFinish Finish(
+            string name, long expectedLength, FileAttributes attributes, long lastWriteTime, out int failureCode)
+        {
+            failureCode = 0;
+            try
+            {
+                // Through to the device, so the copy does not rest on the cache when the
+                // file it was made from goes.
+                _content.Flush(flushToDisk: true);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ObjectDisposedException)
+            {
+                failureCode = WindowsErrors.Of(ex) ?? Kernel32.ERROR_UNIDENTIFIED_ERROR;
+                return CopyFinish.Failed;
+            }
+
+            if (!Kernel32.GetFileInformationByHandle(_handle, out var info))
+            {
+                failureCode = Marshal.GetLastWin32Error();
+                return CopyFinish.Failed;
+            }
+            if ((((long)info.nFileSizeHigh << 32) | info.nFileSizeLow) != expectedLength)
+                return CopyFinish.LengthDiffers;
+
+            // The attributes SetFileAttributes can set, and normal where none is left,
+            // a zero leaving them unchanged. The other times are left zero, as they are.
+            var carried = (uint)attributes & CarriedAttributes;
+            var basic = new Kernel32.FILE_BASIC_INFO
+            {
+                LastWriteTime = lastWriteTime,
+                FileAttributes = carried == 0 ? AttributeNormal : carried,
+            };
+            if (!Kernel32.SetFileBasicInfoByHandle(
+                    _handle, Kernel32.FileBasicInfo, in basic, (uint)sizeof(Kernel32.FILE_BASIC_INFO)))
+            {
+                failureCode = Marshal.GetLastWin32Error();
+                return CopyFinish.Failed;
+            }
+
+            if (!DirectoryGuard.RenameByHandle(_handle, _destination.Handle, name, out failureCode))
+                return failureCode == Kernel32.ERROR_ALREADY_EXISTS ? CopyFinish.NameTaken : CopyFinish.Failed;
+
+            // Through to the device again, for the name, the time and the attributes.
+            // Until this answers the copy is not finished, and disposing removes it.
+            try
+            {
+                _content.Flush(flushToDisk: true);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                failureCode = WindowsErrors.Of(ex) ?? Kernel32.ERROR_UNIDENTIFIED_ERROR;
+                return CopyFinish.Failed;
+            }
+
+            _finished = true;
+            return CopyFinish.Finished;
+        }
+
+        /// <summary>Archive, hidden, normal, not content indexed, offline, read-only, system and temporary.</summary>
+        private const uint CarriedAttributes = 0x000031A7;
+        private const uint AttributeNormal = 0x00000080;
+
+        public void Dispose()
+        {
+            // A copy that was not finished is removed through its own handle, a read-only
+            // attribute it was given cleared for that, before the handle closes.
+            if (!_finished && !_handle.IsClosed)
+            {
+                var attributes = Kernel32.GetFileInformationByHandle(_handle, out var info) ? info.dwFileAttributes : 0;
+                DirectoryGuard.DeleteClearingReadOnly(_handle, attributes);
+            }
+            else if (!_finished && _destination.Handle is { IsClosed: false } folder)
+            {
+                // The stream was closed under the target, and its handle with it: the
+                // temporary file is removed by its name inside the folder's handle.
+                DirectoryGuard.TryRemoveChildFile(folder, _temporary);
+            }
+
+            try
+            {
+                _content.Dispose();
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // The handle is closed whatever the close's own last write did.
+            }
+        }
     }
 
     public bool TryRemoveEmptyFolder(string folder, string existingAncestor)
@@ -249,6 +485,92 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
         }
     }
 
+    public DestinationFolder? Open(string folder, out int failureCode)
+    {
+        failureCode = 0;
+        try
+        {
+            if (_fs.Directory.Exists(folder)) return new DestinationFolder(folder, handle: null);
+            failureCode = Kernel32.ERROR_PATH_NOT_FOUND;
+            return null;
+        }
+        catch (Exception ex)
+        {
+            failureCode = Win32CodeOf(ex);
+            return null;
+        }
+    }
+
+    public ICopyTarget? CreateCopy(DestinationFolder destination, out int failureCode)
+    {
+        failureCode = 0;
+        var temporary = PathText.Combine(destination.Path, HandleDestinationGuard.TemporaryCopyName());
+        try
+        {
+            // Allowed here for the reason the write probe above gives: this guard writes
+            // only through the filesystem a test substitutes.
+#pragma warning disable RS0030
+            return new CopyTarget(_fs, destination.Path, temporary, _fs.File.Create(temporary));
+#pragma warning restore RS0030
+        }
+        catch (Exception ex)
+        {
+            failureCode = Win32CodeOf(ex);
+            return null;
+        }
+    }
+
+    private sealed class CopyTarget(IFileSystem fs, string folder, string temporary, Stream content) : ICopyTarget
+    {
+        private bool _finished;
+
+        public Stream Content { get; } = content;
+
+        public CopyFinish Finish(
+            string name, long expectedLength, FileAttributes attributes, long lastWriteTime, out int failureCode)
+        {
+            failureCode = 0;
+            try
+            {
+                Content.Flush();
+                if (Content.Length != expectedLength) return CopyFinish.LengthDiffers;
+
+                var destination = PathText.Combine(folder, name);
+                if (fs.File.Exists(destination) || fs.Directory.Exists(destination)) return CopyFinish.NameTaken;
+
+                // Closed only now, so a copy refused above can be finished under another name.
+                Content.Dispose();
+
+#pragma warning disable RS0030
+                fs.File.SetLastWriteTimeUtc(temporary, DateTime.FromFileTimeUtc(lastWriteTime));
+#pragma warning restore RS0030
+                fs.File.Move(temporary, destination);
+                fs.File.SetAttributes(destination, attributes);
+                _finished = true;
+                return CopyFinish.Finished;
+            }
+            catch (Exception ex)
+            {
+                failureCode = Win32CodeOf(ex);
+                return CopyFinish.Failed;
+            }
+        }
+
+        public void Dispose()
+        {
+            Content.Dispose();
+            if (_finished) return;
+            try
+            {
+                if (fs.File.Exists(temporary)) fs.File.Delete(temporary);
+            }
+            catch
+            {
+                // The temporary file stays under its temporary name.
+            }
+        }
+    }
+
     public bool TryRemoveEmptyFolder(string folder, string existingAncestor)
     {
         try
@@ -271,7 +593,7 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
     /// that stands for no error, answers <see cref="Kernel32.ERROR_UNIDENTIFIED_ERROR"/>:
     /// never 0, which Windows reads as success.
     /// </summary>
-    private static int Win32CodeOf(Exception exception)
+    internal static int Win32CodeOf(Exception exception)
     {
         var code = exception is UnauthorizedAccessException
             ? Kernel32.ERROR_ACCESS_DENIED

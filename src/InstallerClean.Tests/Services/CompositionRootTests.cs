@@ -70,6 +70,20 @@ public class CompositionRootTests
     }
 
     [Fact]
+    public void A_file_is_held_and_renamed_through_handles()
+    {
+        // Core also holds a by-path form, for tests on a substitute filesystem, which
+        // holds nothing: anything can open a file it has "held". Handed to the app, it
+        // would leave nothing between a file in use and its removal, so the wiring is
+        // held here.
+        using var services = new ServiceCollection()
+            .AddInstallerCleanCore()
+            .BuildServiceProvider();
+
+        Assert.IsType<HandleInHandFolder>(services.GetRequiredService<IInHandFolder>());
+    }
+
+    [Fact]
     public void The_move_acts_on_its_destination_through_the_handle_guard()
     {
         // The test seam's constructors default to the by-path guard; production must

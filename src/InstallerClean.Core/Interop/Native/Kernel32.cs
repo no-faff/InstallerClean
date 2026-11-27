@@ -785,6 +785,30 @@ internal static class Kernel32
         in FILE_DISPOSITION_INFO lpFileInformation,
         uint dwBufferSize);
 
+    /// <summary>
+    /// Renames the file an open handle names, through the handle, so the file renamed is
+    /// the one the handle was opened on whatever has happened to its name since.
+    /// <paramref name="lpFileInformation"/> points at a FILE_RENAME_INFO the caller has
+    /// built: a flag that is zero to replace nothing, a directory handle left null, the
+    /// name's length in bytes, and the name as a full path. A name that is not a full
+    /// path is completed from the process's current directory, so a name relative to a
+    /// directory handle goes through <see cref="Ntdll.NtSetInformationFile"/> instead.
+    ///
+    /// THE HANDLE NEEDS <see cref="Ntdll.DELETE"/>. A rename to another volume is refused
+    /// with <see cref="ERROR_NOT_SAME_DEVICE"/>, and one onto a name already taken with
+    /// <see cref="ERROR_ALREADY_EXISTS"/>.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "SetFileInformationByHandle", ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetFileRenameInfo(
+        SafeFileHandle hFile,
+        uint fileInformationClass,
+        IntPtr lpFileInformation,
+        uint dwBufferSize);
+
+    /// <summary>FileRenameInfo of FILE_INFO_BY_HANDLE_CLASS.</summary>
+    public const uint FileRenameInfo = 3;
+
     /// <summary>The POSIX disposition: a flag word read with the flags below.</summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct FILE_DISPOSITION_INFO_EX
@@ -1183,6 +1207,7 @@ internal static class Kernel32
     public const uint FILE_FLAG_DELETE_ON_CLOSE     = 0x04000000;
 
     public const uint FILE_ATTRIBUTE_REPARSE_POINT  = 0x00000400;
+    public const uint FILE_ATTRIBUTE_READONLY       = 0x00000001;
     public const uint FILE_ATTRIBUTE_DIRECTORY      = 0x00000010;
 
     // GetDriveType's return values. Numbered here rather than cast to
@@ -1264,6 +1289,9 @@ internal static class Kernel32
     // What a rename or delete answers where another process has the file open without
     // sharing delete.
     public const int ERROR_SHARING_VIOLATION = 32;
+
+    /// <summary>A rename was asked to cross from one volume to another.</summary>
+    public const int ERROR_NOT_SAME_DEVICE = 17;
 
     // What a read answers where another process has locked the part of the file it reads.
     public const int ERROR_LOCK_VIOLATION = 33;

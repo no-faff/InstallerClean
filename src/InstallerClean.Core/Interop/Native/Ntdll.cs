@@ -45,6 +45,24 @@ internal static class Ntdll
         uint EaLength);
 
     /// <summary>
+    /// Sets one class of information on the file <paramref name="FileHandle"/> names.
+    /// Declared for <see cref="FileRenameInformation"/>, whose buffer holds a handle to
+    /// the directory the new name is relative to: the Win32 call that takes the same
+    /// buffer turns the name into a full path first, so only this one renames a file
+    /// into the directory a handle names. The return value is an NTSTATUS.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "NtSetInformationFile", ExactSpelling = true)]
+    public static extern int NtSetInformationFile(
+        SafeFileHandle FileHandle,
+        out IO_STATUS_BLOCK IoStatusBlock,
+        IntPtr FileInformation,
+        uint Length,
+        int FileInformationClass);
+
+    /// <summary>FileRenameInformation of FILE_INFORMATION_CLASS.</summary>
+    public const int FileRenameInformation = 10;
+
+    /// <summary>
     /// Fills <paramref name="FileInformation"/> with the next entries of the folder
     /// <paramref name="FileHandle"/> lists, as records of the kind
     /// <paramref name="FileInformationClass"/> names, each pointing at the next. The return

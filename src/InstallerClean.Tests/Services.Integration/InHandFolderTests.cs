@@ -1,0 +1,396 @@
+using InstallerClean.Interop.Native;
+using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
+
+namespace InstallerClean.Tests.Services.Integration;
+
+/// <summary>
+/// The app's own <see cref="HandleInHandFolder"/> and the copy half of
+/// <see cref="HandleDestinationGuard"/> against real files, with a temp folder standing
+/// in for the Installer folder and a second one for a Move's destination. What Windows
+/// refuses while a file is held is the subject, which no substitute filesystem can show.
+/// </summary>
+public sealed class InHandFolderTests : IDisposable
+{
+    private readonly string _installer = TestTemp.NewFolder("ic-inhand-");
+    private readonly string _destination = TestTemp.NewFolder("ic-inhand-dest-");
+    private readonly HandleInHandFolder _hand = new();
+    private readonly HandleDestinationGuard _guard = new();
+
+    public void Dispose()
+    {
+        TestTemp.Delete(_installer);
+        TestTemp.Delete(_destination);
+    }
+
+    private string Cached(string name, FileAttributes attributes = FileAttributes.Normal)
+    {
+        var path = Path.Combine(_installer, name);
+        File.WriteAllBytes(path, [1, 2, 3, 4, 5]);
+        File.SetAttributes(path, attributes);
+        return path;
+    }
+
+    private IInHandBatch OpenBatch()
+    {
+        var batch = _hand.OpenBatch(_installer, out var code);
+        Assert.True(batch is not null, $"the batch's folder could not be made: {code}");
+        return batch;
+    }
+
+    private static IHeldFile Held(IInHandBatch batch, string path)
+    {
+        var hold = batch.Hold(path);
+        Assert.Equal(HoldOutcome.Held, hold.Outcome);
+        return hold.File!;
+    }
+
+    private static int OpenError(string path, FileAccess access, FileShare share)
+    {
+        try
+        {
+            using var _ = new FileStream(path, FileMode.Open, access, share);
+            return 0;
+        }
+        catch (IOException ex)
+        {
+            return ex.HResult & 0xFFFF;
+        }
+    }
+
+    [Fact]
+    public void A_batch_makes_its_own_folder_inside_the_in_hand_folder_and_removes_both_when_it_ends()
+    {
+        var inHand = Path.Combine(_installer, InHandFolders.FolderName);
+        string folder;
+        using (var batch = OpenBatch())
+        {
+            folder = batch.Folder;
+            Assert.True(Directory.Exists(folder));
+            Assert.Equal(inHand, Path.GetDirectoryName(folder));
+        }
+
+        Assert.False(Directory.Exists(folder));
+        Assert.False(Directory.Exists(inHand));
+    }
+
+    [Fact]
+    public void Two_batches_have_folders_of_their_own_and_the_in_hand_folder_stays_while_one_is_open()
+    {
+        using var first = OpenBatch();
+        string second;
+        using (var other = OpenBatch())
+        {
+            second = other.Folder;
+            Assert.NotEqual(first.Folder, second);
+        }
+
+        Assert.False(Directory.Exists(second));
+        Assert.True(Directory.Exists(first.Folder));
+    }
+
+    [Fact]
+    public void A_file_standing_under_the_in_hand_folders_name_refuses_the_batch()
+    {
+        File.WriteAllBytes(Path.Combine(_installer, InHandFolders.FolderName), []);
+
+        var batch = _hand.OpenBatch(_installer, out var code);
+
+        Assert.Null(batch);
+        Assert.NotEqual(0, code);
+    }
+
+    [Fact]
+    public void A_held_file_stays_in_its_place_and_nothing_else_can_open_it()
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+
+        using (var held = Held(batch, path))
+        {
+            Assert.False(held.IsOut);
+            Assert.True(File.Exists(path));
+            Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION,
+                OpenError(path, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete));
+        }
+
+        Assert.Equal(0, OpenError(path, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete));
+    }
+
+    [Theory]
+    [InlineData(FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)]
+    [InlineData(FileAccess.Read, FileShare.Read)]
+    [InlineData(FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete)]
+    public void A_file_anything_has_open_is_in_use_and_is_held_once_it_is_let_go(FileAccess access, FileShare share)
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+
+        using (new FileStream(path, FileMode.Open, access, share))
+        {
+            var refused = batch.Hold(path);
+            Assert.Equal(HoldOutcome.InUse, refused.Outcome);
+            Assert.Null(refused.File);
+        }
+
+        using var held = Held(batch, path);
+        Assert.True(File.Exists(path));
+    }
+
+    [Fact]
+    public void A_path_with_nothing_at_it_is_gone_and_a_folder_is_not_a_plain_file()
+    {
+        using var batch = OpenBatch();
+        Directory.CreateDirectory(Path.Combine(_installer, "folder.msp"));
+
+        Assert.Equal(HoldOutcome.Gone, batch.Hold(Path.Combine(_installer, "absent.msp")).Outcome);
+        Assert.Equal(HoldOutcome.NotAPlainFile, batch.Hold(Path.Combine(_installer, "folder.msp")).Outcome);
+        Assert.Equal(HoldOutcome.NotAPlainFile, batch.OpenToCopy(Path.Combine(_installer, "folder.msp")).Outcome);
+    }
+
+    [Fact]
+    public void Taking_a_file_out_renames_it_into_the_batchs_folder_and_putting_it_back_returns_it()
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+        using var held = Held(batch, path);
+
+        Assert.True(held.TakeOut(out _));
+        Assert.True(held.IsOut);
+        Assert.False(File.Exists(path));
+        Assert.True(File.Exists(Path.Combine(batch.Folder, "a.msp")));
+
+        Assert.True(held.PutBack(out _));
+        Assert.False(held.IsOut);
+        Assert.True(File.Exists(path));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(batch.Folder));
+    }
+
+    [Fact]
+    public void A_file_in_hand_cannot_be_opened_or_renamed_by_anything_else()
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+        using var held = Held(batch, path);
+        Assert.True(held.TakeOut(out _));
+        var away = Path.Combine(batch.Folder, "a.msp");
+
+        Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION,
+            OpenError(away, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete));
+        Assert.ThrowsAny<IOException>(() => File.Move(away, Path.Combine(_installer, "elsewhere.msp")));
+
+        Assert.True(held.PutBack(out _));
+    }
+
+    [Fact]
+    public void A_file_whose_name_has_been_taken_meanwhile_is_not_put_back_and_stays_in_the_batchs_folder()
+    {
+        var path = Cached("a.msp");
+        string folder;
+        using (var batch = OpenBatch())
+        {
+            folder = batch.Folder;
+            using var held = Held(batch, path);
+            Assert.True(held.TakeOut(out _));
+            File.WriteAllBytes(path, [9]);
+
+            Assert.False(held.PutBack(out var code));
+            Assert.Equal(Kernel32.ERROR_ALREADY_EXISTS, code);
+            Assert.True(held.IsOut);
+        }
+
+        // The batch's folder is left, with the file whole in it, and what took the name is untouched.
+        Assert.Equal([1, 2, 3, 4, 5], File.ReadAllBytes(Path.Combine(folder, "a.msp")));
+        Assert.Equal([9], File.ReadAllBytes(path));
+    }
+
+    [Theory]
+    [InlineData(FileAttributes.Normal)]
+    [InlineData(FileAttributes.ReadOnly)]
+    [InlineData(FileAttributes.ReadOnly | FileAttributes.Hidden)]
+    public void A_file_in_hand_is_deleted_as_its_hold_ends_read_only_or_not(FileAttributes attributes)
+    {
+        var path = Cached("a.msp", attributes);
+        using var batch = OpenBatch();
+        var held = Held(batch, path);
+        Assert.True(held.TakeOut(out _));
+
+        Assert.True(held.Delete(out var code), $"the delete was refused: {code}");
+        held.Dispose();
+
+        Assert.False(File.Exists(path));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(batch.Folder));
+    }
+
+    [Fact]
+    public void A_file_in_hand_is_sent_on_into_the_destination_under_its_name()
+    {
+        var path = Cached("a.msp", FileAttributes.ReadOnly);
+        using var batch = OpenBatch();
+        using var destination = _guard.Open(_destination, out _);
+        Assert.NotNull(destination);
+        using (var held = Held(batch, path))
+        {
+            Assert.True(held.TakeOut(out _));
+            Assert.True(held.MoveInto(destination, "a.msp", out var code), $"the rename was refused: {code}");
+            Assert.False(held.IsOut);
+        }
+
+        var moved = Path.Combine(_destination, "a.msp");
+        Assert.False(File.Exists(path));
+        Assert.Equal([1, 2, 3, 4, 5], File.ReadAllBytes(moved));
+        Assert.True(File.GetAttributes(moved).HasFlag(FileAttributes.ReadOnly));
+        File.SetAttributes(moved, FileAttributes.Normal);
+    }
+
+    [Fact]
+    public void A_name_already_in_the_destination_refuses_the_file_which_can_then_be_put_back()
+    {
+        var path = Cached("a.msp");
+        File.WriteAllBytes(Path.Combine(_destination, "a.msp"), [9]);
+        using var batch = OpenBatch();
+        using var destination = _guard.Open(_destination, out _);
+        using var held = Held(batch, path);
+        Assert.True(held.TakeOut(out _));
+
+        Assert.False(held.MoveInto(destination!, "a.msp", out var code));
+        Assert.Equal(Kernel32.ERROR_ALREADY_EXISTS, code);
+        Assert.True(held.IsOut);
+        Assert.Equal([9], File.ReadAllBytes(Path.Combine(_destination, "a.msp")));
+
+        Assert.True(held.PutBack(out _));
+        Assert.True(File.Exists(path));
+    }
+
+    /// <summary>
+    /// The file lands in the folder the destination's handle was opened on, where the
+    /// path it was opened by has since come to name another folder.
+    /// </summary>
+    [Fact]
+    public void A_file_sent_on_lands_in_the_folder_that_was_opened_whatever_its_path_names_since()
+    {
+        var path = Cached("a.msp");
+        var chosen = Path.Combine(_destination, "chosen");
+        var aside = Path.Combine(_destination, "aside");
+        Directory.CreateDirectory(chosen);
+        using var batch = OpenBatch();
+        using (var destination = _guard.Open(chosen, out _))
+        {
+            Assert.NotNull(destination);
+            Directory.Move(chosen, aside);
+            Directory.CreateDirectory(chosen);
+            using var held = Held(batch, path);
+            Assert.True(held.TakeOut(out _));
+
+            Assert.True(held.MoveInto(destination, "a.msp", out var code), $"the rename was refused: {code}");
+        }
+
+        Assert.True(File.Exists(Path.Combine(aside, "a.msp")));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(chosen));
+    }
+
+    [Fact]
+    public void A_destination_on_the_same_volume_is_reached_by_a_rename_and_the_question_leaves_nothing_behind()
+    {
+        using var batch = OpenBatch();
+        using var destination = _guard.Open(_destination, out _);
+
+        var reach = batch.ReachOf(destination!, out var code);
+
+        Assert.True(reach == RenameReach.SameVolume, $"{reach}, {code}");
+        Assert.Empty(Directory.EnumerateFileSystemEntries(_destination));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(batch.Folder));
+    }
+
+    [Fact]
+    public void A_file_open_for_a_copy_can_be_read_by_others_and_not_written_and_gives_the_stamp_a_hold_gives()
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+        FileStamp copied;
+        using (var open = batch.OpenToCopy(path).Source!)
+        {
+            copied = open.Stamp;
+            var bytes = new byte[8];
+            Assert.Equal(5, open.Content.Read(bytes, 0, bytes.Length));
+            Assert.Equal(0, OpenError(path, FileAccess.Read, FileShare.Read));
+            Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION,
+                OpenError(path, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete));
+        }
+
+        using var held = Held(batch, path);
+        Assert.True(held.TryReadStamp(out var taken));
+        Assert.Equal(copied, taken);
+        Assert.Equal(5, taken.Length);
+    }
+
+    [Fact]
+    public void A_file_written_again_after_it_was_copied_gives_a_different_stamp()
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+        FileStamp copied;
+        using (var open = batch.OpenToCopy(path).Source!) copied = open.Stamp;
+
+        File.WriteAllBytes(path, [1, 2, 3, 4, 5, 6]);
+
+        using var held = Held(batch, path);
+        Assert.True(held.TryReadStamp(out var taken));
+        Assert.NotEqual(copied, taken);
+    }
+
+    [Fact]
+    public void A_finished_copy_is_whole_under_its_real_name_with_the_attributes_and_time_it_was_given()
+    {
+        var written = new DateTime(2020, 3, 4, 5, 6, 7, DateTimeKind.Utc);
+        using var destination = _guard.Open(_destination, out _);
+        using (var copy = _guard.CreateCopy(destination!, out var created))
+        {
+            Assert.True(copy is not null, $"the copy could not be created: {created}");
+            copy.Content.Write([1, 2, 3], 0, 3);
+            Assert.Single(Directory.EnumerateFiles(_destination, "*.tmp"));
+
+            var finish = copy.Finish("a.msp", 3, FileAttributes.ReadOnly | FileAttributes.Archive, written.ToFileTimeUtc(), out var code);
+
+            Assert.True(finish == CopyFinish.Finished, $"{finish}, {code}");
+        }
+
+        var path = Path.Combine(_destination, "a.msp");
+        Assert.Equal([path], Directory.EnumerateFileSystemEntries(_destination));
+        Assert.Equal([1, 2, 3], File.ReadAllBytes(path));
+        Assert.Equal(written, File.GetLastWriteTimeUtc(path));
+        Assert.Equal(FileAttributes.ReadOnly | FileAttributes.Archive, File.GetAttributes(path));
+        File.SetAttributes(path, FileAttributes.Normal);
+    }
+
+    [Fact]
+    public void A_copy_that_is_not_finished_is_removed_when_it_is_disposed_of()
+    {
+        using var destination = _guard.Open(_destination, out _);
+        using (var copy = _guard.CreateCopy(destination!, out _))
+        {
+            Assert.NotNull(copy);
+            copy.Content.Write([1, 2, 3], 0, 3);
+        }
+
+        Assert.Empty(Directory.EnumerateFileSystemEntries(_destination));
+    }
+
+    [Fact]
+    public void A_copy_of_the_wrong_length_or_onto_a_taken_name_is_not_finished_and_leaves_nothing_of_its_own()
+    {
+        File.WriteAllBytes(Path.Combine(_destination, "taken.msp"), [9]);
+        using var destination = _guard.Open(_destination, out _);
+        using (var copy = _guard.CreateCopy(destination!, out _))
+        {
+            Assert.NotNull(copy);
+            copy.Content.Write([1, 2, 3], 0, 3);
+
+            Assert.Equal(CopyFinish.LengthDiffers, copy.Finish("a.msp", 4, FileAttributes.Normal, DateTime.UtcNow.ToFileTimeUtc(), out _));
+            Assert.Equal(CopyFinish.NameTaken, copy.Finish("taken.msp", 3, FileAttributes.ReadOnly, DateTime.UtcNow.ToFileTimeUtc(), out _));
+        }
+
+        Assert.Equal([Path.Combine(_destination, "taken.msp")], Directory.EnumerateFileSystemEntries(_destination));
+        Assert.Equal([9], File.ReadAllBytes(Path.Combine(_destination, "taken.msp")));
+    }
+}
