@@ -3,12 +3,13 @@ using InstallerClean.Helpers;
 namespace InstallerClean.Services;
 
 /// <summary>
-/// Returns Block when any of four signals says the MSI cache is at risk or cannot be
-/// shown not to be: the _MSIExecute mutex, held, refusing this process the rights to
+/// Makes two reads of whether the MSI cache is at risk. <see cref="Check"/> returns
+/// Block when any of four signals says it is or cannot be shown not to be: the _MSIExecute mutex, held, refusing this process the rights to
 /// open it, or not sampled; the Installer\InProgress key; Windows Installer's in-progress file in the
 /// cache folder, there or refusing the read; or any PendingFileRenameOperations entry,
 /// source or destination, that names a path under %SystemRoot%\Installer or that the
-/// app cannot place at all.
+/// app cannot place at all. <see cref="CheckBusy"/> reads the first three of those and
+/// then the Windows Installer service's own state, and not the queued file operations.
 /// </summary>
 /// <remarks>
 /// Every entry is checked, not just the sources: a queued rename INTO the cache is as
@@ -34,105 +35,48 @@ public sealed class PendingRebootService : IPendingRebootService
     private readonly IMutexProbe _mutex;
     private readonly IVolumeMountProbe _volumes;
     private readonly IInstallerInProgressMarker _marker;
+    private readonly IInstallerServiceState _service;
 
     /// <summary>Override for %SystemRoot%; null in production.</summary>
     private readonly string? _windowsRootOverride;
 
     public PendingRebootService(IRegistryReader registry, IMutexProbe mutex, IVolumeMountProbe volumes,
-        IInstallerInProgressMarker marker)
-        : this(registry, mutex, volumes, marker, windowsRootOverride: null)
+        IInstallerInProgressMarker marker, IInstallerServiceState service)
+        : this(registry, mutex, volumes, marker, windowsRootOverride: null,
+            service ?? throw new ArgumentNullException(nameof(service)))
     {
     }
 
-    /// <summary>Test-only constructor. Lets the path comparison run against an arbitrary %SystemRoot%.</summary>
+    /// <summary>
+    /// Test-only constructor. Lets the path comparison run against an arbitrary %SystemRoot%.
+    /// With no <paramref name="service"/> the Windows Installer service reads stopped.
+    /// </summary>
     internal PendingRebootService(
         IRegistryReader registry,
         IMutexProbe mutex,
         IVolumeMountProbe volumes,
         IInstallerInProgressMarker marker,
-        string? windowsRootOverride)
+        string? windowsRootOverride,
+        IInstallerServiceState? service = null)
     {
         _registry = registry;
         _mutex = mutex;
         _volumes = volumes;
         _marker = marker;
         _windowsRootOverride = windowsRootOverride;
+        _service = service ?? StoppedInstallerService.Instance;
     }
 
     public PendingRebootResult Check()
     {
-        // Mutex first because an active install is the most decisive signal; if it fires,
-        // every probe after it is skipped. A refused open is read here too and stops the
-        // run just as early: the action services' acquire falls back to the rights this
-        // probe asks for where full access is refused, so a refusal standing now refuses
-        // the batch later whatever the other two signals say.
-        MutexSampling mutex;
-        try
-        {
-            mutex = _mutex.Sample(MsiExecuteMutexName);
-        }
-        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
-        {
-            // A throw is a sample that did not happen, so it answers what the probe's
-            // own failure return does. OOM and StackOverflow propagate, matching
-            // RegistryReader and MutexProbe.
-            mutex = new MutexSampling(MutexSample.Unestablished, WindowsErrors.Of(ex));
-        }
-        if (mutex.State is MutexSample.Held)
-            return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld);
-        if (mutex.State is MutexSample.AccessRefused)
-            return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexAccessRefused);
+        if (BlockFromAnInstallation(out var mutex) is { } block) return block;
 
         // NOT HELD IS THE ONLY SAMPLE THAT LETS THE CHECK FINISH CLEAN, on the rule the
         // reads below follow, so a sample that did not establish the mutex's state, or a
-        // member added to the enum later, blocks. The other three signals are still read
-        // first: one of them that blocks names what is happening, where this can say only
-        // that the mutex was not sampled.
+        // member added to the enum later, blocks. The last signal is still read first:
+        // if it blocks it names what is happening, where this can say only that the
+        // mutex was not sampled.
         var mutexUnestablished = mutex.State is not MutexSample.NotHeld;
-
-        // IRegistryReader documents "never throws", but the unit tests deliberately
-        // substitute throwing fakes to exercise what a non-conforming implementation
-        // would do; this wrap keeps Check's contract intact whether the bound
-        // implementation honours the interface contract or not. A throw is a read
-        // that did not happen, so it answers the same state the reader's own failure
-        // return does and the two arrive at the gate below as one case.
-        RegistryKeyPresence installerInProgress;
-        try
-        {
-            installerInProgress = _registry.LocalMachineKeyPresence(InstallerInProgressKey);
-        }
-        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
-        {
-            installerInProgress = RegistryKeyPresence.Unreadable;
-        }
-        if (installerInProgress is RegistryKeyPresence.Present)
-            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgress);
-
-        // ABSENT IS THE ONLY STATE THAT CARRIES ON, AND THE TEST IS WRITTEN THAT WAY
-        // ROUND ON PURPOSE. A key that is not there says no transaction is suspended,
-        // which is the answer nearly every machine gives. Anything else is a read
-        // that did not answer, so whether one is suspended is not established, and a
-        // state added to the enum later falls here rather than through.
-        if (installerInProgress is not RegistryKeyPresence.Absent)
-            return PendingRebootResult.Block(PendingRebootReason.RegistryCheckUnreadable);
-
-        // Windows Installer's in-progress file. Windows Installer writes it some time
-        // after an installation has taken the mutex above, after its working copy is
-        // already in the folder. The mutex is read first and covers that time, and across a transaction of several packages the file
-        // stays until the transaction has finished, the stretches between packages
-        // included, when the mutex is free. The two cover an installation together.
-        // Absent is the only reading that carries on, on the rule the key above
-        // follows, so a reading added later blocks.
-        //
-        // NOT WRAPPED, UNLIKE THE READS ABOVE. The probe throws only for a failure
-        // that none of its readings names, and no sentence this gate has is true of
-        // that, so it leaves through the caller's own error path, which reports it
-        // and acts on nothing. See IInstallerInProgressMarker.Read.
-        var marker = _marker.Read();
-        if (marker is InstallerInProgressMarkerReading.AccessRefused)
-            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgressMarkerAccessRefused);
-        if (marker is not InstallerInProgressMarkerReading.Absent)
-            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgressMarker);
 
         // Bare PendingFileRenameOperations is too broad (any third-party uninstaller
         // writes to it); refine to "an entry, source or destination, that names a path
@@ -192,6 +136,104 @@ public sealed class PendingRebootService : IPendingRebootService
         return anyUnplaceable
             ? PendingRebootResult.Block(PendingRebootReason.PendingRenameUnresolved)
             : CleanUnlessTheMutexWasUnestablished(mutexUnestablished, mutex.WindowsError);
+    }
+
+    public PendingRebootResult CheckBusy()
+    {
+        if (BlockFromAnInstallation(out var mutex) is { } block) return block;
+
+        // The service last, so that it is the reason given only where nothing else is
+        // set: the minutes after an installation has finished, while its service has not
+        // yet stopped. Its probe answers and never throws.
+        var service = _service.Read();
+        if (service.State is InstallerServiceState.Unreadable)
+            return PendingRebootResult.Block(
+                PendingRebootReason.InstallerServiceUnreadable, windowsError: service.WindowsError);
+
+        // STOPPED AND NOT THERE ARE THE ONLY STATES THAT CARRY ON, on the rule the reads
+        // before it follow, so a state added to the enum later blocks.
+        if (service.State is not (InstallerServiceState.Stopped or InstallerServiceState.NotThere))
+            return PendingRebootResult.Block(PendingRebootReason.InstallerServiceRunning);
+
+        return CleanUnlessTheMutexWasUnestablished(
+            mutex.State is not MutexSample.NotHeld, mutex.WindowsError);
+    }
+
+    /// <summary>
+    /// Reads the three signals an installation sets, the mutex, the InProgress key and
+    /// Windows Installer's in-progress file, in that order, and answers the block of the
+    /// first that is set or could not be read, or null where none is.
+    /// <paramref name="mutex"/> is the sample taken, which the caller reads for a mutex
+    /// that was not sampled where nothing else blocked.
+    /// </summary>
+    private PendingRebootResult? BlockFromAnInstallation(out MutexSampling mutex)
+    {
+        // Mutex first because an active install is the most decisive signal; if it fires,
+        // every probe after it is skipped. A refused open is read here too and stops the
+        // run just as early: the action services' acquire falls back to the rights this
+        // probe asks for where full access is refused, so a refusal standing now refuses
+        // the batch later whatever the other two signals say.
+        try
+        {
+            mutex = _mutex.Sample(MsiExecuteMutexName);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            // A throw is a sample that did not happen, so it answers what the probe's
+            // own failure return does. OOM and StackOverflow propagate, matching
+            // RegistryReader and MutexProbe.
+            mutex = new MutexSampling(MutexSample.Unestablished, WindowsErrors.Of(ex));
+        }
+        if (mutex.State is MutexSample.Held)
+            return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld);
+        if (mutex.State is MutexSample.AccessRefused)
+            return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexAccessRefused);
+
+        // IRegistryReader documents "never throws", but the unit tests deliberately
+        // substitute throwing fakes to exercise what a non-conforming implementation
+        // would do; this wrap keeps Check's contract intact whether the bound
+        // implementation honours the interface contract or not. A throw is a read
+        // that did not happen, so it answers the same state the reader's own failure
+        // return does and the two arrive at the gate below as one case.
+        RegistryKeyPresence installerInProgress;
+        try
+        {
+            installerInProgress = _registry.LocalMachineKeyPresence(InstallerInProgressKey);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            installerInProgress = RegistryKeyPresence.Unreadable;
+        }
+        if (installerInProgress is RegistryKeyPresence.Present)
+            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgress);
+
+        // ABSENT IS THE ONLY STATE THAT CARRIES ON, AND THE TEST IS WRITTEN THAT WAY
+        // ROUND ON PURPOSE. A key that is not there says no transaction is suspended,
+        // which is the answer nearly every machine gives. Anything else is a read
+        // that did not answer, so whether one is suspended is not established, and a
+        // state added to the enum later falls here rather than through.
+        if (installerInProgress is not RegistryKeyPresence.Absent)
+            return PendingRebootResult.Block(PendingRebootReason.RegistryCheckUnreadable);
+
+        // Windows Installer's in-progress file. Windows Installer writes it some time
+        // after an installation has taken the mutex above, after its working copy is
+        // already in the folder. The mutex is read first and covers that time, and across a transaction of several packages the file
+        // stays until the transaction has finished, the stretches between packages
+        // included, when the mutex is free. The two cover an installation together.
+        // Absent is the only reading that carries on, on the rule the key above
+        // follows, so a reading added later blocks.
+        //
+        // NOT WRAPPED, UNLIKE THE READS ABOVE. The probe throws only for a failure
+        // that none of its readings names, and no sentence this gate has is true of
+        // that, so it leaves through the caller's own error path, which reports it
+        // and acts on nothing. See IInstallerInProgressMarker.Read.
+        var marker = _marker.Read();
+        if (marker is InstallerInProgressMarkerReading.AccessRefused)
+            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgressMarkerAccessRefused);
+        if (marker is not InstallerInProgressMarkerReading.Absent)
+            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgressMarker);
+
+        return null;
     }
 
     /// <summary>

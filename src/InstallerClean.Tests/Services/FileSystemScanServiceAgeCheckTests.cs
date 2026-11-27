@@ -560,6 +560,9 @@ internal sealed class ScriptedInstallerActivity(PendingRebootResult result, Fixe
         ClockReadsAtEachCheck.Add(clock?.Reads ?? -1);
         return result;
     }
+
+    /// <summary>The same scripted answer, for a caller that asks whether Windows Installer is busy.</summary>
+    public PendingRebootResult CheckBusy() => result;
 }
 
 /// <summary>

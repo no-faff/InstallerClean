@@ -26,4 +26,25 @@ public interface IPendingRebootService
     /// abandoned counts as not held.
     /// </summary>
     PendingRebootResult Check();
+
+    /// <summary>
+    /// Whether Windows Installer is busy at this moment: the mutex, the InProgress key
+    /// and the in-progress file, read as <see cref="Check"/> reads them and in its order,
+    /// and then the Windows Installer service's own state, which blocks unless the
+    /// service is stopped or is not there. The queued file operations
+    /// <see cref="Check"/> reads last are not read. It throws in the one case
+    /// <see cref="Check"/> does.
+    ///
+    /// THE SERVICE IS READ WITH THE MUTEX AND NEVER IN ITS PLACE. An installation's
+    /// client takes the mutex a few milliseconds before the service leaves its stopped
+    /// state, so for those milliseconds only the mutex says that one has begun; and
+    /// between the passes of an installation that makes more than one, the mutex is free
+    /// and only the service says that one is under way.
+    ///
+    /// <see cref="Check"/> DOES NOT READ THE SERVICE, and must not come to: the scan and
+    /// the check before a Move or Delete hold every file no record names while
+    /// <see cref="Check"/> is blocked, and the service runs on for minutes after every
+    /// installation, so a scan made in those minutes lists its files as any other does.
+    /// </summary>
+    PendingRebootResult CheckBusy();
 }

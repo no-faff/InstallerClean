@@ -116,7 +116,8 @@ internal static class ScanSignalReport
         PendingRebootReason.MsiExecuteMutexAccessRefused
             or PendingRebootReason.InstallerInProgressMarkerAccessRefused => Group.AccessRefused,
         PendingRebootReason.RegistryCheckUnreadable => Group.RegistryUnreadable,
-        PendingRebootReason.MsiExecuteMutexUnreadable => Group.LockUnreadable,
+        PendingRebootReason.MsiExecuteMutexUnreadable
+            or PendingRebootReason.InstallerServiceUnreadable => Group.LockUnreadable,
         _ => Group.Other,
     };
 

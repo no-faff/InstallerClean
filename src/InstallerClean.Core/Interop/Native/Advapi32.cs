@@ -87,6 +87,78 @@ internal static class Advapi32
         int samDesired,
         out IntPtr phkResult);
 
+    /// <summary>
+    /// Opens the service control manager of this PC with the access
+    /// <paramref name="dwDesiredAccess"/> asks for. The handle is closed with
+    /// <see cref="CloseServiceHandle"/>.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "OpenSCManagerW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern SafeServiceHandle OpenSCManager(string? lpMachineName, string? lpDatabaseName, uint dwDesiredAccess);
+
+    /// <summary>
+    /// Opens the service <paramref name="lpServiceName"/> names. Fails with
+    /// <see cref="ERROR_SERVICE_DOES_NOT_EXIST"/> where there is no such service.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "OpenServiceW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern SafeServiceHandle OpenService(SafeServiceHandle hSCManager, string lpServiceName, uint dwDesiredAccess);
+
+    /// <summary>
+    /// Reads a service's present state into <paramref name="lpBuffer"/>, for the one
+    /// information level there is, SC_STATUS_PROCESS_INFO. It asks the service control
+    /// manager and starts nothing.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "QueryServiceStatusEx", ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool QueryServiceStatusEx(
+        SafeServiceHandle hService,
+        int InfoLevel,
+        out SERVICE_STATUS_PROCESS lpBuffer,
+        uint cbBufSize,
+        out uint pcbBytesNeeded);
+
+    /// <summary>Closes a handle <see cref="OpenSCManager"/> or <see cref="OpenService"/> gave.</summary>
+    [DllImport(Library, EntryPoint = "CloseServiceHandle", ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool CloseServiceHandle(IntPtr hSCObject);
+
+    /// <summary>SERVICE_STATUS_PROCESS, as winsvc.h declares it: nine DWORDs.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SERVICE_STATUS_PROCESS
+    {
+        public uint dwServiceType;
+        public uint dwCurrentState;
+        public uint dwControlsAccepted;
+        public uint dwWin32ExitCode;
+        public uint dwServiceSpecificExitCode;
+        public uint dwCheckPoint;
+        public uint dwWaitHint;
+        public uint dwProcessId;
+        public uint dwServiceFlags;
+    }
+
+    /// <summary>A handle to the service control manager or to a service.</summary>
+    public sealed class SafeServiceHandle : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private SafeServiceHandle() : base(ownsHandle: true) { }
+
+        protected override bool ReleaseHandle() => CloseServiceHandle(handle);
+    }
+
+    /// <summary>SC_MANAGER_CONNECT: the right to connect to the service control manager.</summary>
+    public const uint SC_MANAGER_CONNECT = 0x0001;
+
+    /// <summary>SERVICE_QUERY_STATUS: the right to ask a service's state.</summary>
+    public const uint SERVICE_QUERY_STATUS = 0x0004;
+
+    /// <summary>SC_STATUS_PROCESS_INFO, the information level <see cref="QueryServiceStatusEx"/> takes.</summary>
+    public const int SC_STATUS_PROCESS_INFO = 0;
+
+    /// <summary>SERVICE_STOPPED: the service is not running.</summary>
+    public const uint SERVICE_STOPPED = 0x00000001;
+
+    /// <summary>The service named is not installed on this PC.</summary>
+    public const int ERROR_SERVICE_DOES_NOT_EXIST = 1060;
+
     /// <summary>KEY_QUERY_VALUE: the right <see cref="RegQueryInfoKey"/> needs on a key.</summary>
     public const int KEY_QUERY_VALUE = 0x0001;
 

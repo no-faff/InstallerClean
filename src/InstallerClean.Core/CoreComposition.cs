@@ -46,6 +46,8 @@ public static class CoreComposition
         // Reads whether Windows Installer's in-progress file is in the cache folder,
         // for the pending-reboot gate alone.
         services.AddSingleton<IInstallerInProgressMarker, InstallerInProgressMarker>();
+        // Reads whether the Windows Installer service is stopped, for the same gate.
+        services.AddSingleton<IInstallerServiceState, InstallerServiceStateProbe>();
         services.AddSingleton<Interop.IMsiApi, Interop.MsiApi>();
         // Arms a watch on the registry keys Windows Installer keeps its records in.
         services.AddSingleton<IRecordsWatchFactory, RecordsWatchFactory>();

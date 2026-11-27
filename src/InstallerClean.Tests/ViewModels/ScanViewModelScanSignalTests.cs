@@ -174,10 +174,15 @@ public class ScanViewModelScanSignalTests
     public void Every_reason_the_banners_tell_apart_has_a_line_of_its_own()
     {
         // The two refusals share a banner, and the in-progress file takes the banner true
-        // of the whole family, so each shares the line its banner's twin has.
+        // of the whole family, so each shares the line its banner's twin has. So do the
+        // two reads that could not be made. The scan does not read the Windows Installer
+        // service, so a running one is never the signal at a scan's start and takes the
+        // family's line, as the in-progress file does.
         var shared = new Dictionary<PendingRebootReason, PendingRebootReason>
         {
             [PendingRebootReason.InstallerInProgressMarkerAccessRefused] = PendingRebootReason.MsiExecuteMutexAccessRefused,
+            [PendingRebootReason.InstallerServiceUnreadable] = PendingRebootReason.MsiExecuteMutexUnreadable,
+            [PendingRebootReason.InstallerServiceRunning] = PendingRebootReason.InstallerInProgressMarker,
         };
         var seen = new List<string>();
         foreach (var reason in Enum.GetValues<PendingRebootReason>())

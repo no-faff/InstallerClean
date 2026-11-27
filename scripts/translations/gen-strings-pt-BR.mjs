@@ -665,6 +665,8 @@ const MAP = {
   'Automation.UpdateNotice.WhatsNew.HelpText': `Abre as versões do InstallerClean no github no seu navegador, da mais recente para a mais antiga.`,
   'About.Link.WhatsNew': `Novidades desta versão`,
   'Automation.About.WhatsNew.HelpText': `Abre a página desta versão no github no seu navegador.`,
+  'Body.PendingReboot.InstallerServiceRunning': `Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. Move and Delete are paused until it has stopped, so InstallerClean won't touch {InstallerFolder}. Then Re-scan and they come back.`,
+  'Cli.PendingRebootBlocked.InstallerServiceRunning': `Error: Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. /m and /d are blocked until it has stopped. Try again in a few minutes.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.

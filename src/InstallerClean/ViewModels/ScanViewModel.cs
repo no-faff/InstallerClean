@@ -203,6 +203,14 @@ public partial class ScanViewModel : ObservableObject
             PendingRebootResult.WindowsError,
             Strings.Body_PendingReboot_MsiExecuteMutexUnreadable,
             Strings.Body_PendingReboot_MsiExecuteMutexUnreadableWindowsError),
+        PendingRebootReason.InstallerServiceRunning => Strings.Body_PendingReboot_InstallerServiceRunning,
+        // The Windows Installer service's state would not read: the banner for a lock
+        // that could not be sampled says the app could not check whether Windows
+        // Installer is busy, which is as true of this read as of that one.
+        PendingRebootReason.InstallerServiceUnreadable => WindowsErrors.Sentence(
+            PendingRebootResult.WindowsError,
+            Strings.Body_PendingReboot_MsiExecuteMutexUnreadable,
+            Strings.Body_PendingReboot_MsiExecuteMutexUnreadableWindowsError),
         null => string.Empty,
         _ => Strings.Body_PendingReboot_Other,
     };

@@ -8968,6 +8968,42 @@
       "vi": "b2ebe565933d2c6a",
       "zh-Hans": "b2ebe565933d2c6a",
       "zh-Hant": "b2ebe565933d2c6a"
+    },
+    "Body.PendingReboot.InstallerServiceRunning": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "id": "unverified",
+      "it": "unverified",
+      "ja": "unverified",
+      "ko": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "tr": "unverified",
+      "uk": "unverified",
+      "vi": "unverified",
+      "zh-Hans": "unverified",
+      "zh-Hant": "unverified"
+    },
+    "Cli.PendingRebootBlocked.InstallerServiceRunning": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "id": "unverified",
+      "it": "unverified",
+      "ja": "unverified",
+      "ko": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "tr": "unverified",
+      "uk": "unverified",
+      "vi": "unverified",
+      "zh-Hans": "unverified",
+      "zh-Hant": "unverified"
     }
   }
 }

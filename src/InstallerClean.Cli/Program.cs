@@ -2831,6 +2831,15 @@ internal static class Program
                 WindowsErrors.Sentence(windowsError,
                     Strings.Cli_PendingRebootBlocked_MsiExecuteMutexUnreadable,
                     Strings.Cli_PendingRebootBlocked_MsiExecuteMutexUnreadableWindowsError),
+            PendingRebootReason.InstallerServiceRunning =>
+                Strings.Cli_PendingRebootBlocked_InstallerServiceRunning,
+            // The Windows Installer service's state would not read: the sentence for a
+            // lock that could not be sampled says the app could not check whether
+            // Windows Installer is busy, which is as true of this read as of that one.
+            PendingRebootReason.InstallerServiceUnreadable =>
+                WindowsErrors.Sentence(windowsError,
+                    Strings.Cli_PendingRebootBlocked_MsiExecuteMutexUnreadable,
+                    Strings.Cli_PendingRebootBlocked_MsiExecuteMutexUnreadableWindowsError),
             // What a reason with no line of its own gets: a sentence true of the
             // whole family, where a throw would reach the generic catch and report
             // a held run as an unexpected crash. It cannot fire for a null reason
@@ -2876,6 +2885,12 @@ internal static class Program
                 nameof(PendingRebootReason.InstallerInProgressMarkerAccessRefused),
             PendingRebootReason.MsiExecuteMutexUnreadable =>
                 Strings.Cli_EventLogReason_MsiExecuteMutexUnreadable,
+            // The two reasons the Windows Installer service's state gives are labelled
+            // with their own names, as the in-progress file's are.
+            PendingRebootReason.InstallerServiceRunning =>
+                nameof(PendingRebootReason.InstallerServiceRunning),
+            PendingRebootReason.InstallerServiceUnreadable =>
+                nameof(PendingRebootReason.InstallerServiceUnreadable),
             _ => reason.ToString(),
         };
 
@@ -2951,8 +2966,9 @@ internal static class Program
         //
         // THE REASONS THAT ASSERT SOMETHING IS IN FLIGHT TAKE THE TRANSIENT CODE. An
         // install holding the mutex, a suspended transaction, Windows Installer's
-        // in-progress file, a queued rename: each of those ends by itself, so a
-        // scheduler that comes back finds the machine in a different state.
+        // in-progress file, a queued rename, the Windows Installer service still
+        // running: each of those ends by itself, so a scheduler that comes back finds
+        // the machine in a different state.
         //
         // A READ THE APP COULD NOT MAKE IS NOT ONE OF THEM, and this is the arm the
         // default falls to. A sample of the lock that failed is such a read. Nothing
@@ -2976,7 +2992,8 @@ internal static class Program
             PendingRebootReason.InstallerInProgress or
             PendingRebootReason.InstallerInProgressMarker or
             PendingRebootReason.PendingRenameInCache or
-            PendingRebootReason.PendingRenameUnresolved =>
+            PendingRebootReason.PendingRenameUnresolved or
+            PendingRebootReason.InstallerServiceRunning =>
                 (ExitTransient, CliEventClass.TransientSkip),
             _ => (ExitError, CliEventClass.HardError),
         };

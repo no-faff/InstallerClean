@@ -57,11 +57,14 @@ public class CliPendingRebootStringsTests
     /// The reasons whose stdout line is another reason's, each with the reason it
     /// shares. A refused read of Windows Installer's in-progress file prints the
     /// refused-lock line, whose sentence says Windows refused the app permission to
-    /// check whether Windows Installer was busy.
+    /// check whether Windows Installer was busy. A Windows Installer service whose
+    /// state would not read prints the line of a lock that could not be sampled, whose
+    /// sentence says the app could not check whether Windows Installer is busy.
     /// </summary>
     private static readonly Dictionary<PendingRebootReason, PendingRebootReason> SharedLine = new()
     {
         [PendingRebootReason.InstallerInProgressMarkerAccessRefused] = PendingRebootReason.MsiExecuteMutexAccessRefused,
+        [PendingRebootReason.InstallerServiceUnreadable] = PendingRebootReason.MsiExecuteMutexUnreadable,
     };
 
     /// <summary>
@@ -73,6 +76,8 @@ public class CliPendingRebootStringsTests
     {
         PendingRebootReason.InstallerInProgressMarker,
         PendingRebootReason.InstallerInProgressMarkerAccessRefused,
+        PendingRebootReason.InstallerServiceRunning,
+        PendingRebootReason.InstallerServiceUnreadable,
     };
 
     /// <summary>

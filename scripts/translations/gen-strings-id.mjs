@@ -685,6 +685,8 @@ const MAP = {
   'Automation.UpdateNotice.WhatsNew.HelpText': `Membuka rilis InstallerClean di github melalui browser Anda, mulai dari yang terbaru.`,
   'About.Link.WhatsNew': `Yang baru di versi ini`,
   'Automation.About.WhatsNew.HelpText': `Membuka halaman rilis versi ini di github melalui browser Anda.`,
+  'Body.PendingReboot.InstallerServiceRunning': `Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. Move and Delete are paused until it has stopped, so InstallerClean won't touch {InstallerFolder}. Then Re-scan and they come back.`,
+  'Cli.PendingRebootBlocked.InstallerServiceRunning': `Error: Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. /m and /d are blocked until it has stopped. Try again in a few minutes.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

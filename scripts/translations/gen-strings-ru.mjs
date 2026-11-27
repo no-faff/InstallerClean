@@ -551,6 +551,7 @@ const MAP = {
   'Automation.UpdateNotice.WhatsNew.HelpText': `Открывает выпуски InstallerClean на github в вашем браузере, начиная с самого нового.`,
   'About.Link.WhatsNew': `Что нового в этой версии`,
   'Automation.About.WhatsNew.HelpText': `Открывает страницу этой версии на github в вашем браузере.`,
+  'Body.PendingReboot.InstallerServiceRunning': `Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. Move and Delete are paused until it has stopped, so InstallerClean won't touch {InstallerFolder}. Then Re-scan and they come back.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -731,6 +732,7 @@ const CLI = {
   'Cli.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices    Показать уведомления третьих сторон`,
   'Cli.ReportCancelledWhileSending': `Отменено во время отправки отчёта. Он всё равно мог дойти.`,
+  'Cli.PendingRebootBlocked.InstallerServiceRunning': `Error: Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. /m and /d are blocked until it has stopped. Try again in a few minutes.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -9,7 +9,8 @@ public sealed record PendingRebootResult
 
     /// <summary>
     /// The Windows error number the check failed on, where it failed on one: set only on
-    /// a <see cref="PendingRebootReason.MsiExecuteMutexUnreadable"/> block whose failure
+    /// a <see cref="PendingRebootReason.MsiExecuteMutexUnreadable"/> or
+    /// <see cref="PendingRebootReason.InstallerServiceUnreadable"/> block whose failure
     /// Windows raised, and null on every other result. The sentences for that reason give
     /// it with the text Windows gives for it, and say nothing about a cause where it is null.
     /// </summary>
@@ -147,4 +148,49 @@ public enum PendingRebootReason
     /// <see cref="MutexAcquireOutcome.NotAcquired"/> and refuses the batch on it.
     /// </summary>
     MsiExecuteMutexUnreadable,
+
+    /// <summary>
+    /// The Windows Installer service is not stopped: starting, running or stopping. Every
+    /// installation's engine runs in that service, so while it is stopped none is under
+    /// way, and it stops by itself some minutes after the last one has finished. An
+    /// installer window left open keeps it running for as long as the window is up.
+    ///
+    /// GIVEN BY <see cref="IPendingRebootService.CheckBusy"/> ALONE, and only where
+    /// neither the mutex, the InProgress key nor the in-progress file blocked, so it
+    /// names the minutes after an installation and not the installation itself. It is
+    /// given ahead of a mutex that could not be sampled, as every signal that blocks is.
+    /// </summary>
+    InstallerServiceRunning,
+
+    /// <summary>
+    /// The Windows Installer service's state could not be read, so whether an
+    /// installation's engine is running was not established. Carries the Windows error
+    /// the read failed on (<see cref="PendingRebootResult.WindowsError"/>). Given by
+    /// <see cref="IPendingRebootService.CheckBusy"/> alone.
+    /// </summary>
+    InstallerServiceUnreadable,
+}
+
+/// <summary>What a reason is, beyond which signal gave it.</summary>
+public static class PendingRebootReasons
+{
+    /// <summary>
+    /// Whether <paramref name="reason"/> is one an installation ending clears, so that
+    /// waiting for it is worth while: the mutex held, the InProgress key or the
+    /// in-progress file there, or the service running.
+    ///
+    /// TRUE DOES NOT PROMISE THAT A WAIT ENDS. An installation left unfinished until the
+    /// next restart leaves the InProgress key or the in-progress file where it is, and
+    /// an installer's window left open keeps the service running, so a caller that
+    /// waits on this bounds its wait or lets the person stop it.
+    ///
+    /// EVERY OTHER REASON ANSWERS FALSE, a member added to the enum later among them: a
+    /// file operation queued for the next restart, a signal that could not be read and a
+    /// signal the app was refused permission to read do not change by being waited on.
+    /// </summary>
+    public static bool ClearsByWaiting(this PendingRebootReason reason) => reason is
+        PendingRebootReason.MsiExecuteMutexHeld
+        or PendingRebootReason.InstallerInProgress
+        or PendingRebootReason.InstallerInProgressMarker
+        or PendingRebootReason.InstallerServiceRunning;
 }

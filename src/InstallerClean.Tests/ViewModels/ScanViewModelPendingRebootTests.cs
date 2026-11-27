@@ -62,11 +62,14 @@ public class ScanViewModelPendingRebootTests
     /// The reasons whose banner is another reason's, each with the reason it shares.
     /// A refused read of Windows Installer's in-progress file shows the refused-lock
     /// banner, whose sentence says Windows refused the app permission to check
-    /// whether Windows Installer is busy.
+    /// whether Windows Installer is busy. A Windows Installer service whose state
+    /// would not read shows the banner of a lock that could not be sampled, whose
+    /// sentence says the app could not check whether Windows Installer is busy.
     /// </summary>
     private static readonly Dictionary<PendingRebootReason, PendingRebootReason> SharedBanner = new()
     {
         [PendingRebootReason.InstallerInProgressMarkerAccessRefused] = PendingRebootReason.MsiExecuteMutexAccessRefused,
+        [PendingRebootReason.InstallerServiceUnreadable] = PendingRebootReason.MsiExecuteMutexUnreadable,
     };
 
     /// <summary>

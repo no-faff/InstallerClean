@@ -169,6 +169,7 @@ public class NativeDeclarationTests
     // passed to Windows that is missing here fails the test below until its size is added.
     private static readonly Dictionary<Type, int> HeaderSize = new()
     {
+        [typeof(Advapi32.SERVICE_STATUS_PROCESS)] = 36,
         [typeof(Kernel32.WIN32_FIND_DATA)] = 592,
         [typeof(Kernel32.WIN32_FILE_ATTRIBUTE_DATA)] = 36,
         [typeof(Kernel32.FILETIME)] = 8,
