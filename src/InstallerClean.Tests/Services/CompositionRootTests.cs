@@ -57,6 +57,19 @@ public class CompositionRootTests
     }
 
     [Fact]
+    public void The_watch_on_the_records_is_the_one_armed_on_the_registry()
+    {
+        // Core also holds a factory whose watches never change, for tests. Handed to the
+        // app, that one would read unchanged whatever was written under the keys, with
+        // nothing to show it, so the wiring is held here.
+        using var services = new ServiceCollection()
+            .AddInstallerCleanCore()
+            .BuildServiceProvider();
+
+        Assert.IsType<RecordsWatchFactory>(services.GetRequiredService<IRecordsWatchFactory>());
+    }
+
+    [Fact]
     public void The_move_acts_on_its_destination_through_the_handle_guard()
     {
         // The test seam's constructors default to the by-path guard; production must

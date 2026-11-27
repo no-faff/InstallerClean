@@ -87,6 +87,46 @@ internal static class Advapi32
         int samDesired,
         out IntPtr phkResult);
 
+    /// <summary>KEY_QUERY_VALUE: the right <see cref="RegQueryInfoKey"/> needs on a key.</summary>
+    public const int KEY_QUERY_VALUE = 0x0001;
+
+    /// <summary>KEY_NOTIFY: the right <see cref="RegNotifyChangeKeyValue"/> needs on a key.</summary>
+    public const int KEY_NOTIFY = 0x0010;
+
+    /// <summary>KEY_WOW64_64KEY: open the key in the 64-bit view of the registry, whatever the process is.</summary>
+    public const int KEY_WOW64_64KEY = 0x0100;
+
+    /// <summary>REG_NOTIFY_CHANGE_NAME: a subkey is added or deleted.</summary>
+    public const uint REG_NOTIFY_CHANGE_NAME = 0x00000001;
+
+    /// <summary>REG_NOTIFY_CHANGE_LAST_SET: a value is added, deleted or changed.</summary>
+    public const uint REG_NOTIFY_CHANGE_LAST_SET = 0x00000004;
+
+    /// <summary>
+    /// REG_NOTIFY_THREAD_AGNOSTIC: the registration is not tied to the thread that made
+    /// it, so it stays in force after that thread ends. Windows 8 and later.
+    /// </summary>
+    public const uint REG_NOTIFY_THREAD_AGNOSTIC = 0x10000000;
+
+    /// <summary>
+    /// Asks to be told of one change to the key <paramref name="hKey"/> names, or to
+    /// anything under it where <paramref name="bWatchSubtree"/> is true, of the kinds
+    /// <paramref name="dwNotifyFilter"/> names. With <paramref name="fAsynchronous"/> true
+    /// it returns at once and sets <paramref name="hEvent"/> when the change comes.
+    /// Answers ERROR_SUCCESS or a Win32 error. Microsoft's page for it: "This function
+    /// detects a single change. After the caller receives a notification event, it should
+    /// call the function again to receive the next notification", and the key is to have
+    /// been opened with KEY_NOTIFY and is to stay open for as long as the change is
+    /// waited for.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegNotifyChangeKeyValue", ExactSpelling = true)]
+    public static extern int RegNotifyChangeKeyValue(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        [MarshalAs(UnmanagedType.Bool)] bool bWatchSubtree,
+        uint dwNotifyFilter,
+        Microsoft.Win32.SafeHandles.SafeWaitHandle hEvent,
+        [MarshalAs(UnmanagedType.Bool)] bool fAsynchronous);
+
     /// <summary>
     /// Reads how many subkeys and values an open key holds. Every other count, length
     /// and time it can answer is passed as null and not read. Answers ERROR_SUCCESS or

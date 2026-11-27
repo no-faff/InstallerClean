@@ -47,6 +47,8 @@ public static class CoreComposition
         // for the pending-reboot gate alone.
         services.AddSingleton<IInstallerInProgressMarker, InstallerInProgressMarker>();
         services.AddSingleton<Interop.IMsiApi, Interop.MsiApi>();
+        // Arms a watch on the registry keys Windows Installer keeps its records in.
+        services.AddSingleton<IRecordsWatchFactory, RecordsWatchFactory>();
 
         // Win32 / registry / MSI-API wrappers.
         services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
