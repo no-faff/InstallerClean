@@ -10,11 +10,13 @@ namespace InstallerClean.Interop;
 /// buffer contract changes across this boundary.
 /// </summary>
 /// <remarks>
-/// The signatures mirror the native double-call buffer pattern verbatim: pass
-/// a buffer plus a <c>ref</c> character count, read the return code, and on
-/// <c>MoreData</c> reallocate and retry. The interface deliberately carries no
-/// buffer-management logic of its own, so a fake sees the same call shape the
-/// real API does.
+/// The signatures of the enumeration and property calls mirror the native
+/// double-call buffer pattern verbatim: pass a buffer plus a <c>ref</c>
+/// character count, read the return code, and on <c>MoreData</c> reallocate and
+/// retry. The interface deliberately carries no buffer-management logic of its
+/// own, so a fake sees the same call shape the real API does.
+/// <see cref="DeterminePatchSequence"/> takes no buffer: it puts one patch to the
+/// function and hands back the two numbers the function writes for it.
 /// </remarks>
 public interface IMsiApi
 {
