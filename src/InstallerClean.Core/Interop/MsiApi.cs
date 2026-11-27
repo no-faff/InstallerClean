@@ -8,8 +8,9 @@ namespace InstallerClean.Interop;
 /// the double-call buffer contract, the fixed GUID-buffer sizes and the
 /// marshalling declarations all live on <see cref="Msi"/>. The one thing it
 /// builds is the single-patch list <see cref="DeterminePatchSequence"/> hands
-/// the function. Its only reason to exist is to give the verdict logic a
-/// mockable seam.
+/// the function, whose entry points at the patch file's path, pinned here for
+/// the call. Its only reason to exist is to give the verdict logic a mockable
+/// seam.
 /// </summary>
 internal sealed class MsiApi : IMsiApi
 {
@@ -96,7 +97,7 @@ internal sealed class MsiApi : IMsiApi
         Msi.MsiGetPatchInfoEx(
             patchCode, productCode, userSid, context, property, value, ref valueLength);
 
-    public uint DeterminePatchSequence(
+    public unsafe uint DeterminePatchSequence(
         string productCode,
         string? userSid,
         MsiInstallContext context,
@@ -104,22 +105,27 @@ internal sealed class MsiApi : IMsiApi
         out uint order,
         out uint status)
     {
-        // Both members start at values the function does not give for a patch it has
-        // sequenced, so an answer it did not write is not read as one.
-        var patches = new[]
+        // The path stays pinned for the call: the struct holds a pointer to its
+        // characters, which a string keeps null-terminated.
+        fixed (char* path = patchFilePath)
         {
-            new Msi.PatchSequenceInfo
+            // Both members start at values the function does not give for a patch it has
+            // sequenced, so an answer it did not write is not read as one.
+            var patches = new[]
             {
-                PatchData = patchFilePath,
-                PatchDataType = Msi.PatchDataTypePatchFile,
-                Order = Msi.NotInSequence,
-                Status = uint.MaxValue,
-            },
-        };
+                new Msi.PatchSequenceInfo
+                {
+                    PatchData = (IntPtr)path,
+                    PatchDataType = Msi.PatchDataTypePatchFile,
+                    Order = Msi.NotInSequence,
+                    Status = uint.MaxValue,
+                },
+            };
 
-        var error = Msi.MsiDeterminePatchSequence(productCode, userSid, context, 1, patches);
-        order = patches[0].Order;
-        status = patches[0].Status;
-        return error;
+            var error = Msi.MsiDeterminePatchSequence(productCode, userSid, context, 1, patches);
+            order = patches[0].Order;
+            status = patches[0].Status;
+            return error;
+        }
     }
 }

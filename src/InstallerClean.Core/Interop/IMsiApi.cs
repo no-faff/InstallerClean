@@ -7,7 +7,9 @@ namespace InstallerClean.Interop;
 /// fake, exactly as <c>PendingRebootService</c> takes <c>IRegistryReader</c>
 /// and <c>IMutexProbe</c>. The production implementation (<c>MsiApi</c>) is a
 /// thin pass-through to the static <c>Msi</c> P/Invokes; no marshalling or
-/// buffer contract changes across this boundary.
+/// buffer contract changes across this boundary, except that
+/// <see cref="DeterminePatchSequence"/> takes the patch file's path as a string
+/// and the implementation pins it for the function.
 /// </summary>
 /// <remarks>
 /// The signatures of the enumeration and property calls mirror the native

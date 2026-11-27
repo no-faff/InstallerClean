@@ -12,6 +12,10 @@ namespace InstallerClean.Interop.Native;
 /// [Out] copies what the function wrote back into the array wherever
 /// the marshaller copies the array rather than pinning it.
 ///
+/// One struct, <see cref="PatchSequenceInfo"/>, carries text as a pointer the
+/// caller pins, because a struct passed to Windows holds nothing the
+/// marshaller converts.
+///
 /// The double-call pattern: pass a buffer plus a ref count of the
 /// buffer's character capacity. On success the count is updated to the
 /// actual character count (excluding the null terminator). On
@@ -176,17 +180,22 @@ internal static class Msi
 
     /// <summary>
     /// One patch put to <see cref="MsiDeterminePatchSequence"/>: msi.h's
-    /// MSIPATCHSEQUENCEINFOW. <see cref="PatchData"/> is the patch, in the form
-    /// <see cref="PatchDataType"/> names. The function writes the other two members:
-    /// <see cref="Order"/> is the patch's place in the order Windows would apply the
-    /// patches in, or <see cref="NotInSequence"/> for a patch it would not apply, and
-    /// <see cref="Status"/> is the Windows error that goes with that answer.
+    /// MSIPATCHSEQUENCEINFOW. <see cref="PatchData"/> points at the patch, a
+    /// null-terminated UTF-16 string in the form <see cref="PatchDataType"/> names,
+    /// which the caller keeps pinned for the call. The function writes the other two
+    /// members: <see cref="Order"/> is the patch's place in the order Windows would
+    /// apply the patches in, or <see cref="NotInSequence"/> for a patch it would not
+    /// apply, and <see cref="Status"/> is the Windows error that goes with that answer.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    /// <remarks>
+    /// Every member is one the marshaller copies as it is, so the array passed to the
+    /// function is pinned and the function writes its answers into the caller's own
+    /// elements.
+    /// </remarks>
+    [StructLayout(LayoutKind.Sequential)]
     public struct PatchSequenceInfo
     {
-        [MarshalAs(UnmanagedType.LPWStr)]
-        public string PatchData;
+        public IntPtr PatchData;
         public int PatchDataType;
         public uint Order;
         public uint Status;
