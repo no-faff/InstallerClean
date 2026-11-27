@@ -40,7 +40,7 @@
 - **Combien d'espace :** Le graphique ci-dessus montre les résultats des rapports facultatifs envoyés depuis l'application (merci à tous). Sur les <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end --> qui ont libéré de l'espace, la médiane libérée est de <!-- reports-median-start -->1,5 Go<!-- reports-median-end -->. Ce sont des fichiers dont vous ignoriez sans doute l'existence et qui prennent de la place pour rien. <!-- reports-over5gb-start -->20,9 %<!-- reports-over5gb-end --> de *toutes* les machines ont récupéré plus de 5 Go, et certains ont libéré des centaines de Go. Plus vous installez de logiciels basés sur MSI, plus vous aurez de fichiers inutiles.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Cliquez pour voir</kbd> à quoi ressemblerait le graphique si les rapports étaient le reflet exact de la totalité des 148 681 téléchargements</summary>
+  <summary><kbd>Cliquez pour voir</kbd> à quoi ressemblerait le graphique si les rapports étaient le reflet exact de la totalité des 148 841 téléchargements</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-fr-scaled-dark.svg" />

@@ -40,7 +40,7 @@
 - **얼마나 비워지나:** 위 그래프는 앱에서 보낸 선택적 보고서의 결과입니다(모두 감사합니다). 공간을 확보한 <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->1.5GB<!-- reports-median-end -->입니다. 아마 있는 줄도 몰랐을 파일들이 그냥 자리만 차지하고 있던 것입니다. *전체* 컴퓨터의 <!-- reports-over5gb-start -->20.9%<!-- reports-over5gb-end -->가 5GB 넘게 되찾았고, 수백 GB를 비운 분도 있습니다. MSI 기반 소프트웨어를 많이 설치할수록 불필요한 파일도 많아집니다.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>클릭해서 보기</kbd> 보고서가 전체 다운로드 148,681건을 정확히 반영한다면 그래프가 어떻게 보일지</summary>
+  <summary><kbd>클릭해서 보기</kbd> 보고서가 전체 다운로드 148,841건을 정확히 반영한다면 그래프가 어떻게 보일지</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ko-scaled-dark.svg" />
