@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.8.0-blue" alt="GitHub-Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-148k-brightgreen" alt="Downloads insgesamt"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-149k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -40,7 +40,7 @@
 - **Wie viel Platz:** Das Diagramm oben zeigt die Ergebnisse der optionalen Berichte, die über die App gesendet wurden (danke an alle). Bei den <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end -->, die Speicherplatz freigegeben haben, liegt der Median des Freigegebenen bei <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Das sind Dateien, von denen du wahrscheinlich nichts wusstest und die einfach nur Platz belegen. <!-- reports-over5gb-start -->20,9 %<!-- reports-over5gb-end --> *aller* Rechner haben mehr als 5 GB zurückgeholt, und manche haben Hunderte GB freigegeben. Je mehr MSI-basierte Software du installierst, desto mehr nicht benötigte Dateien hast du.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Klick hier</kbd>, um zu sehen, wie das Diagramm aussähe, wenn die Berichte ein genaues Abbild aller 148.841 Downloads wären</summary>
+  <summary><kbd>Klick hier</kbd>, um zu sehen, wie das Diagramm aussähe, wenn die Berichte ein genaues Abbild aller 149.002 Downloads wären</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-de-scaled-dark.svg" />
@@ -249,7 +249,7 @@ InstallerClean ist unsigniert. Das kannst du prüfen, bevor du es ausführst:
 - VirusTotal: Jeder Build wird vor der Veröffentlichung gescannt, und die Release-Seite trägt das vollständige Ergebnis je Engine für jeden Download.
 - Der Quellcode liegt hier auf [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und ausstehenden Neustart sind durch eine automatisierte Testsuite abgedeckt, die bei jedem Push auf `main` und bei jedem Pull Request unter Windows läuft, und das CI-Badge oben auf dieser Seite meldet das Ergebnis.
 - Release-Builds sind deterministisch: Derselbe Quellcode, dasselbe SDK und dieselben Publish-Optionen ergeben dieselben Bytes, und eine Version lässt sich nur taggen, wenn jede Build-Eingabe zum Quellcode an diesem Tag passt. Du kannst also den Tag auschecken, selbst bauen und die Hashes mit den veröffentlichten vergleichen. Die Release-Notes jeder Version enthalten, was du dafür brauchst: die SDK-Version, mit der gebaut wurde, und die Publish-Optionen für jeden Download, der nicht mit den Standardwerten gebaut wurde. Das Setup wird von Inno Setup kompiliert statt vom SDK, für seinen Hash braucht es also zusätzlich dieselbe Inno-Setup-Version und einen Build über `scripts/compile-setup.ps1`, das jeder Datei, die das Setup packt, Datum und Uhrzeit des Commits gibt.
-- <!-- downloads-start -->148.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
+- <!-- downloads-start -->149.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testet jede Einreichung in einer virtuellen Maschine und listet sie nur, wenn sie die Prüfung besteht.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Von MajorGeeks als 100 % sauber zertifiziert" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) hat es geprüft und als frei von Spyware, Adware und Viren zertifiziert.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia-Auszeichnung „100 % kostenlos“, zertifiziert ohne Spyware, ohne Adware und ohne Viren" width="190"></a>
 

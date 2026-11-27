@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.8.0-blue" alt="Version GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-148k-brightgreen" alt="Total des téléchargements"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-149k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -40,7 +40,7 @@
 - **Combien d'espace :** Le graphique ci-dessus montre les résultats des rapports facultatifs envoyés depuis l'application (merci à tous). Sur les <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end --> qui ont libéré de l'espace, la médiane libérée est de <!-- reports-median-start -->1,5 Go<!-- reports-median-end -->. Ce sont des fichiers dont vous ignoriez sans doute l'existence et qui prennent de la place pour rien. <!-- reports-over5gb-start -->20,9 %<!-- reports-over5gb-end --> de *toutes* les machines ont récupéré plus de 5 Go, et certains ont libéré des centaines de Go. Plus vous installez de logiciels basés sur MSI, plus vous aurez de fichiers inutiles.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Cliquez pour voir</kbd> à quoi ressemblerait le graphique si les rapports étaient le reflet exact de la totalité des 148 841 téléchargements</summary>
+  <summary><kbd>Cliquez pour voir</kbd> à quoi ressemblerait le graphique si les rapports étaient le reflet exact de la totalité des 149 002 téléchargements</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-fr-scaled-dark.svg" />
@@ -249,7 +249,7 @@ InstallerClean n'est pas signé. Voici ce que vous pouvez vérifier avant de le 
 - VirusTotal : chaque build est analysé avant d'être publié, et la page de la version porte le résultat complet, moteur par moteur, pour chaque téléchargement.
 - Le code source est ici, sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Les services d'analyse, de requête, de déplacement, de suppression, de réglages et de redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute sous Windows à chaque push sur `main` et à chaque pull request, et le badge CI en haut de cette page en donne le résultat.
 - Les builds de publication sont déterministes : les mêmes sources, le même SDK et les mêmes options de publication produisent les mêmes octets, et une version ne peut pas être taguée si chacune des entrées du build ne correspond pas aux sources à ce tag. Vous pouvez donc basculer sur le tag, compiler vous-même et comparer les empreintes à celles publiées. Les notes de chaque version portent ce qu'il faut pour cela : la version du SDK avec laquelle elle a été compilée, et les options de publication de tout téléchargement qui n'a pas été compilé avec les valeurs par défaut. Le setup est compilé par Inno Setup et non par le SDK, si bien que reproduire son empreinte demande en plus la même version d'Inno Setup et une compilation par `scripts/compile-setup.ps1`, qui donne à chaque fichier qu'il contient la date et l'heure du commit.
-- <!-- downloads-start -->148 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
+- <!-- downloads-start -->149 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certifié 100 % propre par MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) l'a testé et l'a certifié exempt de logiciels espions, de publiciels et de virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Récompense Softpedia 100 % gratuit, certifié sans logiciel espion, sans publiciel et sans virus" width="190"></a>
 
