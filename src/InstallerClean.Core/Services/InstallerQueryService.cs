@@ -357,6 +357,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
+    /// One cached file put to one installation: the file's path, the product, and the
+    /// account and context the installation is in. The path, the code and the account
+    /// compare without case; the context compares exactly.
+    /// </summary>
+    private readonly record struct FileAndInstallation(
+        string Path, string ProductCode, string? Sid, MsiInstallContext Context)
+    {
+        public bool Equals(FileAndInstallation other) =>
+            Context == other.Context
+            && string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(ProductCode, other.ProductCode, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(Sid, other.Sid, StringComparison.OrdinalIgnoreCase);
+
+        public override int GetHashCode() => HashCode.Combine(
+            StringComparer.OrdinalIgnoreCase.GetHashCode(Path),
+            StringComparer.OrdinalIgnoreCase.GetHashCode(ProductCode),
+            Sid is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(Sid),
+            Context);
+    }
+
+    /// <summary>
     /// The two registry listings that together say which cached files one product's
     /// patches could reach for: the patch codes a product holds, and the cached path
     /// each of those patch codes records for itself.
@@ -2167,8 +2188,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// IT IS THE CONDITION THE SUPERSEDED OFFER RESTS ON. A superseded patch is
     /// offered only where this pass has asked every product it knows of and none of
-    /// them still holds it. Emptiness here is a machine with nothing removable, never
-    /// a mechanism that is not needed.
+    /// them still holds it, and no program the patch file names that does not hold the
+    /// patch keeps the file (<see cref="LackingProgramKeep"/>). Emptiness here is a
+    /// machine with nothing removable, never a mechanism that is not needed.
     ///
     /// AND AN EMPTY WORK LIST DOES NOT RETURN AT THE TOP, which is a separate
     /// statement and the one most likely to be undone by somebody restoring an
@@ -2295,6 +2317,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     : PropertyRead.StandsInTheScan);
         }
 
+        // THE PROGRAMS EACH FILE'S TEMPLATE NAMES THAT DO NOT HOLD ITS PATCH, noted as the
+        // per-pairing pass asks them, one entry each time one is asked.
+        var programsLacking = new Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>(
+            StringComparer.OrdinalIgnoreCase);
+
         // ONE WAY OF ASKING, SHARED BY THE PER-PAIRING PASS AND BY THE PASS OVER ROWS NO
         // OTHER PASS ASKS ABOUT. Every installation the enumeration returned, every one the
         // recovery by name found, every holder route A names for the code, and any
@@ -2311,11 +2338,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Do not let a claim end the reads. The missing-files split reads a row kept on a
         // claim as one whose verdict this pass established, which holds only where every
         // installation holding the patch answered.
+        //
+        // AND IT NOTES, FOR THE PASS AT THE END, each program the file's own Template names
+        // (namedByTheFile) that does not hold the patch, and the account of each
+        // installation that does (KeepForProgramsLackingThePatch).
         (bool Unanswered, List<HeldByAsking>? Holds) AskEveryInstallation(
             string path,
             string patchCode,
             IReadOnlyList<(string ProductCode, string? Sid, MsiInstallContext Context)> alsoAsk,
-            bool recordHeld)
+            bool recordHeld,
+            HashSet<string>? namedByTheFile = null)
         {
             var toAsk = new List<(string ProductCode, string? Sid, MsiInstallContext Context)>(products);
             toAsk.AddRange(recovered);
@@ -2337,8 +2369,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // ONLY AN INSTALLATION ANSWERING THAT IT HOLDS NO RECORD OF THE PATCH IS
                 // SKIPPED, AND NOT ONE THE MACHINE-WIDE PATCH ENUMERATION HAS LISTED AS
                 // HOLDING IT. From any other installation that answer is a positive one
-                // that it does not hold the patch, so it says nothing about the verdict
-                // either way. From a listed holder it contradicts the listing, which
+                // that it does not hold the patch, so as a holder it says nothing about
+                // the verdict either way. From a listed holder it contradicts the listing, which
                 // named the same product, account and context this read is put in, so
                 // it is read again (StateOf), and an answer that still says so counts with
                 // every other read that did not answer.
@@ -2348,9 +2380,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // product enumeration, the recovery by name, the machine-wide patch
                 // enumeration or the resolve of a declared target, so that answer
                 // contradicts what the scan established, and it counts with them too.
-                if (state.PatchNotHeld && !IsListedHolder(named, productCode, userSid, context)) continue;
+                //
+                // A PROGRAM THE FILE'S TEMPLATE NAMES IS SKIPPED AS A HOLDER AND NOTED FOR
+                // ANOTHER QUESTION. It does not hold the patch, so it brings no claim and
+                // no unread answer. The patch can still be applied to it later, by an
+                // installation that can open this file, so the pass at the end asks
+                // whether the patch would apply (KeepForProgramsLackingThePatch). The test
+                // is on the program's code and not on which list brought it here: the
+                // walk's installations come first on the list, and one of them can be a
+                // program the Template names.
+                if (state.PatchNotHeld && !IsListedHolder(named, productCode, userSid, context))
+                {
+                    if (namedByTheFile is not null && namedByTheFile.Contains(productCode))
+                    {
+                        if (!programsLacking.TryGetValue(path, out var lackingIt))
+                            programsLacking[path] = lackingIt = [];
+                        lackingIt.Add((productCode, userSid, context));
+                    }
+
+                    continue;
+                }
 
                 if (state.Unreadable) return (true, holds);
+
+                // This installation holds the patch, so the patch is registered under its
+                // account, whether or not a claim of its own reached the merge.
+                AccountsRegistering(path).Add(UserDataAccount(userSid, context));
 
                 // NOTHING HERE IS SKIPPED. The State read has just answered, and not
                 // that this installation holds no record of the patch, so it holds
@@ -2474,6 +2529,139 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             return declaredByPath[patchPath] = new DeclaredTargets(installed, unreadable, unaskable);
+        }
+
+        // THE ACCOUNTS WHOSE RECORDS REGISTER EACH CACHED FILE. A claim's account and
+        // context are the ones its patch is registered in, and the registration that
+        // records the cached file is under that account's UserData key
+        // (UserDataAccount). An installation found holding the patch by asking adds its
+        // own account as it answers (AskEveryInstallation). Null in a set is a
+        // registration whose key cannot be named.
+        var registeredUnder = new Dictionary<string, HashSet<string?>>(StringComparer.OrdinalIgnoreCase);
+        HashSet<string?> AccountsRegistering(string path)
+        {
+            if (!registeredUnder.TryGetValue(path, out var accounts))
+                registeredUnder[path] = accounts = new HashSet<string?>(StringComparer.OrdinalIgnoreCase);
+            return accounts;
+        }
+
+        foreach (var claim in patchClaims)
+            AccountsRegistering(claim.LocalPackagePath)
+                .Add(UserDataAccount(claim.UserSid, (MsiInstallContext)claim.Context));
+
+        // WHETHER A PROGRAM THAT DOES NOT HOLD A PATCH KEEPS THE PATCH'S CACHED FILE, for a
+        // program the file's own Template names. A superseded patch can still be applied
+        // to such a program. Where the program's records and a registration of the file
+        // are under one UserData key, the installation that applies it opens the cached
+        // file that registration names, and with the file gone it can fail, or finish
+        // with custom actions that never ran.
+        //
+        // ONE ANSWER LETS THE FILE GO: Windows Installer, asked with the file itself in
+        // the program's own account and context, answers that the patch cannot be applied
+        // to that program (order -1 with ERROR_PATCH_TARGET_NOT_FOUND), which is the error
+        // an installation handed such a patch ends with before it runs any action. Every
+        // other answer keeps the file, each under its own name (LackingProgramKeep).
+        //
+        // TWO PROGRAMS KEEP NOTHING AND ARE NOT ASKED. One installed per user by the
+        // local system: only the local system patches it, an installation the local
+        // system runs carries on where the registered file is missing, and Microsoft's
+        // page for the call says it does not take that SID. And one whose records are
+        // under a different key from every registration of the file, where the patch is
+        // not registered and applying it does not open this file.
+        //
+        // IT DECIDES LAST AND ONCE FOR EACH FILE, after every code naming the file has
+        // been put to every installation: a file an installation did not answer for, or
+        // one a program holds as needed, is kept on that and carries no mark from here,
+        // and every account found registering the file is known before a program is
+        // placed beside them. So neither the order of the codes nor the order of the
+        // installations decides which reason a file is kept under.
+        //
+        // AN ANSWER WINDOWS GAVE KEEPS THE FILE ON A FINDING, as a claim does, and an
+        // answer that was not had keeps it as every read that established nothing does.
+        void KeepForProgramsLackingThePatch()
+        {
+            // The calls keep a budget of pauses of their own, and a program whose call
+            // does not answer is asked again for one file only, so a program that never
+            // answers costs the scan's other reads none of the pauses they share.
+            var sequenceRestarts = WalkRestarts.For(ct, WalkPause);
+            var answers = new Dictionary<FileAndInstallation, LackingProgramKeep>();
+
+            foreach (var (path, programs) in programsLacking)
+            {
+                ct.ThrowIfCancellationRequested();
+                if (!claimed.TryGetValue(path, out var row) || !row.IsRemovable) continue;
+
+                var lacking = LackingProgramKeep.None;
+                foreach (var (productCode, sid, context) in programs)
+                {
+                    // No later answer is stronger than that the patch would apply.
+                    if (lacking == LackingProgramKeep.WouldApply) break;
+
+                    var key = new FileAndInstallation(path, productCode, sid, context);
+                    if (!answers.TryGetValue(key, out var answer))
+                        answers[key] = answer = Ask(path, productCode, sid, context);
+                    lacking = LackingProgramKeeps.Stronger(lacking, answer);
+                }
+
+                if (lacking == LackingProgramKeep.None) continue;
+
+                Downgrade(claimed, path, withheld: lacking == LackingProgramKeep.AnswerNotHad);
+                claimed[path] = claimed[path] with { KeptForLackingProgram = lacking };
+            }
+
+            LackingProgramKeep Ask(string path, string productCode, string? sid, MsiInstallContext context)
+            {
+                if (context is MsiInstallContext.UserManaged or MsiInstallContext.UserUnmanaged
+                    && string.Equals(sid, LocalSystemAccount, StringComparison.OrdinalIgnoreCase))
+                    return LackingProgramKeep.None;
+
+                // A program or a registration whose key cannot be named is one this
+                // cannot place beside the other, so the file is kept.
+                var account = UserDataAccount(sid, context);
+                var registrations = AccountsRegistering(path);
+                if (account is null || registrations.Count == 0 || registrations.Contains(null))
+                    return LackingProgramKeep.AnswerNotHad;
+
+                if (!registrations.Contains(account)) return LackingProgramKeep.None;
+
+                // Installed, and not advertised alone: the product enumeration lists
+                // both, and the question below is about a program that is installed.
+                var productState = GetProductProperty(productCode, sid, context, MsiInstallProperty.State, restarts);
+                if (productState.Unreadable || productState.Value != MsiInstallProperty.ProductStateInstalled)
+                    return LackingProgramKeep.AnswerNotHad;
+
+                // A call that fails is made again as a property read is, and an answer
+                // read after a failure is taken only where the next agrees with it.
+                var sequence = sequenceRestarts.KeyedRead(
+                    () => $"patch sequence|{InstallationKey(productCode, sid, context)}",
+                    () =>
+                    {
+                        var error = _msi.DeterminePatchSequence(
+                            productCode, sid, context, path, out var order, out var status);
+                        return (Error: error, Order: order, Status: status);
+                    },
+                    stands: read => read.Error == MsiError.Success,
+                    standsAgain: read => read.Error == MsiError.Success,
+                    agrees: (a, b) => a == b);
+
+                // THREE ANSWERS ARE READ AS ANSWERS, each a call that succeeded and wrote
+                // a status of its own for the patch: it cannot be applied to the program,
+                // it would be applied, and it would not be applied with nothing wrong,
+                // which is how a patch the program already holds something over reads.
+                // Any other status, and one the call did not write, is no answer.
+                if (sequence.Error != MsiError.Success) return LackingProgramKeep.AnswerNotHad;
+                if (sequence.Order == Msi.NotInSequence)
+                    return sequence.Status switch
+                    {
+                        MsiError.PatchTargetNotFound => LackingProgramKeep.None,
+                        MsiError.Success => LackingProgramKeep.SupersededThere,
+                        _ => LackingProgramKeep.AnswerNotHad,
+                    };
+
+                return sequence.Status == MsiError.Success
+                    ? LackingProgramKeep.WouldApply
+                    : LackingProgramKeep.AnswerNotHad;
+            }
         }
 
         // THE PER-PRODUCT CONDITION, RUN BEFORE THE PER-PAIRING WORK BELOW because
@@ -2604,9 +2792,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // answers by the patch's code whatever its enumeration did, which is what says
             // the file is still needed. Every code is asked because the work list reaches
             // the path under one of them first, and which one that is must decide nothing.
+            //
+            // ONLY A FILE THAT READS HAS THE PROGRAMS THAT LACK ITS PATCH NOTED. The
+            // Template is what names them, and the question is put to Windows with the
+            // file itself, so a file that will not read brings neither.
             var (unanswered, holds) = fromFile.Unreadable
                 ? AskAboutEveryCode(path, codesByPath[path])
-                : AskEveryInstallation(path, patchCode, fromFile.Installed, recordHeld: true);
+                : AskEveryInstallation(
+                    path, patchCode, fromFile.Installed, recordHeld: true,
+                    new HashSet<string>(
+                        fromFile.Installed.Select(i => i.ProductCode), StringComparer.OrdinalIgnoreCase));
 
             if (unanswered)
             {
@@ -2642,6 +2837,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 Downgrade(claimed, path, withheld: true, unreadableFile: true);
             }
         }
+
+        KeepForProgramsLackingThePatch();
     }
 
     /// <summary>

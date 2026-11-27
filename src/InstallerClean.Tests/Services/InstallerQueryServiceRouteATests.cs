@@ -213,6 +213,9 @@ public class InstallerQueryServiceRouteATests
             msi.SetProductProperty("{OTHER}", "ProductName", "Some Other Program");
             msi.AddPatch("{OTHER}", "{SUP}", PatchFile, state: "2", uninstallable: "0");
             sets["{OTHER}"] = ProductPatchSet.AllNonRemovable;
+            // That patch's file names the first product, which does not hold it. Windows
+            // answers that the patch cannot be applied to it, so it keeps no file.
+            msi.PatchSequenceFor = (_, _) => FakeMsiApi.CannotApply;
         }
 
         var result = await new InstallerQueryService(msi,
@@ -284,6 +287,10 @@ public class InstallerQueryServiceRouteATests
         msi.SetProductProperty(SecondProduct, "LocalPackage", SecondProductFile);
         msi.SetProductProperty(SecondProduct, "ProductName", "Second Product");
         msi.AddPatch(SecondProduct, "{Q}", SecondPatchFile, state: "2", uninstallable: "0");
+        // Every patch file here names the first product, which does not hold the other
+        // product's patch. Windows answers that the patch cannot be applied to it, so it
+        // keeps no file.
+        msi.PatchSequenceFor = (_, _) => FakeMsiApi.CannotApply;
 
         var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
         {

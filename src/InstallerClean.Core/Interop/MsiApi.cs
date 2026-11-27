@@ -6,8 +6,10 @@ namespace InstallerClean.Interop;
 /// Production <see cref="IMsiApi"/>: a thin pass-through to the static
 /// <see cref="Msi"/> P/Invoke surface. It holds no state and adds no logic;
 /// the double-call buffer contract, the fixed GUID-buffer sizes and the
-/// marshalling declarations all live on <see cref="Msi"/>. Its only reason
-/// to exist is to give the verdict logic a mockable seam.
+/// marshalling declarations all live on <see cref="Msi"/>. The one thing it
+/// builds is the single-patch list <see cref="DeterminePatchSequence"/> hands
+/// the function. Its only reason to exist is to give the verdict logic a
+/// mockable seam.
 /// </summary>
 internal sealed class MsiApi : IMsiApi
 {
@@ -93,4 +95,31 @@ internal sealed class MsiApi : IMsiApi
         ref uint valueLength) =>
         Msi.MsiGetPatchInfoEx(
             patchCode, productCode, userSid, context, property, value, ref valueLength);
+
+    public uint DeterminePatchSequence(
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        string patchFilePath,
+        out uint order,
+        out uint status)
+    {
+        // Both members start at values the function does not give for a patch it has
+        // sequenced, so an answer it did not write is not read as one.
+        var patches = new[]
+        {
+            new Msi.PatchSequenceInfo
+            {
+                PatchData = patchFilePath,
+                PatchDataType = Msi.PatchDataTypePatchFile,
+                Order = Msi.NotInSequence,
+                Status = uint.MaxValue,
+            },
+        };
+
+        var error = Msi.MsiDeterminePatchSequence(productCode, userSid, context, 1, patches);
+        order = patches[0].Order;
+        status = patches[0].Status;
+        return error;
+    }
 }

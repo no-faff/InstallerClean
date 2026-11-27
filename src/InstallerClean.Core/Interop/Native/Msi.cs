@@ -175,6 +175,52 @@ internal static class Msi
         ref uint pcchValue);
 
     /// <summary>
+    /// One patch put to <see cref="MsiDeterminePatchSequence"/>: msi.h's
+    /// MSIPATCHSEQUENCEINFOW. <see cref="PatchData"/> is the patch, in the form
+    /// <see cref="PatchDataType"/> names. The function writes the other two members:
+    /// <see cref="Order"/> is the patch's place in the order Windows would apply the
+    /// patches in, or <see cref="NotInSequence"/> for a patch it would not apply, and
+    /// <see cref="Status"/> is the Windows error that goes with that answer.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct PatchSequenceInfo
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string PatchData;
+        public int PatchDataType;
+        public uint Order;
+        public uint Status;
+    }
+
+    /// <summary>MSIPATCH_DATATYPE_PATCHFILE: the patch is given as the full path of its file.</summary>
+    public const int PatchDataTypePatchFile = 0;
+
+    /// <summary>
+    /// The order the function gives a patch it would not apply to the product: -1 in
+    /// the header's DWORD.
+    /// </summary>
+    public const uint NotInSequence = 0xFFFFFFFF;
+
+    /// <summary>
+    /// Asks Windows Installer which of a set of patches it would apply to one installed
+    /// product, and in what order. The product is named by its code, with the account
+    /// and context it is installed in; <paramref name="szUserSid"/> is null for a
+    /// per-machine installation and for the calling account's own. Microsoft's page for
+    /// the function says the SID cannot be "S-1-1-0" or "S-1-5-18".
+    /// </summary>
+    /// <remarks>
+    /// The function reads each patch from its file, so a patch whose file is not there
+    /// fails the call.
+    /// </remarks>
+    [DllImport(Library, EntryPoint = "MsiDeterminePatchSequenceW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint MsiDeterminePatchSequence(
+        string szProductCode,
+        string? szUserSid,
+        MsiInstallContext dwContext,
+        uint cPatchInfo,
+        [In, Out] PatchSequenceInfo[] pPatchInfo);
+
+    /// <summary>
     /// Opens an MSI summary-information stream for a .msi or .msp file.
     /// The returned handle MUST be closed via <see cref="MsiCloseHandle"/>.
     /// </summary>

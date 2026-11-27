@@ -71,6 +71,10 @@ public class InstallerQueryServiceWalkRestartTests
         msi.AddPatch(Second, "{Q}", SecondPatchFile, state: "2", uninstallable: "0");
         msi.RouteAHolders.Add(("{P}", First));
         msi.RouteAHolders.Add(("{Q}", Second));
+        // The second product's patch file names the first product, which does not hold
+        // that patch. Windows answers that the patch cannot be applied to it, so it keeps
+        // no file and both patches are offered.
+        msi.PatchSequenceFor = (_, _) => FakeMsiApi.CannotApply;
         plant?.Invoke(msi);
 
         var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)

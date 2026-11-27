@@ -754,6 +754,31 @@ public record ScanResult(
         RegisteredPackages.Count(p => p.WithheldOnUnlistedKey && p.FileExists);
 
     /// <summary>
+    /// How many superseded files a program that does not hold their patch kept, under one
+    /// answer: rows carrying <paramref name="answer"/> in
+    /// <see cref="RegisteredPackage.KeptForLackingProgram"/> whose file is on disk.
+    ///
+    /// A FILE IS UNDER ONE ANSWER, so the three add up to every file such a program keeps
+    /// (<see cref="LackingProgramKeeps.Stronger"/> says which, where two programs keep one
+    /// file). The files kept because the answer was not had are in
+    /// <see cref="WithheldCount"/> as well; the other two are kept on an answer Windows
+    /// gave and are not. A row an earlier pass had already taken carries no answer, that
+    /// pass's reason being the one that decided it.
+    /// </summary>
+    public int SupersededKeptForLackingProgramCount(LackingProgramKeep answer) =>
+        answer == LackingProgramKeep.None
+            ? 0
+            : RegisteredPackages.Count(p => p.KeptForLackingProgram == answer && p.FileExists);
+
+    /// <summary>The bytes of the files <see cref="SupersededKeptForLackingProgramCount"/> counts.</summary>
+    public long SupersededKeptForLackingProgramBytes(LackingProgramKeep answer) =>
+        answer == LackingProgramKeep.None
+            ? 0
+            : RegisteredPackages
+                .Where(p => p.KeptForLackingProgram == answer && p.FileExists)
+                .Sum(p => p.FileSizeBytes);
+
+    /// <summary>
     /// How many superseded files a condition on the whole machine held back: rows carrying
     /// <see cref="RegisteredPackage.WithheldScanWide"/> whose file is on disk. The
     /// conditions are named there. The opt-in report carries it as a count of its own.

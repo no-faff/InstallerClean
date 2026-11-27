@@ -405,7 +405,67 @@ internal sealed class FakeMsiApi : IMsiApi
             valueLength = 0;
             return forced;
         }
-        return DoubleCall(_productProps.GetValueOrDefault((productCode, property), ""), value, ref valueLength);
+        // A product whose state a fixture does not set reads as installed, which is what
+        // every fixture that says nothing about it is describing.
+        var unset = property == MsiInstallProperty.State ? MsiInstallProperty.ProductStateInstalled : "";
+        return DoubleCall(_productProps.GetValueOrDefault((productCode, property), unset), value, ref valueLength);
+    }
+
+    /// <summary>
+    /// What <c>MsiDeterminePatchSequence</c> answers for one product and one patch file:
+    /// the return, and the order and status it writes for the patch. A pairing with no
+    /// entry answers <see cref="SequenceNotScripted"/>, a failed call, so a test whose
+    /// outcome turns on the answer has to say what it is.
+    /// </summary>
+    public Dictionary<(string ProductCode, string PatchFilePath), (uint Error, uint Order, uint Status)>
+        PatchSequence { get; } = new(new SequenceKeyComparer());
+
+    /// <summary>
+    /// Answers every sequence call in place of <see cref="PatchSequence"/>, for a fixture
+    /// whose answer changes from one call to the next.
+    /// </summary>
+    public Func<string, string, (uint Error, uint Order, uint Status)>? PatchSequenceFor { get; set; }
+
+    /// <summary>The failed return an unscripted <see cref="PatchSequence"/> pairing gives.</summary>
+    public const uint SequenceNotScripted = 1627;
+
+    /// <summary>Order -1 with ERROR_PATCH_TARGET_NOT_FOUND: the patch cannot be applied to the product.</summary>
+    public static readonly (uint Error, uint Order, uint Status) CannotApply = (0, 0xFFFFFFFF, 1642);
+
+    /// <summary>Order 0: Windows Installer would apply the patch to the product.</summary>
+    public static readonly (uint Error, uint Order, uint Status) WouldApply = (0, 0, 0);
+
+    /// <summary>Order -1 with success: the patch is superseded on the product.</summary>
+    public static readonly (uint Error, uint Order, uint Status) SupersededThere = (0, 0xFFFFFFFF, 0);
+
+    /// <summary>Every sequence call made, in order, with the account and context it was made in.</summary>
+    public List<(string ProductCode, string? Sid, MsiInstallContext Context, string PatchFilePath)>
+        PatchSequenceAsks { get; } = new();
+
+    public uint DeterminePatchSequence(string productCode, string? userSid, MsiInstallContext context,
+        string patchFilePath, out uint order, out uint status)
+    {
+        PatchSequenceAsks.Add((productCode, userSid, context, patchFilePath));
+        order = 0xFFFFFFFF;
+        status = uint.MaxValue;
+        (uint Error, uint Order, uint Status) scripted;
+        if (PatchSequenceFor is not null) scripted = PatchSequenceFor(productCode, patchFilePath);
+        else if (!PatchSequence.TryGetValue((productCode, patchFilePath), out scripted))
+            return SequenceNotScripted;
+
+        if (scripted.Error == Success) (order, status) = (scripted.Order, scripted.Status);
+        return scripted.Error;
+    }
+
+    private sealed class SequenceKeyComparer : IEqualityComparer<(string ProductCode, string PatchFilePath)>
+    {
+        public bool Equals((string ProductCode, string PatchFilePath) x, (string ProductCode, string PatchFilePath) y) =>
+            string.Equals(x.ProductCode, y.ProductCode, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(x.PatchFilePath, y.PatchFilePath, StringComparison.OrdinalIgnoreCase);
+
+        public int GetHashCode((string ProductCode, string PatchFilePath) key) =>
+            StringComparer.OrdinalIgnoreCase.GetHashCode(key.ProductCode)
+            ^ StringComparer.OrdinalIgnoreCase.GetHashCode(key.PatchFilePath);
     }
 
     public uint EnumSources(string productCode, string? userSid, MsiInstallContext context, uint options,

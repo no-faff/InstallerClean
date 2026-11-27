@@ -11089,6 +11089,10 @@ internal sealed class ScriptedMsiProducts : IMsiApi
             : ListPropertyOf(code, isPatch: false, sid, context, MsiInstallProperty.MediaPackagePath) is
                 { Error: MsiError.Success, Value.Length: > 0 };
 
+    public uint DeterminePatchSequence(string productCode, string? userSid, MsiInstallContext context,
+        string patchFilePath, out uint order, out uint status) =>
+        throw new InvalidOperationException("the declared-product check asks for no patch sequence");
+
     /// <summary>
     /// Answers whether the product's source list holds a disk at <paramref name="index"/>: disk 1
     /// at the first index where it holds a media source (<see cref="HoldsMediaDisk"/>), the

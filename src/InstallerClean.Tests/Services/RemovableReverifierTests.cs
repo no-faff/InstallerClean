@@ -82,6 +82,31 @@ public class RemovableReverifierTests
         Assert.Equal(new[] { superseded }, result.Dropped);
     }
 
+    [Theory]
+    [InlineData(LackingProgramKeep.WouldApply, false)]
+    [InlineData(LackingProgramKeep.SupersededThere, false)]
+    [InlineData(LackingProgramKeep.AnswerNotHad, true)]
+    public async Task A_file_now_kept_for_a_program_that_lacks_its_patch_is_held_back_under_that_cause(
+        LackingProgramKeep answer, bool withheld)
+    {
+        // The scan listed the file. By the time of the check, a program the patch is for,
+        // which does not hold it, keeps it: one installed or changed since the scan.
+        const string superseded = @"C:\Windows\Installer\superseded.msp";
+        var svc = Reverifier(Query(NonRemovable(superseded) with
+        {
+            PatchState = 2, RemovableWithheld = withheld, KeptForLackingProgram = answer,
+        }));
+
+        var result = await svc.ReverifyAsync(new[] { superseded });
+
+        Assert.Empty(result.Surviving);
+        Assert.Equal(new[] { superseded }, result.Dropped);
+        // Under its own cause whichever answer keeps it, the answer that was not had
+        // included, which would otherwise count as records that could not be read.
+        Assert.Equal(new HeldBackReasons(LackingProgram: 1), result.Reasons);
+        Assert.Equal(1, result.Reasons.Total);
+    }
+
     [Fact]
     public async Task Keeps_a_candidate_no_registration_names_at_all()
     {
@@ -1238,6 +1263,11 @@ public class RemovableReverifierTests
         public uint EnumMediaDisks(string productCodeOrPatchCode, string? userSid,
             InstallerClean.Interop.MsiInstallContext context, uint options, uint index, out uint diskId) =>
             throw new InvalidOperationException("The under-lease re-read must not read source lists.");
+
+        public uint DeterminePatchSequence(string productCode, string? userSid,
+            InstallerClean.Interop.MsiInstallContext context, string patchFilePath,
+            out uint order, out uint status) =>
+            throw new InvalidOperationException("The under-lease re-read must not ask for a patch sequence.");
 
         public uint GetSourceListInfo(string productCodeOrPatchCode, string? userSid,
             InstallerClean.Interop.MsiInstallContext context, uint options, string property,

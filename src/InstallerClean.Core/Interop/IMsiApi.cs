@@ -96,4 +96,21 @@ public interface IMsiApi
         string property,
         char[]? value,
         ref uint valueLength);
+
+    /// <summary>
+    /// Wraps <c>MsiDeterminePatchSequenceW</c> for one patch given as its file: whether
+    /// Windows Installer would apply the patch at <paramref name="patchFilePath"/> to
+    /// the product installed in <paramref name="userSid"/> and
+    /// <paramref name="context"/>. <paramref name="order"/> and
+    /// <paramref name="status"/> are the two members the function writes for the patch,
+    /// and mean nothing where the return is not success. See
+    /// <c>Msi.MsiDeterminePatchSequence</c>.
+    /// </summary>
+    uint DeterminePatchSequence(
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        string patchFilePath,
+        out uint order,
+        out uint status);
 }

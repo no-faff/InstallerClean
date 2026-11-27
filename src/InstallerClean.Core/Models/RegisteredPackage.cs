@@ -7,8 +7,9 @@ namespace InstallerClean.Models;
 /// NEARLY EVERY ROW IS KEPT, AND ONE NARROW SHAPE LEAVES FOR THE OFFER. A row is
 /// offered only where Windows positively reported the patch SUPERSEDED, its own
 /// <c>Uninstallable</c> positively read zero, <see cref="ProductPatchSetVerdict"/>
-/// came back clean across every product sharing the patch, the file is on disk and
-/// the containment guard passed it. Everything else on this record is kept, and
+/// came back clean across every product sharing the patch, no program the patch is for
+/// that does not hold it keeps the file (<see cref="KeptForLackingProgram"/>), the file
+/// is on disk and the containment guard passed it. Everything else on this record is kept, and
 /// nothing here grants that verdict on its own: see
 /// <see cref="Services.IFileSystemScanService"/> for where the row is read and
 /// <see cref="ProductPatchSetVerdict"/> for what the flags do and do not establish.
@@ -148,6 +149,14 @@ namespace InstallerClean.Models;
 /// it. A failed read of the registry alone takes the verdict with no key to name, and does not
 /// set it.
 /// </param>
+/// <param name="KeptForLackingProgram">
+/// A program the patch is for, which does not hold it, took this row's removable verdict
+/// away, and the answer Windows Installer gave about that program
+/// (<see cref="LackingProgramKeep"/>). Set where the row still carried the verdict and every
+/// installation asked about the patch had answered, so a row an earlier pass had already
+/// taken never carries it. A row kept on an answer Windows gave carries no
+/// <paramref name="RemovableWithheld"/>; one kept because the answer was not had carries it.
+/// </param>
 public record RegisteredPackage(
     string LocalPackagePath,
     string ProductName,
@@ -163,7 +172,8 @@ public record RegisteredPackage(
     bool WithheldOnRecordedPathUnestablished = false,
     bool WithheldScanWide = false,
     bool OtherHoldNotRuledOut = false,
-    bool WithheldOnUnlistedKey = false)
+    bool WithheldOnUnlistedKey = false,
+    LackingProgramKeep KeptForLackingProgram = LackingProgramKeep.None)
 {
     /// <summary>
     /// Windows holds a record naming this file and the file is not there. The one

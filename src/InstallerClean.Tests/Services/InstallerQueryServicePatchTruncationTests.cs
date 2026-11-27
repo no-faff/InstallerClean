@@ -738,8 +738,10 @@ public class InstallerQueryServicePatchTruncationTests
     /// file's own Template and holds nothing, so no enumeration lists it as holding the
     /// patch, and its answer that it holds no record of the patch is the ordinary one: it
     /// is skipped and the offer stands. The read is shown to have been made, so the offer
-    /// standing is the skip and not a pairing that was never asked. A whole scan rather
-    /// than Confirm, for the reason given at
+    /// standing is the skip and not a pairing that was never asked. Windows answers that
+    /// the patch cannot be applied to that product, so it keeps no file either
+    /// (<see cref="InstallerQueryServiceLackingProgramTests"/> has every other answer). A
+    /// whole scan rather than Confirm, for the reason given at
     /// <see cref="A_declared_target_holding_no_patches_leaves_the_offer_standing"/>.
     /// </summary>
     [Fact]
@@ -750,6 +752,7 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         msi.HiddenFromWalk.Add(StillApplied);
         msi.PatchPropertyResult[(Patch, StillApplied, "State")] = UnknownPatch;
+        msi.PatchSequence[StillApplied] = FakeMsiApi.CannotApply;
 
         var result = await new InstallerQueryService(
                 msi,
@@ -979,7 +982,10 @@ public class InstallerQueryServicePatchTruncationTests
 
     /// <summary>
     /// A declared target that is installed and holds no patches at all costs the offer
-    /// nothing, which is what makes reading the declared targets affordable.
+    /// nothing on its patch set, which is what makes reading the declared targets
+    /// affordable. Whether it keeps the file as a program the patch could still be applied
+    /// to is a separate question, answered here with Windows saying the patch cannot be
+    /// (<see cref="InstallerQueryServiceLackingProgramTests"/>).
     ///
     /// A patch names in its Template every product it may be applied to, and on an
     /// ordinary machine most of them either are not installed or hold nothing that can
@@ -1009,8 +1015,10 @@ public class InstallerQueryServicePatchTruncationTests
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
-        // Installed, named by the patch file, and holding nothing whatever.
+        // Installed, named by the patch file, and holding nothing whatever. Windows
+        // answers that the patch cannot be applied to it.
         msi.HiddenFromWalk.Add(StillApplied);
+        msi.PatchSequence[StillApplied] = FakeMsiApi.CannotApply;
 
         var result = await new InstallerQueryService(
                 msi,
@@ -1164,6 +1172,8 @@ public class InstallerQueryServicePatchTruncationTests
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         msi.AddProduct(StillApplied);
+        // It holds no patch, and Windows answers that this one cannot be applied to it.
+        msi.PatchSequence[StillApplied] = FakeMsiApi.CannotApply;
 
         var result = await new InstallerQueryService(
                 msi,
@@ -1818,11 +1828,49 @@ public class InstallerQueryServicePatchTruncationTests
         public uint GetProductInfo(string productCode, string? userSid, MsiInstallContext context,
             string property, char[]? value, ref uint valueLength)
         {
+            // Every product here reads as installed, unless a test says otherwise.
+            if (property == MsiInstallProperty.State)
+            {
+                var state = ProductState.TryGetValue(productCode, out var set)
+                    ? set : MsiInstallProperty.ProductStateInstalled;
+                if (state.Length == 0) { valueLength = 0; return Success; }
+                if (value is null) { valueLength = (uint)state.Length; return MoreData; }
+                Write(value, state);
+                valueLength = (uint)state.Length;
+                return Success;
+            }
+
             // Products carry no cached package of their own here, so nothing but
             // the patch rows reaches the merge and every assertion is about one
             // row. A readable empty value is the benign "no such property" state.
             valueLength = 0;
             return Success;
+        }
+
+        /// <summary>A product's own State, for a product that is not to read as installed.</summary>
+        public Dictionary<string, string> ProductState { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// What the patch sequence call answers for one product: the return, and the
+        /// order and status written for the patch. A product with no entry answers a
+        /// failed call, so a test whose outcome turns on the answer says what it is.
+        /// </summary>
+        public Dictionary<string, (uint Error, uint Order, uint Status)> PatchSequence { get; } =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Every sequence call made, with the account, the context and the file it was made with.</summary>
+        public List<(string Product, string? Sid, MsiInstallContext Context, string PatchFilePath)>
+            PatchSequenceAsks { get; } = new();
+
+        public uint DeterminePatchSequence(string productCode, string? userSid, MsiInstallContext context,
+            string patchFilePath, out uint order, out uint status)
+        {
+            PatchSequenceAsks.Add((productCode, userSid, context, patchFilePath));
+            order = 0xFFFFFFFF;
+            status = uint.MaxValue;
+            if (!PatchSequence.TryGetValue(productCode, out var scripted)) return FakeMsiApi.SequenceNotScripted;
+            if (scripted.Error == Success) (order, status) = (scripted.Order, scripted.Status);
+            return scripted.Error;
         }
 
         public uint EnumSources(string productCode, string? userSid, MsiInstallContext context,

@@ -40,6 +40,15 @@ public static class MsiError
     public const uint UnknownPatch = 1647;
 
     /// <summary>
+    /// ERROR_PATCH_TARGET_NOT_FOUND: the program a patch would upgrade "may be missing,
+    /// or the upgrade patch may update a different version of the program" (same
+    /// table). <c>MsiDeterminePatchSequence</c> gives it as the status of a patch that
+    /// cannot be applied to the product asked about, and an installation that is
+    /// handed such a patch ends with it before any of its actions runs.
+    /// </summary>
+    public const uint PatchTargetNotFound = 1642;
+
+    /// <summary>
     /// ERROR_BAD_CONFIGURATION, "the configuration data for this product is corrupt" in
     /// Microsoft's Windows Installer error-code table. The declared-product check takes it
     /// from <c>MsiSourceListGetInfo</c>, asked for a product's package name, as the answer
@@ -194,8 +203,17 @@ public static class MsiInstallProperty
     /// </summary>
     public const string MediaPackagePath = "MediaPackagePath";
 
-    /// <summary>Patch state: 1=Applied, 2=Superseded, 4=Obsoleted.</summary>
+    /// <summary>
+    /// A patch's state, read through <c>MsiGetPatchInfoEx</c>: 1=Applied, 2=Superseded,
+    /// 4=Obsoleted. A product's own state has the same name
+    /// (INSTALLPROPERTY_PRODUCTSTATE), read through <c>MsiGetProductInfoEx</c>: 1 for a
+    /// product that is advertised and not installed, and
+    /// <see cref="ProductStateInstalled"/> for one that is installed.
+    /// </summary>
     public const string State = "State";
+
+    /// <summary>The value of a product's <see cref="State"/> where the product is installed.</summary>
+    public const string ProductStateInstalled = "5";
 
     /// <summary>Whether the patch can be uninstalled ("1" = yes).</summary>
     public const string Uninstallable = "Uninstallable";

@@ -133,6 +133,11 @@ internal static class MissingFilesReport
     /// <see cref="RegisteredPackage.OtherHoldNotRuledOut"/> and is reported. An installation
     /// that holds the patch applied carries that state onto the row, which then leaves the
     /// first conjunct of the exemption.
+    ///
+    /// AND A ROW KEPT FOR A PROGRAM THAT DOES NOT HOLD ITS PATCH IS REPORTED
+    /// (<see cref="RegisteredPackage.KeptForLackingProgram"/>). The scan read the file a
+    /// moment before it found it gone, and the file named a program the patch can still
+    /// be applied to, whose installation of it would open this file.
     /// </summary>
     internal static bool Affected(RegisteredPackage row) =>
         row.IsMissingFromDisk && !AbsenceShownHarmless(row);
@@ -159,6 +164,7 @@ internal static class MissingFilesReport
     internal static bool AbsenceHarmlessIfJudgedClean(RegisteredPackage row) =>
         row.IsSupersededOrObsoleted
         && !row.OtherHoldNotRuledOut
+        && row.KeptForLackingProgram == LackingProgramKeep.None
         && (!row.RemovableWithheld || row.WithheldOnUnreadableFile);
 
     /// <summary>

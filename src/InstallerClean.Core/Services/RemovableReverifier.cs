@@ -300,14 +300,15 @@ public sealed class RemovableReverifier : IRemovableReverifier
     }
 
     /// <summary>
-    /// The cause a non-removable row supports: records that were not read to a
-    /// verdict for a row whose verdict was unread or withheld, a live claim for any
+    /// The cause a non-removable row supports: a program that does not hold the patch
+    /// for a row kept for one, whichever answer keeps it; records that were not read to
+    /// a verdict for a row whose verdict was unread or withheld; a live claim for any
     /// other.
     /// </summary>
     private static HeldBackReason CauseOfNonRemovable(RegisteredPackage pkg) =>
-        pkg.RemovableWithheld || pkg.VerdictUnreadable
-            ? HeldBackReason.RecordsUnreadable
-            : HeldBackReason.Reclaimed;
+        pkg.KeptForLackingProgram != LackingProgramKeep.None ? HeldBackReason.LackingProgram
+        : pkg.RemovableWithheld || pkg.VerdictUnreadable ? HeldBackReason.RecordsUnreadable
+        : HeldBackReason.Reclaimed;
 
     /// <summary>
     /// Adds to <paramref name="held"/> every file in <paramref name="walkDerived"/>

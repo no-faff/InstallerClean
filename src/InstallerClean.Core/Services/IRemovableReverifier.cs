@@ -131,9 +131,10 @@ public readonly record struct UnderLeaseClaims(
 }
 
 /// <summary>
-/// Why one file was held back. Five, because they are five different things to have
+/// Why one file was held back. Six, because they are six different things to have
 /// found out: a confirmed positive, an inability, neither, one about the machine
-/// rather than the file, and one about the file itself.
+/// rather than the file, one about the file itself, and one about a program that does
+/// not hold the file's patch.
 ///
 /// NOTHING THE USER READS NAMES ANY OF THEM. The screen and stdout carry one
 /// counted sentence naming no cause, on the ground that every file on it was
@@ -144,8 +145,8 @@ public readonly record struct UnderLeaseClaims(
 ///
 /// THE FIRST THREE ARE ABOUT THE REGISTRATION THAT NAMES THIS PATH. The fourth is
 /// about the machine and rests on nothing about the file. The fifth is about the
-/// file, read the way the scan read it. Each is counted separately for that
-/// reason.
+/// file, read the way the scan read it. The sixth is about a program no registration
+/// of the file names. Each is counted separately for that reason.
 /// </summary>
 public enum HeldBackReason
 {
@@ -275,6 +276,19 @@ public enum HeldBackReason
     /// the other checks.
     /// </summary>
     FileNotConfirmed,
+
+    /// <summary>
+    /// The file is a superseded patch's, and a program the patch is for, which does not
+    /// hold it, keeps it: the row the re-enumeration gave the file carries
+    /// <see cref="Models.RegisteredPackage.KeptForLackingProgram"/>, whichever of its
+    /// answers that is. The scan listed the file, so the program was installed or changed
+    /// after the scan, or answered the scan differently.
+    ///
+    /// IT IS ABOUT A PROGRAM THAT HOLDS NO REGISTRATION OF THE FILE, which is what
+    /// separates it from <see cref="Reclaimed"/>: nothing claims the file, and the patch
+    /// could still be applied to that program, by an installation that opens it.
+    /// </summary>
+    LackingProgram,
 }
 
 /// <summary>
@@ -294,7 +308,8 @@ public readonly record struct HeldBackReasons(
     int RecordsChanged = 0,
     int RecordsUnreadable = 0,
     int OwnershipUnestablished = 0,
-    int FileNotConfirmed = 0)
+    int FileNotConfirmed = 0,
+    int LackingProgram = 0)
 {
     /// <summary>
     /// Files held back for any cause, and the ONLY member the report reads: the
@@ -302,7 +317,8 @@ public readonly record struct HeldBackReasons(
     /// list's count.
     /// </summary>
     public int Total =>
-        Reclaimed + RecordsChanged + RecordsUnreadable + OwnershipUnestablished + FileNotConfirmed;
+        Reclaimed + RecordsChanged + RecordsUnreadable + OwnershipUnestablished + FileNotConfirmed
+        + LackingProgram;
 
     /// <summary>
     /// This tally with one more file counted against <paramref name="reason"/>.
@@ -327,6 +343,7 @@ public readonly record struct HeldBackReasons(
         HeldBackReason.OwnershipUnestablished =>
             this with { OwnershipUnestablished = OwnershipUnestablished + 1 },
         HeldBackReason.FileNotConfirmed => this with { FileNotConfirmed = FileNotConfirmed + 1 },
+        HeldBackReason.LackingProgram => this with { LackingProgram = LackingProgram + 1 },
         _ => throw new ArgumentOutOfRangeException(nameof(reason), reason,
             "A held-back cause with no counter. Add it to HeldBackReasons, and a "
             + "field for it to the opt-in report's operation block, in the same edit "
@@ -348,7 +365,8 @@ public readonly record struct HeldBackReasons(
             a.RecordsChanged + b.RecordsChanged,
             a.RecordsUnreadable + b.RecordsUnreadable,
             a.OwnershipUnestablished + b.OwnershipUnestablished,
-            a.FileNotConfirmed + b.FileNotConfirmed);
+            a.FileNotConfirmed + b.FileNotConfirmed,
+            a.LackingProgram + b.LackingProgram);
 }
 
 /// <summary>
