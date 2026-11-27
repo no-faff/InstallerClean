@@ -83,6 +83,9 @@ public class InstallerQueryServiceWalkRestartTests
             [Second] = ProductPatchSet.AllNonRemovable,
         };
 
+        // No list reader, so a product walk that stops is not walked again list by list and
+        // refuses as the walk of every list at once ended. Walking each list on its own is
+        // InstallerQueryServiceStoppedListTests'.
         var pauses = new List<TimeSpan>();
         var logged = new List<Exception>();
         var service = new InstallerQueryService(msi,

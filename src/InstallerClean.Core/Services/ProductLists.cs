@@ -136,16 +136,3 @@ internal sealed class RegistryProductLists : IProductLists
         }
     }
 }
-
-/// <summary>
-/// Lists that never read, for the constructors whose callers drive the enumeration alone:
-/// a walk that stops at an entry that did not read then refuses the scan.
-/// </summary>
-internal sealed class NoProductLists : IProductLists
-{
-    internal static readonly NoProductLists Instance = new();
-
-    public IReadOnlyList<string>? Accounts(MsiInstallContext context, CancellationToken ct) => null;
-
-    public IReadOnlyList<string>? Names(MsiInstallContext context, string? sid, CancellationToken ct) => null;
-}

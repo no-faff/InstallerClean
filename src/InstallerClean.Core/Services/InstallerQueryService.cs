@@ -44,7 +44,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private readonly IPackageIdentityReader _identityReader;
 
-    private readonly IProductLists _productLists;
+    private readonly IProductLists? _productLists;
 
     /// <summary>
     /// The wait before a Windows Installer list is walked again
@@ -798,7 +798,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <param name="productLists">
     /// The lists Windows Installer walks, read by name where the product walk stops at an
     /// entry that did not read (<see cref="WalkEachList"/>). Null reads none, so such a
-    /// walk refuses the scan.
+    /// walk refuses the scan, and no list is walked again on its own.
     /// </param>
     internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback,
         Action<Exception>? crashLogSink = null, IPackageIdentityReader? identityReader = null,
@@ -808,7 +808,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         _readFallback = readFallback;
         _crashLogSink = crashLogSink;
         _identityReader = identityReader ?? NoPackageIdentity.Instance;
-        _productLists = productLists ?? NoProductLists.Instance;
+        _productLists = productLists;
     }
 
     /// <summary>
@@ -5760,7 +5760,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// that does not read stops the walk of the list it sits in, and the other lists read to
     /// their end. The list that stopped is read by name, and every program named in it after
     /// the entry is put to Windows by code, each installation Windows lists joining the rows.
-    /// Where that cannot be done in full, the scan refuses as the first walk ended: with
+    /// Where that cannot be done in full, or no list can be read by name (a service built
+    /// with no list reader), the scan refuses as the first walk ended: with
     /// <c>Error.MsiNonSuccess</c> for a row that did not read.
     ///
     /// <c>UnreadableRows</c> counts the rows the walk passed without reading, so it is
@@ -5772,12 +5773,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var walk = restarts.Walk(() => WalkProducts(AllUsersSid, MsiInstallContext.All, ct),
             walked => !walked.StoppedAtARow);
         if (walk.Refusal is null) return new ProductWalk(walk.Products, walk.UnreadableRows, null, 0, 0, 0);
-        if (!walk.RowUnread) throw walk.Refusal();
+        if (!walk.RowUnread || _productLists is not { } lists) throw walk.Refusal();
 
         // A list walked on its own that Windows refused for another reason refuses with
         // that reason; anything else that leaves a list unsettled refuses as the first
         // walk ended.
-        return WalkEachList(walk.Products, restarts, ct, out var otherRefusal)
+        return WalkEachList(walk.Products, lists, restarts, ct, out var otherRefusal)
             ?? throw (otherRefusal ?? walk.Refusal)();
     }
 
@@ -5845,7 +5846,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private ProductWalk? WalkEachList(
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> walkedAtOnce,
-        WalkRestarts restarts, CancellationToken ct, out Func<Exception>? otherRefusal)
+        IProductLists lists, WalkRestarts restarts, CancellationToken ct, out Func<Exception>? otherRefusal)
     {
         otherRefusal = null;
         Func<Exception>? endedBy = null;
@@ -5870,7 +5871,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 return false;
             }
 
-            var names = _productLists.Names(context, sid, ct);
+            var names = lists.Names(context, sid, ct);
             if (!SettleAgainstList(walk.Products, names, out var codes)) return false;
 
             into.AddRange(walk.Products);
@@ -5908,7 +5909,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 return null;
             }
 
-            var accounts = _productLists.Accounts(context, ct);
+            var accounts = lists.Accounts(context, ct);
             if (accounts is null) return null;
 
             var stoppedBefore = stopped;
