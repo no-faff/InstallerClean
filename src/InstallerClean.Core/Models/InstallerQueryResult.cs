@@ -146,7 +146,9 @@ public record InstallerQueryResult(
 /// withholding reads counts one of these only where the registry does not hold, under
 /// that installation's own account, what its failed reads would have returned, and then
 /// once per code (<see cref="UnsettledEnumeratedProductCount"/>). The refusal of a scan
-/// whose registry reads failed as well weighs every one of them.
+/// whose registry reads failed as well weighs every one of them. A product whose only
+/// short read is of a patch whose registration has gone lost no record and is not one of
+/// them (<see cref="PatchesListedWithoutRegistrationCount"/>).
 /// </param>
 /// <param name="SkippedProductRows">
 /// Rows the product walk passed without reading, one per row. It is zero on every
@@ -542,7 +544,14 @@ public readonly record struct EnumerationCensus(
     // program's own Patches key failing to read, one per key. Carried for
     // RegistryRecordsUnread and not reported: registryKeyReadFailureCount counts them
     // with the rest.
-    int ProductPatchListReadFailures = 0)
+    int ProductPatchListReadFailures = 0,
+    // PatchesListedWithoutRegistrationCount: patches a program's own patch list names
+    // whose registration has gone, one per program and patch. Windows Installer answered
+    // that it holds no record of the patch when asked for the patch's cached file, and
+    // the registry's listing of the patch keys under the program's account, read to its
+    // end, holds no key for the patch. Such a pairing names no cached file, so nothing
+    // is withheld for it and its product is not counted in UnreadableProducts.
+    int PatchesListedWithoutRegistrationCount = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused

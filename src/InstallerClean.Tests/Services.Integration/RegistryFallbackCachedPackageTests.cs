@@ -226,6 +226,75 @@ public class RegistryFallbackCachedPackageTests
         });
     }
 
+    [Fact]
+    public void The_patch_keys_an_account_holds_are_listed_under_it_whatever_they_record()
+    {
+        WithSubtree(f =>
+        {
+            // A key with no value in it: it records no path, and it is there.
+            PatchValues(f).Dispose();
+
+            var (read, _) = Read(f);
+
+            Assert.Equal(0, read.Failures);
+            Assert.NotNull(read.PatchKeys);
+            Assert.Equal([PatchCode], read.PatchKeys[Sid]);
+        });
+    }
+
+    [Fact]
+    public void An_account_with_no_Patches_key_is_listed_as_holding_no_patch_key()
+    {
+        WithSubtree(f =>
+        {
+            using (var props = ProductValues(f))
+                props.SetValue("LocalPackage", f.Files.Create("msi"), RegistryValueKind.String);
+
+            var (read, _) = Read(f);
+
+            Assert.Equal(0, read.Failures);
+            Assert.NotNull(read.PatchKeys);
+            Assert.Empty(read.PatchKeys[Sid]);
+        });
+    }
+
+    [Theory]
+    // The account's Patches key would not list, so which patch keys it holds is not known.
+    [InlineData(false, false)]
+    // One patch's own key would not read. The listing above it ran to its end, and the key
+    // is in it.
+    [InlineData(true, true)]
+    public void An_accounts_patch_keys_are_listed_only_where_its_Patches_key_listed_to_the_end(
+        bool theFailureIsInsideOnePatchKey, bool listed)
+    {
+        WithSubtree(f =>
+        {
+            using (var values = PatchValues(f))
+                values.SetValue("LocalPackage", f.Files.Create("msp"), RegistryValueKind.String);
+            var keyEnd = theFailureIsInsideOnePatchKey ? $@"\{Sid}\Patches\{PackedPatch}" : $@"\{Sid}\Patches";
+
+            RegistryNames.CallsForTests = (key, calls) =>
+                key.Name.EndsWith(keyEnd, StringComparison.OrdinalIgnoreCase)
+                    ? new DisagreeingCalls(calls, cts: null)
+                    : calls;
+            InstallerQueryService.FallbackRead read;
+            try
+            {
+                (read, _) = Read(f);
+            }
+            finally
+            {
+                RegistryNames.CallsForTests = null;
+            }
+
+            Assert.Equal(1, read.Failures);
+            if (listed)
+                Assert.Equal([PatchCode], read.PatchKeys![Sid]);
+            else
+                Assert.Null(read.PatchKeys);
+        });
+    }
+
     /// <summary>
     /// A key's real calls with a count one higher at every reading, so no two readings
     /// agree, and the token, where there is one, cancelled at the first.

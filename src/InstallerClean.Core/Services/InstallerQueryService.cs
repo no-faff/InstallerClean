@@ -238,6 +238,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// beside (<see cref="ListingCoversTheWalk"/>). A process running as the local system
     /// is another account to every user's installation.
     /// </param>
+    /// <param name="PatchKeys">
+    /// The patch codes of the keys under each account's own <c>Patches</c> key, by the
+    /// account subtree, for every account whose <c>Patches</c> key was listed to its end:
+    /// an account with no <c>Patches</c> key has an entry holding none. An account whose
+    /// listing failed has no entry, and a key whose name is not a packed code is in no
+    /// entry. Windows Installer finds a patch's cached file through its key here, so an
+    /// entry that does not hold a patch's code says the patch has no registration under
+    /// that account (<see cref="RegistrationHasGone"/>). The read of one account gives
+    /// null where that account's listing failed, and the read of every account then
+    /// holds no entry for it. Null too where the caller supplied no reader.
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -259,7 +270,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         int PatchListFailures = 0,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchesReadAsZero = null,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>?>? AdvertisedPatches = null,
-        string? RunningAccount = null)
+        string? RunningAccount = null,
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>>? PatchKeys = null)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -844,15 +856,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var (products, unreadableRows) = EnumerateProducts(restarts, ct);
 
-        // Installed products this scan could not read in full. A skipped patch
-        // row, or a LocalPackage value that could not be read, is one product
-        // whose claims are short by at least one. Both leave the same hole, a
-        // claim that never reached the merge, so both count the product once.
-        // The loop below adds them. It starts from the product rows the walk
-        // passed without reading, which is zero on every walk that returns: the
-        // walk refuses the scan on such a row. Seeding from the walk's own count
-        // keeps a row it ever passed inside this figure.
-        var unreadableProducts = unreadableRows;
+        // Installed products this scan could not read in full are counted once the
+        // registry has been read, below (unreadableProducts): one for each installation
+        // the loop puts in shortInstallations whose short reads lost a record.
 
         // The same installations, each with which of its reads came back short, so the
         // registry's own records can be asked afterwards whether they hold what each lost
@@ -981,7 +987,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // telling anyone more.
             var recordsShort = false;
             var packageLost = false;
-            List<(string PatchCode, string? Sid, MsiInstallContext Context)>? lostPatchRecords = null;
+            List<LostPatchRecord>? lostPatchRecords = null;
 
             var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName, restarts).Value;
             var localPackage = GetProductProperty(productCode, userSid, context, MsiInstallProperty.LocalPackage, restarts);
@@ -1057,8 +1063,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                 // This product's own patch list names the pairing, so an answer that the
                 // installation holds no record of the patch is read again.
+                var pathReads = 0;
+                var everyPathReadSaidNoRecord = true;
                 var patchPath = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext,
-                    MsiInstallProperty.LocalPackage, restarts, PropertyRead.StandsWhereListedAsHeld);
+                    MsiInstallProperty.LocalPackage, restarts, PropertyRead.StandsWhereListedAsHeld,
+                    eachRead: read =>
+                    {
+                        pathReads++;
+                        everyPathReadSaidNoRecord &= read.PatchNotHeld;
+                    });
 
                 // The patch-side half of the same loss: this product holds the
                 // patch, the row naming it came back, and the path it claims
@@ -1066,10 +1079,46 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // the products holding it, so the claim just lost may be the
                 // Applied one that keeps another product's superseded-looking
                 // copy alive.
+                //
+                // AN ANSWER THAT THE INSTALLATION HOLDS NO RECORD OF THE PATCH IS KEPT
+                // AS THAT, the pairing's own list having just named it: where the
+                // registry holds no key for the patch either, the patch's registration
+                // has gone and it names no cached file (RegistrationHasGone). It is that
+                // answer only where every read gave it and more than one was made. The
+                // read is made again within the pass's pauses, and the answer taken is
+                // the first whatever a later read said, so each read is watched here; and
+                // where the pauses were spent and it was read once, it is read once more,
+                // at once. Two reads a moment apart are one look at a record that may be
+                // being rewritten, and the registry's own listing, read later in the
+                // scan, is the second.
+                //
+                // SUCH A PATCH IS STILL ONE OF THE PROGRAM'S PATCHES, so its Uninstallable
+                // goes into the program's patch set as any other patch's does, below: the
+                // program's own record of the patch is what answers it, and a patch that
+                // could be uninstalled holds the program's superseded patches whatever
+                // has become of its own cached file.
                 if (patchPath.Unreadable)
                 {
                     recordsShort = true;
-                    (lostPatchRecords ??= []).Add((patchCode, patchUserSid, patchContext));
+                    var saidNoRecordEveryTime = everyPathReadSaidNoRecord
+                        && (pathReads > 1
+                            || GetPatchPropertyOnce(_msi, patchCode, productCode, patchUserSid, patchContext,
+                                MsiInstallProperty.LocalPackage).PatchNotHeld);
+                    (lostPatchRecords ??= []).Add(
+                        new LostPatchRecord(patchCode, patchUserSid, patchContext, saidNoRecordEveryTime));
+
+                    if (saidNoRecordEveryTime)
+                    {
+                        var uninstallable = GetPatchProperty(_msi, patchCode, productCode, patchUserSid,
+                            patchContext, MsiInstallProperty.Uninstallable, restarts,
+                            PropertyRead.StandsWhereListedAsHeld);
+                        var verdict = PatchSetAnswer(uninstallable);
+                        if (verdict is null && RegistryMayStandIn(uninstallable))
+                            unansweredPatchSets.Add(new UnansweredPairing(
+                                productCode, context, patchCode, patchUserSid, patchContext));
+                        else
+                            FoldVerdict(apiPatchSets, productCode, verdict ?? ProductPatchSet.Unestablished);
+                    }
                 }
                 // AND A PATCH WHOSE PATH READS BENIGNLY EMPTY TAKES NEITHER ARM,
                 // WHICH IS WHY THE PER-PRODUCT CONDITION UNIONS THREE SOURCES
@@ -1160,7 +1209,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (recordsShort)
             {
-                unreadableProducts++;
                 shortInstallations.Add(new ShortInstallation(productCode, userSid, context,
                     packageLost, patchesIncomplete, patches.ConvertAll(p => p.PatchCode),
                     lostPatchRecords ?? []));
@@ -1177,6 +1225,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // that loop has finished above, and the confirmation pass puts no new path
         // into the set, only downgrades rows already in it.
         var fallback = _readFallback(claimed, ct);
+
+        // Installed products this scan could not read in full. A skipped patch
+        // row, or a LocalPackage value that could not be read, is one product
+        // whose claims are short by at least one. Both leave the same hole, a
+        // claim that never reached the merge, so both count the product once.
+        // It starts from the product rows the walk passed without reading, which
+        // is zero on every walk that returns: the walk refuses the scan on such a
+        // row. Seeding from the walk's own count keeps a row it ever passed inside
+        // this figure.
+        //
+        // A PROGRAM WHOSE ONLY SHORT READ IS OF A PATCH WHOSE REGISTRATION HAS GONE IS
+        // NOT ONE (LostNoRecord): no record names a cached file for that patch, so no
+        // claim was lost, and the registry's listing of the account's patch keys is
+        // what shows it, which is why the count waits for the registry's read.
+        var unreadableProducts = unreadableRows
+            + shortInstallations.Count(installation => !LostNoRecord(installation, fallback));
 
         // Even a fresh Windows install has OS-level MSI products. Zero
         // here means the database is corrupt or inaccessible; silently
@@ -1395,6 +1459,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // answer did not settle and whose entry names an unclaimed file; and any product
         // row the walk passed without reading, which no walk that returns has.
         //
+        // AN INSTALLATION THAT LOST NO RECORD IS NOT IN IT: a patch its own list names
+        // whose registration has gone names no cached file (RegistrationHasGone).
+        //
         // AN INSTALLATION WHOSE LOST RECORDS THE REGISTRY DOES HOLD IS NOT IN IT. The
         // fallback read those records and claimed each path, and any of them can take a
         // superseded patch's verdict away (WithholdOnRegistryPackageRecords). What
@@ -1482,7 +1549,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
             missed.RecoveredOfEnumerated,
             unattributedPatchFiles,
             recoveredPatchSetUnestablished,
-            fallback.PatchListFailures);
+            fallback.PatchListFailures,
+            shortInstallations.Sum(installation =>
+                installation.LostPatchRecords.Count(lost => RegistrationHasGone(lost, fallback))));
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -1712,7 +1781,57 @@ public sealed class InstallerQueryService : IInstallerQueryService
         bool PackageLost,
         bool PatchListShort,
         IReadOnlyList<string> PatchCodesListed,
-        IReadOnlyList<(string PatchCode, string? Sid, MsiInstallContext Context)> LostPatchRecords);
+        IReadOnlyList<LostPatchRecord> LostPatchRecords);
+
+    /// <summary>
+    /// One patch a program's own patch list named whose <c>LocalPackage</c> read failed,
+    /// with the account and context the list named it in.
+    /// </summary>
+    /// <param name="AnsweredNoRecord">
+    /// The read's answer was that the installation holds no record of the patch
+    /// (ERROR_UNKNOWN_PATCH) every time it was made, and it was made more than once.
+    /// </param>
+    private readonly record struct LostPatchRecord(
+        string PatchCode, string? Sid, MsiInstallContext Context, bool AnsweredNoRecord);
+
+    /// <summary>
+    /// Whether the registration of a patch a program lists has gone: Windows Installer
+    /// answered that it holds no record of the patch when asked for its cached file, and
+    /// the registry's listing of the patch keys under the account the patch is listed
+    /// in, read to its end, holds no key for it.
+    ///
+    /// WINDOWS INSTALLER FINDS A PATCH'S CACHED FILE THROUGH THAT KEY, so with the key
+    /// gone no record names a cached file for the patch, and the failed read lost none.
+    /// Windows can leave a program in this state itself, where it removes another
+    /// program that shared the patch's registration: the program's own record of the
+    /// patch stays, and the registration and the file go.
+    ///
+    /// BOTH ANSWERS ARE NEEDED, AND THE REGISTRY'S HAS TO BE A LISTING THAT WAS MADE. Any
+    /// other failed read of the path may be hiding a record, and so may an account whose
+    /// patch keys were not listed to the end, or were not listed at all: each answers no.
+    /// A key that is there and names no path answers no too, the registration being
+    /// there.
+    /// </summary>
+    private static bool RegistrationHasGone(LostPatchRecord lost, FallbackRead fallback)
+    {
+        if (!lost.AnsweredNoRecord) return false;
+
+        var account = UserDataAccount(lost.Sid, lost.Context);
+        return account is not null
+            && fallback.PatchKeys is not null
+            && fallback.PatchKeys.TryGetValue(account, out var keys)
+            && !keys.Contains(lost.PatchCode, StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Whether everything short about <paramref name="installation"/>'s records is a
+    /// patch whose registration has gone (<see cref="RegistrationHasGone"/>), so that no
+    /// read of its records lost a claim on a cached file.
+    /// </summary>
+    private static bool LostNoRecord(ShortInstallation installation, FallbackRead fallback) =>
+        !installation.PackageLost
+        && !installation.PatchListShort
+        && installation.LostPatchRecords.All(lost => RegistrationHasGone(lost, fallback));
 
     /// <summary>
     /// Whether the registry holds, under the installation's own account subtree, what
@@ -1721,7 +1840,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// short, a <c>Patches</c> key whose listing was established, names every patch the
     /// enumeration did return, names at least one, and is all Windows Installer's own
     /// patch list reads (<see cref="ListingCoversTheWalk"/>); and a package record for each patch
-    /// whose <c>LocalPackage</c> read failed.
+    /// whose <c>LocalPackage</c> read failed, but for a patch whose registration has gone,
+    /// which has none to hold (<see cref="RegistrationHasGone"/>).
     ///
     /// WHERE IT DOES, WHAT THE INSTALLATION LOST IS ON RECORD. Windows Installer finds a
     /// cached package through the path recorded for it, and the fallback reads and claims
@@ -1772,11 +1892,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 return false;
         }
 
-        foreach (var (patchCode, patchSid, patchContext) in installation.LostPatchRecords)
+        foreach (var lost in installation.LostPatchRecords)
         {
-            var patchAccount = UserDataAccount(patchSid, patchContext);
+            // A patch whose registration has gone lost no record for the registry to hold.
+            if (RegistrationHasGone(lost, fallback)) continue;
+
+            var patchAccount = UserDataAccount(lost.Sid, lost.Context);
             if (patchAccount is null
-                || !HoldsPackageRecord(fallback.PackageRecords, patchAccount, isPatch: true, patchCode))
+                || !HoldsPackageRecord(fallback.PackageRecords, patchAccount, isPatch: true, lost.PatchCode))
                 return false;
         }
 
@@ -3947,6 +4070,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var patchesReadAsZero = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
         var advertisedPatches = new Dictionary<AccountCode, IReadOnlyCollection<string>?>();
         var productEntries = new List<RegistryProductEntry>();
+        var patchKeys = new Dictionary<string, IReadOnlyCollection<string>>(StringComparer.OrdinalIgnoreCase);
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
         var productCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -4003,6 +4127,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             patchesReadAsZero[key] = zeros;
                     if (sidRead.ProductEntries is not null)
                         productEntries.AddRange(sidRead.ProductEntries);
+                    if (sidRead.PatchKeys is not null)
+                        foreach (var (account, keys) in sidRead.PatchKeys)
+                            patchKeys[account] = keys;
                     nonStringValues += sidRead.NonStringLocalPackageValues;
                     unparseableKeyNames += sidRead.UnparseableProductKeyNames;
                     productPatchKeys += sidRead.ProductPatchKeys;
@@ -4077,7 +4204,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             patchListFailures,
             patchesReadAsZero,
             advertisedPatches,
-            runningAccount);
+            runningAccount,
+            patchKeys);
     }
 
     /// <summary>
@@ -4293,6 +4421,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.Record(ex, cause: "products-key");
         }
 
+        // THE PATCH KEYS THIS ACCOUNT HOLDS, kept only where the listing below ran to its
+        // end, a Patches key that is not there being a listing of none. A throw anywhere
+        // in the listing leaves the account with no entry (FallbackRead.PatchKeys).
+        var patchKeysListed = new List<string>();
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>>? patchKeys = null;
+
         try
         {
             using var patchesKey = udKey.OpenSubKeyEarned($@"{sidName}\Patches");
@@ -4310,6 +4444,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // code it holds no entry for is a code whose cached file is
                     // unestablished.
                     var patchCode = UnpackRegistryProductCode(patchGuid);
+                    if (patchCode is not null) patchKeysListed.Add(patchCode);
 
                     // THE PATHS THIS PATCH RECORDS FOR ITSELF, one per value name that
                     // holds one, which is what lets a recovered product be judged
@@ -4390,6 +4525,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     }
                 }
             }
+
+            patchKeys = new Dictionary<string, IReadOnlyCollection<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [sidName] = patchKeysListed,
+            };
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -4406,7 +4546,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             PatchListings: patchListings,
             ProductEntries: productEntries,
             PatchListFailures: patchListFailures,
-            PatchesReadAsZero: patchesReadAsZero);
+            PatchesReadAsZero: patchesReadAsZero,
+            PatchKeys: patchKeys);
     }
 
     /// <summary>
@@ -5947,7 +6088,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Enumerates one product's patches. <c>Incomplete</c> reports that at least
     /// one row was skipped, which costs this product's claim on whatever patch
-    /// the row named. The product loop counts the product once in
+    /// the row named. The scan counts the product once in
     /// <c>unreadableProducts</c>, and withholds the removable class unless the
     /// registry holds a patch listing for that installation's own account naming
     /// every patch this returned (<see cref="RegistryHoldsWhatWasLost"/>).
@@ -6620,6 +6761,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// installation's other patches read again where they fail. None is read again once the
     /// installation's key is spent, by its own reads or by a pairing whose first answer was
     /// that the product is not installed, which is an answer about the installation.
+    /// <paramref name="eachRead"/> is handed every answer as it is read, the first and each
+    /// one read again, for a caller that needs to know what the reads it did not take said.
     /// </summary>
     internal static PropertyRead GetPatchProperty(
         IMsiApi msi,
@@ -6629,10 +6772,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
         MsiInstallContext context,
         string propertyName,
         WalkRestarts restarts,
-        Func<PropertyRead, bool>? stands = null) =>
+        Func<PropertyRead, bool>? stands = null,
+        Action<PropertyRead>? eachRead = null) =>
         ReadAgainWhereItFails(
             restarts,
-            () => GetPatchPropertyOnce(msi, patchCode, productCode, userSid, context, propertyName),
+            () =>
+            {
+                var read = GetPatchPropertyOnce(msi, patchCode, productCode, userSid, context, propertyName);
+                eachRead?.Invoke(read);
+                return read;
+            },
             stands,
             () => PairingKey(patchCode, productCode, userSid, context),
             within: () => InstallationKey(productCode, userSid, context),
