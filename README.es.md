@@ -37,10 +37,10 @@
 
 - **Qué hace:** InstallerClean hace una sola cosa: quita los archivos innecesarios de `C:\Windows\Installer`, una carpeta oculta que se va llenando a medida que instalas y actualizas software. Tras un análisis rápido te dice si tienes alguno, muestra más detalle para los curiosos y te deja moverlos a otro sitio o eliminarlos para liberar espacio en tu unidad C:.
 - **Quizá estés aquí porque:** Usaste [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, viste que `C:\Windows\Installer` ocupaba mucho espacio y no sabías qué había dentro. InstallerClean sabe qué contienen esos archivos con nombres que parecen aleatorios, como `9f05cba.msi`, y te dice cuáles puedes quitar sin riesgo.
-- **Cuánto espacio:** El gráfico de arriba muestra los resultados de los informes opcionales enviados desde la aplicación (gracias a todos). Del <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end --> que liberó espacio, la mediana liberada es de <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Son archivos que probablemente no sabías que existían, ahí ocupando espacio sin más. El <!-- reports-over5gb-start -->21,0 %<!-- reports-over5gb-end --> de *todos* los equipos recuperó más de 5 GB, y algunos liberaron cientos de GB. Cuanto más software basado en MSI instales, más archivos innecesarios tendrás.
+- **Cuánto espacio:** El gráfico de arriba muestra los resultados de los informes opcionales enviados desde la aplicación (gracias a todos). Del <!-- reports-freedpct-start -->62 %<!-- reports-freedpct-end --> que liberó espacio, la mediana liberada es de <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Son archivos que probablemente no sabías que existían, ahí ocupando espacio sin más. El <!-- reports-over5gb-start -->20,9 %<!-- reports-over5gb-end --> de *todos* los equipos recuperó más de 5 GB, y algunos liberaron cientos de GB. Cuanto más software basado en MSI instales, más archivos innecesarios tendrás.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Haz clic para ver</kbd> cómo sería el gráfico si los informes fueran un reflejo exacto de todas las 148.187 descargas</summary>
+  <summary><kbd>Haz clic para ver</kbd> cómo sería el gráfico si los informes fueran un reflejo exacto de todas las 148.681 descargas</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-es-scaled-dark.svg" />

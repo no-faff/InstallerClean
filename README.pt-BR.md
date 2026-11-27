@@ -37,10 +37,10 @@
 
 - **O que faz:** O InstallerClean faz uma coisa só: remove arquivos desnecessários de `C:\Windows\Installer`, uma pasta oculta que vai enchendo conforme você instala e atualiza programas. Depois de uma análise rápida, ele diz se você tem algum, mostra mais detalhes para os curiosos e deixa você movê-los para outro lugar ou excluí-los para liberar espaço no seu disco C:.
 - **Talvez você esteja aqui porque:** Você usou o [WinDirStat](https://github.com/windirstat/windirstat), o WizTree ou o TreeSize, viu que o `C:\Windows\Installer` estava ocupando muito espaço e não sabia o que tinha ali dentro. O InstallerClean sabe o que há naqueles arquivos com nomes que parecem aleatórios, como `9f05cba.msi`, e diz quais você pode remover com segurança.
-- **Quanto espaço:** O gráfico acima mostra os resultados dos relatórios opcionais enviados pelo aplicativo (obrigado a todos). Dos <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> que liberaram espaço, a mediana liberada é <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. São arquivos que você provavelmente nem sabia que existiam, só ocupando espaço. <!-- reports-over5gb-start -->21,0%<!-- reports-over5gb-end --> de *todas* as máquinas recuperaram mais de 5 GB, e algumas pessoas liberaram centenas de GB. Quanto mais programas baseados em MSI você instala, mais arquivos desnecessários vai ter.
+- **Quanto espaço:** O gráfico acima mostra os resultados dos relatórios opcionais enviados pelo aplicativo (obrigado a todos). Dos <!-- reports-freedpct-start -->62%<!-- reports-freedpct-end --> que liberaram espaço, a mediana liberada é <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. São arquivos que você provavelmente nem sabia que existiam, só ocupando espaço. <!-- reports-over5gb-start -->20,9%<!-- reports-over5gb-end --> de *todas* as máquinas recuperaram mais de 5 GB, e algumas pessoas liberaram centenas de GB. Quanto mais programas baseados em MSI você instala, mais arquivos desnecessários vai ter.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Clique para ver</kbd> como o gráfico ficaria se os relatórios fossem um retrato exato de todos os 148.187 downloads</summary>
+  <summary><kbd>Clique para ver</kbd> como o gráfico ficaria se os relatórios fossem um retrato exato de todos os 148.681 downloads</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pt-BR-scaled-dark.svg" />

@@ -37,10 +37,10 @@
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: yazılım kurdukça ve güncelledikçe dolan gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Kısa bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için onları başka bir yere taşımanıza ya da silmenize olanak tanır.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. InstallerClean, `9f05cba.msi` gibi rastgele görünen adlara sahip o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle kaldırabileceğinizi size söyler.
-- **Ne kadar yer:** Yukarıdaki grafik, uygulamadan gönderilen isteğe bağlı raporların sonuçlarını gösteriyor (herkese teşekkürler). Yer açan raporların oranı <!-- reports-freedpct-start -->%62<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Bunlar, muhtemelen varlığından haberiniz bile olmayan, öylece yer kaplayan dosyalar. *Tüm* makinelerin <!-- reports-over5gb-start -->%21,0<!-- reports-over5gb-end --> kadarı 5 GB üzerinde yer kazandı, bazı kişiler de yüzlerce GB açtı. Ne kadar çok MSI tabanlı yazılım kurarsanız o kadar çok gereksiz dosyanız olur.
+- **Ne kadar yer:** Yukarıdaki grafik, uygulamadan gönderilen isteğe bağlı raporların sonuçlarını gösteriyor (herkese teşekkürler). Yer açan raporların oranı <!-- reports-freedpct-start -->%62<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,5 GB<!-- reports-median-end -->. Bunlar, muhtemelen varlığından haberiniz bile olmayan, öylece yer kaplayan dosyalar. *Tüm* makinelerin <!-- reports-over5gb-start -->%20,9<!-- reports-over5gb-end --> kadarı 5 GB üzerinde yer kazandı, bazı kişiler de yüzlerce GB açtı. Ne kadar çok MSI tabanlı yazılım kurarsanız o kadar çok gereksiz dosyanız olur.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 148.187 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
+  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 148.681 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-tr-scaled-dark.svg" />
