@@ -1291,7 +1291,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // lists its account's programs are listed in are asked too (ReadPublishedCodes).
         var published = ReadPublishedCodes(fallback, ct);
         var missed = LocateProductsTheEnumerationMissed(
-            products, CodesToAsk(fallback.RegistryProductCodes, enumerated.NamedByStoppedLists),
+            products, fallback.RegistryProductCodes, enumerated.NamedByStoppedLists,
             published.Codes, restarts, ct);
         var unreachableKeys = UnreachableKeys(published, fallback, products, missed.Recovered,
             missed.UnsettledEnumerated);
@@ -2134,22 +2134,29 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// installation in every question it asks, and withholds on what is still
     /// unaccounted for under that code.
     /// </summary>
+    /// <param name="namedByStoppedLists">
+    /// Codes a list whose walk stopped at an entry that did not read names
+    /// (<see cref="ProductWalk.NamedByStoppedLists"/>), asked on the same terms as
+    /// <paramref name="registryCodes"/>. They share one restart budget, kept apart from the
+    /// scan's, whether or not <paramref name="registryCodes"/> holds them too. Null asks none.
+    /// </param>
     /// <param name="publishedCodes">
     /// Codes the published lists name (<see cref="ReadPublishedCodes"/>), asked on the same
-    /// terms as <paramref name="registryCodes"/>. Those not among them share one restart
-    /// budget, kept apart from the scan's. Null asks none.
+    /// terms as <paramref name="registryCodes"/>. Those in neither of the other two share one
+    /// restart budget, kept apart from the scan's and from the stopped lists'. Null asks none.
     /// </param>
     /// <param name="registryCodes">
     /// Null where no fallback ran, which is not the same as an empty set and must
     /// not read as one: an empty set says the registry holds no product this
     /// enumeration missed, and null says nobody looked. Null asks nothing of its own,
     /// leaving the caller's other signals to speak, because a comparison that did not
-    /// happen may not withhold on its own silence; <paramref name="publishedCodes"/> are
-    /// still asked.
+    /// happen may not withhold on its own silence; <paramref name="namedByStoppedLists"/> and
+    /// <paramref name="publishedCodes"/> are still asked.
     /// </param>
     private MissedProducts LocateProductsTheEnumerationMissed(
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         IReadOnlyCollection<string>? registryCodes,
+        IReadOnlyCollection<string>? namedByStoppedLists,
         IReadOnlyCollection<string>? publishedCodes,
         WalkRestarts restarts,
         CancellationToken ct)
@@ -2157,15 +2164,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var recovered = new List<(string, string?, MsiInstallContext)>();
         var unsettled = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // A published code the registry's own do not hold is asked with a restart budget of
-        // its own, so these asks never spend the one the scan's later keyed reads share.
+        // A code a stopped list names is asked with a restart budget of its own, whether or not
+        // the registry's own hold it too, and so is a code only a published list names, so
+        // these asks never spend the one the scan's later keyed reads share. A stopped list can
+        // name every program of its context, and each of them has records under UserData.
         var asks = new List<(string Code, WalkRestarts Budget)>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (namedByStoppedLists is { Count: > 0 })
+        {
+            var stoppedAsks = WalkRestarts.For(ct, WalkPause);
+            foreach (var code in namedByStoppedLists)
+                if (seen.Add(code)) asks.Add((code, stoppedAsks));
+        }
         foreach (var code in registryCodes ?? [])
             if (seen.Add(code)) asks.Add((code, restarts));
+        WalkRestarts? publishedAsks = null;
         if (publishedCodes is { Count: > 0 })
         {
-            var publishedAsks = WalkRestarts.For(ct, WalkPause);
+            publishedAsks = WalkRestarts.For(ct, WalkPause);
             foreach (var code in publishedCodes)
                 if (seen.Add(code)) asks.Add((code, publishedAsks));
         }
@@ -2209,7 +2225,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return new(recovered, recoveredOfEnumerated, unresolved, unsettled,
-            asks.Count(ask => !ReferenceEquals(ask.Budget, restarts)));
+            asks.Count(ask => ReferenceEquals(ask.Budget, publishedAsks)));
     }
 
     /// <summary>
@@ -5843,7 +5859,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <param name="NamedByStoppedLists">
     /// Every program code named in a list whose walk stopped at an entry that did not read,
     /// null where no walk stopped. Each is asked about by code again beside the registry's own
-    /// (<see cref="CodesToAsk"/>), which is what withholds on one Windows will not answer about.
+    /// (<see cref="LocateProductsTheEnumerationMissed"/>), which is what withholds on one Windows
+    /// will not answer about.
     /// </param>
     /// <param name="StoppedLists">The lists whose walk stopped at an entry that did not read.</param>
     /// <param name="UnnamedListEntries">
@@ -6041,22 +6058,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>One installation's code, account and context, as one key whatever their case.</summary>
     private static string RowKey((string ProductCode, string? UserSid, MsiInstallContext Context) row) =>
         row.ProductCode.ToUpperInvariant() + "|" + (row.UserSid ?? "").ToUpperInvariant() + "|" + (uint)row.Context;
-
-    /// <summary>
-    /// The codes the recovery asks about by code: the registry's own, and those a list whose
-    /// walk stopped names. Null only where neither source has anything, as
-    /// <see cref="LocateProductsTheEnumerationMissed"/> reads null.
-    /// </summary>
-    private static IReadOnlyCollection<string>? CodesToAsk(
-        IReadOnlyCollection<string>? registryCodes, IReadOnlyCollection<string>? namedByStoppedLists)
-    {
-        if (namedByStoppedLists is null || namedByStoppedLists.Count == 0) return registryCodes;
-        if (registryCodes is null) return namedByStoppedLists;
-
-        var both = new HashSet<string>(registryCodes, StringComparer.OrdinalIgnoreCase);
-        both.UnionWith(namedByStoppedLists);
-        return both;
-    }
 
     /// <summary>
     /// The program codes of the published lists that the programs of each account holding a

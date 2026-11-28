@@ -41,6 +41,7 @@ public class InstallerQueryServiceStoppedListTests
     private static string Packed(string code) => InstallerQueryService.PackRegistryCode(code)!;
 
     private const uint AccessDenied = 5;
+    private const uint BadConfiguration = 1610;
 
     // A fallback that ran and named no program.
     private static InstallerQueryService.FallbackRead FallbackRan(
@@ -275,6 +276,85 @@ public class InstallerQueryServiceStoppedListTests
         Assert.Equal(0, result.Census.UnnamedProductListEntries);
         Assert.Equal(0, result.Census.RecoveredProductCount);
         Assert.Contains(result.Packages, p => p.LocalPackagePath == Path.GetFullPath(BeforeFile));
+    }
+
+    /// <summary>
+    /// Answers as the production reader does for a patch on the disk, naming
+    /// <see cref="Before"/> as the product each patch file declares.
+    /// </summary>
+    private sealed class DeclaresBefore : IPackageIdentityReader
+    {
+        public PackageIdentity? Read(string filePath, bool isPatch, out string detail, out PackageReadRefusal refusal)
+        {
+            detail = string.Empty;
+            refusal = PackageReadRefusal.WouldNotRead;
+            return isPatch
+                ? new PackageIdentity(string.Empty, true, new[] { Before })
+                : new PackageIdentity(string.Empty, false, Array.Empty<string>());
+        }
+
+        public string? PackageCodeOf(string filePath) => null;
+
+        public bool HoldsNoRevisionNumber(string filePath) => false;
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task The_codes_a_stopped_list_names_are_asked_again_without_spending_the_restarts_the_scans_reads_share(
+        bool registryNamesThem)
+    {
+        // Fifty programs after the entry. Asked by code after the walk, each answers an error
+        // three times, so none is found there; asked again by the recovery, each answers it
+        // once more and is then listed, so that ask pauses before it is made again. The first
+        // of them holds the superseded patch the program before the entry holds. Planted, that
+        // program's first State read of the patch answers an error. Asked on the scan's own
+        // restarts, the fifty pauses would spend the limit that read shares, so it would be
+        // made once and hold the patch back. Each of them has records under UserData on a real
+        // machine, so the registry names them too.
+        const string Patch = "{77777777-7777-7777-7777-777777777777}";
+        var after = Enumerable.Range(0, 50).Select(i => $"{{{i + 1:X8}-AAAA-AAAA-AAAA-AAAAAAAAAAAA}}").ToArray();
+
+        async Task<(InstallerQueryResult Result, FakeMsiApi Msi)> ScanWith(bool planted)
+        {
+            var msi = MachineWith(new[] { Packed(Before), TooLong }.Concat(after.Select(Packed)).ToArray());
+            foreach (var code in after)
+                msi.PassingError(MsiWalk.Instances, code, 0, BadConfiguration, calls: WalkRestarts.Attempts + 1);
+            msi.AddPatch(Before, Patch, AfterPatchFile, state: "2", uninstallable: "0");
+            msi.AddPatch(after[0], Patch, AfterPatchFile, state: "2", uninstallable: "0");
+            msi.RouteAHolders.Add((Patch, Before));
+            msi.RouteAHolders.Add((Patch, after[0]));
+            msi.PatchSequenceFor = (_, _) => FakeMsiApi.CannotApply;
+            if (planted) msi.PassingReadError(Patch, after[0], "State", BadConfiguration);
+
+            // The registry's reading of every program's patch set, as the fallback gives one for
+            // each product key; a program with none would hold back every patch it shares.
+            var sets = new[] { Before }.Concat(after)
+                .ToDictionary(code => code, _ => ProductPatchSet.AllNonRemovable, StringComparer.OrdinalIgnoreCase);
+            var service = new InstallerQueryService(msi,
+                (_, _) => new InstallerQueryService.FallbackRead(0, sets.Count,
+                    RegistryProductCodes: registryNamesThem ? after : Array.Empty<string>(), ProductPatchSets: sets),
+                identityReader: new DeclaresBefore(), productLists: new FakeProductLists(msi))
+            {
+                WalkPause = _ => { },
+            };
+            return (await service.GetRegisteredPackagesAsync(), msi);
+        }
+
+        var clean = await ScanWith(planted: false);
+        var planted = await ScanWith(planted: true);
+
+        Assert.Equal(1, planted.Result.Census.StoppedProductLists);
+        Assert.Equal(0, planted.Result.Census.StoppedListInstallations);
+        Assert.Equal(after.Length, planted.Result.Census.RecoveredProductCount);
+        Assert.Equal(0, planted.Result.Census.UnansweredProductCount);
+        Assert.Equal(clean.Result.Census, planted.Result.Census);
+
+        // The planted read was made twice more than on the clean scan, once after each pause,
+        // and the scan's answer is the clean scan's.
+        Assert.Equal(clean.Msi.Reads(Patch, after[0], "State") + 2, planted.Msi.Reads(Patch, after[0], "State"));
+        Assert.Equal(clean.Result.Packages, planted.Result.Packages);
+        Assert.Contains(clean.Result.Packages, p => p.LocalPackagePath == Path.GetFullPath(AfterPatchFile) && p.IsRemovable);
     }
 
     [Fact]
