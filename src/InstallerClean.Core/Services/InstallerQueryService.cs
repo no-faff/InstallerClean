@@ -1293,8 +1293,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var missed = LocateProductsTheEnumerationMissed(
             products, fallback.RegistryProductCodes, enumerated.NamedByStoppedLists,
             published.Codes, restarts, ct);
-        var unreachableKeys = UnreachableKeys(published, fallback, products, missed.Recovered,
-            missed.UnsettledEnumerated);
+        var (unreachableKeys, systemKeysAccountedFor) = UnreachableKeys(published, fallback, products,
+            missed.Recovered, missed.UnsettledEnumerated);
 
         // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. A product it
         // lost is recovered by name above, through ResolveProductInstances, which asks
@@ -1509,11 +1509,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unsettledEnumeratedProducts = unsettledEnumerated.Count + unreadableRows;
 
         // The other two: a code Windows would not answer about, and a key whose name
-        // yielded no code to ask with. Both withhold the superseded class here. The first
-        // also withholds the walk-derived offer, through
-        // EnumerationCensus.RegistryProductUnaskable, and so does the second where its
-        // account's published lists do not account for it (UnreachableKeys).
-        var unresolvedProducts = missed.Unresolved + fallback.UnparseableProductKeyNames;
+        // yielded no code to ask with. The first withholds the superseded class here and the
+        // walk-derived offer, through EnumerationCensus.RegistryProductUnaskable. The second
+        // withholds the walk-derived offer where its account's published lists do not account
+        // for it (UnreachableKeys), and the superseded class everywhere but under the system
+        // account where they do.
+        //
+        // A KEY UNDER THE SYSTEM ACCOUNT THAT ITS LISTS ACCOUNT FOR, WHERE EVERY NAME IN THEM IS
+        // THE CODE OF A PER-MACHINE PROGRAM, WITHHOLDS NO SUPERSEDED PATCH. Every program those
+        // lists publish was walked or found by code, so the program whose records the key holds,
+        // where one does, is among them and has been asked. A per-machine program whose key
+        // under UserData alone has a name that is not its code is still walked, and Windows
+        // Installer lists its patches and answers each one's State, so a patch it holds applied
+        // keeps its cached file through its own claim (MergeClaim). Every other such key
+        // withholds the class.
+        systemKeysAccountedFor = Math.Min(systemKeysAccountedFor, fallback.UnparseableProductKeyNames);
+        var unresolvedProducts = missed.Unresolved + fallback.UnparseableProductKeyNames - systemKeysAccountedFor;
 
         var withheldProducts = unsettledEnumeratedProducts + unresolvedProducts;
 
@@ -1589,7 +1600,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             enumerated.UnnamedListEntries,
             enumerated.FoundByCode,
             unreachableKeys,
-            missed.PublishedCodesAsked);
+            missed.PublishedCodesAsked,
+            systemKeysAccountedFor);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -6083,13 +6095,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private PublishedCodes ReadPublishedCodes(FallbackRead fallback, CancellationToken ct)
     {
-        if (fallback.UnparseableProductKeyNames == 0) return new(null, null, 0);
+        if (fallback.UnparseableProductKeyNames == 0) return new(null, null, 0, null);
         if (fallback.UnparseableProductKeysByAccount is not { } byAccount || _productLists is not { } lists)
-            return new(null, null, fallback.UnparseableProductKeyNames);
+            return new(null, null, fallback.UnparseableProductKeyNames, null);
 
         var codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var byAccountRows = new Dictionary<string, List<(string ProductCode, string? UserSid, MsiInstallContext Context)>>(
             StringComparer.OrdinalIgnoreCase);
+        var unnamedByAccount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         // A key the total holds that no account does is one nothing here asked about.
         var unreachable = Math.Max(0, fallback.UnparseableProductKeyNames - byAccount.Values.Sum());
         foreach (var (account, keys) in byAccount)
@@ -6120,6 +6133,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             var rows = new List<(string ProductCode, string? UserSid, MsiInstallContext Context)>();
+            var unnamed = 0;
             foreach (var (names, sid, context) in read)
                 foreach (var name in names!)
                     if (UnpackRegistryProductCode(name) is { } code)
@@ -6127,22 +6141,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         rows.Add((code, sid, context));
                         codes.Add(code);
                     }
+                    else
+                        unnamed++;
             byAccountRows[account] = rows;
+            unnamedByAccount[account] = unnamed;
         }
 
-        return new(codes, byAccountRows, unreachable);
+        return new(codes, byAccountRows, unreachable, unnamedByAccount);
     }
 
     /// <summary>
     /// What <see cref="ReadPublishedCodes"/> read: every code to ask; for each account, the
     /// installation each code in its published lists stands for, by the account and context
-    /// of the list that names it; and the keys already counted as under an account whose
-    /// lists could not all be read. Both collections are null where nothing was read.
+    /// of the list that names it; the keys already counted as under an account whose
+    /// lists could not all be read; and for each account, how many names in its published
+    /// lists are not a program code. The collections are null where nothing was read.
     /// </summary>
     private sealed record PublishedCodes(
         IReadOnlyCollection<string>? Codes,
         IReadOnlyDictionary<string, List<(string ProductCode, string? UserSid, MsiInstallContext Context)>>? ByAccount,
-        int Unreachable);
+        int Unreachable,
+        IReadOnlyDictionary<string, int>? UnnamedByAccount);
 
     /// <summary>
     /// The keys under <c>UserData</c> whose name is not a code that no published list could
@@ -6162,13 +6181,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// installed per user, and per-user programs that are advertised only, which a program
     /// whose records sit under a name that is not its code can be. Such a program could be
     /// the one the key holds, so the key is not accounted for.
+    ///
+    /// <c>SystemAccountedFor</c> is how many of the keys under the system account its lists
+    /// account for, where every name in them is a program code and every code a per-machine
+    /// program's: the keys that withhold no superseded patch. A name in them that is not a
+    /// code is a program no call can name and nothing asked, so it keeps every such key
+    /// withholding.
     /// </summary>
-    private static int UnreachableKeys(PublishedCodes published, FallbackRead fallback,
+    private static (int Unreachable, int SystemAccountedFor) UnreachableKeys(PublishedCodes published,
+        FallbackRead fallback,
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
         HashSet<string> unsettled)
     {
-        if (published.ByAccount is null) return published.Unreachable;
+        if (published.ByAccount is null) return (published.Unreachable, 0);
 
         var settled = new HashSet<string>(StringComparer.Ordinal);
         foreach (var row in products.Concat(recovered))
@@ -6176,10 +6202,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 settled.Add(RowKey(row));
 
         var unreachable = published.Unreachable;
+        var systemAccountedFor = 0;
         foreach (var (account, rows) in published.ByAccount)
+        {
+            var keys = fallback.UnparseableProductKeysByAccount![account];
             if (!rows.All(row => settled.Contains(RowKey(row))))
-                unreachable += fallback.UnparseableProductKeysByAccount![account];
-        return unreachable;
+                unreachable += keys;
+            else if (string.Equals(account, LocalSystemAccount, StringComparison.OrdinalIgnoreCase)
+                     && rows.All(row => row.Context == MsiInstallContext.Machine)
+                     && published.UnnamedByAccount![account] == 0)
+                systemAccountedFor += keys;
+        }
+        return (unreachable, systemAccountedFor);
     }
 
     /// <summary>

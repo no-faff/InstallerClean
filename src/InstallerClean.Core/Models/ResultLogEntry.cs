@@ -489,9 +489,10 @@ public sealed record AppInfo(
 /// machine that did not answer rather than a machine with none. A product the
 /// enumeration never returned is asked only once Windows confirms it installed. One
 /// Windows would not answer about travels as the unanswered count and a key whose name
-/// yields no code as the unparseable count. Both withhold every superseded patch. The
-/// unanswered count also withholds the walk-derived offer, and so does the unparseable
-/// count where no published list accounts for the key.
+/// yields no code as the unparseable count. The unanswered count withholds every superseded
+/// patch and the walk-derived offer. The unparseable count withholds the walk-derived offer
+/// where no published list accounts for the key, and every superseded patch but for a key
+/// under the system account whose lists account for it and name only per-machine programs.
 /// </param>
 /// <param name="SupersededRegistrationCount">
 /// Cached patch paths whose merged row Windows reports superseded: one per path however

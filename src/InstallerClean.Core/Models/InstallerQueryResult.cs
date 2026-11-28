@@ -31,9 +31,11 @@ namespace InstallerClean.Models;
 /// (<see cref="EnumerationCensus.UnsettledEnumeratedProductCount"/>).
 /// A code the enumeration never returned that Windows would not say was installed
 /// (<see cref="EnumerationCensus.UnansweredProductCount"/>). And a registry product key
-/// whose name is no code (<see cref="EnumerationCensus.UnparseableProductKeyNames"/>). The
-/// first are codes the enumeration returned, the second codes it did not, and the third
-/// have no code, so the sum is exact.
+/// whose name is no code (<see cref="EnumerationCensus.UnparseableProductKeyNames"/>), but
+/// for one under the system account that its published lists account for
+/// (<see cref="EnumerationCensus.UnparseableSystemKeysAccountedFor"/>). The first are codes
+/// the enumeration returned, the second codes it did not, and the third have no code, so the
+/// sum is exact: the first two and the third's count less those it leaves out.
 ///
 /// It counts ENTRIES rather than programs because the third kind is a registry key, which
 /// need not be a program. Any sentence built on this number is a sentence about all three
@@ -152,7 +154,8 @@ public record InstallerQueryResult(
 /// enumeration returned, one the recovery by name found installed or not installed, one
 /// Windows would not answer about, or no code at all, and only the kinds already counted
 /// in <see cref="UnsettledEnumeratedProductCount"/>, <see cref="UnansweredProductCount"/>
-/// and <see cref="UnparseableProductKeyNames"/> withhold.
+/// and <see cref="UnparseableProductKeyNames"/> withhold, the last less
+/// <see cref="UnparseableSystemKeysAccountedFor"/>.
 /// </param>
 /// <param name="UnclaimedPatchFiles">
 /// The same for patch entries. <see cref="UnattributedPatchFileCount"/> is the part of it
@@ -253,11 +256,14 @@ public record InstallerQueryResult(
 /// Counted while walking every product key, not only the ones the enumeration
 /// missed, so it is a property of the registry's contents rather than of a run.
 ///
-/// IT WITHHOLDS THE SUPERSEDED CLASS, as the count above does. Such a key can hold a
-/// program's records under a name that is not its code, while Windows Installer lists the
-/// program by the code its published key carries and reads its records under that code, so
-/// a patch the program holds may not be answered as held when the program is asked about
-/// it. So every superseded patch is withheld.
+/// IT WITHHOLDS THE SUPERSEDED CLASS, as the count above does, but for a key under the
+/// system account that its published lists account for, every name in them the code of a
+/// per-machine program (<see cref="UnparseableSystemKeysAccountedFor"/>). Such a key can hold
+/// a program's records under a name that is not its code, while Windows Installer lists the
+/// program by the code its published key carries, so every superseded patch is withheld unless
+/// every program the key could belong to has been asked about its patches. A per-machine
+/// program whose key under UserData alone is misnamed is walked, and Windows Installer lists
+/// its patches and answers each one's State, so it is asked through the product loop.
 ///
 /// THE WALK-DERIVED OFFER IS WITHHELD FOR SUCH A KEY UNLESS ITS ACCOUNT'S PUBLISHED LISTS
 /// ACCOUNT FOR IT (<see cref="UnparseableProductKeysUnreachable"/>). A program's source list
@@ -520,8 +526,9 @@ public readonly record struct EnumerationCensus(
     // keyed answer would not come or left out an installation the enumeration listed
     // and whose registry entry names a cached file the enumeration never claimed that
     // is on the disk, and any product row the walk passed without reading. With
-    // UnansweredProductCount and UnparseableProductKeyNames it is the whole of that
-    // figure, so the report carries the three and never the sum.
+    // UnansweredProductCount, and UnparseableProductKeyNames less
+    // UnparseableSystemKeysAccountedFor, it is the whole of that figure, so the report
+    // carries the four and never the sum.
     int UnsettledEnumeratedProductCount = 0,
     // RecoveredEnumeratedInstallationCount: installations of a code the enumeration
     // returned, listed by the keyed ask for that code under an account or context the
@@ -569,7 +576,13 @@ public readonly record struct EnumerationCensus(
     // PublishedCodesAsked: program codes a published list names that neither the registry's
     // own records under UserData nor a stopped list name, asked by code because a key under
     // UserData has a name that is not a code. Zero on every machine with no such key.
-    int PublishedCodesAsked = 0)
+    int PublishedCodesAsked = 0,
+    // UnparseableSystemKeysAccountedFor: the members of UnparseableProductKeyNames under the
+    // system account whose published lists account for them, every name in those lists the
+    // code of a per-machine program. They withhold neither the superseded class nor the
+    // walk-derived offer, and are the part of UnparseableProductKeyNames that
+    // InstallerQueryResult.UnaccountedProductCount does not add.
+    int UnparseableSystemKeysAccountedFor = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused

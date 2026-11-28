@@ -165,8 +165,7 @@ public class EnumerationCensusTests
     ///
     /// <see cref="EnumerationCensus.UnparseableProductKeyNames"/> IS ABSENT TOO. A key those
     /// lists do account for has every code they name settled in that list's own account and
-    /// context, and every
-    /// cached file it records claimed by path.
+    /// context, and every cached file it records claimed by path.
     ///
     /// <see cref="EnumerationCensus.RecoveredProductCount"/> IS DELIBERATELY ABSENT and
     /// is this list's trap, for the reason the attempts count is the other list's. A
