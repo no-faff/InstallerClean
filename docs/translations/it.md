@@ -237,6 +237,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | All'avvio della scansione, InstallerClean non è riuscito a controllare se Windows Installer era occupato. Windows ha restituito un errore: {0} (errore {1}). InstallerClean non ha toccato i file che non può controllare mentre Windows Installer è occupato. Riavvia Windows. InstallerClean controllerà di nuovo la prossima volta che lo avvii. |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | All'avvio della scansione, Windows Installer aveva qualcosa di non terminato, perciò InstallerClean non ha toccato i file che non può controllare finché Windows Installer non ha finito. Premi Ripeti scansione quando Windows Installer ha finito. |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | L'orologio di questo PC è tornato indietro o ha perso tempo durante la scansione, perciò InstallerClean non poteva sapere quali file erano appena stati aggiunti e non ha toccato nessun file che potesse essere stato appena aggiunto. Premi Ripeti scansione. |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {0} di {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} da eliminare ({2}) |
 | {0} file left alone ({1}) | {0} file non toccato ({1}) |
@@ -516,6 +517,7 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Error: unexpected failure ({0}). Details written to {1}. | Errore: crash inatteso ({0}). Dettagli scritti in {1}. |
 | Error: unexpected failure ({0}). The crash log could not be written. | Errore: crash inatteso ({0}). Non è stato possibile scrivere il registro dei crash. |
 | Scanning {InstallerFolder}... | Scansione di {InstallerFolder}... |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | Trovati {0} {1} non necessari da eliminare ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Trovato {0} {1} non necessario da eliminare ({2}). |
 | No unneeded files identified. | Nessun file non necessario identificato. |

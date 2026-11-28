@@ -227,6 +227,7 @@ public static class Strings
     public static string Cli_EventLogReason_RegistryCheckUnreadable => Get("Cli.EventLogReason.RegistryCheckUnreadable");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
+    public static string Cli_EventLogScanPutBack => Get("Cli.EventLogScanPutBack");
     public static string Cli_EventLogScanWithheld_Plural => Get("Cli.EventLogScanWithheld.Plural");
     public static string Cli_EventLogScanWithheld_Singular => Get("Cli.EventLogScanWithheld.Singular");
     public static string Cli_EventLogScanWithheldPatchFiles_Plural => Get("Cli.EventLogScanWithheldPatchFiles.Plural");
@@ -324,6 +325,7 @@ public static class Strings
     public static string Cli_ReportPrompt => Get("Cli.ReportPrompt");
     public static string Cli_ReportSent => Get("Cli.ReportSent");
     public static string Cli_ReportWaiting => Get("Cli.ReportWaiting");
+    public static string Cli_ScanPutBack => Get("Cli.ScanPutBack");
     public static string Cli_ScanSignal_AccessRefused => Get("Cli.ScanSignal.AccessRefused");
     public static string Cli_ScanSignal_Busy => Get("Cli.ScanSignal.Busy");
     public static string Cli_ScanSignal_ClockSetBack => Get("Cli.ScanSignal.ClockSetBack");
@@ -565,6 +567,7 @@ public static class Strings
     public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
     public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");
     public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
+    public static string Summary_PutBack => Get("Summary.PutBack");
     public static string Summary_RegisteredStillUsed_Plural => Get("Summary.RegisteredStillUsed.Plural");
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow_Missing_Plural => Get("Summary.RegisteredWindow.Missing.Plural");

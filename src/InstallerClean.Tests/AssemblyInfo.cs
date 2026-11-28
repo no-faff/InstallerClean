@@ -49,16 +49,17 @@ internal static class TestWalkPause
 
 /// <summary>
 /// No test waits out the pauses a Move or Delete makes after a put-back and before its
-/// second try at a file in use (<see cref="InstallerClean.Services.BatchRun"/>): for the
-/// whole run they return at once. A test that reads those pauses sets a pause of its own
-/// and puts this one back.
+/// second try at a file in use, or the one a scan makes after it puts back a file a
+/// killed batch left (<see cref="InstallerClean.Services.InHandPause"/>): for the whole
+/// run they return at once. A test that reads those pauses sets a pause of its own and
+/// puts this one back.
 /// </summary>
 internal static class TestBatchPause
 {
     internal static readonly Func<TimeSpan, CancellationToken, Task> AtOnce = (_, _) => Task.CompletedTask;
 
     [ModuleInitializer]
-    internal static void Skip() => InstallerClean.Services.BatchRun.PauseForTests = AtOnce;
+    internal static void Skip() => InstallerClean.Services.InHandPause.ForTests = AtOnce;
 }
 
 /// <summary>

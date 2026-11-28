@@ -76,6 +76,9 @@ internal sealed class ScriptedInHandFolder(IFileSystem fileSystem) : IInHandFold
         return new Batch(this, batch);
     }
 
+    /// <summary>What earlier batches left, as the by-path hand lists it; nothing here is scripted.</summary>
+    public ILeftInHand? OpenLeft(string installerFolder) => _inner.OpenLeft(installerFolder);
+
     private void Record(string step, string path)
     {
         Steps.Add($"{step} {fileSystem.Path.GetFileName(path)}");

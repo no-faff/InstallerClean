@@ -34,6 +34,13 @@ namespace InstallerClean.Models;
 /// The line carries the wait itself, <see cref="Wait"/>, through which the host can stop
 /// waiting for that drive or share (<see cref="SourceFolderWait.StopWaiting"/>). The empty
 /// one carries none.
+///
+/// <see cref="PutBack"/> marks the fourth kind, of which a scan reports at most one, and
+/// before any other update: the scan has put back into the Installer folder files an
+/// earlier Move or Delete had left in the app's own folder there
+/// (<see cref="Services.IInHandRecovery"/>). It is neither a milestone nor a line of the
+/// ticker and carries no message. A host tells the person from it and not from the scan's
+/// result, so that a scan which then fails or is cancelled has still said what it did.
 /// </summary>
 public sealed record ScanProgressUpdate(
     string Message,
@@ -41,8 +48,13 @@ public sealed record ScanProgressUpdate(
     int Position = 0,
     int Total = 0,
     bool IsWait = false,
-    SourceFolderWait? Wait = null)
+    SourceFolderWait? Wait = null,
+    Services.InHandRecoveryResult? PutBack = null)
 {
+    /// <summary>The update saying what the scan put back before it began, <paramref name="putBack"/>.</summary>
+    internal static ScanProgressUpdate ForPutBack(Services.InHandRecoveryResult putBack) =>
+        new(string.Empty, IsMilestone: false, PutBack: putBack);
+
     /// <summary>
     /// The update naming <paramref name="wait"/>, a wait on a drive letter and its colon, a
     /// share, or a path of another form, or, for null, the update saying that the wait has

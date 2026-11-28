@@ -4,8 +4,8 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// Registry-read abstraction. Every read is in the 64-bit (Registry64) view, and the keys checked are
-/// unwowed. Every read but <see cref="UserValues"/> targets HKLM; that one reads one account's own hive
-/// under HKEY_USERS.
+/// unwowed. Every read targets HKLM but <see cref="UserValues"/>, <see cref="UserSubKeys"/> and
+/// <see cref="UserHivePresence"/>, which read one account's own hive under HKEY_USERS.
 /// </summary>
 public interface IRegistryReader
 {
@@ -62,7 +62,33 @@ public interface IRegistryReader
     /// for the reason <see cref="LocalMachineKeyPresence"/> is.
     /// </summary>
     RegistryKeyPresence UserHivePresence(string sid);
+
+    /// <summary>
+    /// The names of the subkeys of one HKLM key, three-state for the reason
+    /// <see cref="LocalMachineKeyPresence"/> is, and read as <see cref="LocalMachineValues"/>
+    /// reads a key's value names: a listing that changes while it is read is read again,
+    /// and one that never settles is a key nobody could read. A cancel of
+    /// <paramref name="cancellationToken"/> while the names are read again throws
+    /// OperationCanceledException.
+    /// </summary>
+    RegistrySubKeyNames LocalMachineSubKeys(string keyPath, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The names of the subkeys of one key in the hive loaded at
+    /// <c>HKEY_USERS\&lt;sid&gt;\</c><paramref name="keyPath"/>, read as
+    /// <see cref="LocalMachineSubKeys"/> reads one. A hive that is not loaded there reads as a
+    /// key that is not there; <see cref="UserHivePresence"/> tells the two apart.
+    /// </summary>
+    RegistrySubKeyNames UserSubKeys(string sid, string keyPath, CancellationToken cancellationToken);
 }
+
+/// <summary>
+/// The names of one key's subkeys. <see cref="Names"/> is meaningful only when
+/// <see cref="Presence"/> is <see cref="RegistryKeyPresence.Present"/> and is null in every
+/// other state, as <see cref="RegistryKeyValues.Values"/> is.
+/// </summary>
+public readonly record struct RegistrySubKeyNames(
+    RegistryKeyPresence Presence, IReadOnlyList<string>? Names = null);
 
 /// <summary>
 /// One value of a key as <see cref="IRegistryReader.LocalMachineValues"/> reads it.

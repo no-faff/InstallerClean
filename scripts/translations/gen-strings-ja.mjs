@@ -595,6 +595,8 @@ const MAP = {
   'Cli.BatchEnded.InHandFolderUnavailable': `Error: InstallerClean could not make its own folder, {0}, inside {InstallerFolder} (Windows error {1}), so it did not move or delete anything.`,
   'Cli.BatchEnded.AccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it stopped. Files already moved or deleted stay so. The rest were not touched.`,
   'Status.WaitingForUnfinishedInstall': `Waiting for an installation that has not finished. If nothing is being installed, cancel and restart Windows.`,
+  'Cli.ScanPutBack': `This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
+  'Summary.PutBack': `A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,
@@ -695,6 +697,7 @@ const STRIPPED = new Set([
   // The entries for a batch that ended before it finished (some files done, or none), by the same rule.
   'Cli.EventLogEndedPartial',
   'Cli.EventLogEndedNoWork',
+  'Cli.EventLogScanPutBack',
   // The update notices' machine Cli keys, which postdate the PR, by the same rule: the 3005,
   // and the 3006 for each reason an update was not made, with its Ctrl+C twin.
   'Cli.EventLogUpdated',

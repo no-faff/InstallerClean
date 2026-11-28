@@ -63,27 +63,12 @@ internal sealed class BatchRun : IDisposable
     private long _refusedAsInUseAt;
 
     /// <summary>
-    /// How long a settle waits after a put-back before the check is made again.
-    ///
-    /// A RENAME MOVES A FILE'S CHANGE TIME, and the full check passes a file no record
-    /// names only where each of its times is before the check's own clock, which moves in
-    /// the system clock's steps (<see cref="FileStampClock"/>, <see cref="CachedFileAge"/>).
-    /// A check begun in the step the file was put back in would read the file as changed
-    /// while the check ran and drop it from the batch. The longest such step is under 16
-    /// milliseconds, and this is three of them.
-    /// </summary>
-    internal static readonly TimeSpan PauseAfterAPutBack = Durations.FromMilliseconds(50);
-
-    /// <summary>
     /// The least time between a file being refused as in use and its second try. In a
     /// long batch the files that follow it take longer than this and nothing is waited
     /// for. In a short one the second try would otherwise come at once, while whatever
     /// had the file open for a moment still has it.
     /// </summary>
     internal static readonly TimeSpan PauseBeforeTheSecondTry = Durations.FromSeconds(1);
-
-    /// <summary>What a run pauses through, for a test that must not wait or that reads the pauses. Null is the app's own delay.</summary>
-    internal static Func<TimeSpan, CancellationToken, Task>? PauseForTests { get; set; }
 
     /// <param name="check">The standing check the host made, which this run owns from here on.</param>
     /// <param name="operation">"Move" or "Delete", for the crash log's entries.</param>
@@ -259,17 +244,9 @@ internal sealed class BatchRun : IDisposable
     /// cancel ends the wait as it ends the batch.
     /// </summary>
     internal Task BeforeTheSecondTryAsync() =>
-        _inUse.Count == 0 ? Task.CompletedTask : PauseSinceAsync(_refusedAsInUseAt, PauseBeforeTheSecondTry);
-
-    /// <summary>Waits out what is left of <paramref name="length"/> since the moment <paramref name="since"/>, a timestamp of <see cref="Stopwatch"/>. Nought is no moment, and nothing is waited for.</summary>
-    private Task PauseSinceAsync(long since, TimeSpan length)
-    {
-        if (since == 0) return Task.CompletedTask;
-        var passed = Durations.FromSeconds((Stopwatch.GetTimestamp() - since) / (double)Stopwatch.Frequency);
-        return passed >= length
+        _inUse.Count == 0
             ? Task.CompletedTask
-            : (PauseForTests ?? FrameworkTask.Delay)(length - passed, _token);
-    }
+            : InHandPause.SinceAsync(_refusedAsInUseAt, PauseBeforeTheSecondTry, _token);
 
     /// <summary>
     /// Files as in use every file that was remembered for one more try and never had it,
@@ -432,8 +409,8 @@ internal sealed class BatchRun : IDisposable
         if (notYetDone.Count == 0) return true;
         _check.Dispose();
 
-        // See PauseAfterAPutBack. A cancel during it ends the batch as any cancel does.
-        await PauseSinceAsync(_putBackAt, PauseAfterAPutBack).ConfigureAwait(false);
+        // See InHandPause.AfterAPutBack. A cancel during it ends the batch as any cancel does.
+        await InHandPause.SinceAsync(_putBackAt, InHandPause.AfterAPutBack, _token).ConfigureAwait(false);
 
         BatchCheckResult result;
         try

@@ -245,6 +245,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | InstallerClean не зміг перевірити, чи був зайнятий Windows Installer, коли почалося сканування. Windows повідомив про помилку: {0} (помилка {1}). InstallerClean залишив без змін файли, які він не може перевірити, доки Windows Installer зайнятий. Перезавантажте Windows. InstallerClean перевірить знову, коли ви наступного разу його запустите. |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | Коли почалося сканування, у Windows Installer було щось незавершене, тож InstallerClean залишив без змін файли, які він не може перевірити, доки це не завершиться. Коли це завершиться, натисніть «Повторити сканування». |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | Під час сканування годинник цього комп'ютера пішов назад або відстав, тож InstallerClean не зміг визначити, які файли було щойно додано, і залишив без змін усі файли, які могли бути серед них. Натисніть «Повторити сканування». |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {0} з {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} для очищення ({2}) |
 | {0} file left alone ({1}) | {0} файл залишено без змін ({1}) |
@@ -531,6 +532,7 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | Error: unexpected failure ({0}). Details written to {1}. | Помилка: неочікуваний збій ({0}). Подробиці записано до {1}. |
 | Error: unexpected failure ({0}). The crash log could not be written. | Помилка: неочікуваний збій ({0}). Журнал збою записати не вдалося. |
 | Scanning {InstallerFolder}... | Сканування {InstallerFolder}... |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | Знайдено {0} непотрібних {1} для очищення ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Знайдено {0} непотрібний {1} для очищення ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(few form)_ | Знайдено {0} непотрібні {1} для очищення ({2}). |

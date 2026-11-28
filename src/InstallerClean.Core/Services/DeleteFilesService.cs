@@ -225,9 +225,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
             }
             catch (Exception ex) when (!BatchStop.EndsBatch(ex, cancellationToken))
             {
-                run.FailureLog.Record(ex);
+                // The file goes back before the log is written: a write to the crash log
+                // can wait on the disk, and nothing that can wait runs with a file out of
+                // its place.
                 var returned = held is null || run.PutBack(held, hand);
                 held = null;
+                run.FailureLog.Record(ex);
                 if (returned) run.Refuse(new UnknownError(filePath));
                 return FileOutcome.NotActed;
             }

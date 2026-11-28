@@ -316,6 +316,16 @@ internal enum CliEventClass
     /// <see cref="CliContract.EntryTypeFor"/>: the update fell short.
     /// </summary>
     UpdateNotInstalledNotice,
+
+    /// <summary>
+    /// Notice: a scan put back into the Installer folder one or more files an earlier
+    /// Move or Delete had left in the app's own folder there. The
+    /// entry names them. Written by whichever process made the scan, the window's among
+    /// them, at the moment the files go back, so it stands whatever the run then comes
+    /// to. INFORMATION, on the rule at <see cref="CliContract.EntryTypeFor"/>: the run
+    /// fell short of nothing.
+    /// </summary>
+    ScanPutBackNotice,
 }
 
 /// <summary>The exit code and Event-log class chosen for a finished file operation.</summary>
@@ -551,6 +561,7 @@ internal static class CliContract
         CliEventClass.UpdatedNotice => 3005,
         CliEventClass.UpdateFailedNotice or CliEventClass.UpdateNotPossibleNotice => 3006,
         CliEventClass.UpdateNotInstalledNotice => 3007,
+        CliEventClass.ScanPutBackNotice => 3008,
         _ => 0,
     };
 
@@ -587,7 +598,7 @@ internal static class CliContract
     internal static EventLogEntryType EntryTypeFor(CliEventClass outcome) => outcome switch
     {
         CliEventClass.Ok or CliEventClass.ScanMissingFilesNotice or CliEventClass.UpdatedNotice
-            or CliEventClass.UpdateNotPossibleNotice
+            or CliEventClass.UpdateNotPossibleNotice or CliEventClass.ScanPutBackNotice
             => EventLogEntryType.Information,
         _ => EventLogEntryType.Warning,
     };

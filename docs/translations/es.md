@@ -237,6 +237,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | InstallerClean no pudo comprobar si Windows Installer estaba ocupado cuando empezó el análisis. Windows dio un error: {0} (error {1}). InstallerClean dejó en paz los archivos que no puede comprobar mientras Windows Installer esté ocupado. Reinicia Windows. La próxima vez que inicies InstallerClean, volverá a comprobarlo. |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | Windows Installer tenía algo sin terminar cuando empezó el análisis, así que InstallerClean dejó en paz los archivos que no puede comprobar hasta que eso termine. Pulsa Volver a analizar cuando haya terminado. |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | El reloj de este equipo retrocedió o se atrasó mientras se ejecutaba el análisis, así que InstallerClean no pudo saber qué archivos se acababan de añadir y dejó en paz todos los archivos que podrían ser de ellos. Pulsa Volver a analizar. |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {0} de {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} para limpiar ({2}) |
 | {0} file left alone ({1}) | {0} archivo dejado en paz ({1}) |
@@ -516,6 +517,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Error: unexpected failure ({0}). Details written to {1}. | Error: fallo inesperado ({0}). Detalles escritos en {1}. |
 | Error: unexpected failure ({0}). The crash log could not be written. | Error: fallo inesperado ({0}). No se pudo escribir el registro de fallos. |
 | Scanning {InstallerFolder}... | Analizando {InstallerFolder}... |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | Se encontraron {0} {1} innecesarios para limpiar ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Se encontró {0} {1} innecesario para limpiar ({2}). |
 | No unneeded files identified. | No se identificaron archivos innecesarios. |

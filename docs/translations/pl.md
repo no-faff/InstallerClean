@@ -242,6 +242,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | Gdy rozpoczęło się skanowanie, InstallerClean nie zdołał sprawdzić, czy Instalator Windows jest zajęty. Windows zgłosił błąd: {0} (błąd {1}). InstallerClean pozostawił bez zmian pliki, których nie może sprawdzić, dopóki Instalator Windows jest zajęty. Uruchom Windows ponownie. InstallerClean sprawdzi to ponownie, gdy następnym razem go uruchomisz. |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | Gdy rozpoczęło się skanowanie, Instalator Windows miał coś niedokończonego, więc InstallerClean pozostawił bez zmian pliki, których nie może sprawdzić, dopóki to się nie zakończy. Gdy to się skończy, naciśnij przycisk Skanuj ponownie. |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | Zegar tego komputera cofnął się lub spóźnił się w trakcie skanowania, więc InstallerClean nie potrafił ustalić, które pliki zostały właśnie dodane, i pozostawił bez zmian każdy plik, który mógł do nich należeć. Naciśnij przycisk Skanuj ponownie. |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} do wyczyszczenia ({2}) |
 | {0} file left alone ({1}) | {0} plik pozostawiony bez zmian ({1}) |
@@ -528,6 +529,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | Error: unexpected failure ({0}). Details written to {1}. | Błąd: nieoczekiwana awaria ({0}). Szczegóły zapisano w {1}. |
 | Error: unexpected failure ({0}). The crash log could not be written. | Błąd: nieoczekiwana awaria ({0}). Nie udało się zapisać dziennika awarii. |
 | Scanning {InstallerFolder}... | Skanowanie {InstallerFolder}... |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | Znaleziono {0} niepotrzebnych {1} do wyczyszczenia ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Znaleziono {0} niepotrzebny {1} do wyczyszczenia ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(few form)_ | Znaleziono {0} niepotrzebne {1} do wyczyszczenia ({2}). |

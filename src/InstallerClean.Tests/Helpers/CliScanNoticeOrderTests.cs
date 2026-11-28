@@ -49,6 +49,51 @@ public class CliScanNoticeOrderTests
         Assert.Equal(string.Empty, lines[^1]);
     }
 
+    [Theory]
+    [InlineData("/s")]
+    [InlineData("/d")]
+    public async Task Files_the_scan_put_back_are_named_in_the_line_after_the_scanning_line(string arg)
+    {
+        var run = await Run(arg, EveryNotice(),
+            putBack: [@"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msp"]);
+
+        var lines = run.Stdout.Split(Environment.NewLine);
+        Assert.Equal(Strings.Cli_ScanningInstaller, lines[0]);
+        Assert.Equal(string.Format(Strings.Cli_ScanPutBack, "a.msi, b.msp"), lines[1]);
+        Assert.Single(lines, l => l.StartsWith(Opening(Strings.Cli_ScanPutBack), StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task A_scan_that_put_nothing_back_prints_no_such_line()
+    {
+        var run = await Run("/s", EveryNotice());
+
+        Assert.DoesNotContain(Opening(Strings.Cli_ScanPutBack), run.Stdout, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task A_scan_that_fails_after_putting_files_back_has_still_named_them()
+    {
+        var run = await Run("/s", OffersNothing(),
+            putBack: [@"C:\Windows\Installer\a.msi"],
+            scanFails: new LocalisedInvalidOperationException("The scan stopped.", "Nothing was removed."));
+
+        var lines = run.Stdout.Split(Environment.NewLine);
+        Assert.Equal(Strings.Cli_ScanningInstaller, lines[0]);
+        Assert.Equal(string.Format(Strings.Cli_ScanPutBack, "a.msi"), lines[1]);
+        Assert.Contains(lines, l => l.Contains("The scan stopped.", StringComparison.Ordinal));
+        Assert.NotEqual(CliExitCode.Ok, run.ExitCode);
+    }
+
+    [Fact]
+    public async Task A_scan_that_is_cancelled_after_putting_files_back_has_still_named_them()
+    {
+        var run = await Run("/s", OffersNothing(),
+            putBack: [@"C:\Windows\Installer\a.msi"], scanFails: new OperationCanceledException());
+
+        Assert.Equal(string.Format(Strings.Cli_ScanPutBack, "a.msi"), run.Stdout.Split(Environment.NewLine)[1]);
+    }
+
     [Fact]
     public async Task A_scan_that_lists_files_and_has_no_notices_ends_at_the_last_row()
     {
@@ -293,11 +338,21 @@ public class CliScanNoticeOrderTests
         int ExitCode, string Stdout, IReadOnlyList<(CliEventClass Class, string Text)> Entries,
         OutputFailure? Failure);
 
-    private static async Task<RunResult> Run(string arg, ScanResult result, StringWriter? console = null)
+    /// <param name="putBack">Where given, the files the scan reports as put back before it does anything else.</param>
+    /// <param name="scanFails">Where given, what the scan ends in after that report.</param>
+    private static async Task<RunResult> Run(
+        string arg, ScanResult result, StringWriter? console = null,
+        string[]? putBack = null, Exception? scanFails = null)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(result);
+            .Returns(call =>
+            {
+                if (putBack is not null)
+                    call.Arg<IProgress<ScanProgressUpdate>?>()?.Report(
+                        ScanProgressUpdate.ForPutBack(new InHandRecoveryResult(putBack)));
+                return scanFails is null ? Task.FromResult(result) : Task.FromException<ScanResult>(scanFails);
+            });
 
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);

@@ -14,44 +14,102 @@ internal sealed class HandleInHandFolder : IInHandFolder
 {
     private const int STATUS_OBJECT_NAME_COLLISION = unchecked((int)0xC0000035);
 
+    // The answers Windows gives while a folder is being removed, or once it has gone.
+    private const int STATUS_OBJECT_NAME_NOT_FOUND = unchecked((int)0xC0000034);
+    private const int STATUS_OBJECT_PATH_NOT_FOUND = unchecked((int)0xC000003A);
+    private const int STATUS_DELETE_PENDING = unchecked((int)0xC0000056);
+    private const int STATUS_FILE_DELETED = unchecked((int)0xC0000123);
+
+    /// <summary>
+    /// How many times <see cref="OpenBatch"/> makes the in-hand folder and the batch's
+    /// folder inside it, and how long it waits between two tries.
+    ///
+    /// A SCAN IN ANOTHER PROCESS REMOVES THE IN-HAND FOLDER WHERE IT FINDS IT EMPTY
+    /// (<see cref="OpenLeft"/>), and can find it so between this making it and this
+    /// making the batch's folder inside it. The batch's folder then fails to be made, for
+    /// no reason of the batch's own, and both are made again.
+    /// </summary>
+    internal const int OpenBatchTries = 3;
+    private static readonly TimeSpan BetweenOpenBatchTries = Durations.FromMilliseconds(15);
+
+    /// <summary>
+    /// Null in the app. A test sets it to act between the opening of the in-hand folder and
+    /// the making of the batch's folder inside it, as a scan in another process can.
+    /// </summary>
+    internal Action? BeforeTheBatchsFolderForTests { get; set; }
+
     public IInHandBatch? OpenBatch(string installerFolder, out int failureCode)
     {
         var installer = DirectoryGuard.OpenDirectoryFollow(installerFolder, out failureCode);
         if (installer is null) return null;
 
-        SafeFileHandle? inHand = null;
         try
         {
-            // The folder that holds every batch's own is made where it is not there, and
-            // opened as itself either way: a link or a file under its name opens as
-            // nothing, and the batch is refused.
-            using (var made = DirectoryGuard.CreateChildFolderHeld(
-                       installer, InHandFolders.FolderName, IntPtr.Zero, out var status))
+            for (var attempt = 1; ; attempt++)
             {
-                if (made is null && status != STATUS_OBJECT_NAME_COLLISION)
+                var batch = TryOpenBatch(
+                    installer, installerFolder, BeforeTheBatchsFolderForTests, out failureCode, out var removedMeanwhile);
+                if (batch is not null) return batch;
+                if (!removedMeanwhile || attempt == OpenBatchTries)
                 {
-                    failureCode = (int)Ntdll.RtlNtStatusToDosError(status);
                     installer.Dispose();
                     return null;
                 }
+                Thread.Sleep(BetweenOpenBatchTries);
             }
+        }
+        catch
+        {
+            installer.Dispose();
+            throw;
+        }
+    }
 
-            inHand = DirectoryGuard.OpenChildFolderNoFollow(installer, InHandFolders.FolderName);
-            if (inHand is null)
+    /// <summary>
+    /// One try at <see cref="OpenBatch"/>'s two folders. <paramref name="removedMeanwhile"/>
+    /// is true where it failed because the in-hand folder went, or was going, under it.
+    /// </summary>
+    private static Batch? TryOpenBatch(
+        SafeFileHandle installer, string installerFolder, Action? beforeTheBatchsFolder,
+        out int failureCode, out bool removedMeanwhile)
+    {
+        removedMeanwhile = false;
+
+        // The folder that holds every batch's own is made where it is not there, and
+        // opened as itself either way: a link or a file under its name opens as
+        // nothing, and the batch is refused.
+        using (var made = DirectoryGuard.CreateChildFolderHeld(
+                   installer, InHandFolders.FolderName, IntPtr.Zero, out var status))
+        {
+            if (made is null && status != STATUS_OBJECT_NAME_COLLISION)
             {
-                failureCode = Kernel32.ERROR_DIRECTORY;
-                installer.Dispose();
+                removedMeanwhile = IsBeingRemoved(status);
+                failureCode = (int)Ntdll.RtlNtStatusToDosError(status);
                 return null;
             }
+        }
+
+        var inHand = DirectoryGuard.OpenChildFolderNoFollow(
+            installer, InHandFolders.FolderName, Ntdll.FILE_GENERIC_READ, out var openStatus);
+        if (inHand is null)
+        {
+            removedMeanwhile = IsBeingRemoved(openStatus);
+            failureCode = Kernel32.ERROR_DIRECTORY;
+            return null;
+        }
+
+        try
+        {
+            beforeTheBatchsFolder?.Invoke();
 
             var name = Guid.NewGuid().ToString("N");
             var batch = DirectoryGuard.CreateChildFolderHeld(inHand, name, IntPtr.Zero, out var batchStatus);
             if (batch is null)
             {
+                removedMeanwhile = IsBeingRemoved(batchStatus);
                 failureCode = (int)Ntdll.RtlNtStatusToDosError(batchStatus);
                 inHand.Dispose();
                 DirectoryGuard.TryRemoveEmptyChildFolder(installer, InHandFolders.FolderName);
-                installer.Dispose();
                 return null;
             }
 
@@ -62,9 +120,132 @@ internal sealed class HandleInHandFolder : IInHandFolder
         }
         catch
         {
+            inHand.Dispose();
+            throw;
+        }
+    }
+
+    private static bool IsBeingRemoved(int status) =>
+        status is STATUS_OBJECT_NAME_NOT_FOUND or STATUS_OBJECT_PATH_NOT_FOUND
+            or STATUS_DELETE_PENDING or STATUS_FILE_DELETED;
+
+    public ILeftInHand? OpenLeft(string installerFolder)
+    {
+        var installer = DirectoryGuard.OpenDirectoryFollow(installerFolder, out _);
+        if (installer is null) return null;
+
+        SafeFileHandle? inHand = null;
+        try
+        {
+            inHand = DirectoryGuard.OpenChildFolderNoFollow(installer, InHandFolders.FolderName);
+            var entries = inHand is null ? null : DirectoryGuard.ListChildren(inHand);
+            if (entries is null)
+            {
+                inHand?.Dispose();
+                installer.Dispose();
+                return null;
+            }
+
+            var inHandPath = PathText.Combine(installerFolder, InHandFolders.FolderName);
+            var folders = new List<string>();
+            var batches = new List<LeftBatch>();
+            foreach (var entry in entries)
+            {
+                if (!entry.IsFolder) continue;
+                folders.Add(entry.Name);
+
+                // A folder that has gone since the listing, or will not open or list, is
+                // left out: a batch that has just ended removes its own.
+                using var folder = DirectoryGuard.OpenChildFolderNoFollow(inHand!, entry.Name);
+                var inside = folder is null ? null : DirectoryGuard.ListChildren(folder);
+                if (inside is null) continue;
+
+                var files = new List<LeftFile>();
+                foreach (var file in inside)
+                    if (!file.IsFolder) files.Add(new LeftFile(entry.Name, file.Name, file.Length));
+
+                var names = StorageHelpers.GetNamesInFolder(PathText.Combine(inHandPath, entry.Name));
+                batches.Add(new LeftBatch(entry.Name, names is { Count: > 1 } ? names[1] : null, files));
+            }
+
+            return new Left(installer, inHand!, installerFolder, folders, batches);
+        }
+        catch
+        {
             inHand?.Dispose();
             installer.Dispose();
             throw;
+        }
+    }
+
+    private sealed class Left : ILeftInHand
+    {
+        private readonly SafeFileHandle _installer;
+        private readonly SafeFileHandle _inHand;
+        private readonly string _installerFolder;
+        private readonly IReadOnlyList<string> _folders;
+        private bool _disposed;
+
+        public Left(
+            SafeFileHandle installer, SafeFileHandle inHand, string installerFolder,
+            IReadOnlyList<string> folders, IReadOnlyList<LeftBatch> batches)
+        {
+            _installer = installer;
+            _inHand = inHand;
+            _installerFolder = installerFolder;
+            _folders = folders;
+            Batches = batches;
+        }
+
+        public IReadOnlyList<LeftBatch> Batches { get; }
+
+        public FileHold Hold(LeftFile file)
+        {
+            using var folder = DirectoryGuard.OpenChildFolderNoFollow(_inHand, file.Batch);
+            if (folder is null) return new FileHold(HoldOutcome.Gone);
+
+            // Opened relative to the batch's folder, itself opened relative to the in-hand
+            // folder, so the file held is the one that was listed, whatever any path names
+            // by now. Renaming needs the right to delete and nothing more.
+            var handle = DirectoryGuard.OpenChildFileAlone(folder, file.Name, HoldAccess, out var status);
+            if (handle is null)
+            {
+                var error = (int)Ntdll.RtlNtStatusToDosError(status);
+                return new FileHold(OutcomeOf(error), WindowsError: error);
+            }
+
+            if (!Kernel32.GetFileInformationByHandle(handle, out var info))
+            {
+                var error = Marshal.GetLastWin32Error();
+                handle.Dispose();
+                return new FileHold(HoldOutcome.Refused, WindowsError: error);
+            }
+
+            if ((info.dwFileAttributes & (Kernel32.FILE_ATTRIBUTE_REPARSE_POINT | Kernel32.FILE_ATTRIBUTE_DIRECTORY)) != 0)
+            {
+                handle.Dispose();
+                return new FileHold(HoldOutcome.NotAPlainFile);
+            }
+
+            var batchFolder = PathText.Combine(PathText.Combine(_installerFolder, InHandFolders.FolderName), file.Batch);
+            return new FileHold(
+                HoldOutcome.Held,
+                new HeldFile(
+                    handle, PathText.Combine(_installerFolder, file.Name), batchFolder, info.dwFileAttributes,
+                    home: _installer));
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            // Each batch's folder goes where it is empty and nothing has it open, and then
+            // the folder above them on the same terms, as a batch that ends removes its own.
+            foreach (var name in _folders) DirectoryGuard.TryRemoveEmptyChildFolder(_inHand, name);
+            _inHand.Dispose();
+            DirectoryGuard.TryRemoveEmptyChildFolder(_installer, InHandFolders.FolderName);
+            _installer.Dispose();
         }
     }
 
@@ -189,7 +370,7 @@ internal sealed class HandleInHandFolder : IInHandFolder
         public RenameReach ReachOf(DestinationFolder destination, out int failureCode)
         {
             failureCode = 0;
-            var leaf = "InstallerClean-" + Guid.NewGuid().ToString("N") + ".tmp";
+            var leaf = InHandFolders.NewProbeName();
             using var probe = DirectoryGuard.CreateChildFileHeld(
                 _batch, leaf, Ntdll.DELETE | Kernel32.FILE_READ_ATTRIBUTES, out var status);
             if (probe is null)
@@ -219,7 +400,8 @@ internal sealed class HandleInHandFolder : IInHandFolder
 
             // The batch's folder is let go and then removed through the folder above it,
             // and that folder through the Installer folder, each only where it is empty: a
-            // file that could not be put back stays, with both folders.
+            // file that could not be put back stays, with both folders, until a scan puts
+            // it back.
             _batch.Dispose();
             DirectoryGuard.TryRemoveEmptyChildFolder(_inHand, _name);
             _inHand.Dispose();
@@ -263,13 +445,23 @@ internal sealed class HandleInHandFolder : IInHandFolder
         private readonly SafeFileHandle _handle;
         private readonly string _batchFolder;
         private readonly uint _attributes;
+        private readonly SafeFileHandle? _home;
 
-        public HeldFile(SafeFileHandle handle, string recordedPath, string batchFolder, uint attributes)
+        /// <param name="home">
+        /// For a file an earlier batch left, held where it lies: the Installer folder's
+        /// open handle, which <see cref="PutBack"/> renames it into. Null for a file held
+        /// in its place, which goes back to the path it was held at.
+        /// </param>
+        public HeldFile(
+            SafeFileHandle handle, string recordedPath, string batchFolder, uint attributes,
+            SafeFileHandle? home = null)
         {
             _handle = handle;
             RecordedPath = recordedPath;
             _batchFolder = batchFolder;
             _attributes = attributes;
+            _home = home;
+            IsOut = home is not null;
         }
 
         public string RecordedPath { get; }
@@ -293,8 +485,10 @@ internal sealed class HandleInHandFolder : IInHandFolder
 
         public bool PutBack(out int failureCode)
         {
-            if (!DirectoryGuard.RenameByHandle(_handle, null, FullPaths.ForWindowsCall(RecordedPath), out failureCode))
-                return false;
+            var back = _home is null
+                ? DirectoryGuard.RenameByHandle(_handle, null, FullPaths.ForWindowsCall(RecordedPath), out failureCode)
+                : DirectoryGuard.RenameByHandle(_handle, _home, PathText.GetFileName(RecordedPath), out failureCode);
+            if (!back) return false;
             IsOut = false;
             return true;
         }

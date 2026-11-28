@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Security;
 using InstallerClean.Helpers;
@@ -21,6 +22,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly IDeclaredProductCheck? _declaredProducts;
     private readonly IFileTimesReader? _fileTimes;
     private readonly IPendingRebootService? _installerActivity;
+    private readonly IInHandRecovery? _recovery;
     private readonly TimeProvider _clock;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
@@ -51,9 +53,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IShortNameCreationProbe shortNames, IFileIdentityReader fileIdentities,
         IDeclaredProductCheck declaredProducts, IFileTimesReader fileTimes, TimeProvider clock,
-        IPendingRebootService installerActivity)
+        IPendingRebootService installerActivity, IInHandRecovery recovery)
         : this(queryService, fileSystem, shortNames, null, null, fileIdentities, declaredProducts,
-            fileTimes, clock, installerActivity) { }
+            fileTimes, clock, installerActivity, recovery) { }
 
     /// <summary>
     /// Test constructor. Injects a filesystem and nothing else, for the tests
@@ -127,6 +129,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// alone, on the terms <paramref name="fileTimes"/> sets out. Production always
     /// supplies one.
     /// </param>
+    /// <param name="recovery">
+    /// What the scan puts back a file an earlier batch left through, before anything else. Null
+    /// puts nothing back and looks for nothing. Production always supplies one.
+    /// </param>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IShortNameCreationProbe? shortNames,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride,
@@ -134,7 +140,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         IDeclaredProductCheck? declaredProducts = null,
         IFileTimesReader? fileTimes = null,
         TimeProvider? clock = null,
-        IPendingRebootService? installerActivity = null)
+        IPendingRebootService? installerActivity = null,
+        IInHandRecovery? recovery = null)
     {
         _queryService = queryService;
         _fs = fileSystem;
@@ -143,6 +150,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         _declaredProducts = declaredProducts;
         _fileTimes = fileTimes;
         _installerActivity = installerActivity;
+        _recovery = recovery;
         _clock = clock ?? TimeProvider.System;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
@@ -162,6 +170,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
     internal bool ReadsInstallerActivity => _installerActivity is not null;
 
     /// <summary>
+    /// Whether this scan puts back what an earlier batch left before it lists anything, for
+    /// the test that holds the hosts' scan to doing so. Every test constructor defaults it
+    /// to null.
+    /// </summary>
+    internal bool PutsBackWhatWasLeftInHand => _recovery is not null;
+
+    /// <summary>
     /// Whether this scan judges file times against <see cref="FileStampClock"/>, for the
     /// test that holds the hosts' scan to it. Every test constructor takes a clock of its
     /// own or the system's.
@@ -179,6 +194,33 @@ public sealed class FileSystemScanService : IFileSystemScanService
         IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        // WHAT AN EARLIER BATCH LEFT GOES BACK FIRST, BEFORE THE CLOCK IS READ. A Move or
+        // Delete has one file at a time out of its place, in the app's own folder inside
+        // this one. A process that dies in that moment leaves it there, and so does a
+        // rename back that Windows refuses, where the walk below does not look. The rename back moves the file's change time, and the
+        // age check keeps a file changed at or after the clock, so a file put back after
+        // the clock was read would be kept for this scan. Put back before it, and with
+        // the wait made below after a put-back, the file is walked and judged as any
+        // other is.
+        var putBack = _recovery is null
+            ? InHandRecoveryResult.None
+            : await _recovery.RecoverAsync(
+                    _installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder, cancellationToken)
+                .ConfigureAwait(false);
+
+        if (putBack.PutBack.Count > 0)
+        {
+            // Said to the host now and not left to the result: a scan that stops or is
+            // cancelled further down returns none, and the files are back all the same.
+            // It is said before the wait, which a cancel ends.
+            progress?.Report(ScanProgressUpdate.ForPutBack(putBack));
+
+            // See InHandPause.AfterAPutBack: the clock read below must be in a later
+            // step of the system clock than the rename was.
+            await InHandPause.SinceAsync(Stopwatch.GetTimestamp(), InHandPause.AfterAPutBack, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         // The age check's clock, read once and before the walk, so every candidate is
         // judged against the same instant and a file created or changed while the
         // scan runs is later than it. The wall-clock reading taken just before it is what
@@ -1153,7 +1195,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             query.UnlistedProductKeys.Count(key => key.HasInstallProperties),
             query.UnlistedProductKeys.Count(key => !key.HasInstallProperties),
             unlistedKeyHolds,
-            keysWithAListUnread);
+            keysWithAListUnread,
+            putBack);
     }
 
     /// <summary>

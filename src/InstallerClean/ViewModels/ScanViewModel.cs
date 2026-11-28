@@ -288,6 +288,65 @@ public partial class ScanViewModel : ObservableObject
     public bool HasScanSignal => ScanSignalText.Length > 0;
 
     /// <summary>
+    /// The line naming the files a scan put back into the Installer folder, which an
+    /// earlier Move or Delete had left in the app's own folder there
+    /// (<see cref="PutBackReport.WindowLine"/>), shown under the left-alone line. Empty
+    /// where none was, which collapses the line.
+    ///
+    /// IT IS SHOWN WITH THE FIRST RESULT AFTER THE FILES WENT BACK, which is the result of
+    /// the scan that put them back unless that scan was cancelled. A scan that fails says
+    /// it in its message (<see cref="WithWhatWasPutBack"/>). Either way it is said once.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPutBack))]
+    private string _putBackText = string.Empty;
+
+    /// <summary>Whether <see cref="PutBackText"/> has a line to show.</summary>
+    public bool HasPutBack => PutBackText.Length > 0;
+
+    /// <summary>
+    /// The files scans have put back that no result or message has yet named, by their
+    /// paths. A scan reports them from whichever thread it runs on, before it reads
+    /// anything else (<see cref="ScanProgressUpdate.PutBack"/>).
+    /// </summary>
+    private readonly List<string> _putBackNotYetSaid = [];
+
+    /// <summary>The line for the files in <see cref="_putBackNotYetSaid"/>, which it empties.</summary>
+    private string TakePutBackLine()
+    {
+        lock (_putBackNotYetSaid)
+        {
+            var line = PutBackReport.WindowLine(_putBackNotYetSaid);
+            _putBackNotYetSaid.Clear();
+            return line;
+        }
+    }
+
+    /// <summary>
+    /// <paramref name="failure"/> with the line naming what the scan put back before it
+    /// failed added to its message, where it put anything back. The files are back
+    /// whatever the scan then came to, and the message is the only thing on screen.
+    /// </summary>
+    private ScanFailure WithWhatWasPutBack(ScanFailure failure) =>
+        TakePutBackLine() is { Length: > 0 } line
+            ? failure with { Message = failure.Message + Environment.NewLine + Environment.NewLine + line }
+            : failure;
+
+    /// <summary>
+    /// Passes a scan's progress on to <paramref name="inner"/>, all but its report of
+    /// what it put back, which goes to <paramref name="putBack"/>.
+    /// </summary>
+    private sealed class PutBackTap(IProgress<ScanProgressUpdate>? inner, Action<InHandRecoveryResult> putBack)
+        : IProgress<ScanProgressUpdate>
+    {
+        public void Report(ScanProgressUpdate value)
+        {
+            if (value.PutBack is { } result) putBack(result);
+            else inner?.Report(value);
+        }
+    }
+
+    /// <summary>
     /// The result the main window is showing, from the most recent scan that
     /// completed. Null until the first scan completes, and null again after a scan
     /// that stops or fails and after the user cancels the scan that follows a Move
@@ -391,7 +450,12 @@ public partial class ScanViewModel : ObservableObject
             // observable property, so a throw or a cancel leaves every property
             // as this method found it. Which endings keep that earlier result on
             // screen is the callers' decision, each in its own catch.
-            var result = await _scanService.ScanAsync(progress, cancellationToken);
+            var result = await _scanService.ScanAsync(
+                new PutBackTap(progress, putBack =>
+                {
+                    lock (_putBackNotYetSaid) _putBackNotYetSaid.AddRange(putBack.PutBack);
+                }),
+                cancellationToken);
             // Sample reboot after the scan; ordering matters. An MSI install
             // starting mid-scan could flip the _MSIExecute mutex, and
             // probing first would miss it.
@@ -416,6 +480,7 @@ public partial class ScanViewModel : ObservableObject
                 MissingFilesReport.Products(result.RegisteredPackages));
             var sourcesGivenUp = SourcesGivenUpReport.WindowLine(result.SourceRootsGivenUpKeepingFiles);
             var scanSignal = ScanSignalReport.WindowLine(result);
+            var putBackLine = TakePutBackLine();
 
             PendingRebootResult = pendingRebootResult;
             LastScanResult = result;
@@ -433,6 +498,7 @@ public partial class ScanViewModel : ObservableObject
             MissingFromDiskPrograms = missingPrograms;
             SourcesGivenUpText = sourcesGivenUp;
             ScanSignalText = scanSignal;
+            PutBackText = putBackLine;
             HasScanned = true;
         }
         finally
@@ -571,6 +637,7 @@ public partial class ScanViewModel : ObservableObject
         MissingFromDiskPrograms = string.Empty;
         SourcesGivenUpText = string.Empty;
         ScanSignalText = string.Empty;
+        PutBackText = string.Empty;
         PendingRebootResult = null;
         HasScanned = false;
     }
@@ -730,7 +797,7 @@ public partial class ScanViewModel : ObservableObject
             // one a failed startup scan opens: the message, Re-scan, and nothing
             // from a list this scan did not produce. A cancel, in the arm above,
             // keeps it.
-            var failure = DescribeScanFailure(ex);
+            var failure = WithWhatWasPutBack(DescribeScanFailure(ex));
             UnfinishedRefreshMessage = string.Empty;
             LastScanErrorTitle = failure.Title;
             LastScanError = failure.Message;
@@ -859,7 +926,7 @@ public partial class ScanViewModel : ObservableObject
             //
             // No scan has completed before this one, so there is nothing to drop,
             // and the call is here so that every scan that fails ends the same way.
-            var failure = DescribeScanFailure(ex);
+            var failure = WithWhatWasPutBack(DescribeScanFailure(ex));
             LastScanErrorTitle = failure.Title;
             LastScanError = failure.Message;
             DropResult();

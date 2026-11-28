@@ -554,6 +554,7 @@ const MAP = {
   'Error.BatchEnded.WatchUnavailable': `InstallerClean stopped because Windows would not let it watch the registry keys where Windows Installer keeps its records, so it cannot tell whether they change while it works. Files already moved or deleted stay so. The rest were not touched.`,
   'Error.BatchEnded.InHandFolderUnavailable': `InstallerClean could not make its own folder, {0}, inside the Installer folder (Windows error {1}), so it did not move or delete anything.`,
   'Status.WaitingForUnfinishedInstall': `Waiting for an installation that has not finished. If nothing is being installed, cancel and restart Windows.`,
+  'Summary.PutBack': `A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -740,6 +741,7 @@ const CLI = {
   'Cli.BatchEnded.WatchUnavailable': `Error: Windows would not let InstallerClean watch the registry keys where Windows Installer keeps its records, so it cannot tell whether they change while it works, and it stopped. Files already moved or deleted stay so. The rest were not touched.`,
   'Cli.BatchEnded.InHandFolderUnavailable': `Error: InstallerClean could not make its own folder, {0}, inside {InstallerFolder} (Windows error {1}), so it did not move or delete anything.`,
   'Cli.BatchEnded.AccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it stopped. Files already moved or deleted stay so. The rest were not touched.`,
+  'Cli.ScanPutBack': `This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

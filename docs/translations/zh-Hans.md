@@ -235,6 +235,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | InstallerClean 无法检查扫描开始时 Windows Installer 是否正忙。Windows 报告了一个错误：{0}（错误 {1}）。InstallerClean 把在 Windows Installer 忙碌期间无法核对的文件原样保留了下来。请重启 Windows。下次启动 InstallerClean 时，它会再次进行检查。 |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | 扫描开始时，Windows Installer 有未完成的操作，因此 InstallerClean 把在该操作完成之前无法核对的文件原样保留了下来。等它完成后，请点击“重新扫描”。 |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | 扫描期间这台计算机的时钟倒退或变慢了，因此 InstallerClean 无法判断哪些文件是刚添加的，于是把所有可能是刚添加的文件都原样保留了下来。请点击“重新扫描”。 |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
 | {0} unneeded {1} ({2}) | {0} 个不需要的{1}（{2}） |
 | {0} file left alone ({1}) | {0} 个文件原样保留（{1}） |
@@ -514,6 +515,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected failure ({0}). Details written to {1}. | 错误：意外故障（{0}）。详情已写入 {1}。 |
 | Error: unexpected failure ({0}). The crash log could not be written. | 错误：意外故障（{0}）。崩溃日志无法写入。 |
 | Scanning {InstallerFolder}... | 正在扫描 {InstallerFolder}… |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | 找到 {0} 个可清理的、不需要的{1}（{2}）。 |
 | No unneeded files identified. | 未识别出不需要的文件。 |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有问题，但该程序的更新或卸载可能会失败。要把该文件放回去，您需要您当前所用版本的安装程序。请向该程序的开发者获取，然后直接运行它，覆盖安装现有的程序。更新的版本不行：新版本必须先移除您现有的版本，而正是这一步需要这个文件。先卸载同样行不通，原因相同。这应当会恢复该文件并保持您的设置不变，但 Microsoft 并不保证。 |

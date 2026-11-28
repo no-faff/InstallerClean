@@ -440,6 +440,11 @@ namespace InstallerClean.Models;
 /// (<see cref="Services.IDeclaredProductCheck.CountKeysWithAListUnread"/>), each key counted once,
 /// asked of every such key whatever the screen read. 0 where the scan has no declared-product check.
 /// </param>
+/// <param name="PutBack">
+/// What the scan put back into the Installer folder before it listed anything, and what it left
+/// in the app's own folder there (<see cref="Services.IInHandRecovery"/>). Null from a scan built
+/// without one, which reads as <see cref="Services.InHandRecoveryResult.None"/>.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
@@ -474,8 +479,13 @@ public record ScanResult(
     int UnlistedKeysWithInstallProperties = 0,
     int UnlistedKeysWithoutInstallProperties = 0,
     Services.UnlistedKeyHolds? UnlistedKeyHolds = null,
-    int UnlistedKeysWithoutInstallPropertiesListUnread = 0)
+    int UnlistedKeysWithoutInstallPropertiesListUnread = 0,
+    Services.InHandRecoveryResult? PutBack = null)
 {
+    /// <summary>Never null: a result built without one reads as a scan that found nothing left in the app's own folder.</summary>
+    public Services.InHandRecoveryResult PutBack { get; init; }
+        = PutBack ?? Services.InHandRecoveryResult.None;
+
     /// <summary>Never null: a result built without them reads as a scan that kept nothing for a key.</summary>
     public Services.UnlistedKeyHolds UnlistedKeyHolds { get; init; }
         = UnlistedKeyHolds ?? Services.UnlistedKeyHolds.None;

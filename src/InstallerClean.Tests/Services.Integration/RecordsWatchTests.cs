@@ -302,4 +302,68 @@ public sealed class RecordsWatchTests : IDisposable
 
         Assert.NotEqual(RecordsWatchReading.Unestablished, watch.Read());
     }
+
+    /// <summary>
+    /// The app's own keys, armed, around the app's own take and put-back of a file in the
+    /// real Installer folder: the watch reads unchanged, at once and a second later. A Move
+    /// or Delete reads the watch after it takes each file, and a watch its own rename
+    /// changed would have every batch check everything again after its first file.
+    ///
+    /// The file is one the test writes there, under a name no cached file has and with an
+    /// extension the app never lists. Something else on the PC can write under the watched
+    /// keys while the test runs, so it tries again with a new watch, and one clean try is
+    /// the whole of the claim: the rename itself wrote nothing there.
+    /// </summary>
+    [AdministratorFact]
+    public void The_apps_own_take_and_put_back_in_the_real_Installer_folder_leaves_the_apps_own_watch_unchanged()
+    {
+        const int Tries = 4;
+        var installer = InstallerCacheHelpers.InstallerFolder;
+        var name = "InstallerClean-test-" + Guid.NewGuid().ToString("N") + ".tmp";
+        var path = Path.Combine(installer, name);
+        var hand = new HandleInHandFolder();
+        string? batchFolder = null;
+        File.WriteAllBytes(path, [1, 2, 3]);
+        try
+        {
+            var readings = new List<string>();
+            for (var attempt = 1; attempt <= Tries; attempt++)
+            {
+                using var watch = new RecordsWatchFactory().Arm();
+                var armed = watch.Read();
+
+                using (var batch = hand.OpenBatch(installer, out var code))
+                {
+                    Assert.True(batch is not null, $"the batch's folder could not be made in {installer}: {code}");
+                    batchFolder = batch.Folder;
+                    var hold = batch.Hold(path);
+                    Assert.Equal(HoldOutcome.Held, hold.Outcome);
+                    using var held = hold.File!;
+                    Assert.True(held.TakeOut(out var takeCode), $"the take was refused: {takeCode}");
+                    Assert.False(File.Exists(path));
+                    Assert.True(held.PutBack(out var backCode), $"the put-back was refused: {backCode}");
+                }
+
+                var atOnce = watch.Read();
+                Thread.Sleep(1000);
+                var later = watch.Read();
+                readings.Add($"try {attempt}: {armed} when armed, {atOnce} at once, {later} a second later");
+
+                if (armed == RecordsWatchReading.Unchanged
+                    && atOnce == RecordsWatchReading.Unchanged
+                    && later == RecordsWatchReading.Unchanged)
+                    return;
+            }
+
+            Assert.Fail("The watch never read unchanged across a take and a put-back. " + string.Join("; ", readings));
+        }
+        finally
+        {
+            // Wherever a failure left the file: in its place, or in the batch's folder,
+            // which is gone where the batch ended with nothing in it.
+            File.Delete(path);
+            if (batchFolder is not null && Directory.Exists(batchFolder))
+                File.Delete(Path.Combine(batchFolder, name));
+        }
+    }
 }

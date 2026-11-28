@@ -9130,6 +9130,42 @@
       "vi": "unverified",
       "zh-Hans": "unverified",
       "zh-Hant": "unverified"
+    },
+    "Cli.ScanPutBack": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "id": "unverified",
+      "it": "unverified",
+      "ja": "unverified",
+      "ko": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "tr": "unverified",
+      "uk": "unverified",
+      "vi": "unverified",
+      "zh-Hans": "unverified",
+      "zh-Hant": "unverified"
+    },
+    "Summary.PutBack": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "id": "unverified",
+      "it": "unverified",
+      "ja": "unverified",
+      "ko": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "tr": "unverified",
+      "uk": "unverified",
+      "vi": "unverified",
+      "zh-Hans": "unverified",
+      "zh-Hant": "unverified"
     }
   }
 }

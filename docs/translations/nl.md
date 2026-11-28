@@ -237,6 +237,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | InstallerClean kon niet controleren of Windows Installer bezig was toen de scan begon. Windows gaf een fout: {0} (fout {1}). InstallerClean heeft de bestanden die het niet kan controleren zolang Windows Installer bezig is, ongemoeid gelaten. Herstart Windows. De volgende keer dat je InstallerClean start, controleert het opnieuw. |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | Windows Installer had iets onafgerond staan toen de scan begon, dus heeft InstallerClean de bestanden die het niet kan controleren totdat dat is afgerond, ongemoeid gelaten. Klik op Opnieuw scannen zodra dat is afgerond. |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | De klok van deze pc is tijdens de scan teruggesprongen of achter gaan lopen, dus kon InstallerClean niet zien welke bestanden net waren toegevoegd, en heeft het elk bestand dat net toegevoegd zou kunnen zijn, ongemoeid gelaten. Klik op Opnieuw scannen. |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {0} van {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} om op te ruimen ({2}) |
 | {0} file left alone ({1}) | {0} bestand ongemoeid gelaten ({1}) |
@@ -516,6 +517,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Error: unexpected failure ({0}). Details written to {1}. | Fout: onverwachte crash ({0}). Details weggeschreven naar {1}. |
 | Error: unexpected failure ({0}). The crash log could not be written. | Fout: onverwachte crash ({0}). Het crashlog kon niet worden weggeschreven. |
 | Scanning {InstallerFolder}... | {InstallerFolder} scannen... |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | {0} overbodige {1} gevonden om op te ruimen ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | {0} overbodig {1} gevonden om op te ruimen ({2}). |
 | No unneeded files identified. | Geen overbodige bestanden geïdentificeerd. |

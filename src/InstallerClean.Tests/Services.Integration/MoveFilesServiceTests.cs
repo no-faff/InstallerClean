@@ -185,6 +185,9 @@ public class MoveFilesServiceTests : IDisposable
     {
         public IInHandBatch? OpenBatch(string installerFolder, out int failureCode) =>
             new ByPathInHandFolder(new System.IO.Abstractions.FileSystem()).OpenBatch(folder, out failureCode);
+
+        public ILeftInHand? OpenLeft(string installerFolder) =>
+            new ByPathInHandFolder(new System.IO.Abstractions.FileSystem()).OpenLeft(folder);
     }
 
     public void Dispose()

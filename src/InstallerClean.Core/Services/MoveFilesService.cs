@@ -620,9 +620,11 @@ public sealed class MoveFilesService : IMoveFilesService
                 // category has been filed, so each is logged.
                 catch (Exception ex) when (!BatchStop.EndsBatch(ex, cancellationToken))
                 {
-                    run.FailureLog.Record(ex);
+                    // The file goes back first, for the reason the Delete service gives
+                    // at the same step.
                     var returned = held is null || run.PutBack(held, hand);
                     held = null;
+                    run.FailureLog.Record(ex);
                     if (returned) run.Refuse(Categorise(ex, sourcePath));
                     return FileOutcome.NotActed;
                 }

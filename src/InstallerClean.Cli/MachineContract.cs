@@ -84,7 +84,9 @@ internal static class MachineContract
     /// Where the update itself saw Ctrl+C, the 3006 says nothing ran and is the run's one
     /// entry. 3007: a newer version a copy had downloaded did not put itself in place of
     /// that copy, saying why; the newer version writes it, it is not a run, and it is the
-    /// only entry its process writes. That aside, a notice never replaces the
+    /// only entry its process writes. 3008: a scan put back into the Installer folder files
+    /// an earlier Move or Delete had left in the app's own folder there, naming them; it is written as the files go back, by the window's scan as by
+    /// the command line's, and once only, since the files are then back. That aside, a notice never replaces the
     /// summary and never stands in for one, so counting runs means counting the summary
     /// bands and that one, and each notice repeats for as long as its own condition
     /// holds, so a machine can emit one on every run for weeks.
@@ -97,7 +99,8 @@ internal static class MachineContract
     /// Warning. 3005 is Information because the run fell short of nothing. 3006 is
     /// Information where the copy does not update for a reason true on every run, and Warning
     /// where the run went on with an older version than it set out to use, or ran nothing.
-    /// 3007 is Warning: the update fell short. Nothing here
+    /// 3007 is Warning: the update fell short. 3008 is Information: the run fell short of
+    /// nothing. Nothing here
     /// contradicts that: this paragraph says only that a notice is not the run's SUMMARY
     /// entry, which is what a consumer counting runs is asking.
     /// Two questions, near-identical wording, and the sense that travels between

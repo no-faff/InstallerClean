@@ -97,6 +97,10 @@ public static class CoreComposition
         services.AddSingleton<IDestinationGuard, HandleDestinationGuard>();
         // Holds a file open to the app alone and renames it through that handle.
         services.AddSingleton<IInHandFolder, HandleInHandFolder>();
+        // Puts back, at the start of every scan, a file an earlier batch left in that
+        // folder, unless a source record names it where it lies.
+        services.AddSingleton<ISourceRecords, RegistrySourceRecords>();
+        services.AddSingleton<IInHandRecovery, InHandRecovery>();
         services.AddSingleton<IMoveFilesService, MoveFilesService>();
         services.AddSingleton<IDeleteFilesService, DeleteFilesService>();
 

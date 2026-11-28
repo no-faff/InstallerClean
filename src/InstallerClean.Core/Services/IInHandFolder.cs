@@ -29,6 +29,19 @@ public interface IInHandFolder
     /// <paramref name="failureCode"/>; nothing has been touched then.
     /// </summary>
     IInHandBatch? OpenBatch(string installerFolder, out int failureCode);
+
+    /// <summary>
+    /// Opens what earlier batches left in <see cref="InHandFolders.FolderName"/> inside
+    /// <paramref name="installerFolder"/>: the batches' folders that are there, and the
+    /// files in each. Null where there is no such folder, or it does not open as a folder
+    /// of its own, and there is then nothing to put back.
+    ///
+    /// A BATCH THAT ENDS LEAVES NOTHING. A process that dies with a file out of its place
+    /// leaves that one file in its batch's folder, whole, and a file Windows would not let
+    /// a batch put back stays the same way. The scan puts each back before it lists
+    /// anything (<see cref="IInHandRecovery"/>).
+    /// </summary>
+    ILeftInHand? OpenLeft(string installerFolder);
 }
 
 /// <summary>Names the app's own folder inside the Installer folder.</summary>
@@ -39,6 +52,81 @@ public static class InHandFolders
     /// only the files directly in the Installer folder, so nothing in here is ever listed.
     /// </summary>
     public const string FolderName = "InstallerClean-in-hand";
+
+    private const string ProbePrefix = "InstallerClean-";
+    private const string ProbeSuffix = ".tmp";
+
+    /// <summary>
+    /// A new name for the empty file a batch makes in its own folder to ask whether a
+    /// rename reaches a destination (<see cref="IInHandBatch.ReachOf"/>).
+    /// </summary>
+    internal static string NewProbeName() => ProbePrefix + Guid.NewGuid().ToString("N") + ProbeSuffix;
+
+    /// <summary>
+    /// Whether <paramref name="name"/> is one <see cref="NewProbeName"/> gives. No cached
+    /// file has such a name: Windows Installer names its cached files with the extensions
+    /// .msi and .msp.
+    /// </summary>
+    internal static bool IsProbeName(string name)
+    {
+        if (name.Length != ProbePrefix.Length + 32 + ProbeSuffix.Length
+            || !name.StartsWith(ProbePrefix, StringComparison.OrdinalIgnoreCase)
+            || !name.EndsWith(ProbeSuffix, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        for (var i = ProbePrefix.Length; i < ProbePrefix.Length + 32; i++)
+        {
+            var c = name[i];
+            if (c is not ((>= '0' and <= '9') or (>= 'a' and <= 'f') or (>= 'A' and <= 'F'))) return false;
+        }
+        return true;
+    }
+}
+
+/// <summary>
+/// What earlier batches left in the app's own folder, as it stood when this was opened.
+/// Disposing of it removes each batch's folder that is empty, and the folder above them
+/// where that is empty; a folder a running batch has open stays, as Windows refuses to
+/// remove it.
+///
+/// A FILE HERE IS REACHED THROUGH <see cref="Hold"/> AND NEVER BY ITS PATH. A batch running
+/// in another process has its file open so that nothing else can open it, so the hold of
+/// that file answers <see cref="HoldOutcome.InUse"/> and the file is not touched. A
+/// rename by path would take it out from under that batch.
+/// </summary>
+public interface ILeftInHand : IDisposable
+{
+    /// <summary>Each batch's folder that was there and could be listed, with what it holds.</summary>
+    IReadOnlyList<LeftBatch> Batches { get; }
+
+    /// <summary>
+    /// Opens <paramref name="file"/> where it lies so that nothing else can open it,
+    /// without following a link. The held file is out of its place
+    /// (<see cref="IHeldFile.IsOut"/>), its <see cref="IHeldFile.RecordedPath"/> is its
+    /// own name directly in the Installer folder, and <see cref="IHeldFile.PutBack"/>
+    /// renames it there, replacing nothing.
+    /// </summary>
+    FileHold Hold(LeftFile file);
+}
+
+/// <summary>One batch's folder as an earlier batch left it.</summary>
+/// <param name="Name">The folder's name inside <see cref="InHandFolders.FolderName"/>.</param>
+/// <param name="ShortName">Its 8.3 short name where it has one, and null where it has none or it could not be read.</param>
+/// <param name="Files">The files in it. Folders in it are not listed: no batch makes one.</param>
+public sealed record LeftBatch(string Name, string? ShortName, IReadOnlyList<LeftFile> Files);
+
+/// <summary>One file in a batch's folder.</summary>
+/// <param name="Batch">The name of the batch's folder it is in.</param>
+/// <param name="Name">The file's name, which is the name it had in the Installer folder.</param>
+/// <param name="Length">Its length in bytes, as the folder's listing gave it.</param>
+public sealed record LeftFile(string Batch, string Name, long Length)
+{
+    /// <summary>
+    /// Whether this is the empty file a batch makes to ask whether a rename reaches a
+    /// destination, left by a process that died before removing it. It was never in the
+    /// Installer folder and is removed, never put there.
+    /// </summary>
+    public bool IsProbe => Length == 0 && InHandFolders.IsProbeName(Name);
 }
 
 /// <summary>
@@ -159,7 +247,8 @@ public interface ICopySource : IDisposable
 ///
 /// DISPOSE OF IT ONLY WHEN THE FILE IS IN A FINISHED PLACE: deleted, at its destination,
 /// or back at its recorded path. Disposing closes the handle wherever the file is, and a
-/// file left in the batch's folder stays there, whole.
+/// file left in the batch's folder stays there, whole, until a scan puts it back
+/// (<see cref="IInHandRecovery"/>).
 /// </summary>
 public interface IHeldFile : IDisposable
 {

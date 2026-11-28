@@ -11891,6 +11891,12 @@ internal sealed class ScriptedSourceListRegistry : IRegistryReader
     public RegistryMultiStringRead LocalMachineMultiStringValue(string keyPath, string valueName) =>
         throw new InvalidOperationException($"the declared-product check reads no string array, and was asked for {keyPath} {valueName}");
 
+    public RegistrySubKeyNames LocalMachineSubKeys(string keyPath, CancellationToken cancellationToken) =>
+        throw new InvalidOperationException($"the declared-product check lists no key's subkeys, and was asked for those of {keyPath}");
+
+    public RegistrySubKeyNames UserSubKeys(string sid, string keyPath, CancellationToken cancellationToken) =>
+        throw new InvalidOperationException($"the declared-product check lists no key's subkeys, and was asked for those of {InHive(sid, keyPath)}");
+
     public RegistryDwordRead LocalMachineDwordValue(string keyPath, string valueName)
     {
         if (keyPath is not (LinkSettingsKey or LinkPolicyKey) || valueName is not (RemoteToLocal or RemoteToRemote))

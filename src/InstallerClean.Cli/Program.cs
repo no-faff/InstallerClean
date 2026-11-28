@@ -1390,7 +1390,16 @@ internal static class Program
 
             Console.WriteLine(Strings.Cli_ScanningInstaller);
             var scanTimer = Stopwatch.StartNew();
-            var scanResult = await scanService.ScanAsync(cancellationToken: workToken);
+            // A FILE THE SCAN PUT BACK IS SAID AS IT GOES BACK, IN A LINE OF ITS OWN, ahead
+            // of everything the scan finds and of any error it ends in: the scan reports
+            // it before it reads anything else. The scan writes the Application log's
+            // entry for it itself (Event ID 3008).
+            var scanResult = await scanService.ScanAsync(
+                new SynchronousProgress<ScanProgressUpdate>(update =>
+                {
+                    if (update.PutBack is { } putBack) Console.WriteLine(PutBackReport.CommandLine(putBack));
+                }),
+                workToken);
             var scanDurationMs = scanTimer.ElapsedMilliseconds;
 
             var count = scanResult.RemovableFiles.Count;

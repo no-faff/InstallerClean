@@ -35,6 +35,82 @@ internal sealed class ByPathInHandFolder(IFileSystem fileSystem) : IInHandFolder
         }
     }
 
+    // The listings below are allowed here as the by-path destination guard's own reads
+    // are: they read only through the filesystem a test substitutes.
+#pragma warning disable RS0030
+    public ILeftInHand? OpenLeft(string installerFolder)
+    {
+        var inHand = PathText.Combine(installerFolder, InHandFolders.FolderName);
+        try
+        {
+            if (!_fs.Directory.Exists(inHand)) return null;
+
+            var batches = new List<LeftBatch>();
+            foreach (var folder in _fs.Directory.GetDirectories(inHand))
+            {
+                var name = PathText.GetFileName(folder);
+                var files = new List<LeftFile>();
+                foreach (var file in _fs.Directory.GetFiles(folder))
+                    files.Add(new LeftFile(name, PathText.GetFileName(file), _fs.FileInfo.New(file).Length));
+
+                // A substitute keeps no short names.
+                batches.Add(new LeftBatch(name, null, files));
+            }
+            return new Left(_fs, installerFolder, inHand, batches);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private sealed class Left(IFileSystem fs, string installerFolder, string inHand, IReadOnlyList<LeftBatch> batches)
+        : ILeftInHand
+    {
+        public IReadOnlyList<LeftBatch> Batches { get; } = batches;
+
+        public FileHold Hold(LeftFile file)
+        {
+            var folder = PathText.Combine(inHand, file.Batch);
+            var path = PathText.Combine(folder, file.Name);
+            try
+            {
+                if (!fs.File.Exists(path))
+                    return new FileHold(fs.Directory.Exists(path) ? HoldOutcome.NotAPlainFile : HoldOutcome.Gone);
+                if (fs.File.GetAttributes(path).HasFlag(FileAttributes.ReparsePoint))
+                    return new FileHold(HoldOutcome.NotAPlainFile);
+                return new FileHold(
+                    HoldOutcome.Held,
+                    new HeldFile(fs, PathText.Combine(installerFolder, file.Name), folder, lyingAt: path));
+            }
+            catch (Exception ex)
+            {
+                var error = ByPathDestinationGuard.Win32CodeOf(ex);
+                return new FileHold(HandleInHandFolder.OutcomeOf(error), WindowsError: error);
+            }
+        }
+
+        public void Dispose()
+        {
+            // Each folder goes only where it is empty, as the app's own does.
+            try
+            {
+                foreach (var batch in Batches)
+                {
+                    var folder = PathText.Combine(inHand, batch.Name);
+                    if (fs.Directory.Exists(folder) && !fs.Directory.EnumerateFileSystemEntries(folder).Any())
+                        fs.Directory.Delete(folder);
+                }
+                if (fs.Directory.Exists(inHand) && !fs.Directory.EnumerateFileSystemEntries(inHand).Any())
+                    fs.Directory.Delete(inHand);
+            }
+            catch
+            {
+            }
+        }
+    }
+#pragma warning restore RS0030
+
     private sealed class Batch(IFileSystem fs, string folder) : IInHandBatch
     {
         public string Folder { get; } = folder;
@@ -125,13 +201,18 @@ internal sealed class ByPathInHandFolder(IFileSystem fileSystem) : IInHandFolder
         public void Dispose() => Content.Dispose();
     }
 
-    private sealed class HeldFile(IFileSystem fs, string recordedPath, string batchFolder) : IHeldFile
+    /// <param name="lyingAt">
+    /// For a file an earlier batch left: where it lies, in that batch's folder. Null for
+    /// a file held in its place.
+    /// </param>
+    private sealed class HeldFile(IFileSystem fs, string recordedPath, string batchFolder, string? lyingAt = null)
+        : IHeldFile
     {
-        private string _current = recordedPath;
+        private string _current = lyingAt ?? recordedPath;
 
         public string RecordedPath { get; } = recordedPath;
 
-        public bool IsOut { get; private set; }
+        public bool IsOut { get; private set; } = lyingAt is not null;
 
         public bool TryReadStamp(out FileStamp stamp)
         {

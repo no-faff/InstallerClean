@@ -172,4 +172,82 @@ public class ByPathInHandFolderTests
         Assert.Equal([1, 2, 3, 4, 5], _fs.File.ReadAllBytes(Destination + @"\a.msp"));
         Assert.True(_fs.File.Exists(path));
     }
+
+    [Fact]
+    public void With_no_in_hand_folder_nothing_was_left()
+    {
+        Cached("a.msp");
+
+        Assert.Null(_hand.OpenLeft(Installer));
+    }
+
+    [Fact]
+    public void A_file_left_in_a_batchs_folder_is_listed_and_goes_back_to_the_Installer_folder_and_the_folders_go()
+    {
+        var path = Cached("a.msp");
+        string folder;
+        using (var batch = _hand.OpenBatch(Installer, out _)!)
+        {
+            folder = batch.Folder;
+            var gone = Held(batch, path);
+            Assert.True(gone.TakeOut(out _));
+            gone.Dispose();
+        }
+        Assert.True(_fs.File.Exists(folder + @"\a.msp"));
+
+        using (var left = _hand.OpenLeft(Installer)!)
+        {
+            var batch = Assert.Single(left.Batches);
+            Assert.Equal(folder, Installer + @"\" + InHandFolders.FolderName + @"\" + batch.Name);
+            var file = Assert.Single(batch.Files);
+            Assert.Equal(("a.msp", 5L), (file.Name, file.Length));
+
+            using var held = Assert.IsAssignableFrom<IHeldFile>(left.Hold(file).File);
+            Assert.True(held.IsOut);
+            Assert.Equal(path, held.RecordedPath);
+            Assert.True(held.PutBack(out _));
+            Assert.False(held.IsOut);
+        }
+
+        Assert.Equal([1, 2, 3, 4, 5], _fs.File.ReadAllBytes(path));
+        Assert.False(_fs.Directory.Exists(Installer + @"\" + InHandFolders.FolderName));
+    }
+
+    [Fact]
+    public void A_file_left_whose_name_is_taken_stays_and_so_do_its_folders()
+    {
+        var path = Cached("a.msp");
+        string folder;
+        using (var batch = _hand.OpenBatch(Installer, out _)!)
+        {
+            folder = batch.Folder;
+            var gone = Held(batch, path);
+            Assert.True(gone.TakeOut(out _));
+            gone.Dispose();
+        }
+        _fs.AddFile(path, new MockFileData([9]));
+
+        using (var left = _hand.OpenLeft(Installer)!)
+        {
+            using var held = left.Hold(left.Batches[0].Files[0]).File!;
+            Assert.False(held.PutBack(out var code));
+            Assert.Equal(Kernel32.ERROR_ALREADY_EXISTS, code);
+        }
+
+        Assert.Equal([1, 2, 3, 4, 5], _fs.File.ReadAllBytes(folder + @"\a.msp"));
+        Assert.Equal([9], _fs.File.ReadAllBytes(path));
+    }
+
+    [Fact]
+    public void A_file_that_has_gone_since_it_was_listed_answers_gone()
+    {
+        var folder = Installer + @"\" + InHandFolders.FolderName + @"\0123456789abcdef0123456789abcdef";
+        _fs.AddFile(folder + @"\a.msp", new MockFileData([1]));
+
+        using var left = _hand.OpenLeft(Installer)!;
+        var file = left.Batches[0].Files[0];
+        _fs.File.Delete(folder + @"\a.msp");
+
+        Assert.Equal(HoldOutcome.Gone, left.Hold(file).Outcome);
+    }
 }

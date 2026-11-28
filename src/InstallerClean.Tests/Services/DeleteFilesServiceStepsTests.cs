@@ -375,7 +375,7 @@ public class DeleteFilesServiceStepsTests
         var pauses = await PausesDuring(() => Delete([A]));
 
         var pause = Assert.Single(pauses);
-        Assert.InRange(pause, TimeSpan.FromMilliseconds(20), BatchRun.PauseAfterAPutBack);
+        Assert.InRange(pause, TimeSpan.FromMilliseconds(20), InHandPause.AfterAPutBack);
         Assert.Single(_checks.Calls);
     }
 
@@ -397,8 +397,8 @@ public class DeleteFilesServiceStepsTests
     private static async Task<List<TimeSpan>> PausesDuring(Func<Task> batch)
     {
         var pauses = new List<TimeSpan>();
-        var before = BatchRun.PauseForTests;
-        BatchRun.PauseForTests = (length, _) =>
+        var before = InHandPause.ForTests;
+        InHandPause.ForTests = (length, _) =>
         {
             pauses.Add(length);
             return Task.CompletedTask;
@@ -409,7 +409,7 @@ public class DeleteFilesServiceStepsTests
         }
         finally
         {
-            BatchRun.PauseForTests = before;
+            InHandPause.ForTests = before;
         }
 
         return pauses;

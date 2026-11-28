@@ -1121,6 +1121,11 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        beyond the allowance. Never shown beside a Summary.ScanSignal.* line above: where a
        signal was set, no file's times are read. -->
   <data name="Summary.ScanSignal.ClockSetBack" xml:space="preserve"><value>Tarama sürerken bu bilgisayarın saati geri gitti ya da geri kaldı, bu yüzden InstallerClean hangi dosyaların az önce eklendiğini bilemedi ve bunlardan biri olabilecek her dosyayı olduğu gibi bıraktı. Yeniden tara'ya basın.</value></data>
+  <!-- 0 = the names of the files put back, separated by a comma and a space. A line
+       under the left-alone count in the main window, and the last paragraph of the
+       message of a scan that failed after putting them back. One sentence for one
+       file or several. -->
+  <data name="Summary.PutBack" xml:space="preserve"><value>A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} {2} içinden {0}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1745,6 +1750,11 @@ InstallerClean'i yönetici olarak yeniden çalıştırın.</value></data>
   <data name="Cli.GenericError" xml:space="preserve"><value>Hata: beklenmeyen arıza ({0}). Ayrıntılar {1} konumuna yazıldı.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Hata: beklenmeyen arıza ({0}). Çökme günlüğü yazılamadı.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>{InstallerFolder} taranıyor...</value></data>
+  <!-- 0 = the names of the files put back, separated by a comma and a space.
+       Printed after the scanning line by /s, /d and /m where the scan put back
+       files an earlier Move or Delete had left in the app's own folder inside
+       the Installer folder. One sentence for one file or several. -->
+  <data name="Cli.ScanPutBack" xml:space="preserve"><value>This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
        a count of zero: that run prints another line instead, so this one does not
        have to read sensibly at "0 ... (0 B)". -->
@@ -2276,6 +2286,9 @@ InstallerClean'i yönetici olarak yeniden çalıştırın.</value></data>
        "file"/"files" agreeing with the total, 4 = the reason, as an English label.
        Audit entry for a /d or /m that ended before its last file. -->
   <!-- 0 = mode arg, 1 = the reason, as an English label. -->
+  <!-- 0 = the names of the files put back, separated by a comma and a space.
+       Written by the scan as the files go back, in the window as on the command
+       line (Event ID 3008). -->
   <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
        cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
        for every run, not only the ones that committed work. -->

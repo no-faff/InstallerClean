@@ -117,6 +117,28 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return RegistryKeyPresence.Unreadable; }
     }
 
+    public RegistrySubKeyNames LocalMachineSubKeys(string keyPath, CancellationToken cancellationToken) =>
+        SubKeysOf(RegistryHive.LocalMachine, keyPath, cancellationToken);
+
+    public RegistrySubKeyNames UserSubKeys(string sid, string keyPath, CancellationToken cancellationToken) =>
+        SubKeysOf(RegistryHive.Users, sid + @"\" + keyPath, cancellationToken);
+
+    private static RegistrySubKeyNames SubKeysOf(RegistryHive root, string keyPath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var hive = RegistryKey.OpenBaseKey(root, RegistryView.Registry64);
+            using var key = hive.OpenSubKeyEarned(keyPath);
+            return key is null
+                ? new RegistrySubKeyNames(RegistryKeyPresence.Absent)
+                : new RegistrySubKeyNames(RegistryKeyPresence.Present, RegistryNames.SubKeysOf(key, cancellationToken));
+        }
+        catch (SecurityException) { return new RegistrySubKeyNames(RegistryKeyPresence.Unreadable); }
+        catch (IOException) { return new RegistrySubKeyNames(RegistryKeyPresence.Unreadable); }
+        catch (UnauthorizedAccessException) { return new RegistrySubKeyNames(RegistryKeyPresence.Unreadable); }
+        catch (ObjectDisposedException) { return new RegistrySubKeyNames(RegistryKeyPresence.Unreadable); }
+    }
+
     private static RegistryKeyValues ValuesOf(RegistryHive root, string keyPath, CancellationToken cancellationToken)
     {
         try

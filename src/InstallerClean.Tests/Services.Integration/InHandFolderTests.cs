@@ -33,7 +33,7 @@ public sealed class InHandFolderTests : IDisposable
 
     /// <summary>
     /// A rename moves a file's change time, which is why a check made straight after a
-    /// put-back waits first (<see cref="BatchRun.PauseAfterAPutBack"/>): the full check
+    /// put-back waits first (<see cref="InHandPause.AfterAPutBack"/>): the full check
     /// passes a file no record names only where its change time is before the check's
     /// clock.
     /// </summary>
@@ -57,6 +57,296 @@ public sealed class InHandFolderTests : IDisposable
         Assert.True(after.ChangeUtc > before.ChangeUtc, $"change time {after.ChangeUtc:O} is not after {before.ChangeUtc:O}");
         Assert.Equal(before.LastWriteUtc, after.LastWriteUtc);
         Assert.Equal(before.CreationUtc, after.CreationUtc);
+    }
+
+    // ---- What an earlier batch left ----
+
+    /// <summary>
+    /// Leaves <paramref name="name"/> as a batch whose process died leaves the file it had
+    /// out of its place: in the batch's folder, with no handle on it. Answers that folder.
+    /// </summary>
+    private string LeaveInHand(string name)
+    {
+        var path = Cached(name);
+        using var batch = OpenBatch();
+        var held = Held(batch, path);
+        Assert.True(held.TakeOut(out _));
+        held.Dispose();
+        return batch.Folder;
+    }
+
+    private string InHand => Path.Combine(_installer, InHandFolders.FolderName);
+
+    [Fact]
+    public void An_Installer_folder_with_no_in_hand_folder_has_nothing_left()
+    {
+        Cached("a.msp");
+
+        Assert.Null(_hand.OpenLeft(_installer));
+    }
+
+    [Fact]
+    public void A_file_standing_under_the_in_hand_folders_name_is_not_opened_as_what_was_left()
+    {
+        File.WriteAllBytes(InHand, []);
+
+        Assert.Null(_hand.OpenLeft(_installer));
+        Assert.True(File.Exists(InHand));
+    }
+
+    [Fact]
+    public void A_file_a_dead_batch_left_is_listed_held_alone_and_put_back_and_both_folders_go()
+    {
+        var folder = LeaveInHand("a.msp");
+        var away = Path.Combine(folder, "a.msp");
+        var home = Path.Combine(_installer, "a.msp");
+        Assert.True(File.Exists(away));
+        Assert.False(File.Exists(home));
+
+        using (var left = _hand.OpenLeft(_installer))
+        {
+            Assert.NotNull(left);
+            var batch = Assert.Single(left.Batches);
+            Assert.Equal(Path.GetFileName(folder), batch.Name);
+            var file = Assert.Single(batch.Files);
+            Assert.Equal(("a.msp", 5L, false), (file.Name, file.Length, file.IsProbe));
+
+            var hold = left.Hold(file);
+            Assert.Equal(HoldOutcome.Held, hold.Outcome);
+            using var held = hold.File!;
+            Assert.True(held.IsOut);
+            Assert.Equal(home, held.RecordedPath);
+            Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION,
+                OpenError(away, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete));
+
+            Assert.True(held.PutBack(out var code), $"the put-back was refused: {code}");
+            Assert.False(held.IsOut);
+        }
+
+        Assert.Equal([1, 2, 3, 4, 5], File.ReadAllBytes(home));
+        Assert.False(Directory.Exists(folder));
+        Assert.False(Directory.Exists(InHand));
+    }
+
+    [Fact]
+    public void A_read_only_file_a_dead_batch_left_goes_back_with_its_attribute()
+    {
+        var path = Cached("a.msp", FileAttributes.ReadOnly);
+        string folder;
+        using (var batch = OpenBatch())
+        {
+            folder = batch.Folder;
+            var held = Held(batch, path);
+            Assert.True(held.TakeOut(out _));
+            held.Dispose();
+        }
+
+        using (var left = _hand.OpenLeft(_installer)!)
+        {
+            using var held = left.Hold(left.Batches[0].Files[0]).File!;
+            Assert.True(held.PutBack(out var code), $"the put-back was refused: {code}");
+        }
+
+        Assert.True(File.GetAttributes(path).HasFlag(FileAttributes.ReadOnly));
+        File.SetAttributes(path, FileAttributes.Normal);
+        Assert.False(Directory.Exists(folder));
+    }
+
+    [Fact]
+    public void A_file_a_running_batch_has_out_of_its_place_answers_in_use_and_its_folders_stay()
+    {
+        var path = Cached("a.msp");
+        using var batch = OpenBatch();
+        using var running = Held(batch, path);
+        Assert.True(running.TakeOut(out _));
+
+        using (var left = _hand.OpenLeft(_installer)!)
+        {
+            var file = Assert.Single(Assert.Single(left.Batches).Files);
+            Assert.Equal(HoldOutcome.InUse, left.Hold(file).Outcome);
+        }
+
+        // The running batch has lost nothing: its file is where it took it, and goes back.
+        Assert.True(File.Exists(Path.Combine(batch.Folder, "a.msp")));
+        Assert.True(running.PutBack(out _));
+        Assert.True(File.Exists(path));
+    }
+
+    [Fact]
+    public void A_running_batchs_empty_folder_stays_and_one_nobody_has_open_goes()
+    {
+        using var batch = OpenBatch();
+        var abandoned = Path.Combine(InHand, Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(abandoned);
+
+        using (var left = _hand.OpenLeft(_installer)!)
+            Assert.Equal(2, left.Batches.Count);
+
+        Assert.False(Directory.Exists(abandoned));
+        Assert.True(Directory.Exists(batch.Folder));
+    }
+
+    [Fact]
+    public void A_file_left_whose_name_has_been_taken_is_not_put_back_and_stays_with_its_folders()
+    {
+        var folder = LeaveInHand("a.msp");
+        var home = Path.Combine(_installer, "a.msp");
+        File.WriteAllBytes(home, [9]);
+
+        using (var left = _hand.OpenLeft(_installer)!)
+        {
+            using var held = left.Hold(left.Batches[0].Files[0]).File!;
+            Assert.False(held.PutBack(out var code));
+            Assert.Equal(Kernel32.ERROR_ALREADY_EXISTS, code);
+            Assert.True(held.IsOut);
+        }
+
+        Assert.Equal([1, 2, 3, 4, 5], File.ReadAllBytes(Path.Combine(folder, "a.msp")));
+        Assert.Equal([9], File.ReadAllBytes(home));
+    }
+
+    [Fact]
+    public void The_empty_file_a_dead_Move_left_in_its_folder_is_told_apart_and_removed_through_its_hold()
+    {
+        var folder = Path.Combine(InHand, Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        var probe = InHandFolders.NewProbeName();
+        File.WriteAllBytes(Path.Combine(folder, probe), []);
+
+        using (var left = _hand.OpenLeft(_installer)!)
+        {
+            var file = Assert.Single(Assert.Single(left.Batches).Files);
+            Assert.True(file.IsProbe);
+            var hold = left.Hold(file);
+            Assert.Equal(HoldOutcome.Held, hold.Outcome);
+            Assert.True(hold.File!.Delete(out var code), $"the delete was refused: {code}");
+            hold.File.Dispose();
+        }
+
+        Assert.False(Directory.Exists(InHand));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(_installer));
+    }
+
+    [Fact]
+    public void A_folder_or_a_file_that_has_gone_since_the_listing_answers_gone()
+    {
+        var folder = LeaveInHand("a.msp");
+
+        using var left = _hand.OpenLeft(_installer)!;
+        var file = left.Batches[0].Files[0];
+        File.Delete(Path.Combine(folder, "a.msp"));
+        Assert.Equal(HoldOutcome.Gone, left.Hold(file).Outcome);
+
+        Directory.Delete(folder);
+        Assert.Equal(HoldOutcome.Gone, left.Hold(file).Outcome);
+    }
+
+    [Fact]
+    public void A_batchs_short_name_is_listed_where_the_volume_gives_it_one()
+    {
+        var folder = LeaveInHand("a.msp");
+
+        using var left = _hand.OpenLeft(_installer)!;
+        var batch = Assert.Single(left.Batches);
+
+        // A volume that makes no short names gives none, and the name alone is then the
+        // whole of what a source record could spell the folder as.
+        var names = InstallerClean.Helpers.StorageHelpers.GetNamesInFolder(folder);
+        Assert.NotNull(names);
+        Assert.Equal(names.Count > 1 ? names[1] : null, batch.ShortName);
+        Assert.NotEqual(batch.Name, batch.ShortName);
+
+        using var held = left.Hold(batch.Files[0]).File!;
+        Assert.True(held.PutBack(out _));
+    }
+
+    /// <summary>
+    /// The whole recovery over real files: the file a dead batch left is back in its place
+    /// with a later change time, which is why the recovery waits before the scan reads its
+    /// clock (<see cref="InHandPause.AfterAPutBack"/>), and the Application log says so.
+    /// </summary>
+    [Fact]
+    public async Task A_recovery_puts_a_dead_batchs_file_back_in_its_place_and_says_so()
+    {
+        var path = Cached("put-back.msi");
+        var times = new FileTimesReader();
+        Assert.Equal(FileTimesRead.Read, times.ReadOutcome(path, out var before));
+        Thread.Sleep(50);
+        using (var batch = OpenBatch())
+        {
+            var held = Held(batch, path);
+            Assert.True(held.TakeOut(out _));
+            held.Dispose();
+        }
+        Assert.False(File.Exists(path));
+        EventLogRecorder.Clear();
+
+        var result = await new InHandRecovery(_hand, new ScriptedSignals(), new ScriptedSourceRecords())
+            .RecoverAsync(_installer, CancellationToken.None);
+
+        Assert.Equal([path], result.PutBack);
+        Assert.Equal([1, 2, 3, 4, 5], File.ReadAllBytes(path));
+        Assert.False(Directory.Exists(InHand));
+        Assert.Equal(FileTimesRead.Read, times.ReadOutcome(path, out var after));
+        Assert.True(after.ChangeUtc > before.ChangeUtc, $"change time {after.ChangeUtc:O} is not after {before.ChangeUtc:O}");
+        Assert.Equal(before.LastWriteUtc, after.LastWriteUtc);
+        var entry = Assert.Single(EventLogRecorder.Entries);
+        Assert.Equal(InstallerClean.Helpers.CliEventClass.ScanPutBackNotice, entry.Class);
+        Assert.Contains("put-back.msi", entry.Text, StringComparison.Ordinal);
+        EventLogRecorder.Clear();
+    }
+
+    [Fact]
+    public async Task A_recovery_leaves_a_file_whose_batch_folder_a_source_record_names()
+    {
+        var folder = LeaveInHand("a.msi");
+
+        var result = await new InHandRecovery(
+                _hand, new ScriptedSignals(), new ScriptedSourceRecords().Naming(Path.GetFileName(folder)))
+            .RecoverAsync(_installer, CancellationToken.None);
+
+        Assert.Empty(result.PutBack);
+        Assert.Equal(1, result.LeftAsSource);
+        Assert.True(File.Exists(Path.Combine(folder, "a.msi")));
+        Assert.False(File.Exists(Path.Combine(_installer, "a.msi")));
+    }
+
+    // ---- A scan in another process beside a batch that is starting ----
+
+    [Fact]
+    public void A_batch_makes_the_in_hand_folder_again_where_it_was_removed_before_the_batchs_own_was_made()
+    {
+        var removed = 0;
+        var hand = new HandleInHandFolder();
+        hand.BeforeTheBatchsFolderForTests = () =>
+        {
+            // What a scan in another process does where it finds the in-hand folder empty.
+            if (removed++ == 0) Directory.Delete(InHand);
+        };
+
+        using var batch = hand.OpenBatch(_installer, out var code);
+
+        Assert.True(batch is not null, $"the batch's folder could not be made: {code}");
+        Assert.Equal(2, removed);
+        Assert.True(Directory.Exists(batch.Folder));
+    }
+
+    [Fact]
+    public void A_batch_gives_up_where_the_in_hand_folder_is_removed_under_it_every_time()
+    {
+        var tries = 0;
+        var hand = new HandleInHandFolder();
+        hand.BeforeTheBatchsFolderForTests = () =>
+        {
+            tries++;
+            Directory.Delete(InHand);
+        };
+
+        var batch = hand.OpenBatch(_installer, out var code);
+
+        Assert.Null(batch);
+        Assert.NotEqual(0, code);
+        Assert.Equal(HandleInHandFolder.OpenBatchTries, tries);
     }
 
     private IInHandBatch OpenBatch()

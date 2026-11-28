@@ -495,7 +495,7 @@ public class FileSystemScanServiceAgeCheckTests
     }
 
     [Fact]
-    public void The_scan_the_hosts_build_runs_the_age_check_and_reads_the_signals()
+    public void The_scan_the_hosts_build_runs_the_age_check_reads_the_signals_and_puts_back_what_a_killed_batch_left()
     {
         // Constructed by hand everywhere else in this file, where the default is no
         // reader. The container is what the hosts use.
@@ -506,6 +506,169 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.True(scan.ChecksAge);
         Assert.True(scan.ReadsInstallerActivity);
         Assert.True(scan.JudgesOnTheFileStampClock);
+        Assert.True(scan.PutsBackWhatWasLeftInHand);
+    }
+
+    // ---- What a killed batch left goes back before the clock ----
+
+    [Fact]
+    public async Task What_a_killed_batch_left_is_put_back_before_the_wall_clock_or_the_clock_is_read()
+    {
+        // A rename moves a file's change time and the age check keeps a file changed at or
+        // after the clock, so the put-back has to be over before either reading is taken.
+        var clock = new FixedClock(Now);
+        var putBack = new InHandRecoveryResult([$@"{Folder}\back.msi"], LeftAsSource: 1);
+        var recovery = new ScriptedRecovery(putBack, clock);
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\back.msi", Old, Old, Old);
+        times.Reads($@"{Folder}\new.msi", Old, Old, Late);
+
+        var result = await Scan(
+            new[] { $@"{Folder}\back.msi", $@"{Folder}\new.msi" }, times, clock: clock, recovery: recovery);
+
+        Assert.Equal([(0, 0)], recovery.ClockAndPreciseReadsAtEachCall);
+        Assert.Same(putBack, result.PutBack);
+        // The scan went on to walk and judge as it always does, with the same reader
+        // keeping the file changed after the clock.
+        Assert.Equal($@"{Folder}\back.msi", Assert.Single(result.RemovableFiles).FullPath);
+        Assert.Equal($@"{Folder}\new.msi", Assert.Single(result.WithheldFiles!).FullPath);
+    }
+
+    [Fact]
+    public async Task What_was_put_back_is_reported_to_the_host_before_any_other_progress()
+    {
+        var putBack = new InHandRecoveryResult([$@"{Folder}\back.msi"]);
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\back.msi", Old, Old, Old);
+        var progress = new RecordedProgress();
+
+        await Scan(new[] { $@"{Folder}\back.msi" }, times,
+            recovery: new ScriptedRecovery(putBack, new FixedClock(Now)), progress: progress);
+
+        Assert.Same(putBack, progress.Updates[0].PutBack);
+        Assert.False(progress.Updates[0].IsMilestone);
+        Assert.Equal(string.Empty, progress.Updates[0].Message);
+        Assert.Single(progress.Updates, u => u.PutBack is not null);
+        Assert.True(progress.Updates.Count > 1);
+    }
+
+    [Fact]
+    public async Task The_scan_waits_after_a_put_back_and_only_then_reads_its_clock()
+    {
+        var clock = new FixedClock(Now);
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\back.msi", Old, Old, Old);
+        var progress = new RecordedProgress();
+        var pauses = new List<(TimeSpan Length, int ClockReads, int Reported)>();
+        var before = InHandPause.ForTests;
+        InHandPause.ForTests = (length, _) =>
+        {
+            pauses.Add((length, clock.Reads + clock.PreciseReadsBeforeTheFirstRead, progress.Updates.Count));
+            return Task.CompletedTask;
+        };
+        try
+        {
+            await Scan(new[] { $@"{Folder}\back.msi" }, times, clock: clock,
+                recovery: new ScriptedRecovery(new InHandRecoveryResult([$@"{Folder}\back.msi"]), clock),
+                progress: progress);
+        }
+        finally
+        {
+            InHandPause.ForTests = before;
+        }
+
+        // One wait, of the whole pause, made before either reading of the clock and
+        // after the host was told what went back, so a cancel of the wait loses nothing.
+        var pause = Assert.Single(pauses);
+        Assert.InRange(pause.Length, TimeSpan.FromMilliseconds(40), InHandPause.AfterAPutBack);
+        Assert.Equal(0, pause.ClockReads);
+        Assert.Equal(1, pause.Reported);
+    }
+
+    [Fact]
+    public async Task A_cancel_of_that_wait_ends_the_scan_with_the_host_already_told()
+    {
+        var times = new ScriptedFileTimes();
+        var progress = new RecordedProgress();
+        var before = InHandPause.ForTests;
+        InHandPause.ForTests = (_, _) => Task.FromCanceled(new CancellationToken(canceled: true));
+        try
+        {
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+                Scan(new[] { $@"{Folder}\back.msi" }, times,
+                    recovery: new ScriptedRecovery(new InHandRecoveryResult([$@"{Folder}\back.msi"]), new FixedClock(Now)),
+                    progress: progress));
+        }
+        finally
+        {
+            InHandPause.ForTests = before;
+        }
+
+        Assert.NotNull(Assert.Single(progress.Updates).PutBack);
+    }
+
+    [Fact]
+    public async Task A_scan_that_put_nothing_back_waits_for_nothing()
+    {
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\old.msi", Old, Old, Old);
+        var waited = 0;
+        var before = InHandPause.ForTests;
+        InHandPause.ForTests = (_, _) =>
+        {
+            waited++;
+            return Task.CompletedTask;
+        };
+        try
+        {
+            await Scan(new[] { $@"{Folder}\old.msi" }, times,
+                recovery: new ScriptedRecovery(new InHandRecoveryResult([], LeftRecordsUnread: 1), new FixedClock(Now)));
+        }
+        finally
+        {
+            InHandPause.ForTests = before;
+        }
+
+        Assert.Equal(0, waited);
+    }
+
+    [Fact]
+    public async Task A_scan_that_put_nothing_back_reports_no_put_back_whatever_it_left()
+    {
+        // Files left where they lie are counted in the result and are no news to the person.
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\old.msi", Old, Old, Old);
+        var progress = new RecordedProgress();
+
+        var result = await Scan(new[] { $@"{Folder}\old.msi" }, times,
+            recovery: new ScriptedRecovery(new InHandRecoveryResult([], LeftInstallerBusy: 1), new FixedClock(Now)),
+            progress: progress);
+
+        Assert.DoesNotContain(progress.Updates, u => u.PutBack is not null);
+        Assert.Equal(1, result.PutBack.LeftInstallerBusy);
+    }
+
+    [Fact]
+    public async Task A_scan_built_without_a_recovery_reports_nothing_put_back()
+    {
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\old.msi", Old, Old, Old);
+
+        var result = await Scan(new[] { $@"{Folder}\old.msi" }, times);
+
+        Assert.Same(InHandRecoveryResult.None, result.PutBack);
+    }
+
+    [Fact]
+    public async Task A_cancel_during_the_put_back_ends_the_scan_before_anything_is_read()
+    {
+        var clock = new FixedClock(Now);
+        var recovery = new ScriptedRecovery(InHandRecoveryResult.None, clock) { Throws = new OperationCanceledException() };
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            Scan(new[] { $@"{Folder}\old.msi" }, new ScriptedFileTimes(), clock: clock, recovery: recovery));
+
+        Assert.Equal(0, clock.Reads);
     }
 
     // ---- Helpers ----
@@ -532,7 +695,9 @@ public class FileSystemScanServiceAgeCheckTests
         IFileTimesReader times,
         IReadOnlyList<RegisteredPackage>? registered = null,
         TimeProvider? clock = null,
-        IPendingRebootService? activity = null)
+        IPendingRebootService? activity = null,
+        IInHandRecovery? recovery = null,
+        IProgress<ScanProgressUpdate>? progress = null)
     {
         var files = walked.ToArray();
         var fs = FolderHolding(files.Concat(
@@ -541,8 +706,38 @@ public class FileSystemScanServiceAgeCheckTests
         return new FileSystemScanService(
             QueryReturning(registered ?? Array.Empty<RegisteredPackage>()), fs, null,
             files, null, null, null,
-            times, clock ?? new FixedClock(Now), activity)
-            .ScanAsync();
+            times, clock ?? new FixedClock(Now), activity, recovery)
+            .ScanAsync(progress);
+    }
+
+    /// <summary>The scan's progress updates in the order it reported them, each taken as it is reported.</summary>
+    private sealed class RecordedProgress : IProgress<ScanProgressUpdate>
+    {
+        public List<ScanProgressUpdate> Updates { get; } = new();
+
+        public void Report(ScanProgressUpdate value) => Updates.Add(value);
+    }
+}
+
+/// <summary>
+/// A scripted putting-back of what a killed batch left, which records how many times the
+/// scan's clock and its precise time had been read at each call.
+/// </summary>
+internal sealed class ScriptedRecovery(InHandRecoveryResult result, FixedClock clock) : IInHandRecovery
+{
+    public List<(int Clock, int Precise)> ClockAndPreciseReadsAtEachCall { get; } = new();
+
+    /// <summary>The folder each call was asked about.</summary>
+    public List<string> Folders { get; } = new();
+
+    /// <summary>Where set, what each call throws.</summary>
+    public Exception? Throws { get; init; }
+
+    public Task<InHandRecoveryResult> RecoverAsync(string installerFolder, CancellationToken cancellationToken)
+    {
+        ClockAndPreciseReadsAtEachCall.Add((clock.Reads, clock.PreciseReadsBeforeTheFirstRead));
+        Folders.Add(installerFolder);
+        return Throws is null ? Task.FromResult(result) : Task.FromException<InHandRecoveryResult>(Throws);
     }
 }
 

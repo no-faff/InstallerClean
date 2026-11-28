@@ -244,6 +244,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | InstallerClean couldn't check whether Windows Installer was busy when the scan started. Windows gave an error: {0} (error {1}). It left alone the files it can't check while Windows Installer is busy. Restart Windows. InstallerClean will check again the next time you start it. | InstallerClean не смог проверить, был ли занят Windows Installer, когда началось сканирование. Windows выдал ошибку: {0} (ошибка {1}). InstallerClean оставил без изменений файлы, которые он не может проверить, пока Windows Installer занят. Перезагрузите Windows. InstallerClean проверит снова, когда вы в следующий раз его запустите. |
 | Windows Installer had something unfinished when the scan started, so InstallerClean left alone the files it can't check until it has finished. Re-scan once it has finished. | Когда началось сканирование, у Windows Installer было что-то незавершённое, поэтому InstallerClean оставил без изменений файлы, которые он не может проверить, пока это не завершится. Когда это закончится, нажмите «Повторить сканирование». |
 | This PC's clock went back or lost time while the scan was running, so InstallerClean couldn't tell which files had just been added, and left alone every file that could have been. Re-scan. | Во время сканирования часы этого компьютера ушли назад или отстали, поэтому InstallerClean не смог определить, какие файлы были только что добавлены, и оставил без изменений все файлы, которые могли оказаться среди них. Нажмите «Повторить сканирование». |
+| A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} для очистки ({2}) |
 | {0} file left alone ({1}) | {0} файл оставлен без изменений ({1}) |
@@ -529,6 +530,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Error: unexpected failure ({0}). Details written to {1}. | Ошибка: непредвиденный сбой ({0}). Подробности записаны в {1}. |
 | Error: unexpected failure ({0}). The crash log could not be written. | Ошибка: непредвиденный сбой ({0}). Журнал сбоя записать не удалось. |
 | Scanning {InstallerFolder}... | Сканирование {InstallerFolder}... |
+| This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} | This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0} |
 | Found {0} unneeded {1} to clean up ({2}). | Найдено {0} ненужных {1} для очистки ({2}). |
 | Found {0} unneeded {1} to clean up ({2}).<br>_(one form)_ | Найден {0} ненужный {1} для очистки ({2}). |
 | No unneeded files identified. | Ненужных файлов не выявлено. |

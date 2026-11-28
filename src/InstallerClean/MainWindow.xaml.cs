@@ -393,6 +393,8 @@ public partial class MainWindow : Window
                 AnnounceLiveRegions(ScanSignalText);
             if (_vm.Scan.HasSourcesGivenUp)
                 AnnounceLiveRegions(SourcesGivenUpText);
+            if (_vm.Scan.HasPutBack)
+                AnnounceLiveRegions(PutBackText);
         }
         if (TakeMark(ref _missingFromDiskToAnnounce))
             AnnounceLiveRegion(MissingFromDiskBannerText, () => _vm.Scan.HasMissingFromDisk);

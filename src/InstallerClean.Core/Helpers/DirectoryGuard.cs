@@ -216,6 +216,68 @@ internal static class DirectoryGuard
             Ntdll.FILE_CREATE, Ntdll.FILE_NON_DIRECTORY_FILE, IntPtr.Zero, out status);
 
     /// <summary>
+    /// Opens the file <paramref name="leaf"/> inside <paramref name="directory"/> with
+    /// <paramref name="access"/> and no sharing, resolved against that handle and without
+    /// following a link in <paramref name="leaf"/>, so Windows refuses the open while
+    /// anything else has the file open and nothing else can open it afterwards. Null
+    /// where the open fails, a folder under that name among the causes, with the NTSTATUS
+    /// in <paramref name="status"/>.
+    /// </summary>
+    internal static SafeFileHandle? OpenChildFileAlone(
+        SafeFileHandle directory, string leaf, uint access, out int status) =>
+        OpenChildNoFollow(
+            directory, leaf, access, 0,
+            Ntdll.FILE_OPEN, Ntdll.FILE_OPEN_REPARSE_POINT | Ntdll.FILE_NON_DIRECTORY_FILE, IntPtr.Zero, out status);
+
+    /// <summary>One entry of a folder as <see cref="ListChildren"/> reads it.</summary>
+    internal readonly record struct ChildEntry(string Name, uint Attributes, long Length)
+    {
+        /// <summary>Whether the entry is a folder.</summary>
+        internal bool IsFolder => (Attributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) != 0;
+    }
+
+    /// <summary>
+    /// Every entry of the folder <paramref name="directory"/> names but <c>.</c> and
+    /// <c>..</c>, read through that handle from the folder's first entry, so what is
+    /// listed is the folder the handle was opened on. Null where Windows refuses the
+    /// listing. The handle carries the right to list, which
+    /// <see cref="Ntdll.FILE_GENERIC_READ"/> includes.
+    /// </summary>
+    internal static unsafe IReadOnlyList<ChildEntry>? ListChildren(SafeFileHandle directory)
+    {
+        const int BufferSize = 64 * 1024;
+        var buffer = Marshal.AllocHGlobal(BufferSize);
+        try
+        {
+            var entries = new List<ChildEntry>();
+            byte restart = 1;
+            while (true)
+            {
+                var status = Ntdll.NtQueryDirectoryFile(
+                    directory, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, out _, buffer, BufferSize,
+                    Ntdll.FileFullDirectoryInformation, ReturnSingleEntry: 0, IntPtr.Zero, RestartScan: restart);
+                restart = 0;
+                if (status == Ntdll.STATUS_NO_MORE_FILES) return entries;
+                if (status != Ntdll.STATUS_SUCCESS) return null;
+
+                var entry = (Ntdll.FILE_FULL_DIR_INFORMATION*)buffer;
+                while (true)
+                {
+                    var name = new string((char*)&entry->FileName, 0, (int)(entry->FileNameLength / sizeof(char)));
+                    if (name != "." && name != "..")
+                        entries.Add(new ChildEntry(name, entry->FileAttributes, entry->EndOfFile));
+                    if (entry->NextEntryOffset == 0) break;
+                    entry = (Ntdll.FILE_FULL_DIR_INFORMATION*)((byte*)entry + entry->NextEntryOffset);
+                }
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+    }
+
+    /// <summary>
     /// Renames the file <paramref name="file"/> names to <paramref name="name"/>, through
     /// its handle, replacing nothing. <paramref name="name"/> is a leaf inside the
     /// directory <paramref name="relativeTo"/> names where that is given, so the file lands
@@ -406,7 +468,7 @@ internal static class DirectoryGuard
     /// The same, with <paramref name="access"/>, reporting the NTSTATUS the open returned in
     /// <paramref name="status"/>.
     /// </summary>
-    private static SafeFileHandle? OpenChildFolderNoFollow(SafeFileHandle directory, string leaf, uint access, out int status)
+    internal static SafeFileHandle? OpenChildFolderNoFollow(SafeFileHandle directory, string leaf, uint access, out int status)
     {
         var child = OpenChildNoFollow(
             directory, leaf, access, Ntdll.FILE_OPEN,
