@@ -308,7 +308,8 @@ public sealed class MoveFilesService : IMoveFilesService
                 "Move ended before its first file: the app's own folder inside the Installer folder could not be made.",
                 new Win32Exception(handError)));
             return (new MoveResult(0, Array.Empty<FileOperationError>(),
-                Ended: new BatchEnd(BatchEndReason.InHandFolderUnavailable, WindowsError: handError)), null);
+                Ended: new BatchEnd(BatchEndReason.InHandFolderUnavailable, WindowsError: handError),
+                Counts: run.Counts), null);
         }
 
         // The destination is opened once and stays open for the batch. Every file sent
@@ -340,7 +341,11 @@ public sealed class MoveFilesService : IMoveFilesService
                 foreach (var sourcePath in pass)
                 {
                     var outcome = await batch.MoveOneAsync(sourcePath, lastTry).ConfigureAwait(false);
-                    if (outcome == FileOutcome.Acted) batch.Moved++;
+                    if (outcome == FileOutcome.Acted)
+                    {
+                        batch.Moved++;
+                        if (lastTry) run.CountTakenAtTheSecondTry();
+                    }
                     if (outcome == FileOutcome.BatchEnded) goto finished;
                 }
             }
@@ -364,7 +369,8 @@ public sealed class MoveFilesService : IMoveFilesService
 
         return (new MoveResult(batch.Moved, run.Errors.AsReadOnly(), cancelled,
             run.HeldBack.ToList().AsReadOnly(), run.HeldBackReasons, run.Ended,
-            run.SourceRootsGivenUp.ToList().AsReadOnly(), run.SourceWaitCount, run.CheckCounts), batch.AbortReason);
+            run.SourceRootsGivenUp.ToList().AsReadOnly(), run.SourceWaitCount, run.CheckCounts, run.Counts),
+            batch.AbortReason);
     }
 
     /// <summary>
@@ -582,7 +588,7 @@ public sealed class MoveFilesService : IMoveFilesService
                     look = run.Look();
                     if (look != LookResult.Clean)
                     {
-                        var back = run.PutBack(held, hand);
+                        var back = run.PutBack(held, hand, forALook: look == LookResult.NotClean);
                         held = null;
                         if (!await run.SettleAsync(look).ConfigureAwait(false)) return FileOutcome.BatchEnded;
                         if (!back) return FileOutcome.NotActed;
@@ -598,6 +604,7 @@ public sealed class MoveFilesService : IMoveFilesService
                         held.Dispose();
                         held = null;
                         run.Done(sourcePath);
+                        if (byCopy) run.CountMovedByCopy();
                         return FileOutcome.Acted;
                     }
 
@@ -648,6 +655,7 @@ public sealed class MoveFilesService : IMoveFilesService
         private bool MakeCopy(string sourcePath, string fileName, bool lastTry, Copy copy)
         {
             copy.Attempts++;
+            if (copy.Attempts > 1) run.CountCopyMadeAgain();
             using var source = run.OpenToCopy(hand, sourcePath, lastTry);
             if (source is null) return false;
 

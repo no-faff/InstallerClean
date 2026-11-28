@@ -79,8 +79,16 @@ public sealed class BatchCheck : IBatchCheck
         var counts = default(BatchCheckCounts);
         var waitClock = new Stopwatch();
         var checkClock = new Stopwatch();
+
+        // Whether a read of whether Windows Installer is busy has answered clear, and
+        // whether any read has found it busy (BatchCheckCounts.CallsNeverBusy). Set only
+        // from reads made, so a call that ends before its first such read counts nothing.
+        var readClear = false;
+        var foundBusy = false;
+        BatchCheckCounts Final() =>
+            Timed(counts with { CallsNeverBusy = readClear && !foundBusy ? 1 : 0 }, checkClock, waitClock);
         BatchCheckResult Ended(BatchEndReason reason, PendingRebootResult? signals = null) =>
-            new(null, new BatchEnd(reason, signals), Timed(counts, checkClock, waitClock));
+            new(null, new BatchEnd(reason, signals), Final());
 
         // How long Windows Installer has been busy without a break: the turns waited, and
         // the length of each check a busy signal threw away. It goes back to nought when a
@@ -99,6 +107,7 @@ public sealed class BatchCheck : IBatchCheck
         // for it.
         cancellationToken.ThrowIfCancellationRequested();
         var atOutset = await Task.Run(_signals.Check, cancellationToken).ConfigureAwait(false);
+        foundBusy = atOutset.IsBlocked;
         if (atOutset.IsBlocked && !atOutset.Reason!.Value.ClearsByWaiting())
             return Ended(BatchEndReason.SignalWaitCannotClear, atOutset);
 
@@ -111,7 +120,12 @@ public sealed class BatchCheck : IBatchCheck
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var busy = await Task.Run(_signals.CheckBusy, cancellationToken).ConfigureAwait(false);
-                if (!busy.IsBlocked) break;
+                if (!busy.IsBlocked)
+                {
+                    readClear = true;
+                    break;
+                }
+                foundBusy = true;
 
                 // Block with no reason is unreachable (PendingRebootResult.Block).
                 var reason = busy.Reason!.Value;
@@ -179,6 +193,7 @@ public sealed class BatchCheck : IBatchCheck
                     : null;
                 if (blocked is not null)
                 {
+                    foundBusy = true;
                     counts = counts with { ChecksThatDidNotStand = counts.ChecksThatDidNotStand + 1 };
                     if (!blocked.Reason!.Value.ClearsByWaiting())
                         return Ended(BatchEndReason.SignalWaitCannotClear, blocked);
@@ -198,8 +213,7 @@ public sealed class BatchCheck : IBatchCheck
                 }
 
                 handedOver = true;
-                return new BatchCheckResult(
-                    new StandingCheck(reverify, watch, waitBound), null, Timed(counts, checkClock, waitClock));
+                return new BatchCheckResult(new StandingCheck(reverify, watch, waitBound), null, Final());
             }
             finally
             {

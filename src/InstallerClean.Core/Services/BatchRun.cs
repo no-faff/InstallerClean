@@ -33,7 +33,8 @@ internal enum LookResult
 ///
 /// THE LOOK is a read of the watch armed before the batch's last full check and a read of
 /// whether Windows Installer is busy. A service looks before it begins on a file and
-/// again once the file is out of its place, and acts only on two clean looks.
+/// again once the file is out of its place, and acts only on clean looks; a Move that
+/// copies a file looks before the copy as well.
 ///
 /// THE SETTLE is what follows a look that is not clean: the watch is given up, the full
 /// check is made again over every file not yet done (<see cref="IBatchCheck"/>, which
@@ -61,6 +62,12 @@ internal sealed class BatchRun : IDisposable
     private int _position;
     private long _putBackAt;
     private long _refusedAsInUseAt;
+    private BatchRunCounts _counts;
+
+    // What the last look read: the watch, and the signal the busy read found where it made
+    // one and found one. A settle is counted under it.
+    private RecordsWatchReading _lookWatch;
+    private PendingRebootReason? _lookSignal;
 
     /// <summary>
     /// The least time between a file being refused as in use and its second try. In a
@@ -114,6 +121,28 @@ internal sealed class BatchRun : IDisposable
 
     /// <summary>Why the batch ended before its last file. Null while it has not.</summary>
     internal BatchEnd? Ended { get; private set; }
+
+    /// <summary>
+    /// What the run did on its way through the files, for the opt-in report. Read once the
+    /// batch is over and <see cref="FileWhatIsStillInUse"/> has run, so that the files
+    /// neither finished with nor held back are those the batch ended or was cancelled
+    /// before finishing with.
+    /// </summary>
+    internal BatchRunCounts Counts => _counts with
+    {
+        InUseAtTake = _inUse.Count,
+        FilesNotFinished = Files.Count(f => !_done.Contains(f) && !_dropped.Contains(f)),
+    };
+
+    /// <summary>Counts a file moved or deleted at the one more try after the last file.</summary>
+    internal void CountTakenAtTheSecondTry() =>
+        _counts = _counts with { InUseTakenAtSecondTry = _counts.InUseTakenAtSecondTry + 1 };
+
+    /// <summary>Counts a file a Move sent to its destination by copying it.</summary>
+    internal void CountMovedByCopy() => _counts = _counts with { MovedByCopy = _counts.MovedByCopy + 1 };
+
+    /// <summary>Counts a copy a Move is to make again, the file having changed since the last.</summary>
+    internal void CountCopyMadeAgain() => _counts = _counts with { CopiesMadeAgain = _counts.CopiesMadeAgain + 1 };
 
     /// <summary>The files refused as in use on their first try, for the one more try after the last file.</summary>
     internal IReadOnlyList<string> InUse => _inUse;
@@ -342,9 +371,11 @@ internal sealed class BatchRun : IDisposable
     /// Puts a held file back where it was recorded, if it is out of its place, and closes
     /// its handle. False where the file would not go back: it is then left whole in the
     /// batch's folder, filed with that folder's path so that a person can find it, and
-    /// finished with.
+    /// finished with. <paramref name="forALook"/> is true where a look made with the file out
+    /// of its place was not clean, and the file is then counted as put back
+    /// (<see cref="BatchRunCounts.PutBacks"/>) where it went back.
     /// </summary>
-    internal bool PutBack(IHeldFile held, IInHandBatch hand)
+    internal bool PutBack(IHeldFile held, IInHandBatch hand, bool forALook = false)
     {
         var wasOut = held.IsOut;
         var code = 0;
@@ -361,6 +392,7 @@ internal sealed class BatchRun : IDisposable
         else if (wasOut)
         {
             _putBackAt = Stopwatch.GetTimestamp();
+            if (forALook) _counts = _counts with { PutBacks = _counts.PutBacks + 1 };
         }
         held.Dispose();
         return back;
@@ -368,7 +400,9 @@ internal sealed class BatchRun : IDisposable
 
     /// <summary>
     /// Reads the watch and, where it is unchanged, whether Windows Installer is busy. It
-    /// makes those two reads and no other: a look is made twice for every file.
+    /// makes those two reads and no other: a look is made twice for every file, and three
+    /// times for a file a Move copies. What they
+    /// read is kept, for a settle after the look to be counted under.
     ///
     /// A read that throws ends the batch (<see cref="BatchEndReason.CheckFailed"/>) and
     /// answers <see cref="LookResult.Failed"/>, so that a caller with a file in hand puts it back
@@ -378,8 +412,13 @@ internal sealed class BatchRun : IDisposable
     {
         try
         {
-            if (_check.Watch.Read() != RecordsWatchReading.Unchanged) return LookResult.NotClean;
-            return _signals.CheckBusy().IsBlocked ? LookResult.NotClean : LookResult.Clean;
+            _lookSignal = null;
+            _lookWatch = _check.Watch.Read();
+            if (_lookWatch != RecordsWatchReading.Unchanged) return LookResult.NotClean;
+            var busy = _signals.CheckBusy();
+            if (!busy.IsBlocked) return LookResult.Clean;
+            _lookSignal = busy.Reason;
+            return LookResult.NotClean;
         }
         catch (Exception ex) when (!BatchStop.EndsBatch(ex, _token))
         {
@@ -412,6 +451,9 @@ internal sealed class BatchRun : IDisposable
         // See InHandPause.AfterAPutBack. A cancel during it ends the batch as any cancel does.
         await InHandPause.SinceAsync(_putBackAt, InHandPause.AfterAPutBack, _token).ConfigureAwait(false);
 
+        // Counted here, where the check is made, so a cancel in the pause counts no settle.
+        var recordsChanged = CountSettle();
+
         BatchCheckResult result;
         try
         {
@@ -425,6 +467,14 @@ internal sealed class BatchRun : IDisposable
         }
 
         CheckCounts += result.Counts;
+        if (recordsChanged && result.Counts.CallsNeverBusy > 0)
+            _counts = _counts with
+            {
+                SettlesForRecordsChangedNotBusy = _counts.SettlesForRecordsChangedNotBusy + 1,
+                ChecksForRecordsChangedNotBusy = _counts.ChecksForRecordsChangedNotBusy + result.Counts.ChecksMade,
+                CheckMillisecondsForRecordsChangedNotBusy =
+                    _counts.CheckMillisecondsForRecordsChangedNotBusy + result.Counts.CheckMilliseconds,
+            };
         if (result.Stood is not { } stood)
         {
             // One of the two is always set (BatchCheckResult).
@@ -444,6 +494,33 @@ internal sealed class BatchRun : IDisposable
         _sourceRootsGivenUp.AddRange(stood.Result.SourceRootsGivenUp);
         SourceWaitCount += stood.Result.SourceWaitCount;
         return true;
+    }
+
+    /// <summary>
+    /// Counts a settle under what the look before it read, and answers whether that was the
+    /// watch reading changed. A look returns on the watch without the busy read, and the
+    /// busy read names the first signal it finds, so each settle counts under one cause.
+    /// </summary>
+    private bool CountSettle()
+    {
+        var c = _counts with { Settles = _counts.Settles + 1 };
+        _counts = _lookWatch switch
+        {
+            RecordsWatchReading.Changed => c with { SettlesForRecordsChanged = c.SettlesForRecordsChanged + 1 },
+            RecordsWatchReading.Unestablished =>
+                c with { SettlesForWatchUnestablished = c.SettlesForWatchUnestablished + 1 },
+            _ => _lookSignal switch
+            {
+                PendingRebootReason.MsiExecuteMutexHeld => c with { SettlesForMutex = c.SettlesForMutex + 1 },
+                PendingRebootReason.InstallerInProgress =>
+                    c with { SettlesForInProgressKey = c.SettlesForInProgressKey + 1 },
+                PendingRebootReason.InstallerInProgressMarker =>
+                    c with { SettlesForInProgressFile = c.SettlesForInProgressFile + 1 },
+                PendingRebootReason.InstallerServiceRunning => c with { SettlesForService = c.SettlesForService + 1 },
+                _ => c with { SettlesForOtherSignal = c.SettlesForOtherSignal + 1 },
+            },
+        };
+        return _lookWatch == RecordsWatchReading.Changed;
     }
 
     /// <summary>Releases the watch of the standing check the run holds.</summary>

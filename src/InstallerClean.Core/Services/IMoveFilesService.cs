@@ -96,6 +96,7 @@ public interface IMoveFilesService
 /// </param>
 /// <param name="SourceWaitCount">The waits on a source folder those checks made.</param>
 /// <param name="CheckCounts">What those checks did, for the opt-in report.</param>
+/// <param name="Counts">What the batch did on its way through the files, for the opt-in report.</param>
 public record MoveResult(
     int MovedCount,
     IReadOnlyList<FileOperationError> Errors,
@@ -105,7 +106,8 @@ public record MoveResult(
     BatchEnd? Ended = null,
     IReadOnlyList<SourceRootGivenUp>? SourceRootsGivenUp = null,
     int SourceWaitCount = 0,
-    BatchCheckCounts CheckCounts = default)
+    BatchCheckCounts CheckCounts = default,
+    BatchRunCounts Counts = default)
 {
     /// <summary>Never null: an absent list reads as nothing held back.</summary>
     public IReadOnlyList<string> HeldBack { get; init; } = HeldBack ?? Array.Empty<string>();

@@ -465,4 +465,118 @@ public class BatchCheckTests
                 if (read == 2 && changes(armed)) watch.Reading = RecordsWatchReading.Changed;
             },
         });
+
+    // CallsNeverBusy: one where every read the call made found Windows Installer not busy.
+
+    [Fact]
+    public async Task A_call_on_a_quiet_machine_counts_as_never_busy()
+    {
+        var result = await Run(Sut());
+
+        Assert.Equal(1, result.Counts.CallsNeverBusy);
+    }
+
+    [Fact]
+    public async Task A_call_whose_outset_read_found_a_busy_signal_does_not()
+    {
+        _signals.All(MutexHeld);
+
+        var result = await Run(Sut());
+
+        Assert.NotNull(result.Stood);
+        Assert.Empty(_delays);
+        Assert.Equal(0, result.Counts.CallsNeverBusy);
+    }
+
+    [Fact]
+    public async Task A_call_that_waited_does_not()
+    {
+        _signals.Busy(ServiceRunning);
+
+        var result = await Run(Sut());
+
+        Assert.NotNull(result.Stood);
+        Assert.Single(_delays);
+        Assert.Equal(0, result.Counts.CallsNeverBusy);
+    }
+
+    [Fact]
+    public async Task A_call_that_threw_a_check_away_for_a_signal_does_not()
+    {
+        _signals.All(PendingRebootResult.Clean).All(MutexHeld);
+
+        var result = await Run(Sut());
+
+        Assert.NotNull(result.Stood);
+        Assert.Empty(_delays);
+        Assert.Equal(0, result.Counts.CallsNeverBusy);
+    }
+
+    [Fact]
+    public async Task A_call_that_threw_a_check_away_because_the_records_changed_still_does()
+    {
+        var watches = new FakeRecordsWatchFactory(armed => new FakeRecordsWatch
+        {
+            OnRead = (watch, read) =>
+            {
+                if (armed == 0 && read == 2) watch.Reading = RecordsWatchReading.Changed;
+            },
+        });
+
+        var result = await Run(Sut(watches));
+
+        Assert.NotNull(result.Stood);
+        Assert.Equal(new BatchCheckCounts(ChecksMade: 2, ChecksThatDidNotStand: 1, CallsNeverBusy: 1),
+            result.Counts with { CheckMilliseconds = 0, WaitMilliseconds = 0 });
+    }
+
+    [Fact]
+    public async Task A_call_that_ended_because_the_records_kept_changing_carries_it_on_the_ended_result()
+    {
+        var watches = new FakeRecordsWatchFactory(_ => new FakeRecordsWatch
+        {
+            OnRead = (watch, read) =>
+            {
+                if (read == 2) watch.Reading = RecordsWatchReading.Changed;
+            },
+        });
+
+        var result = await Run(Sut(watches));
+
+        Assert.Equal(BatchEndReason.RecordsKeptChanging, result.Ended!.Reason);
+        Assert.Equal(1, result.Counts.CallsNeverBusy);
+        Assert.Equal(3, result.Counts.ChecksMade);
+    }
+
+    [Fact]
+    public async Task A_call_that_ended_on_its_outset_read_made_no_busy_read_and_does_not()
+    {
+        _signals.All(QueuedRename);
+
+        var result = await Run(Sut());
+
+        Assert.Equal(BatchEndReason.SignalWaitCannotClear, result.Ended!.Reason);
+        Assert.Equal(0, _signals.BusyReads);
+        Assert.Equal(0, result.Counts.CallsNeverBusy);
+    }
+
+    [Fact]
+    public async Task A_call_that_ended_at_its_bound_does_not()
+    {
+        _signals.Busy(MutexHeld, times: 3);
+
+        var result = await Run(Sut(), bound: TimeSpan.FromMilliseconds(500));
+
+        Assert.Equal(BatchEndReason.WaitBoundReached, result.Ended!.Reason);
+        Assert.Equal(0, result.Counts.CallsNeverBusy);
+    }
+
+    [Fact]
+    public void Two_calls_added_count_each_that_was_never_busy()
+    {
+        var sum = new BatchCheckCounts(CallsNeverBusy: 1) + new BatchCheckCounts(ChecksMade: 1)
+            + new BatchCheckCounts(CallsNeverBusy: 1);
+
+        Assert.Equal(new BatchCheckCounts(ChecksMade: 1, CallsNeverBusy: 2), sum);
+    }
 }

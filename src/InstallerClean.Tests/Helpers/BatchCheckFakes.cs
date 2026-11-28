@@ -51,6 +51,9 @@ internal sealed class ScriptedBatchCheck : IBatchCheck
     /// <summary>What each call reports before it answers. Null reports nothing.</summary>
     public IReadOnlyList<BatchCheckProgress>? Reports { get; set; }
 
+    /// <summary>The counts each check that stands comes back with.</summary>
+    public BatchCheckCounts Counts { get; set; }
+
     /// <summary>The next call stands, dropping <paramref name="dropped"/> as claimed again.</summary>
     public ScriptedBatchCheck ThenStands(params string[] dropped) => Then(files =>
     {
@@ -99,7 +102,7 @@ internal sealed class ScriptedBatchCheck : IBatchCheck
         var watch = new FakeRecordsWatch();
         Watches.Add(watch);
         OnWatch?.Invoke(watch, Watches.Count);
-        return StandingChecks.Stood(result, watch);
+        return new BatchCheckResult(new StandingCheck(result, watch, null), null, Counts);
     }
 }
 

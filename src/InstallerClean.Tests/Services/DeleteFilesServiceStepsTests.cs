@@ -549,4 +549,233 @@ public class DeleteFilesServiceStepsTests
         Assert.True(_fs.File.Exists(A));
         Assert.True(_fs.File.Exists(C));
     }
+
+    // The counts the batch keeps for the opt-in report (BatchRunCounts).
+
+    [Fact]
+    public async Task A_batch_with_every_look_clean_counts_nothing()
+    {
+        var result = await Delete();
+
+        Assert.Equal(default, result.Counts);
+    }
+
+    [Theory]
+    [InlineData(PendingRebootReason.MsiExecuteMutexHeld, "mutex")]
+    [InlineData(PendingRebootReason.InstallerInProgress, "key")]
+    [InlineData(PendingRebootReason.InstallerInProgressMarker, "file")]
+    [InlineData(PendingRebootReason.InstallerServiceRunning, "service")]
+    [InlineData(PendingRebootReason.MsiExecuteMutexAccessRefused, "other")]
+    [InlineData(PendingRebootReason.InstallerServiceUnreadable, "other")]
+    public async Task A_settle_is_counted_under_the_signal_its_look_found(PendingRebootReason reason, string cause)
+    {
+        _signals.Busy(PendingRebootResult.Block(reason));
+
+        var result = await Delete();
+
+        var expected = cause switch
+        {
+            "mutex" => new BatchRunCounts(Settles: 1, SettlesForMutex: 1),
+            "key" => new BatchRunCounts(Settles: 1, SettlesForInProgressKey: 1),
+            "file" => new BatchRunCounts(Settles: 1, SettlesForInProgressFile: 1),
+            "service" => new BatchRunCounts(Settles: 1, SettlesForService: 1),
+            _ => new BatchRunCounts(Settles: 1, SettlesForOtherSignal: 1),
+        };
+        Assert.Equal(expected, result.Counts);
+    }
+
+    [Fact]
+    public async Task A_settle_whose_look_found_the_watch_not_established_is_counted_as_that()
+    {
+        _watch.OnRead = (watch, n) =>
+        {
+            if (n == 1) watch.Reading = RecordsWatchReading.Unestablished;
+        };
+
+        var result = await Delete();
+
+        Assert.Equal(new BatchRunCounts(Settles: 1, SettlesForWatchUnestablished: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_change_of_the_records_whose_check_was_never_busy_counts_that_check_and_its_time()
+    {
+        RecordsChangeAtRead(1);
+        _checks.Counts = new BatchCheckCounts(ChecksMade: 2, ChecksThatDidNotStand: 1, CheckMilliseconds: 40, CallsNeverBusy: 1);
+
+        var result = await Delete();
+
+        Assert.Equal(
+            new BatchRunCounts(
+                Settles: 1, SettlesForRecordsChanged: 1, SettlesForRecordsChangedNotBusy: 1,
+                ChecksForRecordsChangedNotBusy: 2, CheckMillisecondsForRecordsChangedNotBusy: 40),
+            result.Counts);
+        Assert.Equal(2, result.CheckCounts.ChecksMade);
+    }
+
+    [Fact]
+    public async Task A_change_of_the_records_whose_check_found_Windows_Installer_busy_is_counted_only_as_a_change()
+    {
+        RecordsChangeAtRead(1);
+        _checks.Counts = new BatchCheckCounts(ChecksMade: 1, CheckMilliseconds: 40, WaitsForMutex: 1);
+
+        var result = await Delete();
+
+        Assert.Equal(new BatchRunCounts(Settles: 1, SettlesForRecordsChanged: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_settle_for_a_signal_is_not_counted_as_a_quiet_change_whatever_its_check_found()
+    {
+        _signals.Busy(PendingRebootResult.Block(PendingRebootReason.InstallerServiceRunning));
+        _checks.Counts = new BatchCheckCounts(ChecksMade: 1, CallsNeverBusy: 1);
+
+        var result = await Delete();
+
+        Assert.Equal(new BatchRunCounts(Settles: 1, SettlesForService: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_file_put_back_after_its_second_look_is_counted_and_one_whose_first_look_was_not_clean_is_not()
+    {
+        // The first look at the first file, then the second look at the second.
+        _watch.OnRead = (watch, n) =>
+        {
+            if (n == 1) watch.Reading = RecordsWatchReading.Changed;
+        };
+        _checks.OnWatch = (watch, made) =>
+        {
+            if (made == 1)
+                watch.OnRead = (w, n) =>
+                {
+                    if (n == 4) w.Reading = RecordsWatchReading.Changed;
+                };
+        };
+
+        var result = await Delete();
+
+        Assert.Equal(3, result.DeletedCount);
+        Assert.Equal(2, result.Counts.Settles);
+        Assert.Equal(1, result.Counts.PutBacks);
+        Assert.Equal(["hold a.msi", "take a.msi", "delete a.msi", "hold b.msi", "take b.msi", "put-back b.msi"],
+            _hand.Steps.Take(6));
+    }
+
+    [Fact]
+    public async Task A_file_that_would_not_go_back_is_not_counted_as_put_back()
+    {
+        RecordsChangeAtRead(2);
+        _hand.Refuse("put-back", A, Kernel32.ERROR_ALREADY_EXISTS);
+
+        var result = await Delete();
+
+        Assert.IsType<FileLeftInHand>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.Counts.PutBacks);
+        Assert.Equal(1, result.Counts.Settles);
+    }
+
+    [Fact]
+    public async Task A_file_put_back_after_a_look_that_failed_is_not_counted_as_put_back()
+    {
+        _signals.BusyClean().BusyThrows(new InvalidOperationException("the in-progress file would not read"));
+
+        var result = await Delete();
+
+        Assert.Equal(BatchEndReason.CheckFailed, result.Ended!.Reason);
+        Assert.Equal(["hold a.msi", "take a.msi", "put-back a.msi"], _hand.Steps);
+        Assert.Equal(new BatchRunCounts(FilesNotFinished: 3), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_cancel_in_the_pause_after_a_put_back_counts_the_put_back_and_no_settle()
+    {
+        using var source = new CancellationTokenSource();
+        RecordsChangeAtRead(2);
+        var before = InHandPause.ForTests;
+        InHandPause.ForTests = (_, _) =>
+        {
+            source.Cancel();
+            throw new OperationCanceledException(source.Token);
+        };
+        DeleteResult result;
+        try
+        {
+            result = await Delete(token: source.Token);
+        }
+        finally
+        {
+            InHandPause.ForTests = before;
+        }
+
+        Assert.True(result.Cancelled);
+        Assert.Empty(_checks.Calls);
+        Assert.Equal(new BatchRunCounts(PutBacks: 1, FilesNotFinished: 3), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_file_in_use_once_is_counted_as_in_use_and_as_taken_at_the_second_try()
+    {
+        _hand.InUse(A, times: 1);
+
+        var result = await Delete();
+
+        Assert.Equal(new BatchRunCounts(InUseAtTake: 1, InUseTakenAtSecondTry: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_file_still_in_use_at_the_second_try_is_counted_as_in_use_and_not_as_taken()
+    {
+        _hand.InUse(A, times: 2);
+
+        var result = await Delete();
+
+        Assert.Equal(new BatchRunCounts(InUseAtTake: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_batch_that_ended_part_way_counts_the_files_it_left_untouched_and_the_four_add_up()
+    {
+        RecordsChangeAtRead(4);
+        _checks.ThenEnds(BatchEndReason.RecordsKeptChanging);
+
+        var result = await Delete();
+
+        Assert.Equal(2, result.Counts.FilesNotFinished);
+        Assert.Equal(1, result.Counts.PutBacks);
+        Assert.Equal(3,
+            result.DeletedCount + result.Errors.Count + result.HeldBack.Count + result.Counts.FilesNotFinished);
+    }
+
+    [Fact]
+    public async Task A_cancelled_batch_counts_the_file_it_never_came_to_and_not_the_file_in_use_it_filed()
+    {
+        _hand.InUse(A, times: 1);
+
+        var result = await Delete(mayAct: path => path != C);
+
+        Assert.True(result.Cancelled);
+        Assert.Equal(new BatchRunCounts(InUseAtTake: 1, FilesNotFinished: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_batch_whose_folder_cannot_be_made_counts_every_file_as_not_finished()
+    {
+        _hand.OpenBatchError = Kernel32.ERROR_DIRECTORY;
+
+        var result = await Delete();
+
+        Assert.Equal(new BatchRunCounts(FilesNotFinished: 3), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_file_a_later_check_drops_is_held_back_and_not_counted_as_not_finished()
+    {
+        RecordsChangeAtRead(1);
+        _checks.ThenStands(C);
+
+        var result = await Delete();
+
+        Assert.Equal([C], result.HeldBack);
+        Assert.Equal(0, result.Counts.FilesNotFinished);
+    }
 }

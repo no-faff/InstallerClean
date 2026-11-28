@@ -108,7 +108,8 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 "Delete ended before its first file: the app's own folder inside the Installer folder could not be made.",
                 new Win32Exception(handError)));
             return new DeleteResult(0, Array.Empty<FileOperationError>(),
-                Ended: new BatchEnd(BatchEndReason.InHandFolderUnavailable, WindowsError: handError));
+                Ended: new BatchEnd(BatchEndReason.InHandFolderUnavailable, WindowsError: handError),
+                Counts: run.Counts);
         }
 
         var deleted = 0;
@@ -124,7 +125,11 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 {
                     var outcome = await DeleteOneAsync(run, hand, filePath, lastTry, cancellationToken, mayAct)
                         .ConfigureAwait(false);
-                    if (outcome == FileOutcome.Acted) deleted++;
+                    if (outcome == FileOutcome.Acted)
+                    {
+                        deleted++;
+                        if (lastTry) run.CountTakenAtTheSecondTry();
+                    }
                     if (outcome == FileOutcome.BatchEnded) goto finished;
                 }
             }
@@ -148,7 +153,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
         return new DeleteResult(deleted, run.Errors.AsReadOnly(), cancelled,
             run.HeldBack.ToList().AsReadOnly(), run.HeldBackReasons, run.Ended,
-            run.SourceRootsGivenUp.ToList().AsReadOnly(), run.SourceWaitCount, run.CheckCounts);
+            run.SourceRootsGivenUp.ToList().AsReadOnly(), run.SourceWaitCount, run.CheckCounts, run.Counts);
     }
 
     private static async Task<FileOutcome> DeleteOneAsync(
@@ -201,7 +206,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 look = run.Look();
                 if (look != LookResult.Clean)
                 {
-                    var back = run.PutBack(held, hand);
+                    var back = run.PutBack(held, hand, forALook: look == LookResult.NotClean);
                     held = null;
                     if (!await run.SettleAsync(look).ConfigureAwait(false)) return FileOutcome.BatchEnded;
                     if (!back) return FileOutcome.NotActed;

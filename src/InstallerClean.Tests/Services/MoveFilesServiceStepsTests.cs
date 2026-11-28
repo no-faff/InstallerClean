@@ -400,6 +400,117 @@ public class MoveFilesServiceStepsTests
         Assert.False(_fs.Directory.Exists(OtherDrive));
     }
 
+    // The counts the batch keeps for the opt-in report (BatchRunCounts).
+
+    [Fact]
+    public async Task A_move_by_rename_with_every_look_clean_counts_nothing()
+    {
+        var result = await Move(SameDrive);
+
+        Assert.Equal(default, result.Counts);
+    }
+
+    [Fact]
+    public async Task Each_file_moved_by_a_copy_is_counted()
+    {
+        var result = await Move(OtherDrive);
+
+        Assert.Equal(new BatchRunCounts(MovedByCopy: 3), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_file_copied_to_a_destination_whose_reach_was_not_established_is_counted_as_moved_by_copy()
+    {
+        _hand.Reach = RenameReach.Unestablished;
+
+        var result = await Move(SameDrive, [A]);
+
+        Assert.Equal(new BatchRunCounts(MovedByCopy: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_copy_begun_again_because_the_file_changed_is_counted()
+    {
+        var changed = false;
+        _hand.OnStep = (step, path) =>
+        {
+            if (step != "hold" || changed) return;
+            changed = true;
+            _fs.File.WriteAllText(path, "a longer payload, written after the copy");
+        };
+
+        var result = await Move(OtherDrive, [A]);
+
+        Assert.Equal(new BatchRunCounts(MovedByCopy: 1, CopiesMadeAgain: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_file_that_changes_after_every_copy_counts_the_two_copies_begun_again_and_no_move()
+    {
+        var writes = 0;
+        _hand.OnStep = (step, path) =>
+        {
+            if (step == "hold") _fs.File.WriteAllText(path, new string('x', 20 + ++writes));
+        };
+
+        var result = await Move(OtherDrive, [A]);
+
+        Assert.Equal(new BatchRunCounts(CopiesMadeAgain: 2), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_copy_made_afresh_at_the_second_try_is_not_counted_as_made_again()
+    {
+        _hand.InUseAtTheHold(A, times: 2);
+
+        var result = await Move(OtherDrive, [A]);
+
+        Assert.Equal(new BatchRunCounts(InUseAtTake: 1), result.Counts);
+    }
+
+    [Fact]
+    public async Task By_copy_a_file_put_back_after_the_look_with_it_out_is_counted()
+    {
+        RecordsChangeAtRead(3);
+
+        var result = await Move(OtherDrive, [A]);
+
+        Assert.Equal(
+            new BatchRunCounts(Settles: 1, SettlesForRecordsChanged: 1, PutBacks: 1, MovedByCopy: 1),
+            result.Counts);
+    }
+
+    [Fact]
+    public async Task By_copy_a_look_before_the_copy_that_is_not_clean_puts_nothing_back()
+    {
+        RecordsChangeAtRead(1);
+
+        var result = await Move(OtherDrive);
+
+        Assert.Equal(new BatchRunCounts(Settles: 1, SettlesForRecordsChanged: 1, MovedByCopy: 3), result.Counts);
+    }
+
+    [Fact]
+    public async Task A_move_that_ended_before_its_first_file_moved_counts_every_file_as_not_finished()
+    {
+        RecordsChangeAtRead(2);
+        _checks.ThenEnds(BatchEndReason.RecordsKeptChanging);
+
+        var result = await Move(OtherDrive);
+
+        Assert.Equal(new BatchRunCounts(Settles: 1, SettlesForRecordsChanged: 1, FilesNotFinished: 3), result.Counts);
+    }
+
+    [Fact]
+    public async Task By_rename_a_file_in_use_once_is_counted_as_in_use_and_as_taken_at_the_second_try()
+    {
+        _hand.InUse(A, times: 1);
+
+        var result = await Move(SameDrive);
+
+        Assert.Equal(new BatchRunCounts(InUseAtTake: 1, InUseTakenAtSecondTry: 1), result.Counts);
+    }
+
     /// <summary>A destination guard that does everything the by-path one does and refuses the open for the batch.</summary>
     private sealed class GuardThatWillNotOpen(IDestinationGuard inner) : IDestinationGuard
     {

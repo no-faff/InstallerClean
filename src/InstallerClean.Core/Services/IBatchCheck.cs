@@ -223,6 +223,13 @@ public enum BatchCheckStage
 /// <param name="WaitsForInProgressKey">Waits that began on the InProgress registry key.</param>
 /// <param name="WaitsForInProgressFile">Waits that began on Windows Installer's in-progress file.</param>
 /// <param name="WaitsForService">Waits that began on the Windows Installer service running.</param>
+/// <param name="CallsNeverBusy">
+/// Calls that found Windows Installer not busy at every read they made of it: the read of
+/// every signal at the outset clear, the first read of whether it is busy clear, no wait
+/// begun and no check thrown away for a signal. One call counts once at most, and a call
+/// that ended on its outset read, having made no read of whether Windows Installer is busy,
+/// counts nothing.
+/// </param>
 public readonly record struct BatchCheckCounts(
     int ChecksMade = 0,
     int ChecksThatDidNotStand = 0,
@@ -231,7 +238,8 @@ public readonly record struct BatchCheckCounts(
     int WaitsForMutex = 0,
     int WaitsForInProgressKey = 0,
     int WaitsForInProgressFile = 0,
-    int WaitsForService = 0)
+    int WaitsForService = 0,
+    int CallsNeverBusy = 0)
 {
     /// <summary>The two added, for a batch that made more than one call.</summary>
     public static BatchCheckCounts operator +(BatchCheckCounts a, BatchCheckCounts b) =>
@@ -242,7 +250,8 @@ public readonly record struct BatchCheckCounts(
             a.WaitsForMutex + b.WaitsForMutex,
             a.WaitsForInProgressKey + b.WaitsForInProgressKey,
             a.WaitsForInProgressFile + b.WaitsForInProgressFile,
-            a.WaitsForService + b.WaitsForService);
+            a.WaitsForService + b.WaitsForService,
+            a.CallsNeverBusy + b.CallsNeverBusy);
 
     /// <summary>
     /// These counts with one more wait counted against <paramref name="reason"/>. A reason
