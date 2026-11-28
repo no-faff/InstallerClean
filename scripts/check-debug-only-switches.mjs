@@ -124,6 +124,11 @@ const ALLOWED = [
     what: 'ExpandRecordedPath, expanding a path Windows Installer recorded',
   },
   {
+    file: 'src/InstallerClean.Core/Services/SourceRecords.cs',
+    text: "if (text.IndexOf('%') >= 0) Note(Environment.ExpandEnvironmentVariables(text));",
+    what: 'RegistrySourceRecords, expanding a source record Windows Installer kept, to see whether it names a folder an earlier batch left',
+  },
+  {
     file: 'src/InstallerClean.Core/Helpers/RegistryData.cs',
     text: 'while ((length = Kernel32.ExpandEnvironmentStrings(text, buffer, (uint)buffer.Length)) > buffer.Length)',
     what: 'RegistryData.Expanded, expanding a REG_EXPAND_SZ value such as the LocalPackage path Windows Installer recorded',
