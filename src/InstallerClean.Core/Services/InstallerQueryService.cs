@@ -5878,9 +5878,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <param name="UnnamedListEntries">
     /// Entries in those lists whose name is not a program code. No Windows Installer call
     /// can name such an entry, as every one takes a product or patch code and none packs to
-    /// that name, so it decides nothing: the cached files any program has are recorded under
-    /// <c>UserData</c>, which the registry fallback claims by path whatever the key above
-    /// them is called.
+    /// that name, so the count decides nothing: the cached files any program has are recorded
+    /// under <c>UserData</c>, which the registry fallback claims by path whatever the key above
+    /// them is called. What decides whether a key under <c>UserData</c> whose name is no code
+    /// is accounted for is the names in its account's published lists, which
+    /// <see cref="ReadPublishedCodes"/> counts on its own.
     /// </param>
     /// <param name="FoundByCode">
     /// The installations in <paramref name="Products"/> that no walk returned and Windows
@@ -6081,8 +6083,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>UserData</c>. A key under <c>UserData</c> whose name is no code can hold a program's
     /// records under a name that is not its code, and the walk can leave that program out, so
     /// the code of every program its account's published lists name is put to Windows.
-    /// <see cref="UnreachableKeys"/> then holds the account's keys back wherever one of those
-    /// codes was neither walked nor recovered.
+    /// <see cref="UnreachableKeys"/> then holds the account's keys back wherever a name in
+    /// those lists is not a code, or one of their codes was neither walked nor recovered, or
+    /// its own keyed answer did not settle. The names that are not a code are counted here, by
+    /// account.
     ///
     /// The system account's programs are listed in the per-machine list, in a managed list of
     /// its own where there is one, and in its own hive's list, which holds what SYSTEM
@@ -6166,9 +6170,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// The keys under <c>UserData</c> whose name is not a code that no published list could
     /// account for (<see cref="EnumerationCensus.UnparseableProductKeysUnreachable"/>): those
-    /// <see cref="ReadPublishedCodes"/> counted, and every such key of an account one of whose
-    /// published codes has no installation, in the account and context of the list naming
-    /// it, that the walk returned or the recovery found. A code whose own keyed answer did not
+    /// <see cref="ReadPublishedCodes"/> counted, and every such key of an account whose
+    /// published lists hold a name that is not a code, or one of whose published codes has no
+    /// installation, in the account and context of the list naming it, that the walk returned
+    /// or the recovery found. A code whose own keyed answer did not
     /// settle (<paramref name="unsettled"/>) settles nothing, as which of its installations
     /// exist is not established.
     ///
@@ -6182,11 +6187,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// whose records sit under a name that is not its code can be. Such a program could be
     /// the one the key holds, so the key is not accounted for.
     ///
+    /// A NAME IN THE ACCOUNT'S PUBLISHED LISTS THAT IS NOT A CODE LEAVES THE KEY UNACCOUNTED FOR.
+    /// It is a program no Windows Installer call can name, so nothing asked it, and it could
+    /// be the program whose records the key holds. A list holding only such names accounts
+    /// for nothing.
+    ///
     /// <c>SystemAccountedFor</c> is how many of the keys under the system account its lists
-    /// account for, where every name in them is a program code and every code a per-machine
-    /// program's: the keys that withhold no superseded patch. A name in them that is not a
-    /// code is a program no call can name and nothing asked, so it keeps every such key
-    /// withholding.
+    /// account for, where every code they name is a per-machine program's: the keys that
+    /// withhold no superseded patch.
     /// </summary>
     private static (int Unreachable, int SystemAccountedFor) UnreachableKeys(PublishedCodes published,
         FallbackRead fallback,
@@ -6206,11 +6214,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         foreach (var (account, rows) in published.ByAccount)
         {
             var keys = fallback.UnparseableProductKeysByAccount![account];
-            if (!rows.All(row => settled.Contains(RowKey(row))))
+            if (published.UnnamedByAccount![account] > 0 || !rows.All(row => settled.Contains(RowKey(row))))
                 unreachable += keys;
             else if (string.Equals(account, LocalSystemAccount, StringComparison.OrdinalIgnoreCase)
-                     && rows.All(row => row.Context == MsiInstallContext.Machine)
-                     && published.UnnamedByAccount![account] == 0)
+                     && rows.All(row => row.Context == MsiInstallContext.Machine))
                 systemAccountedFor += keys;
         }
         return (unreachable, systemAccountedFor);

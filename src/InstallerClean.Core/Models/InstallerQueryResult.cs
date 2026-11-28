@@ -268,12 +268,14 @@ public record InstallerQueryResult(
 /// THE WALK-DERIVED OFFER IS WITHHELD FOR SUCH A KEY UNLESS ITS ACCOUNT'S PUBLISHED LISTS
 /// ACCOUNT FOR IT (<see cref="UnparseableProductKeysUnreachable"/>). A program's source list
 /// is in its published key, not under <c>UserData</c>, so every code the account's published
-/// lists name is asked by code, and the key is accounted for only where each of those codes
-/// has an installation the walk returned or the recovery found, in the account and context
-/// of the list naming it, and is not a code whose own keyed answer did not settle: each such
-/// program is then asked its <c>InstanceType</c>,
-/// and its packages are compared as any listed installation's are. A program whose published
-/// key has no code for a name is named by no Windows Installer call. Every cached-file value
+/// lists name is asked by code, and the key is accounted for only where those lists hold no
+/// name that is not a code and each of their codes has an installation the walk returned or
+/// the recovery found, in the account and context of the list naming it, and is not a code
+/// whose own keyed answer did not settle: each such program is then asked its
+/// <c>InstanceType</c>, and its packages are compared as any listed installation's are. A
+/// program whose published key has no code for a name is named by no Windows Installer call,
+/// so nothing asks it and the key could be its: such a name leaves the key unaccounted for, and
+/// a list holding only such names accounts for nothing. Every cached-file value
 /// under such a key, product or patch, is claimed by path by the registry fallback whatever
 /// the key's name.
 ///
@@ -560,7 +562,10 @@ public readonly record struct EnumerationCensus(
     // whole.
     int StoppedProductLists = 0,
     // UnnamedProductListEntries: the entries in those lists whose name is not a program
-    // code. Windows Installer has no call that names such an entry, so it decides nothing.
+    // code. Windows Installer has no call that names such an entry, so the count decides
+    // nothing. A name that is not a code in the published lists of an account holding a
+    // misnamed key under UserData is counted apart, when those lists are read, and is one of
+    // the reasons in UnparseableProductKeysUnreachable.
     int UnnamedProductListEntries = 0,
     // StoppedListInstallations: installations no walk returned that Windows listed when
     // asked by code about a program named after the entry in a stopped list. Each is read
@@ -568,10 +573,11 @@ public readonly record struct EnumerationCensus(
     int StoppedListInstallations = 0,
     // UnparseableProductKeysUnreachable: the members of UnparseableProductKeyNames that the
     // published lists of their account do not account for: the account's lists could not all
-    // be read (its hive not loaded, or a list that would not read), or a code they name has no
+    // be read (its hive not loaded, or a list that would not read), a name in them is not a
+    // program code, or a code they name has no
     // installation the walk returned or the recovery found in that list's account and context,
     // or its own keyed answer did not settle. Each withholds the walk-derived offer
-    // (RegistryProductUnaskable).
+    // (RegistryProductUnaskable). One count for every reason; the census does not say which.
     int UnparseableProductKeysUnreachable = 0,
     // PublishedCodesAsked: program codes a published list names that neither the registry's
     // own records under UserData nor a stopped list name, asked by code because a key under

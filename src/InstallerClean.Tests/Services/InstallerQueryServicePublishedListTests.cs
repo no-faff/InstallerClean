@@ -9,10 +9,10 @@ namespace InstallerClean.Tests.Services;
 /// holds one, the scan reads the published lists that account's programs are listed in and
 /// asks Windows about every code they name, so a program the walk left out is recovered and
 /// asked as any recovered program is. The walk-derived offer is withheld unless those lists
-/// account for the key: every list read, and every code in them settled in its list's own
-/// account and context. The superseded class is withheld on every such key but one under the
-/// system account whose lists account for it, every name in them the code of a per-machine
-/// program.
+/// account for the key: every list read, no name in them that is not a code, and every code
+/// in them settled in its list's own account and context. The superseded class is withheld
+/// on every such key but one under the system account whose lists account for it, every code
+/// in them a per-machine program's.
 ///
 /// Every machine here holds one per-machine program, which the walk returns and whose cached
 /// package it claims. The walk returns nothing else: a program a published list names is
@@ -102,7 +102,7 @@ public class InstallerQueryServicePublishedListTests
         const string Patch = "{77777777-7777-7777-7777-777777777777}";
         const string PatchFile = @"C:\Windows\Installer\published-list-patch.msp";
 
-        async Task<InstallerQueryResult> ScanWith(bool missedHoldsItApplied)
+        async Task<InstallerQueryResult> ScanWith(bool missedHoldsItApplied, bool listHoldsANameThatIsNoCode = false)
         {
             var msi = Machine();
             msi.AddPatch(Before, Patch, PatchFile, state: "2", uninstallable: "0");
@@ -114,7 +114,9 @@ public class InstallerQueryServicePublishedListTests
             }
             msi.PatchSequenceFor = (_, _) => FakeMsiApi.CannotApply;
             var lists = new FakeProductLists(msi);
-            lists.PublishedInstead[(MsiInstallContext.Machine, null)] = [Packed(Before), Packed(Missed)];
+            lists.PublishedInstead[(MsiInstallContext.Machine, null)] = listHoldsANameThatIsNoCode
+                ? [Packed(Before), Packed(Missed), TooLong]
+                : [Packed(Before), Packed(Missed)];
 
             // The registry's reading of every program's patch set, as the fallback gives one for
             // each product key; a program with none would hold back every patch it shares.
@@ -134,11 +136,15 @@ public class InstallerQueryServicePublishedListTests
 
         var held = await ScanWith(missedHoldsItApplied: true);
         var offered = await ScanWith(missedHoldsItApplied: false);
+        var beside = await ScanWith(missedHoldsItApplied: false, listHoldsANameThatIsNoCode: true);
 
         Assert.Equal(1, held.Census.UnparseableSystemKeysAccountedFor);
         Assert.Equal(0, held.UnaccountedProductCount);
         Assert.Contains(held.Installations!, i => i.ProductCode == Missed);
         Assert.Contains(held.Packages, p => p.LocalPackagePath == Path.GetFullPath(PatchFile) && !p.IsRemovable);
+        // A name in the list that is not a code is a program nothing asked: the key holds P.
+        Assert.Equal(1, beside.UnaccountedProductCount);
+        Assert.Contains(beside.Packages, p => p.LocalPackagePath == Path.GetFullPath(PatchFile) && !p.IsRemovable);
         Assert.Equal(0, offered.UnaccountedProductCount);
         Assert.Contains(offered.Packages, p => p.LocalPackagePath == Path.GetFullPath(PatchFile) && p.IsRemovable);
     }
@@ -146,18 +152,21 @@ public class InstallerQueryServicePublishedListTests
     public enum KeyCase
     {
         SystemListsAccountFor, SystemListsNameAPerUserProgram, SystemListsHoldANameThatIsNoCode,
-        SystemCodeNotInstalled, SystemCodeUnanswered, SystemListUnread,
-        AnotherAccountsListsAccountFor, AnotherAccountsListsEmpty, Unreachable, SystemAndUnreachable,
+        SystemOwnListHoldsANameThatIsNoCode, SystemCodeNotInstalled, SystemCodeUnanswered, SystemListUnread,
+        AnotherAccountsListsAccountFor, AnotherAccountsListsHoldANameThatIsNoCode, AnotherAccountsListsEmpty,
+        Unreachable, SystemAndUnreachable,
     }
 
     [Theory]
     [InlineData(KeyCase.SystemListsAccountFor, 0, 1)]
     [InlineData(KeyCase.SystemListsNameAPerUserProgram, 1, 0)]
     [InlineData(KeyCase.SystemListsHoldANameThatIsNoCode, 1, 0)]
+    [InlineData(KeyCase.SystemOwnListHoldsANameThatIsNoCode, 1, 0)]
     [InlineData(KeyCase.SystemCodeNotInstalled, 1, 0)]
     [InlineData(KeyCase.SystemCodeUnanswered, 2, 0)]
     [InlineData(KeyCase.SystemListUnread, 1, 0)]
     [InlineData(KeyCase.AnotherAccountsListsAccountFor, 1, 0)]
+    [InlineData(KeyCase.AnotherAccountsListsHoldANameThatIsNoCode, 1, 0)]
     [InlineData(KeyCase.AnotherAccountsListsEmpty, 1, 0)]
     [InlineData(KeyCase.Unreachable, 2, 0)]
     [InlineData(KeyCase.SystemAndUnreachable, 1, 1)]
@@ -166,16 +175,18 @@ public class InstallerQueryServicePublishedListTests
     {
         // The system account's key, accounted for by a per-machine list naming a program the
         // walk left out; the same with SYSTEM's own list naming a program it installed per
-        // user; with the per-machine list holding a name that is not a code; with the code it
+        // user; with the per-machine list holding a name that is not a code; with SYSTEM's own
+        // list holding one; with the code it
         // names not installed; with that code unanswered; with the per-machine list unread; a
-        // signed-in account's key, accounted for by its own list; the same with that account's
-        // lists empty; two keys under an account whose hive is not loaded; and the first and
+        // signed-in account's key, accounted for by its own list; the same with a name that is
+        // not a code beside its program's; the same with that account's lists empty; two keys under an account whose hive is not loaded; and the first and
         // that one together, one key each.
         var msi = Machine();
         var lists = new FakeProductLists(msi);
         var keys = new Dictionary<string, int>();
         var system = plant is KeyCase.SystemListsAccountFor or KeyCase.SystemListsNameAPerUserProgram
-            or KeyCase.SystemListsHoldANameThatIsNoCode or KeyCase.SystemCodeNotInstalled
+            or KeyCase.SystemListsHoldANameThatIsNoCode or KeyCase.SystemOwnListHoldsANameThatIsNoCode
+            or KeyCase.SystemCodeNotInstalled
             or KeyCase.SystemCodeUnanswered or KeyCase.SystemListUnread or KeyCase.SystemAndUnreachable;
         if (system)
         {
@@ -187,6 +198,8 @@ public class InstallerQueryServicePublishedListTests
             };
             keys[LocalSystem] = 1;
         }
+        if (plant == KeyCase.SystemOwnListHoldsANameThatIsNoCode)
+            lists.PublishedInstead[(MsiInstallContext.UserUnmanaged, LocalSystem)] = [TooLong];
         if (plant == KeyCase.SystemCodeNotInstalled) msi.NotInstalled.Add(Missed);
         if (plant == KeyCase.SystemCodeUnanswered) msi.KeyedRowResult[(Missed, 0)] = 1610;
         if (plant == KeyCase.AnotherAccountsListsEmpty)
@@ -199,10 +212,11 @@ public class InstallerQueryServicePublishedListTests
             msi.KeyedInstances[Theirs] = [(LocalSystem, MsiInstallContext.UserUnmanaged)];
             lists.PublishedInstead[(MsiInstallContext.UserUnmanaged, LocalSystem)] = [Packed(Theirs)];
         }
-        if (plant == KeyCase.AnotherAccountsListsAccountFor)
+        if (plant is KeyCase.AnotherAccountsListsAccountFor or KeyCase.AnotherAccountsListsHoldANameThatIsNoCode)
         {
             msi.KeyedInstances[Theirs] = [(Account, MsiInstallContext.UserUnmanaged)];
-            lists.PublishedInstead[(MsiInstallContext.UserUnmanaged, Account)] = [Packed(Theirs)];
+            lists.PublishedInstead[(MsiInstallContext.UserUnmanaged, Account)] =
+                plant == KeyCase.AnotherAccountsListsAccountFor ? [Packed(Theirs)] : [Packed(Theirs), TooLong];
             keys[Account] = 1;
         }
         if (plant is KeyCase.Unreachable or KeyCase.SystemAndUnreachable)
@@ -220,8 +234,32 @@ public class InstallerQueryServicePublishedListTests
                 + result.Census.UnparseableProductKeyNames - result.Census.UnparseableSystemKeysAccountedFor,
             result.UnaccountedProductCount);
         Assert.Equal(plant is KeyCase.Unreachable or KeyCase.SystemAndUnreachable or KeyCase.SystemCodeNotInstalled
-                or KeyCase.SystemCodeUnanswered or KeyCase.SystemListUnread,
+                or KeyCase.SystemCodeUnanswered or KeyCase.SystemListUnread or KeyCase.SystemListsHoldANameThatIsNoCode
+                or KeyCase.SystemOwnListHoldsANameThatIsNoCode or KeyCase.AnotherAccountsListsHoldANameThatIsNoCode,
             result.Census.RegistryProductUnaskable);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_published_list_holding_only_a_name_that_is_no_code_accounts_for_nothing(bool systemAccount)
+    {
+        // The account's published lists read, and the only name in them is one no call can
+        // name. Nothing asked that program, so it could be the one whose records the key holds.
+        var msi = Machine();
+        var lists = new FakeProductLists(msi);
+        var account = systemAccount ? LocalSystem : Account;
+        if (systemAccount)
+            lists.PublishedInstead[(MsiInstallContext.Machine, null)] = [TooLong];
+        else
+            lists.PublishedInstead[(MsiInstallContext.UserUnmanaged, Account)] = [TooLong];
+
+        var result = await Scan(msi, lists, new() { [account] = 1 });
+
+        Assert.Equal(1, result.Census.UnparseableProductKeysUnreachable);
+        Assert.True(result.Census.RegistryProductUnaskable);
+        Assert.Equal(0, result.Census.UnparseableSystemKeysAccountedFor);
+        Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
