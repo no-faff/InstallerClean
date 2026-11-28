@@ -40,9 +40,8 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause, TimeSpan? keyedPauseL
     /// the scan ends the wait with OperationCanceledException
     /// (<see cref="RegistryNames.Pause"/>).
     /// </summary>
-    internal static WalkRestarts For(
-        CancellationToken cancellationToken, Action<TimeSpan>? pause = null, TimeSpan? keyedPauseLimit = null) =>
-        new(pause ?? PauseForTests ?? RegistryNames.Pause(cancellationToken), keyedPauseLimit);
+    internal static WalkRestarts For(CancellationToken cancellationToken, Action<TimeSpan>? pause = null) =>
+        new(pause ?? PauseForTests ?? RegistryNames.Pause(cancellationToken));
 
     /// <summary>
     /// Restarts that make no property read again (<see cref="KeyedRead"/>; never hand them to a

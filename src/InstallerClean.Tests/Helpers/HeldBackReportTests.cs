@@ -97,12 +97,12 @@ public class HeldBackReportTests
         // files, so their causes accumulate; anything merging them would under-count
         // the one number the sentence prints.
         var preAct = new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 2);
-        var underLease = new HeldBackReasons(Reclaimed: 3, RecordsChanged: 1);
+        var midBatch = new HeldBackReasons(Reclaimed: 3, RecordsChanged: 1);
 
         Assert.Equal(
             new HeldBackReasons(Reclaimed: 4, RecordsChanged: 1, RecordsUnreadable: 2),
-            preAct + underLease);
-        Assert.Equal(preAct.Total + underLease.Total, (preAct + underLease).Total);
+            preAct + midBatch);
+        Assert.Equal(preAct.Total + midBatch.Total, (preAct + midBatch).Total);
     }
 
     [Fact]

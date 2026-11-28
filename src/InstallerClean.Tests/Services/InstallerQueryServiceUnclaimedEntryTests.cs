@@ -594,8 +594,7 @@ public class InstallerQueryServiceUnclaimedEntryTests
     public async Task The_check_before_a_Move_or_Delete_drops_a_patch_such_a_program_holds()
     {
         // Every Move and Delete, from the window and the command line, passes through this
-        // re-verify, which runs the enumeration again. The check under the lease re-reads
-        // only pairings the scan found, and this holder is not one.
+        // re-verify, which runs the enumeration again.
         var msi = MachineWithAnUnlistedProgram();
         var fallback = UnlistedProgramFallback(
             new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]));

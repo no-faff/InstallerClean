@@ -1,3 +1,5 @@
+using System.Security.AccessControl;
+using System.Security.Principal;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
@@ -423,6 +425,51 @@ public class ProductPatchSetTests
                 RegistryNames.CallsForTests = forTests;
             }
         });
+    }
+
+    /// <summary>
+    /// A patch key the account is refused the rights to read is one whose Uninstallable
+    /// was never read: the product is left unestablished, the patch stays in the listing,
+    /// which is built from the key's names, and it is not read as zero.
+    /// </summary>
+    [Fact]
+    public void A_patch_key_that_will_not_open_leaves_the_set_unestablished_and_the_listing_standing()
+    {
+        WithProductsKey(products =>
+        {
+            Patch(products, PackedPatchOne, uninstallable: 0);
+            SetDeny(products, PackedPatchOne, add: true);
+            try
+            {
+                var (set, codes, zeros) = ReadZeros(products);
+
+                Assert.Equal(ProductPatchSet.Unestablished, set);
+                Assert.Equal(new[] { PatchOne }, codes);
+                Assert.Empty(zeros);
+            }
+            finally
+            {
+                SetDeny(products, PackedPatchOne, add: false);
+            }
+        });
+    }
+
+    /// <summary>
+    /// Adds or removes a rule denying the running account the rights a read of a patch
+    /// key asks for. The key is opened here for its permissions alone, which the rule
+    /// does not deny, so the test can take the rule off again.
+    /// </summary>
+    private static void SetDeny(RegistryKey products, string patchName, bool add)
+    {
+        using var key = products.OpenSubKey($@"{Product}\Patches\{patchName}",
+            RegistryKeyPermissionCheck.ReadWriteSubTree,
+            RegistryRights.ChangePermissions | RegistryRights.ReadPermissions)!;
+        var security = key.GetAccessControl();
+        var rule = new RegistryAccessRule(WindowsIdentity.GetCurrent().User!,
+            RegistryRights.QueryValues | RegistryRights.EnumerateSubKeys, AccessControlType.Deny);
+        if (add) security.AddAccessRule(rule);
+        else security.RemoveAccessRule(rule);
+        key.SetAccessControl(security);
     }
 
     private static (ProductPatchSet Set, IReadOnlyCollection<string>? Codes, IReadOnlyCollection<string> Zeros)

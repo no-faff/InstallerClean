@@ -13,8 +13,8 @@ namespace InstallerClean.Models;
 /// asking about the survivor's product asks about one of several and cannot see
 /// what any of the others now say.
 ///
-/// So claims are collected per claim rather than per path, and a consumer
-/// re-reading one path re-reads every claim naming it.
+/// So claims are collected per claim rather than per path, and a pass that asks
+/// about one path asks about every claim naming it.
 /// </summary>
 /// <param name="LocalPackagePath">
 /// The claimed path, normalised the same way the <see cref="RegisteredPackage"/>

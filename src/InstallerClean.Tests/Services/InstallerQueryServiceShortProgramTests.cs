@@ -505,54 +505,6 @@ public class InstallerQueryServiceShortProgramTests
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
-    // ---- An installation found holding the patch by name, for the check made under the lease ----
-
-    [Fact]
-    public async Task A_recovered_program_found_holding_the_patch_carries_its_pairing_and_its_other_patches()
-    {
-        var msi = RecoveredHolder();
-
-        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
-
-        AssertOffered(Row(result));
-        var held = Assert.Single(result.PairingsHeldByName);
-        Assert.Equal((Superseded, Recovered), (held.PatchCode, held.ProductCode));
-        Assert.Equal(
-            new[] { Superseded, OtherPatch },
-            result.PairingsOfHoldersWithNoClaims
-                .Where(p => p.ProductCode == Recovered)
-                .Select(p => p.PatchCode)
-                .Order(StringComparer.Ordinal));
-        Assert.All(result.PairingsOfHoldersWithNoClaims, p => Assert.Equal(Recovered, p.ProductCode));
-    }
-
-    /// <summary>
-    /// Access refused at the first row or after <see cref="Superseded"/>, or a list that
-    /// never ends, which in the product walk would refuse the scan. Here the scan stands,
-    /// and the program's pairings for the check under the lease are the rows Windows
-    /// returned before it stopped, each once. The program's own key lists every row Windows
-    /// returns, so the superseded patch stays offered and the program is asked about it.
-    /// </summary>
-    [Theory]
-    [InlineData(0u, new string[0])]
-    [InlineData(1u, new[] { Superseded })]
-    [InlineData(uint.MaxValue, new[] { EndlessPatch })]
-    public async Task A_patch_list_that_refuses_for_that_program_leaves_the_scan_standing_and_carries_the_rows_it_returned(
-        uint refusedAt, string[] carried)
-    {
-        var msi = RecoveredHolder();
-        if (refusedAt == uint.MaxValue) NeverEndingPatchList(msi);
-        else msi.PatchRowResult[(Recovered, refusedAt)] = AccessDenied;
-
-        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded, OtherPatch, EndlessPatch]));
-
-        AssertOffered(Row(result));
-        Assert.Contains(Recovered, msi.PatchEnumerationsStarted);
-        Assert.Single(result.PairingsHeldByName, p => p.ProductCode == Recovered);
-        Assert.Equal(carried, result.PairingsOfHoldersWithNoClaims.Select(p => p.PatchCode));
-        Assert.All(result.PairingsOfHoldersWithNoClaims, p => Assert.Equal(Recovered, p.ProductCode));
-    }
-
     // ---- A recovered program's patches, as Windows Installer lists them ----
 
     [Fact]
@@ -942,13 +894,6 @@ public class InstallerQueryServiceShortProgramTests
     public void The_registry_holds_the_Uninstallable_of_a_per_machine_pairing_and_of_a_per_user_unmanaged_one(
         string? patchSid, MsiInstallContext patchContext, bool isTheSource) =>
         Assert.Equal(isTheSource, InstallerQueryService.RegistryValueIsTheSource(patchSid, patchContext));
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(@"S-1-5-21-1\..\S-1-5-18")]
-    public void An_account_that_is_none_has_no_Uninstallable_value_to_read(string? account) =>
-        Assert.Null(InstallerQueryService.ReadAccountPatchUninstallable(account, Listed, OtherPatch));
 
     [Theory]
     [InlineData(new string[0], new[] { OtherPatch }, true)]

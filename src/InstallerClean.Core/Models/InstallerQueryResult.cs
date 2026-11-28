@@ -45,8 +45,9 @@ namespace InstallerClean.Models;
 /// <param name="PatchClaims">
 /// Every product-to-patch claim this enumeration read, one entry per claim
 /// rather than per path. <see cref="Packages"/> answers what a path's verdict is;
-/// this answers who to ask about it, which the merge behind
-/// <see cref="Packages"/> cannot keep (see <see cref="PatchClaim"/>). Empty on a
+/// this keeps which product holds which patch, which the merge behind
+/// <see cref="Packages"/> cannot keep (see <see cref="PatchClaim"/>). The
+/// enumeration's own later passes read the list; nothing outside it does. Empty on a
 /// machine with no registered patches, and empty on a result built by anything
 /// that does not enumerate patches.
 /// </param>
@@ -69,18 +70,6 @@ namespace InstallerClean.Models;
 /// contradicts this enumeration (see <see cref="Services.IDeclaredProductCheck"/>). Empty
 /// on a result built by anything that does not enumerate.
 /// </param>
-/// <param name="PairingsHeldByName">
-/// Each installation that, asked by name about a patch on a path still removable, answered
-/// that it holds the patch superseded and declaring zero, where that pairing is not one of
-/// <see cref="PatchClaims"/>. The check made under the lease just before a Move or Delete
-/// re-reads these with the claims. Empty on a machine whose enumeration reached every
-/// holder of every patch it offers.
-/// </param>
-/// <param name="PairingsOfHoldersWithNoClaims">
-/// Every patch Windows lists for each installation in <see cref="PairingsHeldByName"/> that
-/// holds no claim, for that check to read as the installation's other patches. They carry
-/// no path.
-/// </param>
 /// <param name="UnlistedProductKeys">
 /// Every product key under <c>UserData</c> no installation in <see cref="Installations"/>
 /// accounts for. The declared-product screen is handed it beside that list, and holds a
@@ -92,8 +81,6 @@ public record InstallerQueryResult(
     IReadOnlyList<PatchClaim>? PatchClaims = null,
     EnumerationCensus Census = default,
     IReadOnlyList<ListedInstallation>? Installations = null,
-    IReadOnlyList<PatchClaim>? PairingsHeldByName = null,
-    IReadOnlyList<PatchClaim>? PairingsOfHoldersWithNoClaims = null,
     IReadOnlyList<UnlistedProductKey>? UnlistedProductKeys = null)
 {
     /// <summary>Never null: an absent list reads as no claims rather than as a fault.</summary>
@@ -102,14 +89,6 @@ public record InstallerQueryResult(
     /// <summary>Never null: an absent list reads as an enumeration that listed nothing.</summary>
     public IReadOnlyList<ListedInstallation> Installations { get; init; } =
         Installations ?? Array.Empty<ListedInstallation>();
-
-    /// <summary>Never null: an absent list reads as no pairing found by name.</summary>
-    public IReadOnlyList<PatchClaim> PairingsHeldByName { get; init; } =
-        PairingsHeldByName ?? Array.Empty<PatchClaim>();
-
-    /// <summary>Never null: an absent list reads as no other patches to re-read.</summary>
-    public IReadOnlyList<PatchClaim> PairingsOfHoldersWithNoClaims { get; init; } =
-        PairingsOfHoldersWithNoClaims ?? Array.Empty<PatchClaim>();
 
     /// <summary>Never null: an absent list reads as no key left out of the enumeration.</summary>
     public IReadOnlyList<UnlistedProductKey> UnlistedProductKeys { get; init; } =
