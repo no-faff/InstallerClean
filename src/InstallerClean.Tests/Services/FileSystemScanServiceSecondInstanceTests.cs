@@ -56,18 +56,30 @@ public class FileSystemScanServiceSecondInstanceTests
     [InlineData(false)]
     public async Task A_product_nobody_could_ask_about_holds_the_whole_walk_offer(bool unanswered)
     {
-        // A code Windows would not say was installed, or a key whose name is no code: no
-        // question the screen could put reaches that product, whether about a package it
-        // opens or a patch it holds.
+        // A code Windows would not say was installed, or a key whose name is no code that its
+        // account's published lists do not account for: no question the screen could
+        // put reaches that product, whether about a package it opens or a patch it holds.
         var census = unanswered
             ? new EnumerationCensus(UnansweredProductCount: 1)
-            : new EnumerationCensus(UnparseableProductKeyNames: 1);
+            : new EnumerationCensus(UnparseableProductKeyNames: 1, UnparseableProductKeysUnreachable: 1);
 
         var result = await Scan(census, walkPatchOrphan: true);
 
         Assert.Empty(result.RemovableFiles);
         Assert.Equal(2, result.WithheldFiles!.Count);
         Assert.Equal(2, result.WithheldBy.WholesaleCount);
+    }
+
+    [Fact]
+    public async Task A_key_whose_name_is_no_code_that_its_accounts_lists_account_for_holds_none_of_the_walk_offer_back()
+    {
+        // Every code that account's published lists name settled in its list's own account and
+        // context, and every cached file the key records is claimed by path.
+        var result = await Scan(new EnumerationCensus(UnparseableProductKeyNames: 1), walkPatchOrphan: true);
+
+        Assert.Equal(new[] { Orphan, PatchOrphan }, result.RemovableFiles.Select(f => f.FullPath));
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
+        Assert.Empty(result.WithheldFiles!);
     }
 
     [Theory]

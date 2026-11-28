@@ -54,6 +54,31 @@ public class RegistryFallbackCachedPackageTests
         });
     }
 
+    [Fact]
+    public void A_product_key_whose_name_is_no_code_has_both_its_cached_packages_claimed_and_is_counted()
+    {
+        // What a key with no code for a name holds back rests on this: whatever the key is
+        // called, every cached-file value under it is claimed by path.
+        WithSubtree(f =>
+        {
+            var local = f.Files.Create("msi");
+            var managed = f.Files.Create("msi");
+            using (var props = f.Account.CreateSubKey(@"Products\NOT-A-PACKED-PRODUCT-CODE-ZZZZZZZZZZ\InstallProperties", writable: true)!)
+            {
+                props.SetValue("LocalPackage", local, RegistryValueKind.String);
+                props.SetValue("ManagedLocalPackage", managed, RegistryValueKind.String);
+            }
+
+            var (read, claimed) = Read(f);
+
+            Assert.Equal(0, read.Failures);
+            Assert.Single(claimed.Keys, k => EndsWithLeaf(k, local));
+            Assert.Single(claimed.Keys, k => EndsWithLeaf(k, managed));
+            Assert.Equal(2, read.PackageRecords!.Count(r => !r.IsPatch));
+            Assert.Equal(1, read.UnparseableProductKeyNames);
+        });
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

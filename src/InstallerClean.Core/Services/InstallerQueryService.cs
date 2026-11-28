@@ -126,8 +126,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// not a packed GUID, so no code could be taken from them. The difference
     /// between the two, and the one state where naming products sees LESS than
     /// counting them did: the registry says the machine has this product and
-    /// nothing can turn its name into a question. It withholds for that reason,
-    /// on the same terms as a code Windows would not answer about.
+    /// nothing can turn its name into a question. It withholds every superseded
+    /// patch, as a code Windows would not answer about does, and the walk-derived
+    /// offer where its account's published lists do not account for it
+    /// (<see cref="EnumerationCensus.UnparseableProductKeyNames"/>).
     /// </param>
     /// <param name="ProductPatchSets">
     /// One verdict per product code, from the registry's own per-product patch
@@ -251,6 +253,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// null where that account's listing failed, and the read of every account then
     /// holds no entry for it. Null too where the caller supplied no reader.
     /// </param>
+    /// <param name="UnparseableProductKeysByAccount">
+    /// <paramref name="UnparseableProductKeyNames"/> by the account subtree each key is under,
+    /// holding only accounts with at least one. Null where the caller supplied no reader,
+    /// and the scan then takes every such key as under an account whose published list it
+    /// cannot read (<see cref="ReadPublishedCodes"/>).
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -273,7 +281,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchesReadAsZero = null,
         IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>?>? AdvertisedPatches = null,
         string? RunningAccount = null,
-        IReadOnlyDictionary<string, IReadOnlyCollection<string>>? PatchKeys = null)
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>>? PatchKeys = null,
+        IReadOnlyDictionary<string, int>? UnparseableProductKeysByAccount = null)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -797,8 +806,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </param>
     /// <param name="productLists">
     /// The lists Windows Installer walks, read by name where the product walk stops at an
-    /// entry that did not read (<see cref="WalkEachList"/>). Null reads none, so such a
-    /// walk refuses the scan, and no list is walked again on its own.
+    /// entry that did not read (<see cref="WalkEachList"/>), and the published lists read
+    /// where a key under <c>UserData</c> has a name that is not a code
+    /// (<see cref="ReadPublishedCodes"/>). Null reads none: such a walk refuses the scan, no
+    /// list is walked again on its own, and every such key withholds the walk-derived offer.
     /// </param>
     internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback,
         Action<Exception>? crashLogSink = null, IPackageIdentityReader? identityReader = null,
@@ -895,8 +906,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // enumeration returned; the pass after it asks every product the enumeration
         // lost that the registry named and Windows confirmed installed. A product the
         // registry names that nothing shows was asked is counted as unanswered or as
-        // an unparseable key name, and EnumerationCensus.RegistryProductUnaskable
-        // withholds the walk-derived offer on those two counts. A product in neither the
+        // an unparseable key name that its account's published lists do not account for,
+        // and EnumerationCensus.RegistryProductUnaskable withholds the walk-derived offer on
+        // those two counts. A product in neither the
         // enumeration nor the registry's product keys is one nothing on this machine can
         // name, which is the limit of the whole scan and not of this rule.
         var instanceProducts = 0;
@@ -1275,8 +1287,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         // The codes a list whose walk stopped names are asked about again with the registry's
         // own, so one Windows would not answer about when the list was settled withholds here.
+        // Where a key under UserData has a name that is not a code, the codes of the published
+        // lists its account's programs are listed in are asked too (ReadPublishedCodes).
+        var published = ReadPublishedCodes(fallback, ct);
         var missed = LocateProductsTheEnumerationMissed(
-            products, CodesToAsk(fallback.RegistryProductCodes, enumerated.NamedByStoppedLists), restarts, ct);
+            products, CodesToAsk(fallback.RegistryProductCodes, enumerated.NamedByStoppedLists),
+            published.Codes, restarts, ct);
+        var unreachableKeys = UnreachableKeys(published, fallback, products, missed.Recovered,
+            missed.UnsettledEnumerated);
 
         // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. A product it
         // lost is recovered by name above, through ResolveProductInstances, which asks
@@ -1491,9 +1509,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unsettledEnumeratedProducts = unsettledEnumerated.Count + unreadableRows;
 
         // The other two: a code Windows would not answer about, and a key whose name
-        // yielded no code to ask with. Nothing shows either was asked its InstanceType,
-        // so both also reach EnumerationCensus.RegistryProductUnaskable, which reads them
-        // apart through the census below.
+        // yielded no code to ask with. Both withhold the superseded class here. The first
+        // also withholds the walk-derived offer, through
+        // EnumerationCensus.RegistryProductUnaskable, and so does the second where its
+        // account's published lists do not account for it (UnreachableKeys).
         var unresolvedProducts = missed.Unresolved + fallback.UnparseableProductKeyNames;
 
         var withheldProducts = unsettledEnumeratedProducts + unresolvedProducts;
@@ -1568,7 +1587,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 installation.LostPatchRecords.Count(lost => RegistrationHasGone(lost, fallback))),
             enumerated.StoppedLists,
             enumerated.UnnamedListEntries,
-            enumerated.FoundByCode);
+            enumerated.FoundByCode,
+            unreachableKeys,
+            missed.PublishedCodesAsked);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -2113,37 +2134,56 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// installation in every question it asks, and withholds on what is still
     /// unaccounted for under that code.
     /// </summary>
+    /// <param name="publishedCodes">
+    /// Codes the published lists name (<see cref="ReadPublishedCodes"/>), asked on the same
+    /// terms as <paramref name="registryCodes"/>. Those not among them share one restart
+    /// budget, kept apart from the scan's. Null asks none.
+    /// </param>
     /// <param name="registryCodes">
     /// Null where no fallback ran, which is not the same as an empty set and must
     /// not read as one: an empty set says the registry holds no product this
-    /// enumeration missed, and null says nobody looked. Null yields no recovered
-    /// products and no unresolved ones, leaving the caller's other signals to
-    /// speak, because a comparison that did not happen may not withhold on its own
-    /// silence.
+    /// enumeration missed, and null says nobody looked. Null asks nothing of its own,
+    /// leaving the caller's other signals to speak, because a comparison that did not
+    /// happen may not withhold on its own silence; <paramref name="publishedCodes"/> are
+    /// still asked.
     /// </param>
     private MissedProducts LocateProductsTheEnumerationMissed(
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         IReadOnlyCollection<string>? registryCodes,
+        IReadOnlyCollection<string>? publishedCodes,
         WalkRestarts restarts,
         CancellationToken ct)
     {
         var recovered = new List<(string, string?, MsiInstallContext)>();
         var unsettled = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (registryCodes is null || registryCodes.Count == 0) return new(recovered, 0, 0, unsettled);
+
+        // A published code the registry's own do not hold is asked with a restart budget of
+        // its own, so these asks never spend the one the scan's later keyed reads share.
+        var asks = new List<(string Code, WalkRestarts Budget)>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var code in registryCodes ?? [])
+            if (seen.Add(code)) asks.Add((code, restarts));
+        if (publishedCodes is { Count: > 0 })
+        {
+            var publishedAsks = WalkRestarts.For(ct, WalkPause);
+            foreach (var code in publishedCodes)
+                if (seen.Add(code)) asks.Add((code, publishedAsks));
+        }
+        if (asks.Count == 0) return new(recovered, 0, 0, unsettled, 0);
 
         var enumerated = InstallationsByCode(products);
 
-        // Unbounded: one keyed read per code the registry names, a set already
-        // bounded by the machine's own registry keys, which the fallback has just
-        // opened one at a time anyway. A cap would fall on the machines with the
-        // most to recover.
+        // Unbounded: one keyed read per code the registry or a published list names, a
+        // set already bounded by the machine's own registry keys, which the fallback and
+        // the published-list read have just listed. A cap would fall on the machines with
+        // the most to recover.
         var unresolved = 0;
         var recoveredOfEnumerated = 0;
-        foreach (var code in registryCodes)
+        foreach (var (code, budget) in asks)
         {
             ct.ThrowIfCancellationRequested();
 
-            var resolved = ResolveProductInstances(_msi, code, restarts);
+            var resolved = ResolveProductInstances(_msi, code, budget);
             if (!enumerated.TryGetValue(code, out var listed))
             {
                 if (resolved.Unaskable) { unresolved++; continue; }
@@ -2168,7 +2208,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
         }
 
-        return new(recovered, recoveredOfEnumerated, unresolved, unsettled);
+        return new(recovered, recoveredOfEnumerated, unresolved, unsettled,
+            asks.Count(ask => !ReferenceEquals(ask.Budget, restarts)));
     }
 
     /// <summary>
@@ -2190,6 +2231,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// a product Windows will not answer about, and the count is what the withholding
     /// needs.
     /// </param>
+    /// <param name="PublishedCodesAsked">
+    /// Codes asked because a published list named them and neither the registry's own nor a
+    /// stopped list did (<see cref="ReadPublishedCodes"/>).
+    /// </param>
     /// <param name="UnsettledEnumerated">
     /// Codes the enumeration returned whose own keyed answer would not come, or left out
     /// an installation the enumeration listed, so which installations of them exist is
@@ -2199,7 +2244,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         List<(string ProductCode, string? Sid, MsiInstallContext Context)> Recovered,
         int RecoveredOfEnumerated,
         int Unresolved,
-        HashSet<string> UnsettledEnumerated);
+        HashSet<string> UnsettledEnumerated,
+        int PublishedCodesAsked);
 
     /// <summary>
     /// Re-establishes every removable verdict by ASKING each enumerated product
@@ -4001,6 +4047,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var patchKeys = new Dictionary<string, IReadOnlyCollection<string>>(StringComparer.OrdinalIgnoreCase);
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
+        var unparseableByAccount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var productCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var productPatchKeys = 0;
         var productPatchRegistrations = 0;
@@ -4060,6 +4107,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             patchKeys[account] = keys;
                     nonStringValues += sidRead.NonStringLocalPackageValues;
                     unparseableKeyNames += sidRead.UnparseableProductKeyNames;
+                    if (sidRead.UnparseableProductKeyNames > 0)
+                        unparseableByAccount[sidName] = sidRead.UnparseableProductKeyNames;
                     productPatchKeys += sidRead.ProductPatchKeys;
                     productPatchRegistrations += sidRead.ProductPatchRegistrations;
                     pathCensus.Add(sidRead.Paths);
@@ -4133,7 +4182,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             patchesReadAsZero,
             advertisedPatches,
             runningAccount,
-            patchKeys);
+            patchKeys,
+            unparseableByAccount);
     }
 
     /// <summary>
@@ -4225,9 +4275,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // A key name that is not a packed GUID is the one place the
                     // comparison is blind where a headcount was not: the registry
                     // says this machine has a product and nothing here can turn
-                    // the name into a question. Counted, and counted into the
-                    // same withholding an unanswerable code reaches, because it
-                    // is the same state one step earlier. Skipping it silently
+                    // the name into a question. Counted, by account, for the
+                    // withholdings EnumerationCensus.UnparseableProductKeyNames
+                    // describes. Skipping it silently
                     // would let a registry this code cannot read look exactly
                     // like a registry that agreed with the enumeration.
                     else unparseableKeyNames++;
@@ -6006,6 +6056,129 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var both = new HashSet<string>(registryCodes, StringComparer.OrdinalIgnoreCase);
         both.UnionWith(namedByStoppedLists);
         return both;
+    }
+
+    /// <summary>
+    /// The program codes of the published lists that the programs of each account holding a
+    /// key under <c>UserData</c> whose name is not a code are listed in, by account, for the
+    /// recovery to ask about by code (<see cref="LocateProductsTheEnumerationMissed"/>); and how
+    /// many such keys are under an account whose published lists could not all be read.
+    ///
+    /// A PROGRAM'S OWN PRODUCT KEY AND SOURCE LIST ARE IN ITS PUBLISHED LIST, not under
+    /// <c>UserData</c>. A key under <c>UserData</c> whose name is no code can hold a program's
+    /// records under a name that is not its code, and the walk can leave that program out, so
+    /// the code of every program its account's published lists name is put to Windows.
+    /// <see cref="UnreachableKeys"/> then holds the account's keys back wherever one of those
+    /// codes was neither walked nor recovered.
+    ///
+    /// The system account's programs are listed in the per-machine list, in a managed list of
+    /// its own where there is one, and in its own hive's list, which holds what SYSTEM
+    /// installed per user. Any other account's programs are
+    /// listed in its managed list and in the list in its own hive, which cannot be read while
+    /// the hive is not loaded. A key under an account any of whose lists would not read is
+    /// counted in <c>Unreachable</c>, as is a key the count holds and no account does.
+    ///
+    /// NOTHING IS READ ON A MACHINE WITH NO SUCH KEY, so its scan asks nothing more.
+    /// </summary>
+    private PublishedCodes ReadPublishedCodes(FallbackRead fallback, CancellationToken ct)
+    {
+        if (fallback.UnparseableProductKeyNames == 0) return new(null, null, 0);
+        if (fallback.UnparseableProductKeysByAccount is not { } byAccount || _productLists is not { } lists)
+            return new(null, null, fallback.UnparseableProductKeyNames);
+
+        var codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var byAccountRows = new Dictionary<string, List<(string ProductCode, string? UserSid, MsiInstallContext Context)>>(
+            StringComparer.OrdinalIgnoreCase);
+        // A key the total holds that no account does is one nothing here asked about.
+        var unreachable = Math.Max(0, fallback.UnparseableProductKeyNames - byAccount.Values.Sum());
+        foreach (var (account, keys) in byAccount)
+        {
+            ct.ThrowIfCancellationRequested();
+            // Each list with the account and context an installation it lists answers in.
+            var read = string.Equals(account, LocalSystemAccount, StringComparison.OrdinalIgnoreCase)
+                ? new[]
+                {
+                    (Names: lists.PublishedNames(MsiInstallContext.Machine, null, ct),
+                        Sid: (string?)null, Context: MsiInstallContext.Machine),
+                    (Names: lists.PublishedNames(MsiInstallContext.UserManaged, account, ct),
+                        Sid: account, Context: MsiInstallContext.UserManaged),
+                    (Names: lists.PublishedNames(MsiInstallContext.UserUnmanaged, account, ct),
+                        Sid: account, Context: MsiInstallContext.UserUnmanaged),
+                }
+                : new[]
+                {
+                    (Names: lists.PublishedNames(MsiInstallContext.UserManaged, account, ct),
+                        Sid: account, Context: MsiInstallContext.UserManaged),
+                    (Names: lists.PublishedNames(MsiInstallContext.UserUnmanaged, account, ct),
+                        Sid: account, Context: MsiInstallContext.UserUnmanaged),
+                };
+            if (read.Any(list => list.Names is null))
+            {
+                unreachable += keys;
+                continue;
+            }
+
+            var rows = new List<(string ProductCode, string? UserSid, MsiInstallContext Context)>();
+            foreach (var (names, sid, context) in read)
+                foreach (var name in names!)
+                    if (UnpackRegistryProductCode(name) is { } code)
+                    {
+                        rows.Add((code, sid, context));
+                        codes.Add(code);
+                    }
+            byAccountRows[account] = rows;
+        }
+
+        return new(codes, byAccountRows, unreachable);
+    }
+
+    /// <summary>
+    /// What <see cref="ReadPublishedCodes"/> read: every code to ask; for each account, the
+    /// installation each code in its published lists stands for, by the account and context
+    /// of the list that names it; and the keys already counted as under an account whose
+    /// lists could not all be read. Both collections are null where nothing was read.
+    /// </summary>
+    private sealed record PublishedCodes(
+        IReadOnlyCollection<string>? Codes,
+        IReadOnlyDictionary<string, List<(string ProductCode, string? UserSid, MsiInstallContext Context)>>? ByAccount,
+        int Unreachable);
+
+    /// <summary>
+    /// The keys under <c>UserData</c> whose name is not a code that no published list could
+    /// account for (<see cref="EnumerationCensus.UnparseableProductKeysUnreachable"/>): those
+    /// <see cref="ReadPublishedCodes"/> counted, and every such key of an account one of whose
+    /// published codes has no installation, in the account and context of the list naming
+    /// it, that the walk returned or the recovery found. A code whose own keyed answer did not
+    /// settle (<paramref name="unsettled"/>) settles nothing, as which of its installations
+    /// exist is not established.
+    ///
+    /// IN THE LIST'S OWN ACCOUNT AND CONTEXT, NOT BY CODE. A code installed per machine and
+    /// listed in an account's own list as well is two programs to Windows Installer, and the
+    /// per-machine one being asked says nothing of the other.
+    ///
+    /// A PUBLISHED CODE WINDOWS ANSWERS WITH NO INSTALLATION IS A PROGRAM NOBODY ASKED. Windows
+    /// Installer's walks leave some programs out even when asked by code: those SYSTEM
+    /// installed per user, and per-user programs that are advertised only, which a program
+    /// whose records sit under a name that is not its code can be. Such a program could be
+    /// the one the key holds, so the key is not accounted for.
+    /// </summary>
+    private static int UnreachableKeys(PublishedCodes published, FallbackRead fallback,
+        List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
+        List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
+        HashSet<string> unsettled)
+    {
+        if (published.ByAccount is null) return published.Unreachable;
+
+        var settled = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var row in products.Concat(recovered))
+            if (!unsettled.Contains(row.ProductCode))
+                settled.Add(RowKey(row));
+
+        var unreachable = published.Unreachable;
+        foreach (var (account, rows) in published.ByAccount)
+            if (!rows.All(row => settled.Contains(RowKey(row))))
+                unreachable += fallback.UnparseableProductKeysByAccount![account];
+        return unreachable;
     }
 
     /// <summary>

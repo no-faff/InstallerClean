@@ -253,10 +253,23 @@ public record InstallerQueryResult(
 /// Counted while walking every product key, not only the ones the enumeration
 /// missed, so it is a property of the registry's contents rather than of a run.
 ///
-/// It withholds on the same two terms as the count above, the whole walk-derived offer
-/// included, through <see cref="RegistryProductUnaskable"/>: a key whose name yields no
-/// code cannot be matched to any product that was asked, so nothing shows the product it
-/// belongs to was asked its <c>InstanceType</c> or whether it holds a patch.
+/// IT WITHHOLDS THE SUPERSEDED CLASS, as the count above does. Such a key can hold a
+/// program's records under a name that is not its code, while Windows Installer lists the
+/// program by the code its published key carries and reads its records under that code, so
+/// a patch the program holds may not be answered as held when the program is asked about
+/// it. So every superseded patch is withheld.
+///
+/// THE WALK-DERIVED OFFER IS WITHHELD FOR SUCH A KEY UNLESS ITS ACCOUNT'S PUBLISHED LISTS
+/// ACCOUNT FOR IT (<see cref="UnparseableProductKeysUnreachable"/>). A program's source list
+/// is in its published key, not under <c>UserData</c>, so every code the account's published
+/// lists name is asked by code, and the key is accounted for only where each of those codes
+/// has an installation the walk returned or the recovery found, in the account and context
+/// of the list naming it, and is not a code whose own keyed answer did not settle: each such
+/// program is then asked its <c>InstanceType</c>,
+/// and its packages are compared as any listed installation's are. A program whose published
+/// key has no code for a name is named by no Windows Installer call. Every cached-file value
+/// under such a key, product or patch, is claimed by path by the registry fallback whatever
+/// the key's name.
 ///
 /// Between them these three report, per machine, how many of its registry keys no walk
 /// and no keyed ask lists. The difference between the two product totals cannot answer
@@ -304,8 +317,9 @@ public record InstallerQueryResult(
 /// resolved as installed (<see cref="RecoveredProductCount"/>), which are asked one keyed
 /// read each. A product the walk never reached goes unasked only in the two states the
 /// recovery cannot settle: a code Windows would not answer about
-/// (<see cref="UnansweredProductCount"/>) and a registry key whose name yielded no code
-/// (<see cref="UnparseableProductKeyNames"/>). Either of those non-zero, or
+/// (<see cref="UnansweredProductCount"/>) and a registry key whose name yielded no code that
+/// its account's published lists do not account for
+/// (<see cref="UnparseableProductKeysUnreachable"/>). Either of those non-zero, or
 /// <see cref="UnreadableProducts"/> on a run where no fallback named the lost product,
 /// makes both counts a floor.
 /// </param>
@@ -544,7 +558,18 @@ public readonly record struct EnumerationCensus(
     // StoppedListInstallations: installations no walk returned that Windows listed when
     // asked by code about a program named after the entry in a stopped list. Each is read
     // by the product loop as a walked installation is, and none is in RecoveredProductCount.
-    int StoppedListInstallations = 0)
+    int StoppedListInstallations = 0,
+    // UnparseableProductKeysUnreachable: the members of UnparseableProductKeyNames that the
+    // published lists of their account do not account for: the account's lists could not all
+    // be read (its hive not loaded, or a list that would not read), or a code they name has no
+    // installation the walk returned or the recovery found in that list's account and context,
+    // or its own keyed answer did not settle. Each withholds the walk-derived offer
+    // (RegistryProductUnaskable).
+    int UnparseableProductKeysUnreachable = 0,
+    // PublishedCodesAsked: program codes a published list names that neither the registry's
+    // own records under UserData nor a stopped list name, asked by code because a key under
+    // UserData has a name that is not a code. Zero on every machine with no such key.
+    int PublishedCodesAsked = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
@@ -616,8 +641,10 @@ public readonly record struct EnumerationCensus(
     /// <summary>
     /// Whether the registry names a product this scan could not put a question to by
     /// name: a code Windows would not say was installed
-    /// (<see cref="UnansweredProductCount"/>), or a product key whose name yields no code
-    /// (<see cref="UnparseableProductKeyNames"/>). THE ONE THING THE WITHHOLDING LEG OF THE
+    /// (<see cref="UnansweredProductCount"/>), or a product key whose name yields no code that
+    /// its account's published lists, where its programs' own codes are, do not account for
+    /// (<see cref="UnparseableProductKeysUnreachable"/>). A key they do account for is not a
+    /// member (<see cref="UnparseableProductKeyNames"/> says why). THE ONE THING THE WITHHOLDING LEG OF THE
     /// SAME NAME FIRES ON, and it is here rather than in the service that acts on it for the reason
     /// <see cref="AnyRecordedPathUnestablished"/> is: a rule that named the members itself
     /// would be one edit away from silently not acting on a member added later, while a
@@ -657,7 +684,7 @@ public readonly record struct EnumerationCensus(
     /// </summary>
     public bool RegistryProductUnaskable =>
         UnansweredProductCount > 0
-        || UnparseableProductKeyNames > 0;
+        || UnparseableProductKeysUnreachable > 0;
 
     /// <summary>
     /// Whether a read of Windows Installer's own records in the registry failed on a key

@@ -159,8 +159,14 @@ public class EnumerationCensusTests
     /// <summary>
     /// The census members the RegistryProductUnaskable withholding leg fires on, which
     /// are not one kind of finding: a product the registry names that Windows would not
-    /// say was installed, and a registry product key whose name yields no code. Nothing
-    /// shows either was asked its InstanceType or whether it holds a patch.
+    /// say was installed, and a registry product key whose name yields no code that its
+    /// account's published lists do not account for. Nothing shows either was asked its
+    /// InstanceType or whether it holds a patch.
+    ///
+    /// <see cref="EnumerationCensus.UnparseableProductKeyNames"/> IS ABSENT TOO. A key those
+    /// lists do account for has every code they name settled in that list's own account and
+    /// context, and every
+    /// cached file it records claimed by path.
     ///
     /// <see cref="EnumerationCensus.RecoveredProductCount"/> IS DELIBERATELY ABSENT and
     /// is this list's trap, for the reason the attempts count is the other list's. A
@@ -176,7 +182,7 @@ public class EnumerationCensusTests
     private static readonly string[] UnaskableMembers =
     [
         "UnansweredProductCount",
-        "UnparseableProductKeyNames",
+        "UnparseableProductKeysUnreachable",
     ];
 
     [Fact]

@@ -72,13 +72,17 @@ public class WithholdingLegsTests
     [InlineData(nameof(EnumerationCensus.InstanceProductCount), false)]
     [InlineData(nameof(EnumerationCensus.InstanceTypeUnreadableCount), false)]
     [InlineData(nameof(EnumerationCensus.UnansweredProductCount), true)]
-    [InlineData(nameof(EnumerationCensus.UnparseableProductKeyNames), true)]
+    [InlineData(nameof(EnumerationCensus.UnparseableProductKeysUnreachable), true)]
+    [InlineData(nameof(EnumerationCensus.UnparseableProductKeyNames), false)]
     public void The_unaskable_product_leg_fires_for_a_product_nobody_could_ask_and_not_for_a_second_copy_the_scan_listed(
         string member, bool fires)
     {
         // The two InstanceType counts are installations the scan listed and marked, which
-        // the declared-product check compares file by file, so neither fires a leg. The
-        // other two are products the registry names that the scan could not ask about.
+        // the declared-product check compares file by file, so neither fires a leg. A code
+        // Windows would not answer about, and a key with no code that its account's published
+        // lists do not account for, are products the scan could not ask about. A key with no
+        // code alone fires no leg: every code its account's published lists name settled in
+        // its list's own account and context.
         var census = CensusWithOnly(member);
         var reads = default(FileIdentityReadTally);
 

@@ -615,7 +615,9 @@ internal sealed record FakeProductList(MsiInstallContext Context, string? Sid, L
 /// The lists <see cref="FakeMsiApi.ProductLists"/> holds, read by name as
 /// <see cref="RegistryProductLists"/> reads the registry. <see cref="NamesInstead"/>
 /// answers in place of a list's own names, null among them for a list that will not read,
-/// and <see cref="AccountsInstead"/> in place of the accounts.
+/// and <see cref="AccountsInstead"/> in place of the accounts. A published list is the list
+/// of the same context and account, or <see cref="PublishedInstead"/>'s, and an account in
+/// <see cref="HiveNotLoaded"/> has no own list that reads.
 /// </summary>
 internal sealed class FakeProductLists(FakeMsiApi msi) : IProductLists
 {
@@ -634,6 +636,25 @@ internal sealed class FakeProductLists(FakeMsiApi msi) : IProductLists
     {
         if (NamesInstead.TryGetValue((context, sid), out var instead)) return instead;
         var list = msi.ProductLists!.FirstOrDefault(l => l.Context == context
+            && string.Equals(l.Sid, sid, StringComparison.OrdinalIgnoreCase));
+        return list is null ? Array.Empty<string>() : list.Names;
+    }
+
+    /// <summary>Published lists given in place of the walked ones, null for one that will not read.</summary>
+    public Dictionary<(MsiInstallContext Context, string? Sid), List<string>?> PublishedInstead { get; } = new();
+
+    /// <summary>Accounts whose hive is not loaded, so their own list does not read.</summary>
+    public HashSet<string> HiveNotLoaded { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Every published list asked for, in order.</summary>
+    public List<(MsiInstallContext Context, string? Sid)> PublishedAsked { get; } = new();
+
+    public IReadOnlyList<string>? PublishedNames(MsiInstallContext context, string? sid, CancellationToken ct)
+    {
+        PublishedAsked.Add((context, sid));
+        if (PublishedInstead.TryGetValue((context, sid), out var instead)) return instead;
+        if (context == MsiInstallContext.UserUnmanaged && sid is not null && HiveNotLoaded.Contains(sid)) return null;
+        var list = msi.ProductLists?.FirstOrDefault(l => l.Context == context
             && string.Equals(l.Sid, sid, StringComparison.OrdinalIgnoreCase));
         return list is null ? Array.Empty<string>() : list.Names;
     }

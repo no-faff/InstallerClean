@@ -443,11 +443,13 @@ public sealed record AppInfo(
 /// behind. It sits here beside <see cref="ProductCount"/> rather than under the scan
 /// because two scans of one machine agree about it.
 ///
-/// The app derives nothing from the difference between the two. Each product the
-/// registry names with a code and the enumeration did not return is asked about by
-/// name: one found installed travels as the recovered count, one Windows would not
-/// answer about as the unanswered count, and one the keyed walk does not list travels in
-/// neither.
+/// The app derives nothing from the difference between the two. A product the
+/// enumeration did not return is asked about by name where the registry names it with a
+/// code: a product key under <c>UserData</c>, a list whose walk stopped at an entry that is
+/// not a program code, or a published list read because a key under <c>UserData</c> in its
+/// account has a name that yields no code. One found installed travels as the recovered
+/// count, one Windows would not answer about as the unanswered count, and one the keyed
+/// walk does not list travels in neither.
 /// A key whose name yields no code travels as the unparseable count. The pair travels because
 /// how far a machine's registry runs ahead of its enumeration is a fact only these
 /// reports can establish.
@@ -487,7 +489,9 @@ public sealed record AppInfo(
 /// machine that did not answer rather than a machine with none. A product the
 /// enumeration never returned is asked only once Windows confirms it installed. One
 /// Windows would not answer about travels as the unanswered count and a key whose name
-/// yields no code as the unparseable count, and both arm the same rule.
+/// yields no code as the unparseable count. Both withhold every superseded patch. The
+/// unanswered count also withholds the walk-derived offer, and so does the unparseable
+/// count where no published list accounts for the key.
 /// </param>
 /// <param name="SupersededRegistrationCount">
 /// Cached patch paths whose merged row Windows reports superseded: one per path however
@@ -962,7 +966,8 @@ public sealed record MachineInfo(
 /// the enumeration never claimed.
 /// </param>
 /// <param name="RecoveredProductCount">
-/// Installations of products the registry named, this enumeration never returned, and
+/// Installations of products the registry named with a code (the sources are on
+/// <see cref="MachineInfo.RegistryProductKeyCount"/>), this enumeration never returned, and
 /// a keyed ask then found installed: each one named and confirmed, not inferred from two
 /// totals. Installations the same ask found of a product the enumeration did return are
 /// <paramref name="RecoveredEnumeratedInstallationCount"/>.
@@ -975,8 +980,9 @@ public sealed record MachineInfo(
 /// short, so two scans of one machine need not agree about it.
 /// </param>
 /// <param name="UnansweredProductCount">
-/// Products the registry named, this enumeration never returned, and Windows would
-/// then not say were installed or not. A question that was put and got no answer,
+/// Products the registry named with a code (the sources are on
+/// <see cref="MachineInfo.RegistryProductKeyCount"/>), this enumeration never returned, and
+/// Windows would then not say were installed or not. A question that was put and got no answer,
 /// which holds back every superseded patch and the whole walk-derived offer,
 /// because nothing about an enumeration's completeness follows from silence.
 ///

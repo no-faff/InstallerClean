@@ -27,6 +27,16 @@ internal interface IProductLists
     /// per-machine list.
     /// </summary>
     IReadOnlyList<string>? Names(MsiInstallContext context, string? sid, CancellationToken ct);
+
+    /// <summary>
+    /// The key names in the published list of <paramref name="context"/> for
+    /// <paramref name="sid"/>, the list a program's own product key and source list are in:
+    /// the per-machine list for <see cref="MsiInstallContext.Machine"/> (<paramref name="sid"/>
+    /// null), the account's managed list, or the account's own list in its hive. Empty where
+    /// the list is not there; null where it would not read, and for an unmanaged account
+    /// whose hive is not loaded, whose own list cannot be read at all.
+    /// </summary>
+    IReadOnlyList<string>? PublishedNames(MsiInstallContext context, string? sid, CancellationToken ct);
 }
 
 /// <summary>
@@ -87,11 +97,35 @@ internal sealed class RegistryProductLists : IProductLists
 
     public IReadOnlyList<string>? Names(MsiInstallContext context, string? sid, CancellationToken ct)
     {
-        if (context == MsiInstallContext.Machine)
-            return sid is null ? Read(RegistryHive.LocalMachine, MachineList, ct) : null;
+        if (context != MsiInstallContext.UserUnmanaged) return PublishedNames(context, sid, ct);
 
         // An account is taken only as 'S-' followed by digits and hyphens, so no account
         // names a key outside its own.
+        if (!InstallerQueryService.IsAccount(sid)) return null;
+
+        // Windows Installer walks a signed-out account's records under UserData. A loaded
+        // hive's list is read through the hive's own key, so a hive that unloads after it is
+        // opened reads as a list that would not read rather than as an empty one.
+        try
+        {
+            using var users = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
+            using var hive = users.OpenSubKeyEarned(sid!);
+            if (hive is null)
+                return Read(RegistryHive.LocalMachine, InstallerKey + @"\UserData\" + sid + @"\Products", ct);
+            using var key = hive.OpenSubKeyEarned(UserList);
+            return key is null ? Array.Empty<string>() : RegistryNames.SubKeysOf(key, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    public IReadOnlyList<string>? PublishedNames(MsiInstallContext context, string? sid, CancellationToken ct)
+    {
+        if (context == MsiInstallContext.Machine)
+            return sid is null ? Read(RegistryHive.LocalMachine, MachineList, ct) : null;
+
         if (!InstallerQueryService.IsAccount(sid)) return null;
 
         if (context == MsiInstallContext.UserManaged)
@@ -99,11 +133,20 @@ internal sealed class RegistryProductLists : IProductLists
 
         if (context != MsiInstallContext.UserUnmanaged) return null;
 
-        var loaded = HiveLoaded(sid!);
-        if (loaded is null) return null;
-        return loaded.Value
-            ? Read(RegistryHive.Users, sid + @"\" + UserList, ct)
-            : Read(RegistryHive.LocalMachine, InstallerKey + @"\UserData\" + sid + @"\Products", ct);
+        // Read through the hive's own key, so a hive that unloads after the check reads as
+        // a list that would not read rather than as an empty one.
+        try
+        {
+            using var users = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
+            using var hive = users.OpenSubKeyEarned(sid!);
+            if (hive is null) return null;
+            using var key = hive.OpenSubKeyEarned(UserList);
+            return key is null ? Array.Empty<string>() : RegistryNames.SubKeysOf(key, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return null;
+        }
     }
 
     // Whether the account's own hive is loaded under HKEY_USERS; null where that would not

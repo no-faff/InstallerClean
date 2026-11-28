@@ -72,7 +72,7 @@ public class RemovableReverifierSecondInstanceTests
         // either file, so neither may the action.
         var census = unanswered
             ? new EnumerationCensus(UnansweredProductCount: 1)
-            : new EnumerationCensus(UnparseableProductKeyNames: 1);
+            : new EnumerationCensus(UnparseableProductKeyNames: 1, UnparseableProductKeysUnreachable: 1);
         var svc = Reverifier(Query(census));
 
         var result = await svc.ReverifyAsync(new[] { Orphan, PatchOrphan });
@@ -81,6 +81,18 @@ public class RemovableReverifierSecondInstanceTests
         Assert.Equal(new[] { Orphan, PatchOrphan }, result.Dropped);
         Assert.Equal(2, result.Reasons.OwnershipUnestablished);
         Assert.Equal(2, result.Reasons.Total);
+    }
+
+    [Fact]
+    public async Task A_key_whose_name_is_no_code_that_its_accounts_lists_account_for_drops_nothing()
+    {
+        var svc = Reverifier(Query(new EnumerationCensus(UnparseableProductKeyNames: 1)));
+
+        var result = await svc.ReverifyAsync(new[] { Orphan, PatchOrphan });
+
+        Assert.Equal(new[] { Orphan, PatchOrphan }, result.Surviving);
+        Assert.Empty(result.Dropped);
+        Assert.Equal(0, result.Reasons.Total);
     }
 
     [Theory]
