@@ -36,11 +36,6 @@ public class CliDonateLineTests
     private const string File1 = @"C:\Windows\Installer\a.msi";
     private const string File2 = @"C:\Windows\Installer\b.msp";
 
-    private static readonly PatchClaim SurvivingA =
-        new(File1, "{AAAA1111-0000-0000-0000-000000000001}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-    private static readonly PatchClaim SurvivingB =
-        new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-
     private static string DonateLine => string.Format(Strings.Cli_DonateAsk, SupportLink.Url);
 
     [Fact]
@@ -90,8 +85,8 @@ public class CliDonateLineTests
     public async Task A_move_that_moved_files_ends_with_the_tip_line_after_the_restore_hint()
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
@@ -111,8 +106,7 @@ public class CliDonateLineTests
     public async Task A_delete_that_deleted_nothing_prints_no_tip_line()
     {
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(0, new FileOperationError[] { new UnknownError(File1), new UnknownError(File2) }));
 
         var (exitCode, stdout) = await Run("/d", null, Services(delete: delete), watched: true);
@@ -127,8 +121,8 @@ public class CliDonateLineTests
     {
         // Files reached the folder before the stop, so the count alone would ask.
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
@@ -147,8 +141,7 @@ public class CliDonateLineTests
         // The cancellation stays the last thing on the screen.
         using var cts = new CancellationTokenSource();
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
                 cts.Cancel();
@@ -168,8 +161,8 @@ public class CliDonateLineTests
         // The undo stays the last thing on the screen.
         using var cts = new CancellationTokenSource();
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -198,8 +191,7 @@ public class CliDonateLineTests
     private static IDeleteFilesService DeleteThatDeletes(int deleted)
     {
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(deleted, Array.Empty<FileOperationError>()));
         return delete;
     }
@@ -226,7 +218,7 @@ public class CliDonateLineTests
 
     /// <summary>
     /// The services the work path resolves. The scan offers two files, the
-    /// pending-reboot gate is clean and the re-verify keeps both, so the run
+    /// signals read clean and the check before the batch stands over both, so the run
     /// reaches whichever service the test scripted.
     /// </summary>
     private static IServiceProvider Services(
@@ -248,15 +240,10 @@ public class CliDonateLineTests
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
 
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(
-                new[] { File1, File2 },
-                Array.Empty<string>(),
-                SurvivingPatchClaims: new[] { SurvivingA, SurvivingB },
-                SiblingPatchClaims: Array.Empty<PatchClaim>()));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(new[] { File1, File2 }, Array.Empty<string>()));
 
-        return CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier,
+        return CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck,
             delete: delete, move: move);
     }
 }

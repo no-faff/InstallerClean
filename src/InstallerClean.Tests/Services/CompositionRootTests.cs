@@ -84,6 +84,19 @@ public class CompositionRootTests
     }
 
     [Fact]
+    public void The_check_before_a_batch_is_the_batch_check()
+    {
+        // The Move and Delete services and both hosts take the interface, so a registration
+        // naming anything else would hand them a check that does not arm the watch on
+        // Windows Installer's records. The wiring is held here.
+        using var services = new ServiceCollection()
+            .AddInstallerCleanCore()
+            .BuildServiceProvider();
+
+        Assert.IsType<BatchCheck>(services.GetRequiredService<IBatchCheck>());
+    }
+
+    [Fact]
     public void The_move_acts_on_its_destination_through_the_handle_guard()
     {
         // The test seam's constructors default to the by-path guard; production must

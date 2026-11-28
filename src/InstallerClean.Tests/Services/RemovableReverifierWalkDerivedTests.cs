@@ -47,7 +47,7 @@ public class RemovableReverifierWalkDerivedTests
     private static RemovableReverifier Reverifier(
         IInstallerQueryService query, IFileIdentityReader ids, IDeclaredProductCheck screen, IFileTimesReader times,
         IPendingRebootService? activity = null, TimeProvider? clock = null) =>
-        new(query, Substitute.For<IMsiApi>(), ids, screen, times, clock ?? new FixedClock(Now),
+        new(query, ids, screen, times, clock ?? new FixedClock(Now),
             installerFolderOverride: null, installerActivity: activity);
 
     /// <summary>

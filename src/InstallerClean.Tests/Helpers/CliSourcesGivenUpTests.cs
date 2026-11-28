@@ -268,15 +268,17 @@ public class CliSourcesGivenUpTests
     [Theory]
     [InlineData("/d")]
     [InlineData("/m")]
-    public async Task A_run_refused_after_the_check_still_writes_the_check_s_notice_and_prints_neither_line(string arg)
+    public async Task A_run_that_ended_before_its_first_file_still_writes_the_check_s_notice_and_prints_neither_line(string arg)
     {
-        // The action service refuses the batch for want of the Windows Installer lock. The
-        // console says nothing about files held back on that run, as the window shows no
+        // The action service ends the batch before its first file, because Windows
+        // Installer's records kept changing. The console says nothing about files held back on that run, as the window shows no
         // card for it, and the Application log still records that the check left files
         // alone, which is true of a run that then touched nothing at all.
         var run = await Run(arg, Offered(2), CheckGivingUp(Given(Share, 1)),
-            delete: new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true),
-            move: _ => new MoveResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true));
+            delete: new DeleteResult(0, Array.Empty<FileOperationError>(),
+                Ended: new BatchEnd(BatchEndReason.RecordsKeptChanging)),
+            move: _ => new MoveResult(0, Array.Empty<FileOperationError>(),
+                Ended: new BatchEnd(BatchEndReason.RecordsKeptChanging)));
 
         Assert.Equal(CliExitCode.Transient, run.ExitCode);
         Assert.DoesNotContain(SourcesGivenUpReport.CommandLine([Given(Share, 1)]), run.Stdout, StringComparison.Ordinal);
@@ -390,23 +392,20 @@ public class CliSourcesGivenUpTests
 
         // Surviving defaults to the whole offer and gives nothing up, so a test about the
         // scan never meets a check it did not ask for.
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(reverify ?? new ReverifyResult(
-                result.RemovableFiles.Select(f => f.FullPath).ToList(), Array.Empty<string>()));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(reverify ?? new ReverifyResult(
+            result.RemovableFiles.Select(f => f.FullPath).ToList(), Array.Empty<string>()));
 
         var deleter = Substitute.For<IDeleteFilesService>();
-        deleter.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        deleter.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(delete ?? new DeleteResult(result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
 
         var mover = Substitute.For<IMoveFilesService>();
-        mover.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        mover.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(move ?? (_ => new MoveResult(result.RemovableFiles.Count, Array.Empty<FileOperationError>())));
 
-        var services = CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier,
+        var services = CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck,
             delete: deleter, move: mover);
 
         var invocation = arg switch

@@ -27,12 +27,14 @@ public class MoveFilesServiceTests : IDisposable
         // cache root; point that root at the sandbox so a legitimately in-bounds
         // real file is not refused. The destination is a separate temp folder,
         // outside the sandbox, so its own gates pass.
-        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
-        var results = await svc.MoveFilesAsync(new[] { file }, _destDir, UnderLeaseClaims.None);
+        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), null, null, new HandleInHandFolder(), new HandleDestinationGuard(), _sourceDir);
+        var results = await svc.MoveFilesAsync(StandingChecks.Of(file), _destDir);
 
         Assert.Empty(results.Errors);
         Assert.False(File.Exists(file));
         Assert.True(File.Exists(Path.Combine(_destDir, "test.msi")));
+        // The batch's own folder is removed once it is empty, and so is the folder above it.
+        Assert.False(Directory.Exists(Path.Combine(_sourceDir, InHandFolders.FolderName)));
     }
 
     [Fact]
@@ -47,8 +49,8 @@ public class MoveFilesServiceTests : IDisposable
         // moved, which is how the command line stops a run the single-instance mutex no
         // longer covers. The file turned down gets no progress line.
         var reported = new List<string>();
-        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
-        var result = await svc.MoveFilesAsync(new[] { first, second }, _destDir, UnderLeaseClaims.None,
+        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), null, null, new HandleInHandFolder(), new HandleDestinationGuard(), _sourceDir);
+        var result = await svc.MoveFilesAsync(StandingChecks.Of(first, second), _destDir,
             new SyncProgress<OperationProgress>(p => reported.Add(p.CurrentFileName)),
             mayAct: path => path != second);
 
@@ -77,9 +79,13 @@ public class MoveFilesServiceTests : IDisposable
         var file = Path.Combine(_sourceDir, "resolves-fine.msi");
         await File.WriteAllTextAsync(file, "content");
 
-        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(),
+        // The batch's own folder is made in the sandbox, which the hand cannot do
+        // under a drive nothing is mounted on, so the source checks are what refuse
+        // the file here.
+        var svc = new MoveFilesService(
+            new System.IO.Abstractions.FileSystem(), null, null, new HandInTheSandbox(_sourceDir), new HandleDestinationGuard(),
             $@"{unmounted}:\Windows\Installer");
-        var result = await svc.MoveFilesAsync(new[] { file }, _destDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(StandingChecks.Of(file), _destDir);
 
         Assert.Equal(0, result.MovedCount);
         Assert.True(File.Exists(file), "An unproven verdict keeps the file exactly as a refusal does");
@@ -122,14 +128,18 @@ public class MoveFilesServiceTests : IDisposable
         }
 
         var swapped = false;
+        var renamedAway = _destDir + "-renamed-away";
         var progress = new Helpers.SyncProgress<InstallerClean.Models.OperationProgress>(p =>
         {
             // Fires before each file's move. On the second, put a link to
-            // somewhere else where the folder the batch resolved was.
+            // somewhere else where the folder the batch resolved was. The folder is
+            // renamed away and not deleted: the batch holds it open, and a folder
+            // deleted while it is open can keep its name until that handle closes,
+            // which would refuse the link.
             if (p.CurrentFile != 2 || swapped) return;
             foreach (var moved in Directory.GetFiles(_destDir))
                 File.Move(moved, Path.Combine(decoy, Path.GetFileName(moved)));
-            Directory.Delete(_destDir);
+            Directory.Move(_destDir, renamedAway);
             Directory.CreateSymbolicLink(_destDir, decoy);
             swapped = true;
         });
@@ -140,11 +150,11 @@ public class MoveFilesServiceTests : IDisposable
         InstallerCacheHelpers.TryResolveFinalPath(_destDir, out var resolvedDest);
         resolvedDest = resolvedDest.TrimEnd(Path.DirectorySeparatorChar);
 
-        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
+        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), null, null, new HandleInHandFolder(), new HandleDestinationGuard(), _sourceDir);
         try
         {
             var ex = await Assert.ThrowsAsync<MoveAbortedException>(() =>
-                svc.MoveFilesAsync(new[] { first, second }, _destDir, UnderLeaseClaims.None, progress));
+                svc.MoveFilesAsync(StandingChecks.Of(first, second), _destDir, progress));
 
             Assert.Equal(1, ex.Partial.MovedCount);
             Assert.Empty(ex.Partial.Errors);
@@ -163,58 +173,18 @@ public class MoveFilesServiceTests : IDisposable
         finally
         {
             TestTemp.Delete(decoy);
+            TestTemp.Delete(renamedAway);
         }
     }
 
-    [Fact]
-    public async Task MoveFilesAsync_records_a_batch_refused_for_want_of_the_installer_mutex()
+    /// <summary>
+    /// A hand that makes each batch's folder in a real folder of the test's own and
+    /// acts by path, for the one test whose cache root is a drive nothing is mounted on.
+    /// </summary>
+    private sealed class HandInTheSandbox(string folder) : IInHandFolder
     {
-        // The sibling of DeleteFilesServiceTests' own record test, and the
-        // reasoning is that file's: a hold that could not be taken, with nothing
-        // shown to be holding it, stops the batch, because without it nothing
-        // prevents a program registering a package part-way through and the
-        // act-time proof can go stale underneath. Real filesystem because the
-        // record is a real crash-log write, which is half the behaviour under
-        // test; the batch itself runs against a mock so nothing on disk is
-        // touched.
-        var logPath = InstallerClean.Helpers.CrashLog.TryWrite(
-            new InvalidOperationException("baseline for the move mutex refusal record")).Path;
-        var baseline = new FileInfo(logPath).Length;
-
-        var fs = new System.IO.Abstractions.TestingHelpers.MockFileSystem();
-        var source = @"C:\Windows\Installer\never-reached.msi";
-        fs.AddFile(source, new System.IO.Abstractions.TestingHelpers.MockFileData("payload"));
-        var mutex = new Tests.Helpers.FakeMutexProbe(Tests.Helpers.FakeMutexProbe.Mode.RefusedNotHeld);
-
-        var result = await new MoveFilesService(fs, mutex, installerFolderOverride: null)
-            .MoveFilesAsync(new[] { source }, _destDir, UnderLeaseClaims.None);
-
-        // Refused, and distinguishably so: nothing was shown to hold the mutex, so
-        // the pending-reboot gate the busy case is answered by can account for this
-        // one neither way.
-        Assert.True(result.InstallerLockUnavailable);
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(0, result.MovedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(source), "A refused batch touches nothing");
-        Assert.False(fs.Directory.Exists(_destDir), "A refused batch creates no destination");
-        Assert.Equal(1, mutex.AcquireAttempts);
-        Assert.Equal(0, mutex.Acquired);
-
-        // Read from the baseline on, so a note left by an earlier run cannot
-        // pass for this one's. A rotation between the two reads shortens the
-        // file, and starting at 0 is then still right.
-        using var stream = new System.IO.FileStream(
-            logPath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
-        using var reader = new StreamReader(stream);
-        var written = await reader.ReadToEndAsync();
-        var appended = written.Length >= baseline ? written[(int)baseline..] : written;
-        // The whole clause, not the "Move refused" opening: this service writes
-        // that opening for its containment refusals too, so the prefix alone does
-        // not say which refusal reached the log. Its delete twin pins the same
-        // clause.
-        Assert.Contains(
-            "Move refused: the Windows Installer mutex could not be acquired", appended);
+        public IInHandBatch? OpenBatch(string installerFolder, out int failureCode) =>
+            new ByPathInHandFolder(new System.IO.Abstractions.FileSystem()).OpenBatch(folder, out failureCode);
     }
 
     public void Dispose()

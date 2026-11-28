@@ -112,7 +112,7 @@ public class CliPendingRebootOutcomeTests
         {
             if (!Declared.TryGetValue(reason, out var expected)) continue;
 
-            var (exit, _, entries) = await Run("/d", PendingRebootResult.Block(reason), metAtAcquire: null);
+            var (exit, _, entries) = await Run("/d", PendingRebootResult.Block(reason));
             if (exit != expected.Exit) wrong.Add($"{reason}: expected exit {expected.Exit}, got {exit}");
             // A held run writes its summary and nothing beside it.
             if (entries.Count != 1)
@@ -127,7 +127,7 @@ public class CliPendingRebootOutcomeTests
     }
 
     [Fact]
-    public async Task A_reason_the_gate_has_never_met_still_holds_the_run()
+    public async Task A_reason_the_check_has_never_met_still_holds_the_run()
     {
         // Cast past the enum's members deliberately, the way the strings tests do:
         // this is the state a new reason arrives in. Whatever else is undecided, the
@@ -135,88 +135,43 @@ public class CliPendingRebootOutcomeTests
         // holding one rather than to be any particular value.
         const PendingRebootReason unwritten = (PendingRebootReason)99;
 
-        var (exit, _, _) = await Run("/d", PendingRebootResult.Block(unwritten), metAtAcquire: null);
+        var (exit, _, _) = await Run("/d", PendingRebootResult.Block(unwritten));
 
         Assert.NotEqual(CliExitCode.Ok, exit);
         Assert.NotEqual(CliExitCode.Partial, exit);
     }
 
     /// <summary>
-    /// A lock the action service meets at its acquire is reported under the gate's own
-    /// reason for the same condition, so a run exits with the same code and prints the
-    /// same sentence whether the gate met the lock or the acquire did. One row per
-    /// mapping the host makes, for both flags.
-    ///
-    /// THE REFUSAL'S ROWS ARE THE ONES WITH TEETH. The acquire meets a refusal only when
-    /// it began after the gate ran, the two asking for the same rights, so a scheduler
-    /// that is told one thing on the night the refusal appears and another on every
-    /// night after it has been told two things about one condition.
-    /// </summary>
-    [Theory]
-    [InlineData("/d", PendingRebootReason.MsiExecuteMutexHeld)]
-    [InlineData("/m", PendingRebootReason.MsiExecuteMutexHeld)]
-    [InlineData("/d", PendingRebootReason.MsiExecuteMutexAccessRefused)]
-    [InlineData("/m", PendingRebootReason.MsiExecuteMutexAccessRefused)]
-    public async Task A_lock_met_at_the_acquire_reports_what_the_gate_reports_for_it(
-        string arg, PendingRebootReason reason)
-    {
-        var sentence = Program.PendingRebootBlockedMessage(arg, reason, detail: null);
-
-        var (gateExit, gateStdout, gateEntries) =
-            await Run(arg, PendingRebootResult.Block(reason), metAtAcquire: null);
-        var (acquireExit, acquireStdout, acquireEntries) =
-            await Run(arg, PendingRebootResult.Clean, metAtAcquire: reason);
-
-        Assert.Equal(Declared[reason].Exit, gateExit);
-        Assert.Equal(gateExit, acquireExit);
-        // The whole entry, class and text, is the same at both points.
-        Assert.Equal(Declared[reason].Class, Assert.Single(gateEntries).Class);
-        Assert.Equal(gateEntries, acquireEntries);
-        Assert.Contains(sentence, gateStdout);
-        Assert.Contains(sentence, acquireStdout);
-        // A refusal never tells the operator something is using Windows Installer,
-        // at either point; nothing has been seen holding the lock.
-        if (reason == PendingRebootReason.MsiExecuteMutexAccessRefused)
-        {
-            Assert.DoesNotContain(Strings.Cli_PendingRebootBlocked_MsiExecuteMutex, gateStdout);
-            Assert.DoesNotContain(Strings.Cli_PendingRebootBlocked_MsiExecuteMutex, acquireStdout);
-        }
-    }
-
-    /// <summary>
-    /// A transaction under way when the re-verify reads the in-progress signals refuses the
-    /// run exactly as the gate refuses it when the transaction is already under way at the
-    /// gate: the same exit code, the same output and the same entry, for every reason, and
-    /// neither run reaches an action service. Both files survive the re-verify, so the run
-    /// that goes on to act is one where nothing but the read stops it.
+    /// A check that ends on a blocked read of Windows Installer's signals refuses the run
+    /// with that reason's own sentence, exit code and entry, for every reason, and neither
+    /// action service is reached. Both files are offered, so the run that goes on to act is
+    /// one where nothing but the read stops it.
     /// </summary>
     [Theory]
     [InlineData("/d")]
     [InlineData("/m")]
-    public async Task A_blocked_signal_read_at_the_re_verify_ends_the_run_as_the_gate_does(string arg)
+    public async Task A_check_that_ends_on_a_blocked_signal_read_ends_the_run_without_acting(string arg)
     {
         var wrong = new List<string>();
 
         foreach (var reason in Enum.GetValues<PendingRebootReason>())
         {
-            var blocked = PendingRebootResult.Block(reason);
-            var atGate = await RunToTheEnd(arg, blocked, metAtAcquire: null, atReverify: null);
-            var atReverify = await RunToTheEnd(arg, PendingRebootResult.Clean, metAtAcquire: null, atReverify: blocked);
+            var sentence = Program.PendingRebootBlockedMessage(arg, reason, detail: null);
+            var run = await RunToTheEnd(arg, PendingRebootResult.Block(reason));
 
-            if (atReverify.ExitCode != atGate.ExitCode)
-                wrong.Add($"{reason}: exit {atReverify.ExitCode} at the re-verify, {atGate.ExitCode} at the gate");
-            if (atReverify.Stdout != atGate.Stdout)
-                wrong.Add($"{reason}: output differs from the gate's");
-            if (!atReverify.Entries.SequenceEqual(atGate.Entries))
-                wrong.Add($"{reason}: entries differ from the gate's");
-            if (atReverify.Acted || atGate.Acted)
+            if (run.ExitCode != Declared[reason].Exit)
+                wrong.Add($"{reason}: exit {run.ExitCode}, expected {Declared[reason].Exit}");
+            if (!run.Stdout.Contains(sentence))
+                wrong.Add($"{reason}: output lacks the reason's sentence");
+            if (run.Entries.Count != 1 || run.Entries[0].Class != Declared[reason].Class)
+                wrong.Add($"{reason}: the entry is not the one declared");
+            if (run.Acted)
                 wrong.Add($"{reason}: an action service was called");
         }
 
-        // The control: a clean read at the re-verify goes on to the action service.
-        var clean = await RunToTheEnd(arg, PendingRebootResult.Clean, metAtAcquire: null,
-            atReverify: PendingRebootResult.Clean);
-        if (!clean.Acted) wrong.Add("a clean read at the re-verify did not reach the action service");
+        // The control: a check that stands goes on to the action service.
+        var clean = await RunToTheEnd(arg, signals: null);
+        if (!clean.Acted) wrong.Add("a check that stood did not reach the action service");
 
         Assert.True(wrong.Count == 0, string.Join("; ", wrong));
     }
@@ -230,29 +185,28 @@ public class CliPendingRebootOutcomeTests
         Path.Combine(Path.GetTempPath(), "installerclean-cli-pending-reboot-outcome-test");
 
     /// <summary>
-    /// Runs <paramref name="arg"/> to its end against a gate answering
-    /// <paramref name="gate"/>, and an action service that, when the run reaches it,
-    /// refuses at its acquire for the lock condition <paramref name="metAtAcquire"/>
-    /// names: held, or refused permission to open. Returns the exit code, stdout and
-    /// the entries the run wrote.
+    /// Runs <paramref name="arg"/> to its end against a batch check that ends on
+    /// <paramref name="signals"/>, as a check does that cannot wait out a blocked read of
+    /// Windows Installer's signals. Returns the exit code, stdout and the entries the run
+    /// wrote.
     /// </summary>
     private static async Task<(int ExitCode, string Stdout, IReadOnlyList<(CliEventClass Class, string Text)> Entries)> Run(
-        string arg, PendingRebootResult gate, PendingRebootReason? metAtAcquire)
+        string arg, PendingRebootResult signals)
     {
-        var (exitCode, stdout, entries, _) = await RunToTheEnd(arg, gate, metAtAcquire, atReverify: null);
+        var (exitCode, stdout, entries, _) = await RunToTheEnd(arg, signals);
         return (exitCode, stdout, entries);
     }
 
     /// <summary>
-    /// <see cref="Run"/>, with the re-verify handing back <paramref name="atReverify"/> as its
-    /// read of the in-progress signals (none where null), and whether the run reached either
-    /// action service.
+    /// <see cref="Run"/>, with a check that stands over both files where
+    /// <paramref name="signals"/> is null, and whether the run reached either action
+    /// service.
     /// </summary>
     private static async Task<(int ExitCode, string Stdout, IReadOnlyList<(CliEventClass Class, string Text)> Entries, bool Acted)> RunToTheEnd(
-        string arg, PendingRebootResult gate, PendingRebootReason? metAtAcquire, PendingRebootResult? atReverify)
+        string arg, PendingRebootResult? signals)
     {
-        // The gate sits after the scan, so the offer has to be non-empty or the run
-        // returns on "nothing to do" before ever reaching it.
+        // The offer has to be non-empty or the run returns on "nothing to do" before
+        // ever reaching the check.
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
@@ -260,33 +214,23 @@ public class CliPendingRebootOutcomeTests
                  new OrphanedFile(OfferB, 1024, false, false, false, "unclaimed")],
                 Array.Empty<RegisteredPackage>(), 0));
 
-        var reboot = Substitute.For<IPendingRebootService>();
-        reboot.Check().Returns(gate);
-
-        // Both files survive the re-verify, so a run the gate lets through reaches the
+        // A check that stands keeps both files, so a run it lets through reaches the
         // action service with a batch to act on.
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(new[] { OfferA, OfferB }, Array.Empty<string>(),
-                InstallerActivity: atReverify));
-
-        var busy = metAtAcquire == PendingRebootReason.MsiExecuteMutexHeld;
-        var refused = metAtAcquire == PendingRebootReason.MsiExecuteMutexAccessRefused;
+        var batchCheck = signals is null
+            ? CliRunFixtures.BatchCheckStandingOverEverything()
+            : CliRunFixtures.BatchCheckEnding(BatchEndReason.SignalWaitCannotClear, signals);
 
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
-                InstallerBusy: busy, InstallerLockAccessRefused: refused));
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>()));
 
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
-                InstallerBusy: busy, InstallerLockAccessRefused: refused));
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>()));
 
-        var services = CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier,
+        var services = CliRunFixtures.Services(scan, batchCheck: batchCheck,
             delete: delete, move: move);
 
         var invocation = arg == "/m"

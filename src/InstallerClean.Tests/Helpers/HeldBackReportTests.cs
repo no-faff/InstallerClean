@@ -93,7 +93,7 @@ public class HeldBackReportTests
     public void Two_tallies_add_rather_than_one_standing_in_for_the_other()
     {
         // The fold's arithmetic, and it outlives the partition because the counts
-        // do. The pre-act re-verify and the under-lease re-read keep back DIFFERENT
+        // do. The check before a batch and a check made in the middle of it keep back DIFFERENT
         // files, so their causes accumulate; anything merging them would under-count
         // the one number the sentence prints.
         var preAct = new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 2);

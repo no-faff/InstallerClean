@@ -86,7 +86,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IFileSystem fileSystem,
         IResultLogService resultLogService,
         IUpdateCheckService updateCheckService,
-        IRemovableReverifier reverifier,
+        IBatchCheck batchCheck,
         IEarlierRunCheck earlierRunCheck,
         IFirstRunMark firstRunMark,
         IWindowsRegion windowsRegion,
@@ -113,7 +113,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
-            Scan, Completion, reverifier,
+            Scan, Completion, batchCheck,
             instanceLockLost: windowService.IsInstanceLockLost,
             destinationGuard: destinationGuard);
         Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService,

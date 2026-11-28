@@ -7,26 +7,19 @@ using Microsoft.Win32.SafeHandles;
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
-/// The real <see cref="MutexProbe"/> against real Win32 named mutexes. Covering
-/// it separately is what stops <c>FakeMutexProbe</c> being the only thing under
-/// test: the fake defines the contract it imitates, so the real probe has to be
-/// held to that contract independently. The mutex hold that stops a msiexec
-/// racing a delete batch rests entirely on
-/// <c>TryAcquire</c> reporting the right <see cref="MutexAcquireOutcome"/>, since
-/// DeleteFilesService and MoveFilesService refuse the whole batch and choose which
-/// refusal the user is told about on exactly that value.
+/// The real <see cref="MutexProbe"/> against real Win32 named mutexes. Its sample is what
+/// the pending-reboot check reads Windows Installer's own mutex through, so the answers it
+/// gives for a mutex held, abandoned, owned by the asking thread or closed to this process
+/// are held here to what Windows does and not to a fake's answers.
 ///
-/// A <c>Local\</c> name with a fresh GUID per test, never
-/// <c>Global\_MSIExecute</c>: the real object is machine-wide and taking it
-/// would serialise every installer on whichever machine ran the suite, which
-/// is the very cost the production comment warns about.
+/// A <c>Local\</c> name with a fresh GUID per test, never <c>Global\_MSIExecute</c>: the
+/// real object is machine-wide and a test holding it would hold up every installer on
+/// whichever machine ran the suite.
 ///
-/// The access-refused answers (<see cref="MutexSample.AccessRefused"/> from the
-/// sample, and a null lease with <see cref="MutexAcquireOutcome.AccessRefused"/>
-/// from the acquire) are reproduced with a named object whose DACL is empty. Each
-/// test using one first shows a plain open of that object being refused with the
-/// very call the probe makes, so a setup that went subtly wrong fails there rather
-/// than letting the assertion after it pass for the wrong reason.
+/// The access-refused answer (<see cref="MutexSample.AccessRefused"/>) is reproduced with a
+/// named object whose DACL is empty. The test using it first shows a plain open of that
+/// object being refused with the very call the probe makes, so a setup that went subtly
+/// wrong fails there rather than letting the assertion after it pass for the wrong reason.
 /// </summary>
 public class MutexProbeTests
 {
@@ -81,55 +74,7 @@ public class MutexProbeTests
     }
 
     [Fact]
-    public void TryAcquire_takes_a_name_nobody_holds()
-    {
-        var probe = new MutexProbe();
-
-        using var lease = probe.TryAcquire(_name, out var outcome);
-
-        Assert.NotNull(lease);
-        Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
-    }
-
-    [Fact]
-    public void TryAcquire_reports_a_name_another_thread_holds()
-    {
-        WithNameHeldElsewhere(_name, () =>
-        {
-            var probe = new MutexProbe();
-
-            var lease = probe.TryAcquire(_name, out var outcome);
-
-            // The value that decides WHICH refusal the caller reports. Every
-            // outcome here stops the batch, so a null lease under the wrong one
-            // would not let anything through; what it would do is send a live
-            // installer transaction down a path whose sentence names a different
-            // condition, and the pending-reboot banner that would have named the
-            // real cause is never painted.
-            Assert.Null(lease);
-            Assert.Equal(MutexAcquireOutcome.HeldByAnother, outcome);
-        });
-    }
-
-    [Fact]
-    public void Disposing_a_lease_frees_the_name_for_the_next_acquire()
-    {
-        var probe = new MutexProbe();
-
-        // Acquire and release both on this thread, per the Win32 owner-thread
-        // rule; the test is deliberately synchronous so no await can hop it.
-        var first = probe.TryAcquire(_name, out _);
-        Assert.NotNull(first);
-        first.Dispose();
-
-        using var second = probe.TryAcquire(_name, out var outcome);
-
-        Assert.NotNull(second);
-        Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
-    }
-
-    [Fact]
-    public void A_sample_and_an_acquire_hand_no_wait_to_the_threads_synchronisation_context()
+    public void A_sample_hands_no_wait_to_the_threads_synchronisation_context()
     {
         using var existing = new Mutex(initiallyOwned: false, _name);
 
@@ -137,37 +82,10 @@ public class MutexProbeTests
         {
             var probe = new MutexProbe();
             Assert.Equal(MutexSample.NotHeld, probe.Sample(_name).State);
-            using (var lease = probe.TryAcquire(_name, out var outcome))
-                Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
             return context.Waits;
         });
 
         Assert.Equal(0, waits);
-    }
-
-    [Fact]
-    public void An_abandoned_mutex_is_acquired_rather_than_reported_as_held()
-    {
-        // A holder thread that exits without releasing leaves the mutex
-        // abandoned, which the next acquire's wait answers as abandoned, WITH
-        // ownership already transferred. Reporting that as
-        // held by another would refuse every batch after a crashed installer,
-        // and go on refusing until the machine restarted.
-        var holder = new Thread(() =>
-        {
-            var mutex = new Mutex(initiallyOwned: false, _name);
-            mutex.WaitOne(0);
-            // No release, no dispose: the thread ends holding it.
-        })
-        { IsBackground = true };
-        holder.Start();
-        Assert.True(holder.Join(TimeSpan.FromSeconds(30)));
-
-        var probe = new MutexProbe();
-        using var lease = probe.TryAcquire(_name, out var outcome);
-
-        Assert.NotNull(lease);
-        Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
     }
 
     [Fact]
@@ -285,25 +203,6 @@ public class MutexProbeTests
         // and exit code the command line gives. Held would tell the user something
         // is installing, which nothing here has seen.
         Assert.Equal(MutexSample.AccessRefused, new MutexProbe().Sample(_name).State);
-    }
-
-    [Fact]
-    public void TryAcquire_reports_a_name_whose_security_refuses_the_open_as_refused()
-    {
-        using var refusing = CreateRefusingMutex(_name);
-
-        // The control, for the call TryAcquire makes: the create-or-open
-        // constructor meets the existing object and is refused.
-        Assert.Throws<UnauthorizedAccessException>(() => new Mutex(initiallyOwned: false, _name));
-
-        var probe = new MutexProbe();
-        var lease = probe.TryAcquire(_name, out var outcome);
-
-        Assert.Null(lease);
-        Assert.Equal(MutexAcquireOutcome.AccessRefused, outcome);
-        // And the sample of the same object agrees with it, which is what lets the
-        // pending-reboot gate meet a standing refusal before the action does.
-        Assert.Equal(MutexSample.AccessRefused, probe.Sample(_name).State);
     }
 
     /// <summary>

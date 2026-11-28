@@ -27,7 +27,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     private readonly IDestinationGuard _destinationGuard;
     private readonly ScanViewModel _scan;
     private readonly CompletionViewModel _completion;
-    private readonly IRemovableReverifier _reverifier;
+    private readonly IBatchCheck _batchCheck;
     private readonly PropertyChangedEventHandler _scanHandler;
 
     /// <summary>
@@ -264,6 +264,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <summary>The wait whose line <see cref="WaitsInTheHeading"/> is writing, and null at any other time.</summary>
     private SourceFolderWait? _waitTakingTheLine;
 
+    /// <summary>The heading the running Move or Delete carries, which a wait or a check in the middle of it gives back.</summary>
+    private string _operationHeading = string.Empty;
+
+    /// <summary>Whether a wait for Windows Installer or a check made again has the heading, until the next file's line.</summary>
+    private bool _checkStageInTheHeading;
+
+    /// <summary>The heading's line for a wait on a source folder that a check before or in a batch reports. One for each operation.</summary>
+    private WaitLine? _checkWaitLine;
+
     /// <summary>Whether the card shows the button that stops the wait the heading names.</summary>
     public bool CanStopWaiting => WaitShown is not null;
 
@@ -332,7 +341,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         IFileSystem fileSystem,
         ScanViewModel scan,
         CompletionViewModel completion,
-        IRemovableReverifier reverifier,
+        IBatchCheck batchCheck,
         IDestinationGuard destinationGuard,
         Func<string, bool?>? resolveIsOnCacheVolume = null,
         Func<bool>? instanceLockLost = null)
@@ -346,7 +355,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         _destinationGuard = destinationGuard;
         _scan = scan;
         _completion = completion;
-        _reverifier = reverifier;
+        _batchCheck = batchCheck;
         _resolveIsOnCacheVolume = resolveIsOnCacheVolume ?? MoveDestinationClassifier.AskWhetherOnCacheVolume;
         _instanceLockLost = instanceLockLost ?? (() => false);
 
@@ -1163,36 +1172,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // Re-check the pending-reboot gate at the moment of action, after the
-        // confirmation and immediately before acting. The scan sampled it once; a
-        // user who left the confirmation dialog open while a Windows Installer
-        // transaction started would otherwise move files against a live install,
-        // the one condition the gate exists to block. Blocked => the banner paints
-        // via HasPendingReboot and both commands drop out; refuse without calling
-        // the service.
-        //
-        // Check() throws when a read of Windows Installer's in-progress file fails
-        // in a way none of its readings names. Nothing has been touched at this
-        // point, so the throw ends here in the same dialog as the unforeseen-failure
-        // arm below. The counts on screen still describe the folder, so there is
-        // no rescan, and the folders the pre-flight made are removed as they are when
-        // the gate blocks.
-        bool blocked;
-        try
-        {
-            blocked = await _scan.RecheckPendingRebootAsync();
-        }
-        catch (Exception ex)
-        {
-            EndOperation();
-            OperationProgress = string.Empty;
-            await RemoveCreatedFoldersAsync(createdFolders);
-            ShowActionFailed(ex, deleting: false);
-            return;
-        }
-        // A close asked for during the confirmation or this check ends the Move
-        // here, as a declined confirmation does: nothing has been placed.
-        if (blocked || CloseRequested)
+        // A close asked for during the confirmation ends the Move here, as a declined
+        // confirmation does: nothing has been placed.
+        if (CloseRequested)
         {
             EndOperation();
             OperationProgress = string.Empty;
@@ -1205,7 +1187,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // It names no count, so it needs neither formatting nor a plural form;
         // the "X of Y" line beneath it is what counts, and it counts the batch
         // the re-verify actually handed over rather than the one the scan found.
-        OperationProgress = Strings.Status_Moving;
+        OperationProgress = _operationHeading = Strings.Status_Moving;
         IsOperating = true;
 
         // Started with the overlay and read where the report is built, so the
@@ -1217,24 +1199,25 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         try
         {
-            // Re-verify the removable set immediately before acting, behind the
-            // overlay: the Windows Installer records are enumerated again, and
-            // every file no record names is judged again the way the scan judged
-            // it (see IRemovableReverifier). It can fail; a failure must STOP
-            // the batch, never act on an un-verified set, so it is surfaced through
-            // the scan's own error ladder. A cancellation propagates to the outer
-            // OCE catch.
+            // The check the batch acts on, made immediately before it, behind the
+            // overlay (IBatchCheck). It waits first for as long as Windows Installer is
+            // busy, with the wait in the heading and Cancel live; the window gives the
+            // wait no bound. Then the Windows Installer records are enumerated again
+            // and every file no record names is judged again the way the scan judged
+            // it, under a watch on those records, until one such check stands. It can
+            // fail; a failure must STOP the batch, never act on an un-verified set, so
+            // it is surfaced through the scan's own error ladder. A cancellation
+            // propagates to the outer OCE catch.
             //
             // A moving bar over no count from here until the batch reports its first
-            // file, as on the rescan after a batch: the re-verify reads the records again
-            // and re-checks the files, and the service then takes the installer lock and
-            // re-reads the batch's claims under it, and nothing in that stretch is a
-            // count of the batch. OnOperationProgressUpdate brings the measured bar back.
+            // file, as on the rescan after a batch: nothing in that stretch is a count
+            // of the batch. OnOperationProgressUpdate brings the measured bar back.
             IsOperationProgressIndeterminate = true;
-            ReverifyResult reverify;
+            BatchCheckResult firstCheck;
             try
             {
-                reverify = await _reverifier.ReverifyAsync(filePaths, OperationSource!.Token, WaitsInTheHeading());
+                firstCheck = await _batchCheck.RunAsync(
+                    filePaths, waitBound: null, CheckStagesInTheHeading(), OperationSource!.Token);
             }
             catch (OperationCanceledException)
             {
@@ -1247,7 +1230,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 ReleaseOperationSource();
                 var failure = _scan.DescribeScanFailure(ex);
                 OperationProgress = string.Empty;
-                // The re-verify runs before the batch, so nothing was placed.
+                // The check runs before the batch, so nothing was placed.
                 await RemoveCreatedFoldersAsync(createdFolders);
                 if (failure.IsError)
                     _dialogService.ShowError(failure.Message, failure.Title);
@@ -1256,25 +1239,29 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            // A Windows Installer transaction that started after the gate re-check above
-            // and was under way when the re-verify read the in-progress signals stops the
-            // whole batch, as that gate stops it: the banner paints and both commands drop
-            // out through HasPendingReboot. The re-verify itself holds back only the files no
-            // record names on such a read, and a superseded patch in the same batch is
-            // stopped here. It comes ahead of the all-held arm below so a batch the
-            // re-verify emptied ends here too, under the banner rather than the held-back
-            // card. Nothing has been touched, so there is no rescan; the finally below ends
-            // the operation and takes the overlay down. Nothing is left running on the
-            // operation's source, so it goes first, and Cancel is out of use while the
-            // folder the pre-flight made is removed.
-            if (reverify.InstallerActivity is { IsBlocked: true } installerActivity)
+            // Disposed of when this try is left, which releases the watch on every arm
+            // that stops before the service is handed the check. The service disposes
+            // of it as well, which is safe twice.
+            using var checkHeld = firstCheck;
+
+            // No check stood, so nothing has been touched and there is no rescan. A
+            // read of Windows Installer's signals that waiting does not change paints
+            // the gate's banner, and both commands drop out through HasPendingReboot;
+            // the other reasons have a dialog. It comes ahead of the all-held arm
+            // below. Nothing is left running on the operation's source, so it goes
+            // first, and Cancel is out of use while the folder the pre-flight made is
+            // removed.
+            if (firstCheck.Stood is not { } standing)
             {
                 ReleaseOperationSource();
-                _scan.PendingRebootResult = installerActivity;
                 OperationProgress = string.Empty;
+                // One of the two is always set (BatchCheckResult).
+                ShowBatchNotStarted(firstCheck.Ended!, deleting: false);
                 await RemoveCreatedFoldersAsync(createdFolders);
                 return;
             }
+
+            var reverify = standing.Result;
 
             var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
             var survivingFiles = removableFiles.Where(f => survivingSet.Contains(f.FullPath)).ToList();
@@ -1290,7 +1277,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            var survivingPaths = survivingFiles.Select(f => f.FullPath).ToList();
             var survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
 
             // The source installed for the pre-flight above runs on through the
@@ -1302,8 +1288,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             {
                 try
                 {
-                    result = await _moveService.MoveFilesAsync(survivingPaths, dest,
-                        UnderLeaseClaims.From(reverify), progress, OperationSource!.Token);
+                    result = await _moveService.MoveFilesAsync(
+                        standing, dest, progress, OperationSource!.Token);
                 }
                 finally
                 {
@@ -1328,8 +1314,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 await RefreshAfterBatchAsync();
                 if (ex.Partial.MovedCount > 0) _completion.RecordFirstRun();
                 // Same fold as the main path: a batch the destination guard
-                // stopped still owes an account of anything the under-lease re-read
-                // took back before it started.
+                // stopped still owes an account of anything a check made in the
+                // middle of it dropped.
                 var abortReclaimed = new HashSet<string>(ex.Partial.HeldBack, StringComparer.OrdinalIgnoreCase);
                 var abortSurviving = ex.Partial.HeldBack.Count == 0
                     ? survivingFiles
@@ -1365,99 +1351,60 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     _completion.ShowMoveStoppedSummary(ex.Partial.MovedCount,
                         CompletedBytes(abortSurviving, ex.Partial.MovedCount, ex.Partial.Errors),
                         ex.Destination, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
-                        reverify.WithHeldBack(ex.Partial.HeldBack, ex.Partial.HeldBackReasons));
+                        reverify.WithLaterChecks(ex.Partial.HeldBack, ex.Partial.HeldBackReasons,
+                            ex.Partial.SourceRootsGivenUp, ex.Partial.SourceWaitCount));
                 }
                 return;
             }
 
-            if (result.InstallerBusy)
-            {
-                // A Windows Installer transaction took Global\_MSIExecute after the
-                // act-time gate re-check above passed and before the service
-                // acquired it, so the service refused and touched nothing. Re-run
-                // the gate to paint the banner, and report no completed operation.
-                // The heading goes first on this arm and the two after it, which end
-                // in the re-check or a dialog with nothing the heading names running.
-                OperationProgress = string.Empty;
-                await RecheckAfterLockRefusalAsync(deleting: false);
-                // The service refused at the mutex, before its own
-                // CreateDestinationFolder, so nothing was placed.
-                await RemoveCreatedFoldersAsync(createdFolders);
-                return;
-            }
-
-            if (result.InstallerLockUnavailable)
-            {
-                // The service could not take Global\_MSIExecute and nothing was
-                // shown to be holding it, so it refused and touched nothing. No
-                // gate re-check here, unlike the arm above, and that is the whole
-                // reason this is a separate flag rather than a second cause behind
-                // the same one: the gate has no account of this condition, its
-                // probe reading such a failure as not held, so a re-check would
-                // come back clean and leave a refusal with no reason on screen. A
-                // dialog carries the reason instead. The service's own acquire has
-                // the detail.
-                //
-                // The destination cleanup matches the arm above, and for the same
-                // reason: the service refuses ahead of its own
-                // CreateDestinationFolder, so nothing it did needs undoing, and
-                // what does is the folder THIS pre-flight made, which would
-                // otherwise be left empty behind a batch that never ran.
-                OperationProgress = string.Empty;
-                _dialogService.ShowWarning(
-                    Strings.Error_MoveInstallerLockUnavailable,
-                    Strings.Error_MoveInstallerLockUnavailableTitle);
-                await RemoveCreatedFoldersAsync(createdFolders);
-                return;
-            }
-
-            if (result.InstallerLockAccessRefused)
-            {
-                // The object's security refused the service the rights to open it,
-                // so it never learned whether a transaction held it and refused
-                // without touching anything. A different sentence from the arm
-                // above: the app was not allowed to look, which is not the same as
-                // finding the lock busy, and only one of those two is something an
-                // administrator can go and change.
-                //
-                // The dialog says what happened to this click, and the gate is then
-                // re-run as the busy arm runs it, because the gate has a reason for
-                // this condition and paints a banner of its own for it. A refusal
-                // that stands leaves the window saying so with both commands out,
-                // rather than offering buttons that will refuse the next click the
-                // same way. A refusal that has already gone leaves the window as it
-                // was, which is the state the machine is now in.
-                OperationProgress = string.Empty;
-                _dialogService.ShowWarning(
-                    Strings.Error_MoveInstallerLockAccessRefused,
-                    Strings.Error_MoveInstallerLockUnavailableTitle);
-                await RecheckAfterLockRefusalAsync(deleting: false);
-                await RemoveCreatedFoldersAsync(createdFolders);
-                return;
-            }
-
+            // What the checks made in the middle of the batch came to is folded into the
+            // first check's account, ahead of every arm below, because each of them
+            // reports from it. The files those checks dropped were not touched, so they
+            // leave the batch's account of itself: the file list and the byte total
+            // both shrink, and the kept-back tally grows by the same files.
             if (result.HeldBack.Count > 0)
             {
-                // The service's own re-read, taken under the installer mutex, took
-                // these back. Nothing touched them, so they leave the batch's
-                // account of itself entirely: the file list and the byte total
-                // both shrink, and the re-verify's kept-back tally grows by the
-                // same files. Ahead of every arm below, because each of them
-                // reports one or both.
-                var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
-                survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                var dropped = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
+                survivingFiles = survivingFiles.Where(f => !dropped.Contains(f.FullPath)).ToList();
                 survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
-                reverify = reverify.WithHeldBack(result.HeldBack, result.HeldBackReasons);
+            }
+            reverify = reverify.WithLaterChecks(
+                result.HeldBack, result.HeldBackReasons, result.SourceRootsGivenUp, result.SourceWaitCount);
+
+            if (result.Ended is { } ended)
+            {
+                // The batch ended before its last file for a reason of its own
+                // (BatchEndReason). It is shown as a batch the destination guard
+                // stopped is: the reason in a dialog, then the card with what was done,
+                // carrying the same reason. The dialog goes up before the card for the
+                // reason given on that arm. No result-log entry, as for a cancelled
+                // run, and files that moved make this the PC's first run all the same.
+                // Where nothing moved and nothing failed, the folder the pre-flight
+                // made is removed, nothing having been placed in it.
+                await RefreshAfterBatchAsync();
+                if (result.MovedCount > 0) _completion.RecordFirstRun();
+                OperationProgress = string.Empty;
+                var reason = ShowBatchEnded(ended, deleting: false);
+                if (result.MovedCount > 0 || result.Errors.Count > 0)
+                {
+                    _completion.ShowMoveStoppedSummary(result.MovedCount,
+                        CompletedBytes(survivingFiles, result.MovedCount, result.Errors),
+                        dest, result.Errors, ClassifySpaceOutcome(destinationKind), reverify, reason);
+                }
+                else
+                {
+                    await RemoveCreatedFoldersAsync(createdFolders);
+                }
+                return;
             }
 
             if (result.HeldBack.Count > 0 && survivingFiles.Count == 0)
             {
-                // The under-lease re-read took the WHOLE batch back. See the
-                // matching arm on the delete path for why this takes the pre-lease
-                // twin's screen and its silence on the result log; Move owes a
-                // third thing as well, and it is the reason the service is careful
-                // to return before creating anything. The destination folder the
-                // PRE-FLIGHT made is still there, and nothing was ever put in it.
+                // A check made in the middle of the batch dropped every file that was
+                // left, and none had moved. See the matching arm on the delete path for
+                // why this takes the all-skipped screen and its silence on the result
+                // log. The destination folder the PRE-FLIGHT made is still there, with
+                // nothing in it, so it is removed.
                 await RefreshAfterBatchAsync();
                 _completion.ShowReverifyAllSkipped(reverify, deleting: false);
                 OperationProgress = string.Empty;
@@ -1521,11 +1468,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     result, movedBytes,
                     operationTimer.ElapsedMilliseconds,
                     destinationKind,
-                    // The folded result, so the under-lease re-read's own kept-back
-                    // files are counted with the pre-act ones rather than lost:
-                    // the two producers keep back DIFFERENT files and the report
-                    // owes an account of both. The drives and shares given up and the
-                    // waits are the pre-act check's, which the fold carries through.
+                    // The folded result, so the files, the drives and shares and the
+                    // waits of the checks made in the middle of the batch are counted
+                    // with the first check's and not lost: the checks keep back
+                    // DIFFERENT files and the report owes an account of all of them.
                     reverify,
                     _completion.ReportRegion,
                     _completion.ReportHost, _completion.ReportCopy);
@@ -1655,26 +1601,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OperationSource = new CancellationTokenSource();
         IsOperationInFlight = true;
 
-        // Re-check the pending-reboot gate at the moment of action: a
-        // transaction can start while the user is reading the confirmation
-        // dialog. Blocked => paint the banner and refuse. A throw from the check
-        // touches nothing and ends in the failure dialog without a rescan, as on
-        // the Move path.
-        bool blocked;
-        try
-        {
-            blocked = await _scan.RecheckPendingRebootAsync();
-        }
-        catch (Exception ex)
-        {
-            EndOperation();
-            OperationProgress = string.Empty;
-            ShowActionFailed(ex, deleting: true);
-            return;
-        }
-        // A close asked for during this check ends the Delete here, with nothing
+        // A close asked for during the confirmation ends the Delete here, with nothing
         // touched.
-        if (blocked || CloseRequested)
+        if (CloseRequested)
         {
             EndOperation();
             OperationProgress = string.Empty;
@@ -1683,7 +1612,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         // Heading before IsOperating: see the matching comment in the Move
         // path for why it carries no count.
-        OperationProgress = Strings.Status_Deleting;
+        OperationProgress = _operationHeading = Strings.Status_Deleting;
         IsOperating = true;
 
         // Same span as the Move path's timer, for the same reason.
@@ -1691,17 +1620,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         try
         {
-            // Re-verify the removable set immediately before acting, as the Move
-            // path does, so nothing the check no longer confirms is deleted. A
-            // failure STOPS the batch (surfaced through the scan's error ladder);
-            // a cancellation propagates to the outer OCE catch. The bar moves over no
+            // The check the batch acts on, made immediately before it, as on the Move
+            // path, so nothing the check no longer confirms is deleted. A failure
+            // STOPS the batch (surfaced through the scan's error ladder); a
+            // cancellation propagates to the outer OCE catch. The bar moves over no
             // count from here until the batch reports its first file, as on the Move
             // path.
             IsOperationProgressIndeterminate = true;
-            ReverifyResult reverify;
+            BatchCheckResult firstCheck;
             try
             {
-                reverify = await _reverifier.ReverifyAsync(ctx.FilePaths, OperationSource.Token, WaitsInTheHeading());
+                firstCheck = await _batchCheck.RunAsync(
+                    ctx.FilePaths, waitBound: null, CheckStagesInTheHeading(), OperationSource.Token);
             }
             catch (OperationCanceledException)
             {
@@ -1720,15 +1650,20 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            // A blocked read of the in-progress signals at the re-verify stops the whole
-            // batch, ahead of the all-held arm, as on the Move path, its source going first.
-            if (reverify.InstallerActivity is { IsBlocked: true } installerActivity)
+            // Disposed of when this try is left, as on the Move path.
+            using var checkHeld = firstCheck;
+
+            // No check stood, so nothing has been touched: the banner or a dialog, as on
+            // the Move path, the operation's source going first.
+            if (firstCheck.Stood is not { } standing)
             {
                 ReleaseOperationSource();
-                _scan.PendingRebootResult = installerActivity;
                 OperationProgress = string.Empty;
+                ShowBatchNotStarted(firstCheck.Ended!, deleting: true);
                 return;
             }
+
+            var reverify = standing.Result;
 
             var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
             var survivingFiles = ctx.RemovableFiles.Where(f => survivingSet.Contains(f.FullPath)).ToList();
@@ -1743,15 +1678,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            var survivingPaths = survivingFiles.Select(f => f.FullPath).ToList();
             var survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
 
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             DeleteResult result;
             try
             {
-                result = await _deleteService.DeleteFilesAsync(
-                    survivingPaths, UnderLeaseClaims.From(reverify), progress, OperationSource.Token);
+                result = await _deleteService.DeleteFilesAsync(standing, progress, OperationSource.Token);
             }
             finally
             {
@@ -1760,76 +1693,43 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 ReleaseOperationSource();
             }
 
-            if (result.InstallerBusy)
-            {
-                // A Windows Installer transaction grabbed Global\_MSIExecute after
-                // the act-time gate re-check above passed, so the service refused
-                // and touched nothing. Re-run the gate to paint the banner and
-                // report no completed operation. The heading goes first here and on
-                // the two arms after it, as on the Move path.
-                OperationProgress = string.Empty;
-                await RecheckAfterLockRefusalAsync(deleting: true);
-                return;
-            }
-
-            if (result.InstallerLockUnavailable)
-            {
-                // The service could not take Global\_MSIExecute and nothing was
-                // shown to be holding it, so it refused and touched nothing. No
-                // gate re-check here, unlike the arm above, and that is the whole
-                // reason this is a separate flag rather than a second cause behind
-                // the same one: the gate has no account of this condition, its
-                // probe reading such a failure as not held, so a re-check would
-                // come back clean and leave a refusal with no reason on screen. A
-                // dialog carries the reason instead. The service's own acquire has
-                // the detail.
-                OperationProgress = string.Empty;
-                _dialogService.ShowWarning(
-                    Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
-                return;
-            }
-
-            if (result.InstallerLockAccessRefused)
-            {
-                // The object's security refused the service the rights to open it,
-                // so it never learned whether a transaction held it and refused
-                // without touching anything. A different sentence from the arm
-                // above: the app was not allowed to look, which is not the same as
-                // finding the lock busy, and only one of those two is something an
-                // administrator can go and change.
-                //
-                // The dialog says what happened to this click, and the gate is then
-                // re-run as the busy arm runs it, because the gate has a reason for
-                // this condition and paints a banner of its own for it. A refusal
-                // that stands leaves the window saying so with both commands out,
-                // rather than offering buttons that will refuse the next click the
-                // same way. A refusal that has already gone leaves the window as it
-                // was, which is the state the machine is now in.
-                OperationProgress = string.Empty;
-                _dialogService.ShowWarning(
-                    Strings.Error_InstallerLockAccessRefused, Strings.Error_InstallerLockUnavailableTitle);
-                await RecheckAfterLockRefusalAsync(deleting: true);
-                return;
-            }
-
+            // What the checks made in the middle of the batch came to is folded into the
+            // first check's account, exactly as on the Move path.
             if (result.HeldBack.Count > 0)
             {
-                // The service's own re-read, taken under the installer mutex, took
-                // these back. Nothing touched them, so they leave the batch's
-                // account of itself entirely, exactly as on the Move path.
-                var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
-                survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                var dropped = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
+                survivingFiles = survivingFiles.Where(f => !dropped.Contains(f.FullPath)).ToList();
                 survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
-                reverify = reverify.WithHeldBack(result.HeldBack, result.HeldBackReasons);
+            }
+            reverify = reverify.WithLaterChecks(
+                result.HeldBack, result.HeldBackReasons, result.SourceRootsGivenUp, result.SourceWaitCount);
+
+            if (result.Ended is { } ended)
+            {
+                // The batch ended before its last file for a reason of its own, and is
+                // shown as on the Move path: the reason in a dialog, then the card with
+                // what was done. No result-log entry, and files that went make this the
+                // PC's first run.
+                await RefreshAfterBatchAsync();
+                if (result.DeletedCount > 0) _completion.RecordFirstRun();
+                OperationProgress = string.Empty;
+                var reason = ShowBatchEnded(ended, deleting: true);
+                if (result.DeletedCount > 0 || result.Errors.Count > 0)
+                {
+                    _completion.ShowDeleteStoppedSummary(result.DeletedCount,
+                        CompletedBytes(survivingFiles, result.DeletedCount, result.Errors),
+                        result.Errors, reverify, reason);
+                }
+                return;
             }
 
             if (result.HeldBack.Count > 0 && survivingFiles.Count == 0)
             {
-                // The under-lease re-read took the WHOLE batch back, so this is
-                // the arm above having emptied it rather than a batch that ran.
-                // One condition owes one screen and one record, and the pre-lease
-                // twin already decided what both are, so this takes them: the
-                // all-skipped overlay, and no result-log entry.
+                // A check made in the middle of the batch dropped every file that was
+                // left, and none had been deleted. One condition owes one screen and one
+                // record, and the check before the batch already decided what both are
+                // where it drops everything, so this takes them: the all-skipped
+                // overlay, and no result-log entry.
                 //
                 // It returns here rather than falling through: the heading
                 // suppression below turns on errors and there are none here, so the
@@ -1981,22 +1881,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// the destination first. The rule, rather than a list that goes stale as paths
     /// are added: every abandon path on which NOTHING WAS PLACED in the destination
     /// calls this, both before the confirmation (probe cancel, probe write
-    /// failure, free-space refusal, confirmation decline, act-time
-    /// pending-reboot refusal) and after it (re-verify failure, either half of
-    /// the re-verify keeping every candidate back, a cancel before the first
-    /// file, the service refusing at the Global\_MSIExecute mutex, and the
-    /// service's own write-probe failure). The last two are safe because the
-    /// service refuses ahead of its CreateDestinationFolder and its per-file loop
-    /// respectively.
+    /// failure, free-space refusal, confirmation decline, a close asked for
+    /// during the confirmation) and after it (the check before the batch failing,
+    /// ending with no check that stood or keeping every candidate back, a check
+    /// in the middle of the batch dropping every file that was left, a cancel
+    /// before the first file, a batch that ended before it moved anything, and
+    /// the service's own write-probe failure).
     ///
-    /// "Either half" is load-bearing and was once only the first half. The
-    /// pre-lease pass keeping everything back never reaches the service at all;
-    /// the under-lease re-read keeping everything back reaches it and comes
-    /// straight back out, the service returning before its own
-    /// CreateDestinationFolder precisely so that a batch it empties leaves no
-    /// folder behind. That care is undone one layer up if this is not called,
-    /// because the folders that survive are the PRE-FLIGHT's rather than the
-    /// service's.
+    /// A batch the service ran that moved nothing removes the folders the service
+    /// itself made. The folders that are left then are the PRE-FLIGHT's, which is
+    /// why the arms above that reach the service call this too.
     ///
     /// The paths that deliberately do NOT call this are the ones where a file
     /// may already have arrived: Error_DestinationChangedMidBatch, thrown from
@@ -2034,30 +1928,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // not empty any more, is gone already or is refused ends the removal
             // without a word.
             : Task.Run(() => CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders));
-
-    /// <summary>
-    /// Re-runs the pending-reboot gate after the service refused at
-    /// Global\_MSIExecute, so a refusal that still stands paints the gate's banner
-    /// and takes both commands out.
-    ///
-    /// The gate throws when a read of Windows Installer's in-progress file fails in
-    /// a way none of its readings names. The service touched nothing, so the throw
-    /// ends here in the failure dialog with no rescan, as it does at the act-time
-    /// re-check, and the caller goes on to its own clean-up, which on a Move removes
-    /// the folders the pre-flight made. In the arms that show the lock dialog first,
-    /// this is a second dialog, and it is the one that reports the failed read.
-    /// </summary>
-    private async Task RecheckAfterLockRefusalAsync(bool deleting)
-    {
-        try
-        {
-            await _scan.RecheckPendingRebootAsync();
-        }
-        catch (Exception ex)
-        {
-            ShowActionFailed(ex, deleting);
-        }
-    }
 
     /// <summary>
     /// The dialog a Move or Delete ends in when it fails in a way none of its own
@@ -2203,6 +2073,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         cts?.Dispose();
         IsCancellationRequested = false;
         IsOperationInFlight = false;
+        _checkStageInTheHeading = false;
+        _checkWaitLine = null;
     }
 
     /// <summary>
@@ -2329,37 +2201,184 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>
-    /// A reporter for the check before a Move or Delete and the rescan after one, which
-    /// shows a wait they report on a source folder (<see cref="ScanProgressUpdate.IsWait"/>)
-    /// in the heading, the line a screen reader speaks, with the button that stops it
+    /// A reporter for the rescan after a Move or Delete, which shows a wait the scan
+    /// reports on a source folder (<see cref="ScanProgressUpdate.IsWait"/>) in the heading,
+    /// the line a screen reader speaks, with the button that stops it
     /// (<see cref="WaitShown"/>), and puts the heading back when the wait ends, which takes
-    /// the button away. The check reports nothing but waits
-    /// (<see cref="IRemovableReverifier.ReverifyAsync"/>). The rescan's milestones and its
-    /// ticker stop at <see cref="WaitsOnly"/> on the thread that reports them, so none of
-    /// them is shown or crosses to the dispatcher. Once Cancel is pressed a wait is not
-    /// shown or put back, so "Cancelling..." stays in front of the reader. Made on the
-    /// dispatcher, so a wait it is told arrives there.
+    /// the button away. The rescan's milestones and its ticker stop at
+    /// <see cref="WaitsOnly"/> on the thread that reports them, so none of them is shown
+    /// or crosses to the dispatcher. Once Cancel is pressed a wait is not shown or put
+    /// back, so "Cancelling..." stays in front of the reader. Made on the dispatcher, so
+    /// a wait it is told arrives there.
     /// </summary>
     private IProgress<ScanProgressUpdate> WaitsInTheHeading()
     {
         var heading = new WaitLine(() => OperationProgress, line => OperationProgress = line);
-        return new WaitsOnly(new Progress<ScanProgressUpdate>(update =>
-        {
-            if (IsCancellationRequested) return;
-            _waitTakingTheLine = update.Wait;
-            try
-            {
-                heading.Show(update);
-            }
-            finally
-            {
-                _waitTakingTheLine = null;
-            }
-        }));
+        return new WaitsOnly(new Progress<ScanProgressUpdate>(update => ShowSourceWait(heading, update)));
     }
+
+    private void ShowSourceWait(WaitLine heading, ScanProgressUpdate update)
+    {
+        if (IsCancellationRequested) return;
+        _waitTakingTheLine = update.Wait;
+        try
+        {
+            heading.Show(update);
+        }
+        finally
+        {
+            _waitTakingTheLine = null;
+        }
+    }
+
+    /// <summary>
+    /// A reporter for the check made before a batch (<see cref="IBatchCheck"/>), which
+    /// shows each stage it reports in the heading (<see cref="ShowCheckStage"/>). Made on
+    /// the dispatcher, so every stage arrives there, in the order it was reported.
+    /// </summary>
+    private IProgress<BatchCheckProgress> CheckStagesInTheHeading() =>
+        new Progress<BatchCheckProgress>(ShowCheckStage);
+
+    /// <summary>
+    /// Shows one stage of a check in the heading: a wait for Windows Installer, the check
+    /// itself, or a wait the check makes on a source folder, with the button that stops
+    /// that wait. A wait is reported again when its reason changes, so the line follows
+    /// the reason. The check before a batch reports through
+    /// <see cref="CheckStagesInTheHeading"/> and a check made in the middle of one
+    /// through the batch's own progress (<see cref="OperationProgress.Check"/>); both
+    /// arrive here on the dispatcher. Once Cancel is pressed nothing is shown, so
+    /// "Cancelling..." stays in front of the reader.
+    ///
+    /// THE CHECK BEFORE THE FIRST FILE KEEPS THE OPERATION'S OWN HEADING, which already
+    /// says what is happening, and takes it back after a wait. A check made once files
+    /// have been reported says that the files are being checked again.
+    /// </summary>
+    private void ShowCheckStage(BatchCheckProgress stage)
+    {
+        if (IsCancellationRequested) return;
+        switch (stage.Stage)
+        {
+            case BatchCheckStage.Waiting:
+                _checkStageInTheHeading = true;
+                IsOperationProgressIndeterminate = true;
+                OperationProgress = WaitsOnAnUnfinishedInstallation(stage.Signals)
+                    ? Strings.Status_WaitingForUnfinishedInstall
+                    : Strings.Status_WaitingForInstaller;
+                break;
+            case BatchCheckStage.Checking:
+                IsOperationProgressIndeterminate = true;
+                if (OperationCurrentFile > 0)
+                {
+                    _checkStageInTheHeading = true;
+                    OperationProgress = Strings.Status_CheckingAgain;
+                }
+                else
+                {
+                    OperationProgress = _operationHeading;
+                }
+                break;
+            case BatchCheckStage.SourceWait when stage.SourceWait is { } update:
+                ShowSourceWait(
+                    _checkWaitLine ??= new WaitLine(() => OperationProgress, line => OperationProgress = line),
+                    update);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Whether the read being waited on is one an interrupted installation leaves behind:
+    /// the InProgress key or Windows Installer's in-progress file, with nothing holding
+    /// the mutex. An installation under way ends by itself. One waiting for a restart does
+    /// not, so the line for these two says that a restart may be what is needed.
+    /// </summary>
+    private static bool WaitsOnAnUnfinishedInstallation(PendingRebootResult? signals) =>
+        signals?.Reason is PendingRebootReason.InstallerInProgress or PendingRebootReason.InstallerInProgressMarker;
+
+    /// <summary>
+    /// What the window does where no check stood before a batch, so nothing was touched.
+    /// A read of Windows Installer's signals that ended it paints the gate's banner, and
+    /// both commands drop out through HasPendingReboot. The other reasons have a dialog.
+    /// </summary>
+    private void ShowBatchNotStarted(BatchEnd ended, bool deleting)
+    {
+        if (ended.Signals is { } signals)
+        {
+            _scan.PendingRebootResult = signals;
+            return;
+        }
+
+        _dialogService.ShowWarning(EndedLine(ended), StoppedTitle(deleting));
+    }
+
+    /// <summary>
+    /// Shows why a batch ended before its last file, in a dialog, and returns the sentence
+    /// shown, which the card that follows carries under what was done. A read of Windows
+    /// Installer's signals paints the gate's banner as well, whose sentence for that
+    /// reason is the one shown. A check that threw is described as a failed check before
+    /// a batch is.
+    /// </summary>
+    private string ShowBatchEnded(BatchEnd ended, bool deleting)
+    {
+        if (ended.Reason == BatchEndReason.CheckFailed && ended.Failure is { } thrown)
+        {
+            var failure = _scan.DescribeScanFailure(thrown);
+            if (failure.IsError)
+                _dialogService.ShowError(failure.Message, failure.Title);
+            else
+                _dialogService.ShowWarning(failure.Message, failure.Title);
+            return failure.Message;
+        }
+
+        string line;
+        if (ended.Signals is { } signals)
+        {
+            _scan.PendingRebootResult = signals;
+            line = _scan.PendingRebootBannerText;
+        }
+        else
+        {
+            line = EndedLine(ended);
+        }
+
+        _dialogService.ShowWarning(line, StoppedTitle(deleting));
+        return line;
+    }
+
+    private static string StoppedTitle(bool deleting) =>
+        deleting ? Strings.Error_DeleteStoppedTitle : Strings.Error_MoveStoppedTitle;
+
+    /// <summary>
+    /// The sentence for a batch's end that carries no read of the signals and no
+    /// exception. Every such reason is named and the default throws, so a reason added to
+    /// <see cref="BatchEndReason"/> later is never shown under another reason's sentence.
+    /// </summary>
+    private static string EndedLine(BatchEnd ended) => ended.Reason switch
+    {
+        BatchEndReason.RecordsKeptChanging => Strings.Error_BatchEnded_RecordsKeptChanging,
+        BatchEndReason.WatchUnavailable => Strings.Error_BatchEnded_WatchUnavailable,
+        BatchEndReason.InHandFolderUnavailable => string.Format(
+            Strings.Error_BatchEnded_InHandFolderUnavailable, InHandFolders.FolderName, ended.WindowsError),
+        _ => throw new ArgumentOutOfRangeException(nameof(ended), ended.Reason,
+            "A reason a batch ended for with no sentence. Add it to EndedLine in the same edit as the enum member."),
+    };
 
     private void OnOperationProgressUpdate(OperationProgress p)
     {
+        // A wait or a check made in the middle of the batch takes the heading, and the
+        // count stays as it was.
+        if (p.Check is { } check)
+        {
+            ShowCheckStage(check);
+            return;
+        }
+
+        // A file's own line puts the operation's heading back after such a wait or check.
+        if (_checkStageInTheHeading)
+        {
+            _checkStageInTheHeading = false;
+            if (!IsCancellationRequested) OperationProgress = _operationHeading;
+        }
+
         // The batch's first count ends the stretch before it, which the bar spends
         // moving over no count.
         IsOperationProgressIndeterminate = false;

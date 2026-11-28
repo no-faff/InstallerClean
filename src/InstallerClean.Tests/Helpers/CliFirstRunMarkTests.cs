@@ -38,11 +38,6 @@ public class CliFirstRunMarkTests
     private const string File1 = @"C:\Windows\Installer\a.msi";
     private const string File2 = @"C:\Windows\Installer\b.msp";
 
-    private static readonly PatchClaim SurvivingA =
-        new(File1, "{AAAA1111-0000-0000-0000-000000000001}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-    private static readonly PatchClaim SurvivingB =
-        new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-
     [Fact]
     public async Task A_delete_that_deleted_files_sets_the_mark()
     {
@@ -73,17 +68,15 @@ public class CliFirstRunMarkTests
     {
         var mark = Substitute.For<IFirstRunMark>();
         var delete = Delete(new DeleteResult(2, NoErrors));
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(Array.Empty<string>(), new[] { File1, File2 }));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(Array.Empty<string>(), new[] { File1, File2 }));
 
-        var exitCode = await Run("/d", null, Services(mark, delete: delete, reverifier: reverifier));
+        var exitCode = await Run("/d", null, Services(mark, delete: delete, batchCheck: batchCheck));
 
         Assert.Equal(CliExitCode.Ok, exitCode);
         // The run finished without asking the service, so the count it went on is nought.
         await delete.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         mark.DidNotReceive().Set();
         AssertTheLogRecordsIt(actedOnFiles: false);
     }
@@ -94,8 +87,7 @@ public class CliFirstRunMarkTests
         using var cts = new CancellationTokenSource();
         var mark = Substitute.For<IFirstRunMark>();
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
                 cts.Cancel();
@@ -115,8 +107,7 @@ public class CliFirstRunMarkTests
         using var cts = new CancellationTokenSource();
         var mark = Substitute.For<IFirstRunMark>();
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
                 cts.Cancel();
@@ -161,8 +152,8 @@ public class CliFirstRunMarkTests
         using var cts = new CancellationTokenSource();
         var mark = Substitute.For<IFirstRunMark>();
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -219,8 +210,7 @@ public class CliFirstRunMarkTests
     {
         var mark = Substitute.For<IFirstRunMark>();
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<DeleteResult>(_ => throw Unforeseen(failure));
 
         var exitCode = await Run("/d", null, Services(mark, delete: delete));
@@ -237,8 +227,8 @@ public class CliFirstRunMarkTests
     {
         var mark = Substitute.For<IFirstRunMark>();
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw Unforeseen(failure));
 
@@ -272,12 +262,11 @@ public class CliFirstRunMarkTests
         };
         var mark = Substitute.For<IFirstRunMark>();
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<DeleteResult>(_ => throw thrown);
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw thrown);
 
@@ -293,16 +282,17 @@ public class CliFirstRunMarkTests
         // The same failure, met one step earlier, before the batch is handed over.
         var mark = Substitute.For<IFirstRunMark>();
         var delete = Delete(new DeleteResult(2, NoErrors));
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns<ReverifyResult>(_ => throw new InvalidOperationException("planted"));
+        var batchCheck = Substitute.For<IBatchCheck>();
+        batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(),
+                Arg.Any<IProgress<BatchCheckProgress>>(), Arg.Any<CancellationToken>())
+            .Returns<BatchCheckResult>(_ => throw new InvalidOperationException("planted"));
 
-        var exitCode = await Run("/d", null, Services(mark, delete: delete, reverifier: reverifier));
+        var exitCode = await Run("/d", null, Services(mark, delete: delete, batchCheck: batchCheck));
 
         Assert.Equal(CliExitCode.Error, exitCode);
         await delete.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         mark.DidNotReceive().Set();
         AssertTheLogRecordsIt(actedOnFiles: false);
     }
@@ -343,8 +333,7 @@ public class CliFirstRunMarkTests
     private static IDeleteFilesService Delete(DeleteResult result)
     {
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(result);
         return delete;
     }
@@ -352,8 +341,8 @@ public class CliFirstRunMarkTests
     private static IMoveFilesService Move(MoveResult result)
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(result);
         return move;
@@ -363,8 +352,8 @@ public class CliFirstRunMarkTests
     private static IMoveFilesService StoppedMove(int moved)
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "stopped", new MoveResult(moved, NoErrors),
@@ -400,12 +389,12 @@ public class CliFirstRunMarkTests
 
     /// <summary>
     /// The services the work path resolves. The scan offers two files, the
-    /// pending-reboot gate is clean and, unless a test passes its own, the check
-    /// before acting keeps both, so the run reaches whichever service the test scripted.
+    /// signals read clean and, unless a test passes its own, the check
+    /// before acting stands over both, so the run reaches whichever service the test scripted.
     /// </summary>
     private static IServiceProvider Services(
         IFirstRunMark mark, IDeleteFilesService? delete = null, IMoveFilesService? move = null,
-        IRemovableReverifier? reverifier = null)
+        IBatchCheck? batchCheck = null)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -423,18 +412,10 @@ public class CliFirstRunMarkTests
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
 
-        if (reverifier is null)
-        {
-            reverifier = Substitute.For<IRemovableReverifier>();
-            reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-                .Returns(new ReverifyResult(
-                    new[] { File1, File2 },
-                    Array.Empty<string>(),
-                    SurvivingPatchClaims: new[] { SurvivingA, SurvivingB },
-                    SiblingPatchClaims: Array.Empty<PatchClaim>()));
-        }
+        batchCheck ??= CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(new[] { File1, File2 }, Array.Empty<string>()));
 
-        return CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier,
+        return CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck,
             delete: delete, move: move, firstRunMark: mark);
     }
 }

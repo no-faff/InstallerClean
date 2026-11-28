@@ -14,8 +14,8 @@ namespace InstallerClean.Tests.Helpers;
 /// its exit code are the ones its work earns. Driven on its own, through the real work method
 /// with a failing console behind the guard as Main puts it there, and through Main.
 ///
-/// WHAT EVERY RUN FIXTURE SETS UP is a scan offering two files and a re-verify that keeps
-/// both, with a clean pending-reboot gate unless the test blocks it, so the run reaches
+/// WHAT EVERY RUN FIXTURE SETS UP is a scan offering two files and a check before the
+/// batch that stands over both, unless the test ends it on a blocked read of Windows Installer's signals, so the run reaches
 /// whichever service the test scripted. The console fails at the line the test names, or at
 /// every write from the scanning line on.
 /// </summary>
@@ -31,11 +31,6 @@ public class CliConsoleGuardTests
 
     private const string File1 = @"C:\Windows\Installer\a.msi";
     private const string File2 = @"C:\Windows\Installer\b.msp";
-
-    private static readonly PatchClaim SurvivingA =
-        new(File1, "{AAAA1111-0000-0000-0000-000000000001}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-    private static readonly PatchClaim SurvivingB =
-        new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
 
     private static readonly string NewLine = Environment.NewLine;
 
@@ -243,8 +238,7 @@ public class CliConsoleGuardTests
     public async Task A_delete_whose_output_fails_after_the_batch_is_logged_and_exits_as_that_delete()
     {
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>()));
 
         var run = await Run("/d", Services(delete: delete), FailsAt(Strings.Cli_DeletedFiles));
@@ -262,8 +256,8 @@ public class CliConsoleGuardTests
     public async Task A_move_whose_output_fails_after_the_batch_is_logged_and_exits_as_that_move()
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
@@ -285,8 +279,7 @@ public class CliConsoleGuardTests
     {
         using var cts = new CancellationTokenSource();
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
                 cts.Cancel();
@@ -309,8 +302,8 @@ public class CliConsoleGuardTests
     public async Task A_stopped_move_whose_output_fails_is_logged_and_exits_as_that_stopped_move()
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
@@ -331,12 +324,11 @@ public class CliConsoleGuardTests
     public async Task A_delete_or_move_whose_output_fails_from_its_first_line_still_acts_and_exits_as_its_batch(string arg)
     {
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>()));
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
@@ -346,11 +338,11 @@ public class CliConsoleGuardTests
         Assert.True(run.Refused > 0, "The console refused no write.");
         string[] both = [File1, File2];
         if (arg == "/d")
-            await delete.Received(1).DeleteFilesAsync(Arg.Is<IEnumerable<string>>(f => f.SequenceEqual(both)),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            await delete.Received(1).DeleteFilesAsync(Arg.Is<StandingCheck>(c => c.Files.SequenceEqual(both)),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         else
-            await move.Received(1).MoveFilesAsync(Arg.Is<IEnumerable<string>>(f => f.SequenceEqual(both)),
-                Destination, Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+            await move.Received(1).MoveFilesAsync(Arg.Is<StandingCheck>(c => c.Files.SequenceEqual(both)),
+                Destination, Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>());
         Assert.Equal(CliExitCode.Ok, run.ExitCode);
         var summary = Assert.Single(run.Entries, CliRunFixtures.IsSummary);
@@ -368,11 +360,12 @@ public class CliConsoleGuardTests
     [Fact]
     public async Task A_run_refused_for_an_install_in_progress_keeps_its_come_back_later_code_when_its_output_fails()
     {
-        var reboot = Substitute.For<IPendingRebootService>();
-        reboot.Check().Returns(PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
+        var ended = CliRunFixtures.BatchCheckEnding(
+            BatchEndReason.SignalWaitCannotClear,
+            PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
 
         // Every write fails, the scanning line first, so nothing this run prints gets out.
-        var run = await Run("/d", Services(reboot: reboot), new ConsoleFailingAt(""));
+        var run = await Run("/d", Services(batchCheck: ended), new ConsoleFailingAt(""));
 
         Assert.True(run.Refused > 0, "The console refused no write.");
         Assert.Equal(CliExitCode.Transient, run.ExitCode);
@@ -618,12 +611,12 @@ public class CliConsoleGuardTests
 
     /// <summary>
     /// The services the work path resolves: a scan offering two files of 100 and 200 bytes,
-    /// the pending-reboot gate <paramref name="reboot"/> or a clean one, and a re-verify
-    /// keeping both.
+    /// a clean read of Windows Installer's signals, and <paramref name="batchCheck"/> or a
+    /// check standing over both.
     /// </summary>
     private static IServiceProvider Services(
         IDeleteFilesService? delete = null, IMoveFilesService? move = null,
-        IPendingRebootService? reboot = null)
+        IBatchCheck? batchCheck = null)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -638,21 +631,13 @@ public class CliConsoleGuardTests
                 Array.Empty<RegisteredPackage>(),
                 RegisteredTotalBytes: 0));
 
-        if (reboot is null)
-        {
-            reboot = Substitute.For<IPendingRebootService>();
-            reboot.Check().Returns(PendingRebootResult.Clean);
-        }
+        var reboot = Substitute.For<IPendingRebootService>();
+        reboot.Check().Returns(PendingRebootResult.Clean);
 
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(
-                new[] { File1, File2 },
-                Array.Empty<string>(),
-                SurvivingPatchClaims: new[] { SurvivingA, SurvivingB },
-                SiblingPatchClaims: Array.Empty<PatchClaim>()));
+        batchCheck ??= CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(new[] { File1, File2 }, Array.Empty<string>()));
 
-        return CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier,
+        return CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck,
             delete: delete, move: move);
     }
 }

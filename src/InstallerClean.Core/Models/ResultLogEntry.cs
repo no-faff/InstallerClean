@@ -2068,8 +2068,8 @@ public sealed record OperationInfo(
 
     /// <summary>
     /// The operation block of a Move. <paramref name="check"/> is the result of the check made
-    /// when Move was clicked, with what the re-read under the installer lock held back added to
-    /// it.
+    /// when Move was clicked, with what the checks made in the middle of the batch held back
+    /// added to it.
     /// </summary>
     public static OperationInfo FromMove(MoveResult result, long bytesFreed, long durationMs,
         string moveDestinationKind, ReverifyResult check)

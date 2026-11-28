@@ -61,14 +61,14 @@ public sealed class DestinationGuardTests : IDisposable
         File.WriteAllText(copy, "content");
         File.SetAttributes(copy, FileAttributes.ReadOnly);
 
-        Assert.True(_guard.TryDiscardCopy(copy, out _));
+        Assert.True(_guard.DiscardAt(copy, out _));
         Assert.False(File.Exists(copy));
     }
 
     [Fact]
     public void Discarding_a_copy_that_was_never_made_answers_that_it_is_gone()
     {
-        Assert.True(_guard.TryDiscardCopy(Path.Combine(_root, "never-written.msi"), out _));
+        Assert.True(_guard.DiscardAt(Path.Combine(_root, "never-written.msi"), out _));
     }
 
     [Fact]
@@ -290,7 +290,7 @@ public sealed class DestinationGuardTests : IDisposable
 
         AssertTheDiscardsOpenIsGranted(destination, "payload.dll");
 
-        Assert.False(_guard.TryDiscardCopy(copy, out var code));
+        Assert.False(_guard.DiscardAt(copy, out var code));
         Assert.Equal(ErrorAccessDenied, code);
         Assert.Equal(refusal!.HResult & 0xFFFF, code);
         Assert.True(File.Exists(copy));
@@ -306,7 +306,7 @@ public sealed class DestinationGuardTests : IDisposable
         var before = File.GetAttributes(copy);
         AssertTheDiscardsOpenIsGranted(destination, "payload.dll");
 
-        Assert.False(_guard.TryDiscardCopy(copy, out _));
+        Assert.False(_guard.DiscardAt(copy, out _));
 
         Assert.Equal(before, File.GetAttributes(copy));
         Assert.True(File.Exists(copy));
@@ -324,7 +324,7 @@ public sealed class DestinationGuardTests : IDisposable
         File.SetAttributes(copy, File.GetAttributes(copy) | FileAttributes.ReadOnly);
         using var holder = new FileStream(copy, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
 
-        Assert.True(_guard.TryDiscardCopy(copy, out _));
+        Assert.True(_guard.DiscardAt(copy, out _));
 
         File.WriteAllText(copy, "a new file at the same name");
         Assert.Equal("a new file at the same name", File.ReadAllText(copy));
@@ -429,7 +429,7 @@ public sealed class DestinationGuardTests : IDisposable
         var destination = Directory.CreateDirectory(Path.Combine(_root, "named-folder")).FullName;
         var copyName = Directory.CreateDirectory(Path.Combine(destination, "payload.msi")).FullName;
 
-        Assert.False(_guard.TryDiscardCopy(copyName, out var code));
+        Assert.False(_guard.DiscardAt(copyName, out var code));
 
         Assert.Equal(Kernel32.ERROR_DIRECTORY_NOT_SUPPORTED, code);
         Assert.True(Directory.Exists(copyName));
@@ -459,7 +459,7 @@ public sealed class DestinationGuardTests : IDisposable
             return;
         }
 
-        Assert.False(_guard.TryDiscardCopy(copyName, out var code));
+        Assert.False(_guard.DiscardAt(copyName, out var code));
 
         Assert.Equal(Kernel32.ERROR_REPARSE_POINT_ENCOUNTERED, code);
         Assert.True(File.Exists(decoy));

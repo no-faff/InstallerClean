@@ -78,11 +78,6 @@ public class CliMoveDestinationGateTests
     private const string File1 = @"C:\Windows\Installer\a.msi";
     private const string File2 = @"C:\Windows\Installer\b.msp";
 
-    private static readonly PatchClaim SurvivingA =
-        new(File1, "{AAAA1111-0000-0000-0000-000000000001}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-    private static readonly PatchClaim SurvivingB =
-        new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-
     [Fact]
     public async Task A_move_destination_inside_the_installer_cache_is_refused_before_the_scan()
     {
@@ -95,8 +90,7 @@ public class CliMoveDestinationGateTests
         await scan.DidNotReceive().ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
         await move.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -115,8 +109,7 @@ public class CliMoveDestinationGateTests
         await scan.DidNotReceive().ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
         await move.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     /// <summary>
@@ -171,8 +164,7 @@ public class CliMoveDestinationGateTests
         await scan.DidNotReceive().ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
         await move.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -186,8 +178,29 @@ public class CliMoveDestinationGateTests
         await scan.Received(1).ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
         await move.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), AcceptedDestination, Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), AcceptedDestination, Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task The_move_is_handed_the_files_the_check_before_it_kept_and_not_the_whole_offer()
+    {
+        const string LongNamed = @"C:\Windows\Installer\1a2b3c4d.msp";
+        var (services, _, move) = Fixture(
+            new[]
+            {
+                new OrphanedFile(File1, 100, IsPatch: false, IsRemovablePatch: false,
+                    IsObsoleted: false, Reason: "unclaimed"),
+                new OrphanedFile(LongNamed, 200, IsPatch: true, IsRemovablePatch: true,
+                    IsObsoleted: false, Reason: "superseded"),
+            },
+            survivors: new[] { File1 });
+
+        var (exitCode, _) = await RunMove(AcceptedDestination, services);
+
+        Assert.Equal(CliExitCode.Ok, exitCode);
+        await move.Received(1).MoveFilesAsync(
+            Arg.Is<StandingCheck>(check => check.Files.SequenceEqual(new[] { File1 })),
+            AcceptedDestination, Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -204,8 +217,7 @@ public class CliMoveDestinationGateTests
         await scan.DidNotReceive().ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
         await move.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -222,8 +234,7 @@ public class CliMoveDestinationGateTests
         await scan.Received(1).ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
         await move.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -237,8 +248,7 @@ public class CliMoveDestinationGateTests
 
         Assert.Equal(CliExitCode.Ok, exitCode);
         await move.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), destination, Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), destination, Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -257,16 +267,14 @@ public class CliMoveDestinationGateTests
                 new OrphanedFile(LongNamed, 200, IsPatch: true, IsRemovablePatch: true,
                     IsObsoleted: false, Reason: "superseded"),
             },
-            survivors: new[] { File1 },
-            survivingClaims: new[] { SurvivingA });
+            survivors: new[] { File1 });
 
         var (exitCode, stdout) = await RunMove(destination, services);
 
         Assert.Equal(CliExitCode.Error, exitCode);
         Assert.Contains(string.Format(Strings.Error_PathTooLong, destination), stdout);
         await move.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -321,7 +329,7 @@ public class CliMoveDestinationGateTests
 
     /// <summary>
     /// The services the work path resolves for a <c>/m</c>. The scan offers two
-    /// files, the pending-reboot gate is clean, the re-verify keeps both, and the
+    /// files, the signals read clean, the check before the batch keeps both, and the
     /// move service reports them moved, so a run that gets past the destination
     /// gates completes.
     /// </summary>
@@ -334,15 +342,14 @@ public class CliMoveDestinationGateTests
                 new OrphanedFile(File2, 200, IsPatch: true, IsRemovablePatch: true,
                     IsObsoleted: false, Reason: "superseded"),
             },
-            survivors: new[] { File1, File2 },
-            survivingClaims: new[] { SurvivingA, SurvivingB });
+            survivors: new[] { File1, File2 });
 
     /// <summary>
-    /// As <see cref="Fixture()"/>, with the files the scan offers, the ones the re-verify
-    /// keeps, and the claims naming those.
+    /// As <see cref="Fixture()"/>, with the files the scan offers, the ones the check
+    /// before the batch keeps.
     /// </summary>
     private static (IServiceProvider Services, IFileSystemScanService Scan, IMoveFilesService Move) Fixture(
-        OrphanedFile[] offered, string[] survivors, PatchClaim[] survivingClaims)
+        OrphanedFile[] offered, string[] survivors)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -354,21 +361,16 @@ public class CliMoveDestinationGateTests
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
 
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(
-                survivors,
-                offered.Select(f => f.FullPath).Except(survivors).ToArray(),
-                SurvivingPatchClaims: survivingClaims,
-                SiblingPatchClaims: Array.Empty<PatchClaim>()));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(survivors, offered.Select(f => f.FullPath).Except(survivors).ToArray()));
 
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
-        var services = CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier, move: move);
+        var services = CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck, move: move);
 
         return (services, scan, move);
     }

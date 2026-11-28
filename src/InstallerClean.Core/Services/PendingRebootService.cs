@@ -170,9 +170,8 @@ public sealed class PendingRebootService : IPendingRebootService
     {
         // Mutex first because an active install is the most decisive signal; if it fires,
         // every probe after it is skipped. A refused open is read here too and stops the
-        // run just as early: the action services' acquire falls back to the rights this
-        // probe asks for where full access is refused, so a refusal standing now refuses
-        // the batch later whatever the other two signals say.
+        // run just as early: whether an installation holds the mutex is then not known,
+        // whatever the other two signals say.
         try
         {
             mutex = _mutex.Sample(MsiExecuteMutexName);

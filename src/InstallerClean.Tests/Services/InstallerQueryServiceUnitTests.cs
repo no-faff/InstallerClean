@@ -854,7 +854,7 @@ public class InstallerQueryServiceUnitTests
         msi.SetProductProperty("{DL}", "LocalPackage", @"C:\Windows\Installer\displaylink.msi");
         msi.PatchEnumResult["{DL}"] = InvalidParameter; // the collapse that degrades the query
 
-        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, NoFallback), msi);
+        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, NoFallback));
         var result = await reverifier.ReverifyAsync(new[] { superseded });
 
         Assert.Empty(result.Surviving);
@@ -1932,7 +1932,7 @@ public class InstallerQueryServiceUnitTests
         var candidate = Assert.Single(
             (await query.GetRegisteredPackagesAsync()).Packages, r => r.PatchState == 2).LocalPackagePath;
 
-        var result = await new RemovableReverifier(query, msi).ReverifyAsync(new[] { candidate });
+        var result = await new RemovableReverifier(query).ReverifyAsync(new[] { candidate });
 
         Assert.Empty(result.Surviving);
         Assert.Equal(new[] { candidate }, result.Dropped);
@@ -1948,7 +1948,7 @@ public class InstallerQueryServiceUnitTests
         var candidate = Assert.Single(
             (await query.GetRegisteredPackagesAsync()).Packages, r => r.PatchState == 2).LocalPackagePath;
 
-        var result = await new RemovableReverifier(query, msi).ReverifyAsync(new[] { candidate });
+        var result = await new RemovableReverifier(query).ReverifyAsync(new[] { candidate });
 
         Assert.Equal(new[] { candidate }, result.Surviving);
         Assert.Empty(result.Dropped);
@@ -2018,7 +2018,7 @@ public class InstallerQueryServiceUnitTests
         var candidate = Assert.Single(
             (await query.GetRegisteredPackagesAsync()).Packages, r => r.PatchState == 2).LocalPackagePath;
 
-        var result = await new RemovableReverifier(query, msi).ReverifyAsync(new[] { candidate });
+        var result = await new RemovableReverifier(query).ReverifyAsync(new[] { candidate });
 
         Assert.Empty(result.Surviving);
         Assert.Equal(new[] { candidate }, result.Dropped);

@@ -33,7 +33,7 @@ public class RemovableReverifierSecondInstanceTests
     private const string Code = "{00000000-0000-0000-0000-000000000001}";
 
     private static RemovableReverifier Reverifier(IInstallerQueryService query) =>
-        new(query, Substitute.For<InstallerClean.Interop.IMsiApi>());
+        new(query);
 
     private static IInstallerQueryService Query(EnumerationCensus census, params RegisteredPackage[] pkgs)
     {

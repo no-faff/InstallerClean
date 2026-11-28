@@ -12,10 +12,10 @@ namespace InstallerClean.Tests.Helpers;
 /// something, driven through the real work method rather than through the strings.
 ///
 /// TWO STAGES HOLD FILES BACK AND THEY ARE NOT ONE STAGE. The scan withholds before
-/// anything is offered, and the pre-act re-verify drops files out of a batch already
+/// anything is offered, and the check before the batch drops files out of a batch already
 /// offered. A run meets either without the other, and they are reported by different
 /// lines: the scan's by the count of files left alone, which every scan prints, and the
-/// re-verify's by the held-back sentence a Move or Delete prints beside its summary.
+/// check's by the held-back sentence a Move or Delete prints beside its summary.
 ///
 /// THE COUNT SITS UNDER THE LINE SAYING WHAT WAS FOUND. "Found 2 unneeded files" is true
 /// on each of these machines and says nothing about the files that went unmentioned, so
@@ -80,7 +80,7 @@ public class CliHeldBackBesideAnOfferTests
     [Fact]
     public async Task A_run_whose_re_verify_drops_a_file_says_so()
     {
-        // THE PRE-ACT RE-VERIFY IS THE OTHER PRODUCER. It hands back what survives and
+        // THE CHECK BEFORE THE BATCH IS THE OTHER PRODUCER. It hands back what survives and
         // what it dropped, and the held-back line is built from the tally beside them,
         // so a dropped file is the condition this fixture has to create: two offered,
         // one surviving, one dropped with a reason against it.
@@ -96,9 +96,30 @@ public class CliHeldBackBesideAnOfferTests
     }
 
     [Fact]
+    public async Task The_delete_is_handed_the_files_the_check_kept_and_not_the_whole_offer()
+    {
+        var deleter = Substitute.For<IDeleteFilesService>();
+        deleter.DeleteFilesAsync(
+                Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
+
+        await Run("/d",
+            Scan(offer: 2, withheld: 0, split: default),
+            reverify: new ReverifyResult(
+                new[] { OfferA },
+                new[] { OfferB },
+                Reasons: new HeldBackReasons(Reclaimed: 1)),
+            deleteService: deleter);
+
+        await deleter.Received(1).DeleteFilesAsync(
+            Arg.Is<StandingCheck>(check => check.Files.SequenceEqual(new[] { OfferA })),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task The_two_producers_are_added_and_reported_as_one_number()
     {
-        // The pre-act pass and the service's own re-read hold back DIFFERENT files, and
+        // The check before the batch and a check the service makes in the middle of it hold back DIFFERENT files, and
         // the run prints one sentence for the batch. Taking the later tally instead of
         // adding it would report the second producer's files and lose the first's, so
         // this fixture is the one that has to put a count on both at once.
@@ -175,7 +196,8 @@ public class CliHeldBackBesideAnOfferTests
         };
 
     private static async Task<(int ExitCode, string Stdout)> Run(
-        string arg, ScanResult result, ReverifyResult? reverify = null, DeleteResult? delete = null)
+        string arg, ScanResult result, ReverifyResult? reverify = null, DeleteResult? delete = null,
+        IDeleteFilesService? deleteService = null)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -186,27 +208,24 @@ public class CliHeldBackBesideAnOfferTests
 
         // Surviving defaults to the whole offer, so a test that is not about the
         // re-verify does not silently exercise a drop it never asked for.
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(reverify ?? new ReverifyResult(
-                result.RemovableFiles.Select(f => f.FullPath).ToList(),
-                Array.Empty<string>()));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(reverify ?? new ReverifyResult(
+            result.RemovableFiles.Select(f => f.FullPath).ToList(),
+            Array.Empty<string>()));
 
-        var deleter = Substitute.For<IDeleteFilesService>();
-        deleter.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(delete ?? new DeleteResult(
-                result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
+        var deleter = deleteService ?? Substitute.For<IDeleteFilesService>();
+        if (deleteService is null)
+            deleter.DeleteFilesAsync(
+                    Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                .Returns(delete ?? new DeleteResult(
+                    result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
 
         var mover = Substitute.For<IMoveFilesService>();
         mover.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
 
         var services = CliRunFixtures.Services(
-            scan, reboot: reboot, reverifier: reverifier, delete: deleter, move: mover);
+            scan, reboot: reboot, batchCheck: batchCheck, delete: deleter, move: mover);
 
         var original = Console.Out;
         using var buffer = new StringWriter();

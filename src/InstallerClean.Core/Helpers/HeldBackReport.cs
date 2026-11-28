@@ -15,10 +15,10 @@ namespace InstallerClean.Helpers;
 /// ONE SENTENCE OVER EVERY CAUSE, AND IT NAMES NONE OF THEM. It is not a
 /// superordinate over the causes and needs none. Every file on this line arrived
 /// the same way: the scan offered it, and the check made immediately before acting
-/// did not confirm it. Both producers only ever drop out of the batch the scan
-/// produced, <c>RemovableReverifier.ReverifyAsync</c> over the candidate paths it
-/// was handed and the under-lease re-read over the action service's own list, so
-/// that is true of every file by construction.
+/// did not confirm it, or a check made again in the middle of the batch did not.
+/// Every such check is <c>RemovableReverifier.ReverifyAsync</c> over paths that
+/// came from the batch the scan produced, and it only ever drops files out of
+/// them, so that is true of every file by construction.
 ///
 /// <see cref="HeldBackReasons"/> carries one count per cause, and the counts travel
 /// in the opt-in result log, which is where a machine's causes are told apart.

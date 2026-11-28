@@ -23,11 +23,6 @@ namespace InstallerClean.Tests.ViewModels;
 /// </summary>
 public class CleanupPreFlightTests : IDisposable
 {
-    // Every specification of MoveFilesAsync below names the trailing under-lease
-    // argument, and the DidNotReceive ones are why it matters most: the argument
-    // is optional on the interface and never omitted in practice, so leaving it
-    // out matches a literal null no real call can carry, and a negative asserted
-    // that way passes whether the service was called or not.
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
     private readonly IDeleteFilesService _deleteService = Substitute.For<IDeleteFilesService>();
@@ -38,7 +33,7 @@ public class CleanupPreFlightTests : IDisposable
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
-    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
+    private readonly IBatchCheck _batchCheck = Substitute.For<IBatchCheck>();
     private readonly IEarlierRunCheck _earlierRunCheck = Substitute.For<IEarlierRunCheck>();
     private readonly IFirstRunMark _firstRunMark = FirstRunMarks.Claiming();
     private readonly IWindowsRegion _windowsRegion = Substitute.For<IWindowsRegion>();
@@ -57,11 +52,14 @@ public class CleanupPreFlightTests : IDisposable
         // A working settings service: a destination save that does land records nothing.
         _settingsService.Update(Arg.Any<Action<AppSettings>>()).Returns(true);
         // Check() returns Clean or Block, never null (the interface contract);
-        // default it Clean so the act-time pending-reboot re-check proceeds.
+        // default it Clean so the scan proceeds.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
         // No-op re-verify: everything survives, nothing dropped.
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(ci => Task.FromResult(StandingChecks.Stood(
+                new ReverifyResult(ci.Arg<IReadOnlyList<string>>(), Array.Empty<string>()))));
         // MockFileSystem's Path is a working implementation; a bare substitute
         // returns an empty string from GetFullPath and GetRandomFileName.
         _fileSystem.Path.Returns(new MockFileSystem().Path);
@@ -85,7 +83,7 @@ public class CleanupPreFlightTests : IDisposable
         _made.Add(new MainViewModel(_scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _updateCheckService, _reverifier,
+            _fileSystem, _resultLogService, _updateCheckService, _batchCheck,
             _earlierRunCheck, _firstRunMark, _windowsRegion,
             destinationGuard: new ByPathDestinationGuard(_fileSystem)));
 
@@ -282,7 +280,7 @@ public class CleanupPreFlightTests : IDisposable
         Assert.False(vm.Cleanup.IsOperating);
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
 
         // IsCancellationRequested is what gates the Cancel button, so a
@@ -295,7 +293,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {
@@ -343,7 +341,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsCancellationRequested);
         Assert.False(vm.Cleanup.IsOperating);
@@ -366,7 +364,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsOperating);
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
@@ -391,7 +389,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -409,7 +407,7 @@ public class CleanupPreFlightTests : IDisposable
             Arg.Any<string>(), InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
         _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -433,7 +431,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -689,18 +687,20 @@ public class CleanupPreFlightTests : IDisposable
     [Fact]
     public async Task A_pending_reboot_at_act_time_removes_the_folder_the_pre_flight_created()
     {
-        // Clean through the scan and the pre-flight, blocked from the moment the
-        // confirmation is answered: an install that started while the dialog sat
-        // open, which is the exact condition the act-time re-check exists to
-        // catch. Blocking from the start instead would fail the scan-side gate
-        // and never reach this path. The move does not go ahead and nothing was
-        // placed in the folder, so the clean-up rule is the cancel's.
-        var confirmed = false;
+        // Clean through the scan and the pre-flight, blocked once the confirmation is
+        // answered: an install that started while the dialog sat open, which the check
+        // made before the batch reads from Windows Installer's signals and ends on.
+        // Blocking from the start instead would fail the scan-side gate and never reach
+        // this path. The move does not go ahead and nothing was placed in the folder, so
+        // the clean-up rule is the cancel's.
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
-            .Returns(_ => { confirmed = true; return true; });
-        _rebootService.Check().Returns(_ => confirmed
-            ? PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld)
-            : PendingRebootResult.Clean);
+            .Returns(true);
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(_ => Task.FromResult(StandingChecks.Ended(
+                BatchEndReason.SignalWaitCannotClear,
+                PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld))));
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
@@ -710,7 +710,7 @@ public class CleanupPreFlightTests : IDisposable
 
         AssertFolderRemoved();
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -754,7 +754,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsOperating);
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
@@ -870,7 +870,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsOperating);
         // A refusal, not a fault: the test's crash log does not name its folder or carry
@@ -899,7 +899,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsOperating);
         // A mistake the message explains whole: the crash log is left as it was.
@@ -991,7 +991,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
 
@@ -1006,114 +1006,6 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
-    public async Task An_installer_taking_the_lock_at_the_service_removes_the_folder_the_pre_flight_created()
-    {
-        // The race the act-time gate cannot close: the gate passed, then a
-        // transaction took Global\_MSIExecute before the service acquired it. The
-        // service refuses ahead of its own CreateDestinationFolder, so nothing was
-        // placed and the folder goes.
-        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
-            .Returns(true);
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
-
-        var vm = CreateViewModel();
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = _destination;
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        AssertFolderRemoved();
-    }
-
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task A_gate_re_check_that_throws_after_a_lock_refusal_still_removes_the_folder_the_pre_flight_created(
-        bool accessRefused)
-    {
-        // The two arms that re-run the gate after the service refused at the lock,
-        // with the re-check throwing, as the gate does when a read of Windows
-        // Installer's in-progress file fails in a way none of its readings names.
-        // The service refused ahead of its own CreateDestinationFolder, so the
-        // pre-flight's folder is empty and goes, the failure dialog says what
-        // happened, and nothing moved, so there is no rescan. A refused lock has
-        // its own dialog first, and the failure dialog follows it.
-        var refused = false;
-        _rebootService.Check().Returns(_ => refused
-            ? throw new IOException("marker unreadable")
-            : PendingRebootResult.Clean);
-        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
-            .Returns(true);
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(_ =>
-            {
-                refused = true;
-                return new MoveResult(0, Array.Empty<FileOperationError>(),
-                    InstallerBusy: !accessRefused, InstallerLockAccessRefused: accessRefused);
-            });
-
-        var vm = CreateViewModel();
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = _destination;
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        AssertFolderRemoved();
-        _dialogService.Received(accessRefused ? 2 : 1).ShowWarning(Arg.Any<string>(), Arg.Any<string>());
-        _dialogService.Received(1).ShowWarning(
-            Arg.Is<string>(s => s.Contains(nameof(IOException))),
-            InstallerClean.Resources.Strings.Error_MoveFailedTitle);
-        if (accessRefused)
-        {
-            Received.InOrder(() =>
-            {
-                _dialogService.ShowWarning(
-                    InstallerClean.Resources.Strings.Error_MoveInstallerLockAccessRefused,
-                    InstallerClean.Resources.Strings.Error_MoveInstallerLockUnavailableTitle);
-                _dialogService.ShowWarning(
-                    Arg.Any<string>(), InstallerClean.Resources.Strings.Error_MoveFailedTitle);
-            });
-        }
-        await _scanService.Received(1).ScanAsync(
-            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
-        Assert.False(vm.Cleanup.IsOperating);
-        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
-        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
-        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
-    }
-
-    [Fact]
-    public async Task A_lock_the_service_could_not_take_removes_the_folder_the_pre_flight_created()
-    {
-        // The other way the service can refuse at its acquire: the mutex could not
-        // be taken and nothing was shown to be holding it. It refuses ahead of its
-        // own CreateDestinationFolder exactly as the busy arm above does, so the
-        // only folder in existence is this pre-flight's and it has nothing in it.
-        // Its own service-level test pins that the service creates none; this pins
-        // that the host clears the one it made.
-        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
-            .Returns(true);
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
-                InstallerLockUnavailable: true));
-
-        var vm = CreateViewModel();
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = _destination;
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        AssertFolderRemoved();
-    }
-
-    [Fact]
     public async Task A_re_verify_that_keeps_every_file_back_removes_the_folder_the_pre_flight_created()
     {
         // A patch that was superseded at scan time but is wanted again by act
@@ -1121,10 +1013,12 @@ public class CleanupPreFlightTests : IDisposable
         // folder the pre-flight made has nothing in it.
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult(
-                Array.Empty<string>(), (IReadOnlyList<string>)ci[0]!,
-                new HeldBackReasons(Reclaimed: ((IReadOnlyList<string>)ci[0]!).Count)));
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(ci => Task.FromResult(StandingChecks.Stood(new ReverifyResult(
+                Array.Empty<string>(), ci.Arg<IReadOnlyList<string>>(),
+                new HeldBackReasons(Reclaimed: ci.Arg<IReadOnlyList<string>>().Count)))));
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1134,7 +1028,7 @@ public class CleanupPreFlightTests : IDisposable
 
         AssertFolderRemoved();
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -1150,19 +1044,23 @@ public class CleanupPreFlightTests : IDisposable
         MainViewModel? vm = null;
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
             .Returns(async ci =>
             {
-                var progress = (IProgress<ScanProgressUpdate>)ci[2]!;
-                progress.Report(ScanProgressUpdate.Waiting(new SourceFolderWait("D:", () => { })));
+                var files = ci.Arg<IReadOnlyList<string>>();
+                var progress = ci.Arg<IProgress<BatchCheckProgress>>();
+                progress.Report(new BatchCheckProgress(
+                    BatchCheckStage.SourceWait, SourceWait: ScanProgressUpdate.Waiting(new SourceFolderWait("D:", () => { }))));
                 await WaitUntil(() => vm!.Cleanup.OperationProgress == waitLine);
                 duringWait = vm!.Cleanup.OperationProgress;
-                progress.Report(ScanProgressUpdate.Waiting(null));
+                progress.Report(new BatchCheckProgress(
+                    BatchCheckStage.SourceWait, SourceWait: ScanProgressUpdate.Waiting(null)));
                 await WaitUntil(() => vm.Cleanup.OperationProgress != waitLine);
                 afterWait = vm.Cleanup.OperationProgress;
-                return new ReverifyResult(
-                    Array.Empty<string>(), (IReadOnlyList<string>)ci[0]!,
-                    new HeldBackReasons(Reclaimed: ((IReadOnlyList<string>)ci[0]!).Count));
+                return StandingChecks.Stood(new ReverifyResult(
+                    Array.Empty<string>(), files, new HeldBackReasons(Reclaimed: files.Count)));
             });
 
         vm = CreateViewModel();
@@ -1192,7 +1090,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
 
@@ -1240,17 +1138,17 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
-    public async Task A_batch_the_under_lease_re_read_empties_removes_the_folder_too()
+    public async Task A_batch_a_later_check_empties_removes_the_folder_too()
     {
         // The service is careful to return before creating its destination, so a
-        // batch its own re-read empties leaves no folder behind, and its own test
-        // pins that. The folder that survives is the PRE-FLIGHT's, made before the
+        // batch a check made in the middle of it empties leaves no folder behind, and
+        // its own test pins that. The folder that survives is the PRE-FLIGHT's, made before the
         // confirmation, and only this layer can remove it. Nothing was ever placed
         // in it: the service came straight back out.
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\a.msi" }));
@@ -1265,14 +1163,16 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
-    public async Task A_re_verify_that_fails_removes_the_folder_the_pre_flight_created()
+    public async Task A_check_before_the_batch_that_fails_removes_the_folder_the_pre_flight_created()
     {
-        // The re-verify runs between the confirmation and the batch, so a throw
+        // The check runs between the confirmation and the batch, so a throw
         // from it abandons the move with the folder still empty.
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns<ReverifyResult>(_ => throw new LocalisedInvalidOperationException("boom"));
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns<Task<BatchCheckResult>>(_ => throw new LocalisedInvalidOperationException("boom"));
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1303,7 +1203,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new LocalisedInvalidOperationException("swapped"));
 
@@ -1335,7 +1235,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
@@ -1436,7 +1336,7 @@ public class CleanupPreFlightTests : IDisposable
 
         _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         await _moveService.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), chosen, Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), chosen,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         // The answer is kept, so the box shows where the files went.
         Assert.Equal(chosen, vm.Cleanup.MoveDestination);
@@ -1455,7 +1355,7 @@ public class CleanupPreFlightTests : IDisposable
 
         _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
@@ -1502,7 +1402,7 @@ public class CleanupPreFlightTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsOperationInFlight);
     }
@@ -1510,7 +1410,7 @@ public class CleanupPreFlightTests : IDisposable
     /// <summary>The Move's service was never handed a batch.</summary>
     private async Task AssertNoBatchWasHandedOver() =>
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
 
     [Theory]
@@ -1603,8 +1503,9 @@ public class CleanupPreFlightTests : IDisposable
         Assert.True(heldWhileConfirming);
         AssertFolderRemoved();
         await AssertNoBatchWasHandedOver();
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
+        await _batchCheck.DidNotReceive().RunAsync(
+            Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+            Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsMoveOrDeleteRunning);
         Assert.False(vm.Cleanup.IsOperationInFlight);
     }
@@ -1613,14 +1514,17 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_close_during_the_check_after_the_confirmation_ends_the_Move_and_removes_the_created_folder()
     {
         var vm = CreateViewModel();
-        var confirmed = false;
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
-            .Returns(_ => { confirmed = true; return true; });
-        _rebootService.Check().Returns(_ =>
-        {
-            if (confirmed) vm.Cleanup.RequestClose();
-            return PendingRebootResult.Clean;
-        });
+            .Returns(true);
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                vm.Cleanup.RequestClose();
+                ci.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return Task.FromResult(StandingChecks.StoodOver());
+            });
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = _destination;
 
@@ -1629,8 +1533,6 @@ public class CleanupPreFlightTests : IDisposable
         Assert.True(vm.Cleanup.CloseRequested);
         AssertFolderRemoved();
         await AssertNoBatchWasHandedOver();
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
         Assert.False(vm.Cleanup.IsOperating);
         Assert.False(vm.Cleanup.IsMoveOrDeleteRunning);
         Assert.False(vm.Cleanup.IsOperationInFlight);
@@ -1671,10 +1573,11 @@ public class CleanupPreFlightTests : IDisposable
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
+        await _batchCheck.DidNotReceive().RunAsync(
+            Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+            Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsMoveOrDeleteRunning);
         Assert.False(vm.Cleanup.IsOperationInFlight);
     }
@@ -1683,24 +1586,25 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_close_during_the_check_before_a_Delete_ends_the_Delete()
     {
         var vm = CreateViewModel();
-        var confirmed = false;
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>())
-            .Returns(_ => { confirmed = true; return true; });
-        _rebootService.Check().Returns(_ =>
-        {
-            if (confirmed) vm.Cleanup.RequestClose();
-            return PendingRebootResult.Clean;
-        });
+            .Returns(true);
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                vm.Cleanup.RequestClose();
+                ci.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return Task.FromResult(StandingChecks.StoodOver());
+            });
         await vm.Scan.ScanWithProgressAsync(null);
 
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Cleanup.CloseRequested);
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
         Assert.False(vm.Cleanup.IsOperating);
         Assert.False(vm.Cleanup.IsMoveOrDeleteRunning);
         Assert.False(vm.Cleanup.IsOperationInFlight);

@@ -537,8 +537,20 @@ internal static class DirectoryGuard
     internal const uint DiscardOptions = Ntdll.FILE_OPEN_REPARSE_POINT | Ntdll.FILE_NON_DIRECTORY_FILE;
 
     /// <summary>
-    /// Removes the plain file <paramref name="leaf"/> inside <paramref name="folder"/>
-    /// through a handle, a read-only one included. The system is asked to ignore the
+    /// Removes the plain file <paramref name="leaf"/> inside <paramref name="folder"/>,
+    /// opening the folder first and removing the file through that handle
+    /// (<see cref="TryDiscardChildCopy(SafeFileHandle, string, out int)"/>). False where
+    /// the folder will not open.
+    /// </summary>
+    internal static bool TryDiscardChildCopy(string folder, string leaf, out int failureCode)
+    {
+        using var dir = OpenDirectoryFollow(folder, out failureCode);
+        return dir is not null && TryDiscardChildCopy(dir, leaf, out failureCode);
+    }
+
+    /// <summary>
+    /// Removes the plain file <paramref name="leaf"/> inside the folder
+    /// <paramref name="dir"/> is open on, a read-only one included. The system is asked to ignore the
     /// read-only attribute, so the copy goes without its attributes being touched and a
     /// delete that fails leaves it as it was; where the system does not take that form,
     /// the attribute is cleared for the older delete and put back if that delete fails.
@@ -547,11 +559,9 @@ internal static class DirectoryGuard
     /// not go. False where the file is present and could not be removed, is a reparse
     /// point, or is a folder, which is left in place.
     /// </summary>
-    internal static bool TryDiscardChildCopy(string folder, string leaf, out int failureCode)
+    internal static bool TryDiscardChildCopy(SafeFileHandle dir, string leaf, out int failureCode)
     {
-        using var dir = OpenDirectoryFollow(folder, out failureCode);
-        if (dir is null) return false;
-
+        failureCode = 0;
         using var child = OpenChildNoFollow(
             dir, leaf, DiscardAccess, Ntdll.FILE_OPEN, DiscardOptions, out var status);
         if (child is null)

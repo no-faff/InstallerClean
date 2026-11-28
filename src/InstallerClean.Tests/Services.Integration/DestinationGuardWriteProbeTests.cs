@@ -239,7 +239,7 @@ public sealed class DestinationGuardWriteProbeTests : IDisposable
         var file = CreateFileLikeTheProbeLessDelete(facts, "copy.msi");
         AssertReadRefused(file);
         AssertDeleteRefused(file);
-        Assert.False(_guard.TryDiscardCopy(file, out var discardCode));
+        Assert.False(_guard.DiscardAt(file, out var discardCode));
         Assert.Equal(AccessDenied, discardCode);
 
         var folder = MakeFolder(accessList);
@@ -291,7 +291,7 @@ public sealed class DestinationGuardWriteProbeTests : IDisposable
         var file = CreateFileLikeTheProbeLessDelete(facts, "copy.msi");
         AssertReadAllowed(file);
         AssertDeleteRefused(file);
-        Assert.False(_guard.TryDiscardCopy(file, out var discardCode));
+        Assert.False(_guard.DiscardAt(file, out var discardCode));
         Assert.Equal(AccessDenied, discardCode);
 
         var folder = MakeFolder(accessList);
@@ -316,7 +316,7 @@ public sealed class DestinationGuardWriteProbeTests : IDisposable
         AssertAllowed(() => File.Delete(file), "deleting a file in the folder");
         Assert.False(File.Exists(file));
         var copy = CreateFileLikeTheProbeLessDelete(facts, "copy-2.msi");
-        Assert.True(_guard.TryDiscardCopy(copy, out var discardCode));
+        Assert.True(_guard.DiscardAt(copy, out var discardCode));
         Assert.Equal(0, discardCode);
         Assert.False(File.Exists(copy));
 

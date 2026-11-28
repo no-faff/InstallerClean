@@ -1047,9 +1047,9 @@ internal static class Program
     /// and neither host composes anything.
     ///
     /// CALLED ONCE PER RUN, ON A TALLY THE CALLER HAS ALREADY FOLDED. Both the
-    /// pre-act re-verify and the action services' under-lease re-read hold files
-    /// back, and which side of the installer mutex a file was condemned on is a
-    /// fact about how the check is built rather than about the file. The sentence
+    /// check before a batch and a check made in the middle of one hold files
+    /// back, and which of them a file was dropped by is a fact about how the
+    /// batch ran rather than about the file. The sentence
     /// names no cause, so two printings in one run read as one finding repeated
     /// rather than as two. ADD THE TALLIES AND CALL THIS ONCE; a second call in one
     /// run is the fault rather than the wording.
@@ -1100,6 +1100,21 @@ internal static class Program
         if (roots.Count == 0) return;
         MachineContract.WriteEventLog(CliEventClass.SourcesGivenUpNotice,
             () => SourcesGivenUpNoticeEventLogLine(arg, roots, duringTheCheck));
+    }
+
+    /// <summary>
+    /// Adds the drives and shares the checks made in the middle of a batch stopped
+    /// waiting for, where files were kept at them, to the first check's list, writes
+    /// the notice for them, and returns the whole list for the console line. With none,
+    /// it writes nothing and returns <paramref name="soFar"/>.
+    /// </summary>
+    private static IReadOnlyList<SourceRootGivenUp> NoteLaterSourcesGivenUp(
+        string arg, IReadOnlyList<SourceRootGivenUp> soFar, IReadOnlyList<SourceRootGivenUp> later)
+    {
+        var keepingFiles = SourceRootGivenUp.KeepingFiles(later);
+        if (keepingFiles.Count == 0) return soFar;
+        NoteSourcesGivenUp(arg, keepingFiles, duringTheCheck: true);
+        return soFar.Concat(keepingFiles).ToList();
     }
 
     /// <summary>
@@ -1268,10 +1283,10 @@ internal static class Program
         string cancelledMoveDestination = string.Empty;
 
         // The scan and the re-verify stop on Ctrl+C and where the run's cover is lost. The
-        // batch asks the cover as the last thing before each file (mayAct), never waiting,
-        // since it holds the Windows Installer mutex meanwhile; where the run is not covered
-        // the batch stops before that file, and this is cancelled once the batch has
-        // returned, so the run ends in the catch for a stopped cover.
+        // batch asks the cover as the last thing before it opens each file (mayAct), never
+        // waiting; where the run is not covered the batch stops before that file, and this
+        // is cancelled once the batch has returned, so the run ends in the catch for a
+        // stopped cover.
         using var workSource = cover is null ? null : CancellationTokenSource.CreateLinkedTokenSource(token, cover.Lost);
         var workToken = workSource?.Token ?? token;
         var coverStopped = false;
@@ -1541,52 +1556,84 @@ internal static class Program
                 return EndScanOnly(arg, output, NothingOfferedSummary);
             }
 
-            // /s acts on nothing, so it skips the gate here. The scan's own read of the same
-            // signals, made on every mode, is in the scan.
-            if (arg is "/d" or "/m")
+            // Guarded here as well as by ConsoleGuard, so the lines hold wherever
+            // RunWorkAsync is called from. The action services report from inside
+            // their per-file try, so a throw out of a progress line is filed as an
+            // error against a file that is perfectly fine. A failed write is a fact
+            // about the console and never about the file being deleted or moved.
+            //
+            // One crash-log entry per run rather than one per line. One cause, such
+            // as a full disk, can refuse many lines in a row, so an entry each would
+            // spend crash.log's rotation budget on copies of a cause already recorded
+            // and evict the history behind them, which is the failure
+            // PerItemFailureLog exists to prevent on the service side of the same
+            // batch.
+            var progressWriteFailed = false;
+            void SayProgress(string line)
             {
-                var rebootService = services.GetRequiredService<IPendingRebootService>();
-                var rebootCheck = rebootService.Check();
-                if (rebootCheck.IsBlocked)
-                    // Block + null Reason is unreachable per the PendingRebootResult.Block
-                    // factory contract; .Value is safe inside this IsBlocked branch.
-                    return EmitPendingRebootBlocked(
-                        arg, rebootCheck.Reason!.Value, rebootCheck.Detail, rebootCheck.WindowsError);
+                try
+                {
+                    Console.WriteLine(line);
+                }
+                catch (Exception ex)
+                {
+                    if (progressWriteFailed) return;
+                    progressWriteFailed = true;
+                    Helpers.CrashLog.TryWrite(ex);
+                }
             }
 
-            // Re-verify the removable set immediately before acting: the Windows
-            // Installer records are enumerated again, and every file no record
-            // names is judged again the way the scan judged it (see
-            // IRemovableReverifier). It runs inside this try, so a re-verify that
-            // throws (the enumeration can fail, e.g. LocalisedAccessException)
-            // stops the batch through the existing error path rather than acting
-            // on an un-verified set, and a cancellation routes to the OCE catch.
-            // It runs synchronously before the batch; the CLI blocks on it
-            // naturally.
-            var reverifier = services.GetRequiredService<IRemovableReverifier>();
-            var reverify = await reverifier.ReverifyAsync(
-                scanResult.RemovableFiles.Select(f => f.FullPath).ToList(), workToken);
+            // A wait for Windows Installer prints one line when it begins, at the
+            // start of the run or in the middle of a batch. A check made in the middle
+            // of a batch prints one too; the check before the batch does not, the run
+            // having said nothing yet that it would follow. A check's own waits on a
+            // source folder print nothing here.
+            void SayCheckStage(BatchCheckProgress stage, bool inTheBatch)
+            {
+                if (stage.Stage == BatchCheckStage.Waiting) SayProgress(Strings.Cli_WaitingForInstaller);
+                else if (stage.Stage == BatchCheckStage.Checking && inTheBatch) SayProgress(Strings.Cli_CheckingAgain);
+            }
+
+            // The check the batch acts on, made immediately before it (IBatchCheck).
+            // /s acts on nothing and has returned above; the scan's own read of
+            // Windows Installer's signals, made on every mode, is in the scan.
+            //
+            // It waits first for as long as Windows Installer is busy, up to
+            // BusyWaitBound. Then the Windows Installer records are enumerated again
+            // and every file no record names is judged again the way the scan judged
+            // it (see IRemovableReverifier), under a watch on those records, until one
+            // such check stands. It runs inside this try, so a check that throws (the
+            // enumeration can fail, e.g. LocalisedAccessException) stops the batch
+            // through the existing error path rather than acting on an un-verified
+            // set, and a cancellation routes to the OCE catch.
+            //
+            // Disposed of when this try is left, which releases its watch on every
+            // return below that comes before the service is handed the check. The
+            // service disposes of it too, which is safe twice.
+            var batchCheck = services.GetRequiredService<IBatchCheck>();
+            using var firstCheck = await batchCheck.RunAsync(
+                scanResult.RemovableFiles.Select(f => f.FullPath).ToList(), BusyWaitBound,
+                new SynchronousProgress<BatchCheckProgress>(stage => SayCheckStage(stage, inTheBatch: false)),
+                workToken);
+
+            // No check stood, so nothing has been touched. One of the two is always
+            // set (BatchCheckResult).
+            if (firstCheck.Stood is not { } standing)
+                return EmitBatchEnded(arg, firstCheck.Ended!, 0, 0);
+            var reverify = standing.Result;
 
             // THE DRIVES AND SHARES THIS CHECK STOPPED WAITING FOR WHILE FILES STILL HAD TO
-            // BE CHECKED AGAINST THEM, read once. The action services' own re-read gives
-            // none up, so this list is everything the run gives up after the scan.
+            // BE CHECKED AGAINST THEM, read once. A check made in the middle of the batch
+            // can give up more, which are added to this list when the batch returns
+            // (NoteLaterSourcesGivenUp).
             //
             // ITS NOTICE IS WRITTEN HERE, AHEAD OF EVERY RETURN THE RUN CAN TAKE FROM NOW
             // ON, as ReportScanSignals writes the scan's ahead of every return after the
-            // scan. A run the action then refuses still left those files alone, so the
-            // notice is true of it. The console line waits for the held-back line below
-            // and is silent wherever that line is.
+            // scan. A run that then ends before its first file still left those files
+            // alone, so the notice is true of it. The console line waits for the
+            // held-back line below and is silent wherever that line is.
             var checkSourcesGivenUp = reverify.SourceRootsGivenUpKeepingFiles;
             NoteSourcesGivenUp(arg, checkSourcesGivenUp, duringTheCheck: true);
-
-            // A Windows Installer transaction under way when the re-verify read the
-            // in-progress signals refuses the run as the gate above refuses it, with the same
-            // line, entry and exit code. The re-verify itself holds back only the files no
-            // record names on such a read, and a superseded patch in the same batch is
-            // stopped here. Block + null Reason is unreachable, as at the gate.
-            if (reverify.InstallerActivity is { IsBlocked: true } installerActivity)
-                return EmitPendingRebootBlocked(arg, installerActivity.Reason!.Value,
-                    installerActivity.Detail, installerActivity.WindowsError);
 
             var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
             var survivingFiles = scanResult.RemovableFiles
@@ -1594,26 +1641,25 @@ internal static class Program
 
             // The counts and byte figures further down are recomputed from the
             // survivor subset, so "X of Y" and the freed-space total describe what
-            // was acted on rather than the pre-reverify scan.
+            // was acted on rather than the scan before the check.
             //
-            // NOTHING IS PRINTED HERE, AND THAT IS THE FOLD. What this pass held
-            // back and what the action service's own re-read holds back are one
+            // NOTHING IS PRINTED HERE, AND THAT IS THE FOLD. What this check held back
+            // and what a check made in the middle of the batch holds back are one
             // account of one batch, so the tally is carried down in heldBack and
             // printed ONCE beside the service's, which is what the window does when
             // it folds both into a single ReverifyResult before the completion
-            // overlay reads it. The two producers print the same sentence, so
-            // printing here as well would put it on stdout twice for one batch with
-            // nothing to tell the two numbers apart.
+            // overlay reads it. The checks print the same sentence, so printing here
+            // as well would put it on stdout twice for one batch with nothing to tell
+            // the two numbers apart.
             //
-            // THE PATHS THAT PRINT NOTHING ARE THE ONES THE WINDOW IS ALSO SILENT
-            // ON: an installer-busy refusal, a refused lock, an unavailable lock and
-            // a free-space refusal all return before the print, and none of them
-            // commits anything, so there is no completed-of-intended count for the
-            // sentence to sit beside. The window reaches no completion screen on
-            // any of the four either.
+            // THE PATHS THAT PRINT NOTHING ARE THE ONES THE WINDOW IS ALSO SILENT ON: a
+            // batch that ended before it moved or deleted anything and a free-space
+            // refusal return before the print, and neither commits anything, so there
+            // is no completed-of-intended count for the sentence to sit beside. The
+            // window reaches no completion screen on either.
             //
             // A MACHINE THE SCAN WOULD NOW OFFER NO WALKED FILE ON DOES NOT REFUSE
-            // THE RUN. The re-verify drops the walk-derived half of the batch and any
+            // THE RUN. The check drops the walk-derived half of the batch and any
             // superseded file a fresh scan would now hold back, each counted in
             // heldBack, and the rest of the batch goes on.
             var heldBack = reverify.Reasons;
@@ -1629,31 +1675,14 @@ internal static class Program
             // print after the post-await summary ("Deleted N files."),
             // breaking the stdout line order an RMM scrapes.
             totalToProcess = count;
-            // Guarded here as well as by ConsoleGuard, so the handler holds wherever
-            // RunWorkAsync is called from. The action services report from inside
-            // their per-file try, so a throw out of this handler is filed as an
-            // error against a file that is perfectly fine. A failed write is a fact
-            // about the console and never about the file being deleted or moved.
-            //
-            // One crash-log entry per run rather than one per file. One cause, such
-            // as a full disk, can refuse many reports in a row, so an entry each
-            // would spend crash.log's rotation budget on copies of a cause already
-            // recorded and evict the history behind them, which is the failure
-            // PerItemFailureLog exists to prevent on the service side of the same
-            // batch.
-            var progressWriteFailed = false;
+            // Each line is written through SayProgress, above, which holds a failed
+            // write to the console away from the file being acted on.
             var progress = new SynchronousProgress<OperationProgress>(p =>
             {
-                try
-                {
-                    Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}");
-                }
-                catch (Exception ex)
-                {
-                    if (progressWriteFailed) return;
-                    progressWriteFailed = true;
-                    Helpers.CrashLog.TryWrite(ex);
-                }
+                // A wait or a check made in the middle of the batch has a line of its
+                // own, and a file its count and name.
+                if (p.Check is { } stage) SayCheckStage(stage, inTheBatch: true);
+                else SayProgress($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}");
             });
 
             // Set where a batch moves or deletes a file, or ends where how far it got is
@@ -1688,37 +1717,23 @@ internal static class Program
                     () => filePaths.Count == 0
                         ? Task.FromResult(new DeleteResult(0, Array.Empty<FileOperationError>()))
                         : deleteService.DeleteFilesAsync(
-                            filePaths, UnderLeaseClaims.From(reverify),
-                            progress: progress, cancellationToken: workToken, mayAct: mayAct),
+                            standing, progress: progress, cancellationToken: workToken, mayAct: mayAct),
                     r => r.DeletedCount);
                 var operationDurationMs = operationTimer.ElapsedMilliseconds;
 
-                // A Windows Installer transaction grabbed Global\_MSIExecute in the
-                // race after the gate check passed, so the service refused and
-                // touched nothing. Report it identically to a pre-act gate block.
-                if (result.InstallerBusy)
-                    return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
+                // A batch that ended with nothing deleted and nothing failed prints no
+                // summary: there is no completed-of-intended count for one to state. Its
+                // reason, its entry and its exit code are the whole of what it reports.
+                if (result.Ended is { } endedEarly && result.DeletedCount == 0 && result.Errors.Count == 0)
+                    return EmitBatchEnded(arg, endedEarly, 0, count);
 
-                // The security on Global\_MSIExecute refused the service the rights
-                // to open it, a refusal that began after the gate check passed, so
-                // it refused and touched nothing. Reported under the gate's own
-                // reason for the same refusal, so the run reads identically wherever
-                // the refusal was met.
-                if (result.InstallerLockAccessRefused)
-                    return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexAccessRefused, null);
-
-                // The service could not take Global\_MSIExecute and nothing was
-                // shown to be holding it, so it refused and touched nothing.
-                if (result.InstallerLockUnavailable)
-                    return EmitInstallerLockUnavailable(arg);
-
-                // THE RUN'S ONE HELD-BACK LINE, printed here because this is the
-                // last of the two producers to answer: the service takes the
-                // installer mutex and re-reads the batch's patch claims inside it,
-                // so anything condemned there is condemned after the pre-act pass
-                // has already finished. Adding rather than replacing, because the
-                // two hold back DIFFERENT files and the number on the line is every
-                // file the run held back.
+                // THE RUN'S ONE HELD-BACK LINE, printed here because the batch is the
+                // last thing that can hold a file back: where a look finds Windows
+                // Installer's records changed or Windows Installer busy, the service
+                // makes the check again over the files not yet done, and anything that
+                // check drops is dropped after the first check has finished. Adding
+                // rather than replacing, because the checks hold back DIFFERENT files
+                // and the number on the line is every file the run held back.
                 //
                 // Ahead of the "deleted N" line, so the run reads in the order it
                 // happened: what was intended, what was held back, what was done.
@@ -1733,6 +1748,7 @@ internal static class Program
                 // held back by that check, so it reads under the count of them, and it
                 // goes ahead of the cancel re-entry with it.
                 heldBack += result.HeldBackReasons;
+                checkSourcesGivenUp = NoteLaterSourcesGivenUp(arg, checkSourcesGivenUp, result.SourceRootsGivenUp);
                 ReportHeldBack(heldBack);
                 ReportSourcesGivenUp(checkSourcesGivenUp);
                 // Held-back files were never touched, so they leave the tally the
@@ -1771,6 +1787,13 @@ internal static class Program
                         Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
 
+                // A batch that ended before its last file has printed what it did, above:
+                // the held-back line, the count and the errors. Its reason follows, with
+                // the entry and the exit code for it, and no report is carried, as none
+                // is for a cancelled run.
+                if (result.Ended is { } ended)
+                    return EmitBatchEnded(arg, ended, result.DeletedCount, count);
+
                 // The service returns its partial result on a mid-batch cancel
                 // rather than throwing, so re-enter the OCE catch by hand: a
                 // cancelled run gets one cancelled-run event-log entry and a
@@ -1792,11 +1815,12 @@ internal static class Program
                     ? totalBytes
                     : SumBytesExcludingErrors(survivingFiles, result.Errors);
                 var outcome = CliContract.ClassifyFileOperation(result.DeletedCount, result.Errors.Count);
-                // The folded check, so the under-lease re-read's own held-back files are
-                // counted with the pre-act ones, as the window's report counts them.
+                // The folded check, so what the checks made in the middle of the batch held
+                // back is counted with the first check's, as the window's report counts it.
                 await CarryReportAsync(() => ResultLogEntry.ForDelete(
                     scanResult, scanDurationMs, result, actualBytes, operationDurationMs,
-                    reverify.WithHeldBack(result.HeldBack, result.HeldBackReasons),
+                    reverify.WithLaterChecks(result.HeldBack, result.HeldBackReasons,
+                        result.SourceRootsGivenUp, result.SourceWaitCount),
                     WindowsRegion(), ReportHost.CommandLine, RunningCopy(services)));
 
                 // After the cancel re-entry, so a cancelled run never prints it: there
@@ -1868,8 +1892,7 @@ internal static class Program
                 moveResult = await HandOverBatchAsync(firstRunMark,
                     () => filePaths.Count == 0
                         ? Task.FromResult(new MoveResult(0, Array.Empty<FileOperationError>()))
-                        : moveService.MoveFilesAsync(filePaths, moveDest,
-                            UnderLeaseClaims.From(reverify), progress, workToken, mayAct),
+                        : moveService.MoveFilesAsync(standing, moveDest, progress, workToken, mayAct),
                     r => r.MovedCount);
             }
             catch (MoveAbortedException ex)
@@ -1891,6 +1914,7 @@ internal static class Program
                 // rows. The count goes the same way, being the "of N" in the
                 // Application-log line an RMM audits.
                 heldBack += ex.Partial.HeldBackReasons;
+                checkSourcesGivenUp = NoteLaterSourcesGivenUp(arg, checkSourcesGivenUp, ex.Partial.SourceRootsGivenUp);
                 ReportHeldBack(heldBack);
                 ReportSourcesGivenUp(checkSourcesGivenUp);
                 if (ex.Partial.HeldBack.Count > 0)
@@ -1903,27 +1927,17 @@ internal static class Program
 
             var moveDurationMs = moveTimer.ElapsedMilliseconds;
 
-            // Global\_MSIExecute found held at the service boundary: same outcome
-            // as a gate block.
-            if (moveResult.InstallerBusy)
-                return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
+            // A batch that ended with nothing moved and nothing failed prints no
+            // summary. See the /d branch.
+            if (moveResult.Ended is { } moveEndedEarly && moveResult.MovedCount == 0 && moveResult.Errors.Count == 0)
+                return EmitBatchEnded(arg, moveEndedEarly, 0, count);
 
-            // Global\_MSIExecute refused the service the rights to open it: same
-            // outcome as the gate meeting that refusal. See the /d branch.
-            if (moveResult.InstallerLockAccessRefused)
-                return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexAccessRefused, null);
-
-            // The service could not take Global\_MSIExecute and nothing was shown
-            // to be holding it, so it refused and touched nothing, its own
-            // destination folder included.
-            if (moveResult.InstallerLockUnavailable)
-                return EmitInstallerLockUnavailable(arg);
-
-            // The run's one held-back line, and the check's line naming the drives
-            // and shares under it. See the /d branch for why the two producers'
-            // tallies are added and printed here rather than one each, and for why
-            // both come ahead of the cancel re-entry.
+            // The run's one held-back line, and the line naming the drives and shares
+            // under it. See the /d branch for why the checks' tallies are added and
+            // printed here rather than one each, and for why both come ahead of the
+            // cancel re-entry.
             heldBack += moveResult.HeldBackReasons;
+            checkSourcesGivenUp = NoteLaterSourcesGivenUp(arg, checkSourcesGivenUp, moveResult.SourceRootsGivenUp);
             ReportHeldBack(heldBack);
             ReportSourcesGivenUp(checkSourcesGivenUp);
             if (moveResult.HeldBack.Count > 0)
@@ -1967,6 +1981,11 @@ internal static class Program
             if (moveResult.MovedCount > 0 && !moveResult.Cancelled)
                 Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, moveDest));
 
+            // A batch that ended before its last file has printed what it did, above;
+            // its reason, its entry and its exit code are next. See the /d branch.
+            if (moveResult.Ended is { } moveEnded)
+                return EmitBatchEnded(arg, moveEnded, moveResult.MovedCount, count);
+
             // Partial result returned on a mid-batch cancel; re-enter the OCE catch
             // so the machine contract matches a thrown cancellation. See the /d
             // branch above.
@@ -1989,7 +2008,8 @@ internal static class Program
             await CarryReportAsync(() => ResultLogEntry.ForMove(
                 scanResult, scanDurationMs, moveResult, actualMovedBytes, moveDurationMs,
                 MoveDestinationClassifier.Classify(moveDest),
-                reverify.WithHeldBack(moveResult.HeldBack, moveResult.HeldBackReasons),
+                reverify.WithLaterChecks(moveResult.HeldBack, moveResult.HeldBackReasons,
+                    moveResult.SourceRootsGivenUp, moveResult.SourceWaitCount),
                 WindowsRegion(), ReportHost.CommandLine, RunningCopy(services)));
 
             // See the /d branch. The stopped Move returns through ReportAbortedMove
@@ -2676,71 +2696,156 @@ internal static class Program
     }
 
     /// <summary>
-    /// The stdout sentence for a run refused because <c>Global\_MSIExecute</c>
-    /// could not be taken and nothing could be shown to be holding it, chosen by
-    /// the flag that ran. <paramref name="arg"/> is the lower-cased flag, so the
-    /// comparison needs no casing rules.
-    /// </summary>
-    /// <remarks>
-    /// Two sentences rather than one, because each closes by naming what did not
-    /// happen to the files and neither ending is true of the other's run. Keyed
-    /// off the flag rather than a bool the caller passes, so a caller cannot hand
-    /// this the wrong one; a third mutating mode would have to come here for a
-    /// sentence of its own, which is the failure worth having.
-    /// </remarks>
-    internal static string InstallerLockUnavailableLine(string arg) =>
-        arg == "/m" ? Strings.Cli_MoveInstallerLockUnavailable : Strings.Cli_InstallerLockUnavailable;
-
-    /// <summary>
-    /// The Application-channel line for that same refusal. ONE line covers both
-    /// flags and <c>{0}</c> names which one ran, so its tail has to be true of a
-    /// move and of a delete alike: an ending naming a single action is false of
-    /// half the runs that can produce it.
-    /// </summary>
-    /// <remarks>
-    /// Built outside the en-GB scope, like <see cref="AbortedMoveEventLogLine"/>:
-    /// the caller wraps it, so the line renders English in production and in the
-    /// ambient culture anywhere else.
-    /// </remarks>
-    internal static string InstallerLockUnavailableEventLogLine(string arg) =>
-        string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg);
-
-    /// <summary>
-    /// The stdout sentence for a run refused because the security on
-    /// <c>Global\_MSIExecute</c> would not let the app open it, wherever the
-    /// refusal was met: <see cref="PendingRebootBlockedMessage"/> prints it for
-    /// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/>, which covers the
-    /// gate and the action services' acquire alike. Keyed off the flag exactly as
-    /// <see cref="InstallerLockUnavailableLine"/> is, and separate from it because
-    /// the two refusals are different facts about the machine: one says nothing
-    /// could be shown to hold the lock, this one says the app was not allowed to
-    /// look.
+    /// The stdout sentence for a run refused because Windows would not let the app
+    /// read one of Windows Installer's signals:
+    /// <see cref="PendingRebootBlockedMessage"/> prints it for
+    /// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/> and
+    /// <see cref="PendingRebootReason.InstallerInProgressMarkerAccessRefused"/>. Two
+    /// sentences, chosen by the flag that ran, because each closes by naming what did
+    /// not happen to the files and neither ending is true of the other's run.
+    /// <paramref name="arg"/> is the lower-cased flag, so the comparison needs no
+    /// casing rules.
     /// </summary>
     internal static string InstallerLockAccessRefusedLine(string arg) =>
         arg == "/m" ? Strings.Cli_MoveInstallerLockAccessRefused : Strings.Cli_InstallerLockAccessRefused;
 
     /// <summary>
-    /// Reports a <c>/d</c> or <c>/m</c> the action service refused because it could
-    /// not take <c>Global\_MSIExecute</c> and nothing was shown to be holding it, and
-    /// returns the exit code for it.
+    /// How long a <c>/d</c> or <c>/m</c> goes on waiting for a busy Windows Installer
+    /// before it ends the run. The command line runs unattended, so its wait has a
+    /// bound; the window's has none, its user being able to see the wait and cancel it.
+    /// </summary>
+    internal static readonly TimeSpan BusyWaitBound = Durations.FromMinutes(30);
+
+    /// <summary>
+    /// The stdout sentence for a <c>/d</c> or <c>/m</c> that ended before its last file,
+    /// or before its first, for a reason of its own (<see cref="BatchEnd"/>).
     /// </summary>
     /// <remarks>
-    /// Deliberately NOT routed through <see cref="EmitPendingRebootBlocked"/>: no
-    /// <see cref="PendingRebootReason"/> describes it. The gate's probe reads the
-    /// same failure as not held, so the gate never reports this condition and has no
-    /// sentence for it. TransientSkip and ExitTransient, on the reasoning that
-    /// method gives its transient reasons: the condition can clear on its own, so a
-    /// scheduler should come back rather than treat the machine as broken.
+    /// A read of the signals takes the sentence its reason has at the gate
+    /// (<see cref="PendingRebootBlockedMessage"/>), with one exception. The two reasons
+    /// that say Windows refused the app permission to look close, at the gate, by saying
+    /// nothing has been moved or deleted, which is not true of a batch that ended in the
+    /// middle, so here they take a sentence that says what such a batch did.
     ///
-    /// The two lines it emits are built by methods of their own, so their wording
-    /// can be read back without driving a run.
+    /// Every reason is named and the default throws, so a reason added to
+    /// <see cref="BatchEndReason"/> later is never printed under another reason's
+    /// sentence. A check that threw has no sentence here: its exception is raised again
+    /// and reported as any other failure of the run is.
     /// </remarks>
-    private static int EmitInstallerLockUnavailable(string arg)
+    internal static string BatchEndedLine(string arg, BatchEnd ended) => ended.Reason switch
     {
-        Console.WriteLine(InstallerLockUnavailableLine(arg));
-        MachineContract.WriteEventLog(CliEventClass.TransientSkip,
-            () => InstallerLockUnavailableEventLogLine(arg));
-        return ExitTransient;
+        BatchEndReason.SignalWaitCannotClear when ended.Signals is { Reason: { } reason } signals =>
+            reason is PendingRebootReason.MsiExecuteMutexAccessRefused
+                or PendingRebootReason.InstallerInProgressMarkerAccessRefused
+                ? Strings.Cli_BatchEnded_AccessRefused
+                : PendingRebootBlockedMessage(arg, reason, signals.Detail, signals.WindowsError),
+        BatchEndReason.WaitBoundReached => Strings.Cli_BatchEnded_WaitBoundReached,
+        BatchEndReason.RecordsKeptChanging => Strings.Cli_BatchEnded_RecordsKeptChanging,
+        BatchEndReason.WatchUnavailable => Strings.Cli_BatchEnded_WatchUnavailable,
+        BatchEndReason.InHandFolderUnavailable => string.Format(
+            Strings.Cli_BatchEnded_InHandFolderUnavailable, InHandFolders.FolderName, ended.WindowsError),
+        _ => throw new ArgumentOutOfRangeException(nameof(ended), ended.Reason,
+            "A reason a batch ended for with no sentence. Add it to BatchEndedLine in the same edit as the enum member."),
+    };
+
+    /// <summary>
+    /// The Application-channel line for that same end: what was done, where anything
+    /// was, and the reason as an English label, which is the reason's own name, with the
+    /// signal's own name after it where a read of the signals ended the batch, or the
+    /// exception's type where a check that threw did. The names are used and not the
+    /// gate's labels for the signals, some of which say that nothing was moved or
+    /// deleted.
+    /// </summary>
+    /// <remarks>
+    /// Built outside the en-GB scope, like <see cref="AbortedMoveEventLogLine"/>: the
+    /// caller wraps it, so the line renders English in production and in the ambient
+    /// culture anywhere else.
+    /// </remarks>
+    internal static string BatchEndedEventLogLine(string arg, BatchEnd ended, int committed, int total)
+    {
+        var reason = ended.Signals is { Reason: { } signal } ? $"{ended.Reason}: {signal}"
+            : ended.Failure is { } failure ? $"{ended.Reason}: {failure.GetType().Name}"
+            : ended.Reason.ToString();
+        return committed > 0
+            ? string.Format(Strings.Cli_EventLogEndedPartial,
+                arg, committed, total, DisplayHelpers.PluraliseFile(total), reason)
+            : string.Format(Strings.Cli_EventLogEndedNoWork, arg, reason);
+    }
+
+    /// <summary>
+    /// Reports a <c>/d</c> or <c>/m</c> that ended before its last file, or before its
+    /// first, and returns the exit code for it.
+    /// </summary>
+    /// <remarks>
+    /// A CHECK THAT THREW WITH NOTHING MOVED OR DELETED IS RAISED AGAIN, so the run
+    /// reports it as it reports a check that fails before a batch. With files moved or
+    /// deleted, the failure is printed and the run is a partial one, as below.
+    ///
+    /// WITH NOTHING MOVED OR DELETED, a read of the signals that waiting does not
+    /// change is reported as the gate reports it
+    /// (<see cref="EmitPendingRebootBlocked"/>). Any other reason prints its own
+    /// sentence and takes the code that is true of it: transient where coming back
+    /// later finds the machine in a different state (Windows Installer was busy for the
+    /// whole wait, or installations kept writing its records), and an error where
+    /// nothing about waiting changes the answer.
+    ///
+    /// WITH FILES MOVED OR DELETED it is a partial run, whatever ended it.
+    ///
+    /// A RUN THAT WAITED OUT ITS BOUND PRINTS THE SIGNAL'S OWN SENTENCE UNDER ITS OWN.
+    /// The signals it waits on do not all end the same way: an installation under way
+    /// finishes, and one left unfinished waits for a restart. The sentence the gate has
+    /// for the signal still up says which, so the reader is told whether to try again
+    /// later or to restart Windows.
+    /// </remarks>
+    private static int EmitBatchEnded(string arg, BatchEnd ended, int committed, int total)
+    {
+        if (ended.Reason == BatchEndReason.CheckFailed && ended.Failure is { } thrown)
+        {
+            // A cancellation that reached here is not the run's own, which the batch
+            // reports as a cancelled run and not as a check that failed. Raised as it
+            // is, it would be reported as the run being cancelled.
+            if (committed == 0)
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(
+                    thrown is OperationCanceledException
+                        ? new InvalidOperationException(
+                            "A check made in the middle of a batch was cancelled by something other than the run.", thrown)
+                        : thrown).Throw();
+
+            // Files were moved or deleted, so the run is a partial one. The failure is
+            // printed as the run prints a failure met anywhere else: its own sentence
+            // where it carries one written for a person, and otherwise its type and
+            // where the detail was written, never its message.
+            if (Classify(thrown) == WorkFailure.Localised)
+            {
+                Console.WriteLine(thrown.Message);
+            }
+            else
+            {
+                var crash = Helpers.CrashLog.TryWrite(thrown);
+                var typeName = thrown.GetType().Name;
+                Console.WriteLine(crash.Written
+                    ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
+                    : string.Format(Strings.Cli_GenericError_NoLog, typeName));
+            }
+            MachineContract.WriteEventLog(CliEventClass.Partial,
+                () => BatchEndedEventLogLine(arg, ended, committed, total));
+            return ExitPartial;
+        }
+
+        if (committed == 0 && ended.Reason == BatchEndReason.SignalWaitCannotClear
+            && ended.Signals is { Reason: { } reason } signals)
+            return EmitPendingRebootBlocked(arg, reason, signals.Detail, signals.WindowsError);
+
+        Console.WriteLine(BatchEndedLine(arg, ended));
+        if (ended.Reason == BatchEndReason.WaitBoundReached && ended.Signals is { Reason: { } stillUp } waitedOn)
+            Console.WriteLine(PendingRebootBlockedMessage(arg, stillUp, waitedOn.Detail, waitedOn.WindowsError));
+        var (exitCode, entryClass) =
+            committed > 0 ? (ExitPartial, CliEventClass.Partial)
+            : ended.Reason is BatchEndReason.WaitBoundReached or BatchEndReason.RecordsKeptChanging
+                ? (ExitTransient, CliEventClass.TransientSkip)
+            : (ExitError, CliEventClass.HardError);
+        MachineContract.WriteEventLog(entryClass, () => BatchEndedEventLogLine(arg, ended, committed, total));
+        return exitCode;
     }
 
     /// <summary>
@@ -2749,7 +2854,7 @@ internal static class Program
     /// <c>{0}</c> names which one ran.
     /// </summary>
     /// <remarks>
-    /// Built outside the en-GB scope, like <see cref="InstallerLockUnavailableEventLogLine"/>:
+    /// Built outside the en-GB scope, like <see cref="AbortedMoveEventLogLine"/>:
     /// the caller wraps it, so the line renders English in production and in the
     /// ambient culture anywhere else.
     /// </remarks>
@@ -2770,8 +2875,8 @@ internal static class Program
     /// does.
     ///
     /// The event-log line it writes (<see cref="AdminRightsNeededEventLogLine"/>) is
-    /// reachable separately and this method is not, for the reason
-    /// <see cref="EmitInstallerLockUnavailable"/> gives.
+    /// built by a method of its own, so its wording can be read back without driving a
+    /// run.
     /// </remarks>
     private static int RefuseWithoutAdministratorRights(string arg)
     {
@@ -2937,21 +3042,10 @@ internal static class Program
     /// Emits the pending-reboot-blocked outcome: the localised stdout reason
     /// sentence, the English Application-log entry, and the exit code its reason
     /// takes.
-    /// Shared by the pre-act gate check and the action services' own boundary
-    /// refusal. When a Move or Delete service acquires <c>Global\_MSIExecute</c>
-    /// and finds it held
-    /// (<see cref="MoveResult.InstallerBusy"/> /
-    /// <see cref="DeleteResult.InstallerBusy"/>), a Windows Installer
-    /// transaction took it after the gate check passed; mapping that to
-    /// <see cref="PendingRebootReason.MsiExecuteMutexHeld"/> here
-    /// makes the service-boundary refusal produce the identical machine contract
-    /// (stdout line, event-log entry, exit code) a gate block does, so an RMM
-    /// consumer cannot tell the two apart. A service refused the rights to open the
-    /// object (<see cref="MoveResult.InstallerLockAccessRefused"/> /
-    /// <see cref="DeleteResult.InstallerLockAccessRefused"/>) maps to
-    /// <see cref="PendingRebootReason.MsiExecuteMutexAccessRefused"/> on the same
-    /// terms, so one refusal carries one sentence and one exit code wherever it is
-    /// met.
+    /// Reached where no check stood before a batch, and where a batch ended in the
+    /// middle on a read of the signals with nothing moved or deleted
+    /// (<see cref="EmitBatchEnded"/>), so one reason carries one sentence, one entry
+    /// and one exit code wherever it is met.
     /// </summary>
     private static int EmitPendingRebootBlocked(
         string arg, PendingRebootReason reason, string? detail, int? windowsError = null)

@@ -31,11 +31,6 @@ public class CliRunCoverTests
     private const string File1 = @"C:\Windows\Installer\a.msi";
     private const string File2 = @"C:\Windows\Installer\b.msp";
 
-    private static readonly PatchClaim SurvivingA =
-        new(File1, "{AAAA1111-0000-0000-0000-000000000001}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-    private static readonly PatchClaim SurvivingB =
-        new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-
     private static string Lost(string arg, int done, int total) => arg == "/m"
         ? string.Format(Strings.Cli_MutexLostMove, DisplayHelpers.FormatCount(done),
             DisplayHelpers.FormatCount(total), DisplayHelpers.PluraliseFile(total), Destination)
@@ -208,8 +203,7 @@ public class CliRunCoverTests
     private static IDeleteFilesService Delete(Func<NSubstitute.Core.CallInfo, DeleteResult> answer)
     {
         var delete = Substitute.For<IDeleteFilesService>();
-        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(), Arg.Any<Func<string, bool>?>())
+        delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(), Arg.Any<Func<string, bool>?>())
             .Returns(call => answer(call));
         return delete;
     }
@@ -217,8 +211,7 @@ public class CliRunCoverTests
     private static IMoveFilesService Move(Func<NSubstitute.Core.CallInfo, MoveResult> answer)
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(), Arg.Any<Func<string, bool>?>())
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(), Arg.Any<Func<string, bool>?>())
             .Returns(call => answer(call));
         return move;
     }
@@ -269,8 +262,8 @@ public class CliRunCoverTests
     }
 
     /// <summary>
-    /// The services the work path resolves. The scan offers two files, the pending-reboot
-    /// gate is clean and the re-verify keeps both, so the run reaches the batch.
+    /// The services the work path resolves. The scan offers two files, the
+    /// signals read clean and the check before the batch stands over both, so the run reaches the batch.
     /// </summary>
     private static IServiceProvider Services(
         IDeleteFilesService? delete = null, IMoveFilesService? move = null)
@@ -291,15 +284,10 @@ public class CliRunCoverTests
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
 
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(
-                new[] { File1, File2 },
-                Array.Empty<string>(),
-                SurvivingPatchClaims: new[] { SurvivingA, SurvivingB },
-                SiblingPatchClaims: Array.Empty<PatchClaim>()));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(new[] { File1, File2 }, Array.Empty<string>()));
 
-        return CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier,
+        return CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck,
             delete: delete, move: move);
     }
 }

@@ -58,10 +58,9 @@ public enum PendingRebootReason
     /// Installer right now; this one says only that the app was not allowed to look,
     /// and nothing has been seen holding the lock.
     ///
-    /// The action services' acquire falls back to the rights the gate's probe asks for
-    /// where full access is refused, so they meet the same refusal, and the command line
-    /// reports a refusal met there under this reason too: one condition, one sentence and
-    /// one exit code, wherever it is met.
+    /// A Move or Delete reads the mutex again at each file, through the same probe, so
+    /// it meets the same refusal under this reason: one condition and one exit code,
+    /// wherever it is met.
     /// </summary>
     MsiExecuteMutexAccessRefused,
 
@@ -144,8 +143,7 @@ public enum PendingRebootReason
     /// IT IS A SEPARATE VERDICT FROM <see cref="MsiExecuteMutexAccessRefused"/>, whose
     /// sentences say Windows refused the app permission to look, which is false of
     /// this; and from <see cref="RegistryCheckUnreadable"/>, whose sentences name a
-    /// registry value. The action services' acquire meets the same kind of failure as
-    /// <see cref="MutexAcquireOutcome.NotAcquired"/> and refuses the batch on it.
+    /// registry value.
     /// </summary>
     MsiExecuteMutexUnreadable,
 

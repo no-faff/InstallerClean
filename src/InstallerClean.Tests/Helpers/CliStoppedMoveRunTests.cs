@@ -46,11 +46,6 @@ public class CliStoppedMoveRunTests
     private const string File1 = @"C:\Windows\Installer\a.msi";
     private const string File2 = @"C:\Windows\Installer\b.msp";
 
-    private static readonly PatchClaim SurvivingA =
-        new(File1, "{AAAA1111-0000-0000-0000-000000000001}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-    private static readonly PatchClaim SurvivingB =
-        new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
-
     [Fact]
     public async Task A_stopped_move_says_it_went_no_further_before_naming_the_folder_to_delete()
     {
@@ -97,8 +92,8 @@ public class CliStoppedMoveRunTests
     private static IMoveFilesService MoveThatStopsAfter(int moved)
     {
         var move = Substitute.For<IMoveFilesService>();
-        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "stopped", new MoveResult(moved, Array.Empty<FileOperationError>()),
@@ -124,15 +119,10 @@ public class CliStoppedMoveRunTests
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
 
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(
-                new[] { File1, File2 },
-                Array.Empty<string>(),
-                SurvivingPatchClaims: new[] { SurvivingA, SurvivingB },
-                SiblingPatchClaims: Array.Empty<PatchClaim>()));
+        var batchCheck = CliRunFixtures.BatchCheckStanding(
+            new ReverifyResult(new[] { File1, File2 }, Array.Empty<string>()));
 
-        return CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier, move: move);
+        return CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck, move: move);
     }
 
     private static async Task<(int ExitCode, string Stdout)> Run(IServiceProvider services)

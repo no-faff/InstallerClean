@@ -70,7 +70,7 @@ public class CliPendingRebootStringsTests
     /// <summary>
     /// The reasons whose Application-channel label is the member's own name, written
     /// out rather than reached through the fallback. Each is stable and greppable and
-    /// names what the gate read.
+    /// names what the read of Windows Installer's signals found.
     /// </summary>
     private static readonly PendingRebootReason[] LabelledByName =
     {
@@ -81,9 +81,28 @@ public class CliPendingRebootStringsTests
     };
 
     /// <summary>
-    /// A refused lock prints the refusal sentence the action services' refusal
-    /// prints, for the flag that ran, and never the sentence saying something is
-    /// using Windows Installer, which nothing has seen.
+    /// A refused lock writes one entry naming the flag and both actions, in full, because
+    /// Application-log tooling matches on its words, and the flag it opens with is the only
+    /// part that varies.
+    /// </summary>
+    [Theory]
+    [InlineData("/d")]
+    [InlineData("/m")]
+    public void A_refused_lock_writes_one_line_naming_the_flag_and_both_actions(string arg)
+    {
+        var line = MachineContract.English(() => Program.PendingRebootEventLogLine(
+            arg, PendingRebootReason.MsiExecuteMutexAccessRefused, detail: null));
+
+        Assert.Equal(
+            $"{arg} mode aborted: access to the Windows Installer mutex was refused, so "
+            + "whether an installation was in progress could not be established and no "
+            + "files were moved or deleted.",
+            line);
+    }
+
+    /// <summary>
+    /// A refused lock prints the refusal sentence for the flag that ran, and never the
+    /// sentence saying something is using Windows Installer, which nothing has seen.
     /// </summary>
     [Fact]
     public void A_refused_lock_prints_the_refusal_sentence_for_the_flag_that_ran()

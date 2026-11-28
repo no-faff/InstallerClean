@@ -483,10 +483,16 @@ public partial class CompletionViewModel : ObservableObject
     /// dialog builds the same sentence from the folder the caller asked for,
     /// because that is the one they configured and can go and look at, and the
     /// two are not always the same place.
+    ///
+    /// A Move that ended before its last file for another reason
+    /// (<see cref="BatchEnd"/>) passes that reason's sentence as
+    /// <paramref name="stopLine"/>, the one its dialog showed, and the card
+    /// carries it in the same place.
     /// </summary>
     public void ShowMoveStoppedSummary(int movedCount, long movedBytes, string destination,
-        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null) =>
-        ShowMoveCard(movedCount, movedBytes, destination, errors, space, reverify, stopped: true);
+        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null,
+        string? stopLine = null) =>
+        ShowMoveCard(movedCount, movedBytes, destination, errors, space, reverify, stopped: true, stopLine);
 
     // One body for both, because everything except the last line is the same
     // card and a second copy of it would drift. The flag is read once, at that
@@ -495,7 +501,7 @@ public partial class CompletionViewModel : ObservableObject
     // after it would be drawn but never spoken.
     private void ShowMoveCard(int movedCount, long movedBytes, string destination,
         IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify,
-        bool stopped)
+        bool stopped, string? stopLine = null)
     {
         // The heading states one outcome and only one. A partial failure still
         // freed what it freed, so it keeps the size heading and lets the count
@@ -536,7 +542,7 @@ public partial class CompletionViewModel : ObservableObject
         // the folder, and it is the only line on the card saying the run did not
         // reach the end.
         Restore = stopped
-            ? string.Format(Strings.Error_DestinationChangedMidBatch, destination)
+            ? stopLine ?? string.Format(Strings.Error_DestinationChangedMidBatch, destination)
             : HeadingIsWarning ? string.Empty : MoveRestoreText(space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
@@ -551,14 +557,30 @@ public partial class CompletionViewModel : ObservableObject
     /// and no third: the heading reads "freed", because a delete reclaims the
     /// disk at the instant it happens, and the summary states what was done.
     ///
-    /// <see cref="Restore"/> is deliberately left empty, which is the one thing
+    /// <see cref="Restore"/> is deliberately left empty here, which is the one thing
     /// about this screen worth defending. The app's claim is not that a delete
     /// can be undone, it is that these files do not need undoing, so a recovery
     /// line here would be the app hedging against the thing it has just said
     /// will not happen.
     /// </summary>
     public void ShowDeleteSummary(int deletedCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
+        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null) =>
+        ShowDeleteCard(deletedCount, deletedBytes, errors, reverify, stopLine: null);
+
+    /// <summary>
+    /// Shows the card after a Delete that ended before its last file
+    /// (<see cref="BatchEnd"/>), once the dialog naming the reason is dismissed.
+    /// Everything on it is <see cref="ShowDeleteSummary"/>'s and is still true of
+    /// the files that went. <paramref name="stopLine"/>, the sentence the dialog
+    /// showed, is the last line, and is the only line on the card saying the run
+    /// did not reach the end. Such a card keeps Done, as a stopped Move's does.
+    /// </summary>
+    public void ShowDeleteStoppedSummary(int deletedCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify, string stopLine) =>
+        ShowDeleteCard(deletedCount, deletedBytes, errors, reverify, stopLine);
+
+    private void ShowDeleteCard(int deletedCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify, string? stopLine)
     {
         // See ShowMoveSummary for why a partial failure keeps the size heading
         // and only a delete that reached no file at all swaps to the warning.
@@ -578,11 +600,11 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_PermanentDeleteSummary_Plural,
                     "Completion.PermanentDeleteSummary"),
                 DisplayHelpers.FormatCount(deletedCount), deletedLabel);
-        Restore = string.Empty;
+        Restore = stopLine ?? string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ScanStartLine = AfterTheOperationLine(_lastScan());
-        AsksForDonation = deletedBytes > 0;
+        AsksForDonation = deletedBytes > 0 && stopLine is null;
         IsComplete = true;
     }
 

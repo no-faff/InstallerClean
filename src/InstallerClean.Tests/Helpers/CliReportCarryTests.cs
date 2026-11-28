@@ -125,8 +125,7 @@ public class CliReportCarryTests
     public async Task A_delete_that_deleted_files_carries_a_delete_report_decided_before_the_batch()
     {
         var rig = new Rig();
-        rig.Delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        rig.Delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, NoErrors));
 
         var exitCode = await rig.Run("/d");
@@ -140,8 +139,7 @@ public class CliReportCarryTests
         Received.InOrder(() =>
         {
             _ = rig.Earlier.ShowsAnEarlierRunWithinAsync(Arg.Any<TimeSpan>());
-            _ = rig.Delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            _ = rig.Delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         });
     }
 
@@ -149,8 +147,7 @@ public class CliReportCarryTests
     public async Task A_delete_on_a_PC_with_an_earlier_run_carries_nothing()
     {
         var rig = new Rig { EarlierRun = true };
-        rig.Delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        rig.Delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, NoErrors));
 
         await rig.Run("/d");
@@ -162,8 +159,7 @@ public class CliReportCarryTests
     public async Task A_delete_in_which_some_files_failed_still_carries_the_report()
     {
         var rig = new Rig();
-        rig.Delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        rig.Delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, new FileOperationError[] { new UnknownError(File2) }));
 
         var exitCode = await rig.Run("/d");
@@ -189,8 +185,8 @@ public class CliReportCarryTests
     public async Task A_move_that_moved_files_carries_a_move_report_naming_where_it_went()
     {
         var rig = new Rig();
-        rig.Move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        rig.Move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, NoErrors));
 
@@ -207,8 +203,7 @@ public class CliReportCarryTests
     {
         using var cts = new CancellationTokenSource();
         var rig = new Rig();
-        rig.Delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        rig.Delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
                 cts.Cancel();
@@ -225,8 +220,8 @@ public class CliReportCarryTests
     public async Task A_stopped_move_carries_nothing()
     {
         var rig = new Rig();
-        rig.Move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        rig.Move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "stopped", new MoveResult(1, NoErrors), Destination, MoveAbortReason.ResolvesElsewhere));
@@ -239,10 +234,12 @@ public class CliReportCarryTests
     [Theory]
     [InlineData("/d")]
     [InlineData("/m")]
-    public async Task A_run_the_pending_reboot_gate_refuses_carries_nothing(string arg)
+    public async Task A_run_whose_check_ends_on_a_blocked_signal_read_carries_nothing(string arg)
     {
-        var rig = new Rig();
-        rig.Reboot.Check().Returns(PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
+        var rig = new Rig
+        {
+            SignalsEndingTheCheck = PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld),
+        };
 
         var exitCode = await rig.Run(arg, arg == "/m" ? Destination : null);
 
@@ -340,8 +337,7 @@ public class CliReportCarryTests
     private static Rig WatchedRigWhoseDeleteDeletes()
     {
         var rig = new Rig { Watched = true };
-        rig.Delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        rig.Delete.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, NoErrors));
         return rig;
     }
@@ -362,8 +358,8 @@ public class CliReportCarryTests
     public async Task A_move_that_carries_a_report_holds_its_tip_line_for_the_end_of_the_run()
     {
         var rig = new Rig { Watched = true };
-        rig.Move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+        rig.Move.MoveFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(),
                 Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, NoErrors));
 
@@ -634,6 +630,12 @@ public class CliReportCarryTests
         public bool Offered { get; set; } = true;
         public bool ReverifyKeeps { get; set; } = true;
 
+        /// <summary>
+        /// A blocked read of Windows Installer's signals that ends the check before the
+        /// batch, so no check stands. Null leaves the check standing.
+        /// </summary>
+        public PendingRebootResult? SignalsEndingTheCheck { get; set; }
+
         /// <summary>The answer the run is given for whether somebody is watching its console.</summary>
         public bool Watched { get; set; }
 
@@ -696,23 +698,16 @@ public class CliReportCarryTests
             scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
                 .Returns(new ScanResult(files, Array.Empty<RegisteredPackage>(), RegisteredTotalBytes: 0));
 
-            var reverifier = Substitute.For<IRemovableReverifier>();
-            reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-                .Returns(ReverifyKeeps
-                    ? new ReverifyResult(
-                        new[] { File1, File2 }, Array.Empty<string>(),
-                        SurvivingPatchClaims: new[]
-                        {
-                            new PatchClaim(File2, "{AAAA1111-0000-0000-0000-000000000002}",
-                                "{PPPP1111-0000-0000-0000-000000000001}", null, 2),
-                        },
-                        SiblingPatchClaims: Array.Empty<PatchClaim>())
+            var batchCheck = SignalsEndingTheCheck is { } signals
+                ? CliRunFixtures.BatchCheckEnding(BatchEndReason.SignalWaitCannotClear, signals)
+                : CliRunFixtures.BatchCheckStanding(ReverifyKeeps
+                    ? new ReverifyResult(new[] { File1, File2 }, Array.Empty<string>())
                     : new ReverifyResult(Array.Empty<string>(), new[] { File1, File2 }));
 
             return new ServiceCollection()
                 .AddSingleton(scan)
                 .AddSingleton(Reboot)
-                .AddSingleton(reverifier)
+                .AddSingleton(batchCheck)
                 .AddSingleton(Delete)
                 .AddSingleton(Move)
                 .AddSingleton(Settings())

@@ -14,12 +14,6 @@ public class MainViewModelTests : IDisposable
 {
     private static readonly string Orphaned = Strings.Reason_Orphaned;
 
-    // Every specification of MoveFilesAsync / DeleteFilesAsync below names the
-    // trailing patchClaims argument, assertions included. It is optional on the
-    // interface and never omitted in practice, ReverifyResult defaulting
-    // SurvivingPatchClaims to an empty array, so a specification that leaves it
-    // out matches a literal null that no real call can carry: a Received() fails
-    // against a call that did happen, and a DidNotReceive() passes whatever did.
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
     private readonly IDeleteFilesService _deleteService = Substitute.For<IDeleteFilesService>();
@@ -31,7 +25,7 @@ public class MainViewModelTests : IDisposable
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
     private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
-    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
+    private readonly IBatchCheck _batchCheck = Substitute.For<IBatchCheck>();
     private readonly IEarlierRunCheck _earlierRunCheck = Substitute.For<IEarlierRunCheck>();
     private readonly IFirstRunMark _firstRunMark = FirstRunMarks.Claiming();
     private readonly IWindowsRegion _windowsRegion = Substitute.For<IWindowsRegion>();
@@ -48,7 +42,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(before, after);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -101,32 +95,54 @@ public class MainViewModelTests : IDisposable
     {
         _settingsService.Load().Returns(settings);
         // Check() returns Clean or Block, never null (the interface contract);
-        // default it Clean so the scan and the act-time re-check both proceed.
-        // Tests covering the gate override with a Clean-then-Block sequence.
+        // default it Clean so the scan proceeds. Tests covering the gate at the moment
+        // of action make the check before the batch end on a read of the signals.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
-        // Default the act-time re-verify to a no-op: every candidate survives and
+        // Default the check before the batch to a no-op: every candidate survives and
         // nothing is dropped, so a Move/Delete acts on the full scanned set.
-        // Tests covering the re-verify override this to drop entries or to throw.
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
+        // Tests covering the re-verify override this to drop entries, to throw or to
+        // end with no check standing.
+        BatchCheckStands(files => new ReverifyResult(files, Array.Empty<string>()));
 
         return _made.Add(new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _updateCheckService, _reverifier,
+            _fileSystem, _resultLogService, _updateCheckService, _batchCheck,
             _earlierRunCheck, _firstRunMark, _windowsRegion,
             destinationGuard: new ByPathDestinationGuard(_fileSystem),
             appUpdater: appUpdater));
     }
 
+    /// <summary>Makes the check before a batch give <paramref name="answer"/> to each call.</summary>
+    private void BatchCheckAnswers(Func<NSubstitute.Core.CallInfo, Task<BatchCheckResult>> answer) =>
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(answer);
+
     /// <summary>
-    /// A per-machine claim on one cached patch. The codes are arbitrary and the
-    /// path is not: it is what a consumer matches a claim to a file on.
+    /// Makes the check before a batch stand with <paramref name="result"/> as what it found,
+    /// made from the files the call was given. Each call gets a result of its own, which
+    /// the window disposes of.
     /// </summary>
-    private static PatchClaim Claim(string path) =>
-        new(path, "{AAAA0000-0000-0000-0000-000000000001}",
-            "{1111FFFF-0000-0000-0000-000000000001}", null, 4);
+    private void BatchCheckStands(Func<IReadOnlyList<string>, ReverifyResult> result) =>
+        BatchCheckAnswers(ci => Task.FromResult(
+            StandingChecks.Stood(result(ci.Arg<IReadOnlyList<string>>()))));
+
+    /// <summary>Makes the check before a batch end with no check standing.</summary>
+    private void BatchCheckEnds(BatchEndReason reason, PendingRebootResult? signals = null) =>
+        BatchCheckAnswers(_ => Task.FromResult(StandingChecks.Ended(reason, signals)));
+
+    /// <summary>Makes the check before a batch throw <paramref name="exception"/>.</summary>
+    private void BatchCheckThrows(Exception exception) =>
+        BatchCheckAnswers(_ => Task.FromException<BatchCheckResult>(exception));
+
+    /// <summary>The check before a batch was never asked.</summary>
+    private void AssertNoBatchCheckWasMade() =>
+        _batchCheck.DidNotReceive().RunAsync(
+            Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+            Arg.Any<CancellationToken>());
 
     private static ScanResult EmptyScanResult() =>
         new(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0);
@@ -1246,7 +1262,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(1));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -1284,7 +1300,7 @@ public class MainViewModelTests : IDisposable
             .Returns(ScanResultWithOrphans(2));
         bool cardUp = true, taken = false, cancelRequested = false;
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -1315,7 +1331,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
@@ -1328,7 +1344,7 @@ public class MainViewModelTests : IDisposable
 
         _confirmationService.Received(1).ConfirmMove(2, Arg.Any<string>(), vm.Cleanup.MoveDestination, Arg.Any<bool>());
         await _moveService.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination, Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), vm.Cleanup.MoveDestination,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         // %TEMP% and the installer cache are on one volume on every host this
@@ -1361,7 +1377,7 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -1376,7 +1392,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
@@ -1388,7 +1404,7 @@ public class MainViewModelTests : IDisposable
 
         _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>());
         await _deleteService.Received(1).DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("permanently deleted", vm.Completion.Summary);
@@ -1405,7 +1421,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmMove(
@@ -1434,7 +1450,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ =>
             {
@@ -1499,7 +1515,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmDelete(
@@ -1520,7 +1536,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<DeleteResult>(_ =>
             {
@@ -1580,7 +1596,7 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -1599,7 +1615,7 @@ public class MainViewModelTests : IDisposable
         // The service returns its partial result with Cancelled set rather than
         // throwing the tally away: two moved before the stop.
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>(), Cancelled: true));
         _confirmationService.ConfirmMove(
@@ -1634,7 +1650,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true));
         _confirmationService.ConfirmDelete(
@@ -1802,7 +1818,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -1882,7 +1898,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -1949,7 +1965,7 @@ public class MainViewModelTests : IDisposable
             liveAfterPress = button.Live;
         }
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -1957,7 +1973,7 @@ public class MainViewModelTests : IDisposable
                 return new MoveResult(1, Array.Empty<FileOperationError>(), Cancelled: true);
             });
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -2005,19 +2021,19 @@ public class MainViewModelTests : IDisposable
             .Select(i => (FileOperationError)new FileInUse($@"C:\Windows\Installer\orphan{i}.msi"))
             .ToArray();
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(ci =>
             {
-                during((CancellationToken)ci[4]);
+                during(ci.Arg<CancellationToken>());
                 return new MoveResult(done, Errors(), Cancelled: cancelled);
             });
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(ci =>
             {
-                during((CancellationToken)ci[3]);
+                during(ci.Arg<CancellationToken>());
                 return new DeleteResult(done, Errors(), Cancelled: cancelled);
             });
     }
@@ -2284,23 +2300,21 @@ public class MainViewModelTests : IDisposable
         Assert.True(vm.Completion.OffersReport);
     }
 
-    public static TheoryData<string> ArmsEndingInADialogOrTheGateReCheck => new()
+    public static TheoryData<string> ArmsEndingInADialog => new()
     {
-        "Move busy", "Move unavailable", "Move access refused", "Move stopped",
-        "Move destination refused", "Move destination unwritable",
-        "Delete busy", "Delete unavailable", "Delete access refused",
+        "Move stopped", "Move destination refused", "Move destination unwritable",
+        "Move ended", "Delete ended",
     };
 
     [Theory]
-    [MemberData(nameof(ArmsEndingInADialogOrTheGateReCheck))]
-    public async Task The_overlay_names_nothing_behind_a_dialog_or_the_gate_re_check_a_Move_or_Delete_ends_in(
+    [MemberData(nameof(ArmsEndingInADialog))]
+    public async Task The_overlay_names_nothing_behind_a_dialog_a_Move_or_Delete_ends_in(
         string arm)
     {
         var vm = CreateViewModel();
         TwoFileBatch(_ => { }, done: 0, errored: 0, cancelled: false);
         var deleting = arm.StartsWith("Delete");
         var result = arm[(arm.IndexOf(' ') + 1)..];
-        var expected = result == "access refused" ? 2 : 1;
         Exception? thrown = result switch
         {
             "stopped" => new MoveAbortedException("stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
@@ -2309,98 +2323,58 @@ public class MainViewModelTests : IDisposable
             "destination unwritable" => new LocalisedAccessException("unwritable"),
             _ => null,
         };
-        var refusal = new MoveResult(0, Array.Empty<FileOperationError>(),
-            InstallerBusy: result == "busy",
-            InstallerLockUnavailable: result == "unavailable",
-            InstallerLockAccessRefused: result == "access refused");
+        var ended = new BatchEnd(BatchEndReason.RecordsKeptChanging);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(_ => thrown is null ? Task.FromResult(refusal) : Task.FromException<MoveResult>(thrown));
+            .Returns(_ => thrown is null
+                ? Task.FromResult(new MoveResult(0, Array.Empty<FileOperationError>(), Ended: ended))
+                : Task.FromException<MoveResult>(thrown));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
-                InstallerBusy: result == "busy",
-                InstallerLockUnavailable: result == "unavailable",
-                InstallerLockAccessRefused: result == "access refused"));
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), Ended: ended));
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-heading-behind-a-dialog");
 
-        // The heading as each dialog shows and as each re-check of the gate runs with
-        // the overlay up. The re-check made at the click runs before the overlay does,
-        // and a scan's own read of the gate is not a re-check.
+        // The heading as each dialog shows.
         var headings = new List<string>();
         _dialogService.When(d => d.ShowWarning(Arg.Any<string>(), Arg.Any<string>()))
             .Do(_ => headings.Add(vm.Cleanup.OperationProgress));
-        _rebootService.Check().Returns(_ =>
-        {
-            if (vm.Cleanup.IsOperating && !vm.Scan.IsScanInFlight)
-                headings.Add(vm.Cleanup.OperationProgress);
-            return PendingRebootResult.Clean;
-        });
 
         await RunBatch(vm, deleting);
 
-        Assert.Equal(expected, headings.Count);
+        Assert.Single(headings);
         Assert.All(headings, heading => Assert.Equal(string.Empty, heading));
     }
 
-    [Fact]
-    public async Task Cancel_and_Esc_are_out_of_use_while_a_Delete_refused_at_the_installer_lock_re_checks_the_gate()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Cancel_is_out_of_use_while_the_dialog_for_a_batch_that_ended_is_shown(bool deleting)
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
-        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-        await vm.Scan.ScanWithProgressAsync(null);
-
-        var button = new CancelButtonState(vm.Cleanup);
-        bool? operating = null, canCancel = null, live = null, escTaken = null;
-        var checks = 0;
-        // The gate at the moment of action, then the re-check after the refusal.
-        _rebootService.Check().Returns(_ =>
-        {
-            if (++checks == 1) return PendingRebootResult.Clean;
-            operating = vm.Cleanup.IsOperating;
-            canCancel = vm.Cleanup.CancelOperationCommand.CanExecute(null);
-            live = button.Live;
-            escTaken = vm.HandleEscape();
-            return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld);
-        });
-
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        Assert.Equal(2, checks);
-        Assert.True(operating);
-        Assert.False(canCancel);
-        Assert.False(live);
-        Assert.False(escTaken);
-    }
-
-    [Fact]
-    public async Task Cancel_is_out_of_use_while_a_Move_refused_at_the_installer_lock_shows_its_dialog()
-    {
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
+        var ended = new BatchEnd(BatchEndReason.RecordsKeptChanging);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerLockAccessRefused: true));
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), Ended: ended));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<StandingCheck>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), Ended: ended));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-lock-refused-cancel");
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-batch-ended-cancel");
 
         var button = new CancelButtonState(vm.Cleanup);
         bool? operating = null, canCancel = null, live = null;
         _dialogService
-            .When(d => d.ShowWarning(Strings.Error_MoveInstallerLockAccessRefused, Arg.Any<string>()))
+            .When(d => d.ShowWarning(Strings.Error_BatchEnded_RecordsKeptChanging, Arg.Any<string>()))
             .Do(_ =>
             {
                 operating = vm.Cleanup.IsOperating;
@@ -2408,7 +2382,7 @@ public class MainViewModelTests : IDisposable
                 live = button.Live;
             });
 
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+        await RunBatch(vm, deleting);
 
         Assert.True(operating);
         Assert.False(canCancel);
@@ -2423,8 +2397,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
+        BatchCheckThrows(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -2457,9 +2430,10 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         // Clean when the scan samples it, blocked by the time the user commits the
-        // move: a Windows Installer transaction started while the window sat open.
-        _rebootService.Check().Returns(
-            PendingRebootResult.Clean,
+        // move: a Windows Installer transaction started while the window sat open,
+        // which the check before the batch reads and ends on.
+        BatchCheckEnds(
+            BatchEndReason.SignalWaitCannotClear,
             PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -2470,11 +2444,11 @@ public class MainViewModelTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        // The act-time re-check found it blocked: the banner paints and the move
+        // The check before the batch found it blocked: the banner paints and the move
         // service is never called.
         Assert.True(vm.Scan.HasPendingReboot);
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Completion.IsComplete);
     }
@@ -2485,8 +2459,8 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
-        _rebootService.Check().Returns(
-            PendingRebootResult.Clean,
+        BatchCheckEnds(
+            BatchEndReason.SignalWaitCannotClear,
             PendingRebootResult.Block(PendingRebootReason.InstallerInProgress));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
@@ -2496,26 +2470,21 @@ public class MainViewModelTests : IDisposable
 
         Assert.True(vm.Scan.HasPendingReboot);
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Completion.IsComplete);
     }
 
     // The gate is clean at the click and a transaction is under way by the time the
-    // re-verify reads the in-progress signals. The whole batch stops as it does at the
-    // gate: the banner paints with the re-verify's own read, neither service is called,
-    // nothing is rescanned and no card is shown. With every file confirmed, the batch
-    // stands for one holding a superseded patch, which the re-verify confirms whatever
-    // the signals say; with none confirmed, for one the re-verify emptied, which still
-    // ends under the banner rather than the held-back card.
+    // check before the batch reads the in-progress signals. The whole batch stops: the
+    // banner paints with the check's own read, neither service is called, nothing is
+    // rescanned and no card is shown.
 
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(false, true)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
-    public async Task A_blocked_signal_read_at_the_re_verify_stops_the_whole_batch_and_paints_the_banner(
-        bool deleting, bool reverifyConfirmsNone)
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_blocked_signal_read_by_the_check_before_the_batch_stops_the_whole_batch_and_paints_the_banner(
+        bool deleting)
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -2529,16 +2498,11 @@ public class MainViewModelTests : IDisposable
 
         var blocked = PendingRebootResult.Block(PendingRebootReason.InstallerInProgressMarker);
         bool? destinationThere = null;
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci =>
-            {
-                destinationThere = _fileSystem.Directory.Exists(dest);
-                var batch = (IReadOnlyList<string>)ci[0]!;
-                return reverifyConfirmsNone
-                    ? new ReverifyResult(Array.Empty<string>(), batch,
-                        new HeldBackReasons(FileNotConfirmed: batch.Count), InstallerActivity: blocked)
-                    : new ReverifyResult(batch, Array.Empty<string>(), InstallerActivity: blocked);
-            });
+        BatchCheckAnswers(_ =>
+        {
+            destinationThere = _fileSystem.Directory.Exists(dest);
+            return Task.FromResult(StandingChecks.Ended(BatchEndReason.SignalWaitCannotClear, blocked));
+        });
 
         if (deleting) await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
         else await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
@@ -2548,10 +2512,10 @@ public class MainViewModelTests : IDisposable
         Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
         Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         await _scanService.Received(1).ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -2562,20 +2526,20 @@ public class MainViewModelTests : IDisposable
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
         if (!deleting)
         {
-            // The pre-flight made the folder before the re-verify ran, and it is gone.
+            // The pre-flight made the folder before the check ran, and it is gone.
             Assert.True(destinationThere);
             Assert.False(_fileSystem.Directory.Exists(dest));
         }
     }
 
-    // Nothing runs on the operation's source once the re-verify has returned a blocked
-    // read, so Cancel is out of use by the time the banner's result is set, which on a
+    // Nothing runs on the operation's source once the check before the batch has ended on a
+    // blocked read, so Cancel is out of use by the time the banner's result is set, which on a
     // Move is before the folder the pre-flight made is removed.
 
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task Cancel_is_out_of_use_once_a_blocked_signal_read_at_the_re_verify_stops_the_batch(bool deleting)
+    public async Task Cancel_is_out_of_use_once_a_blocked_signal_read_by_the_check_before_the_batch_stops_the_batch(bool deleting)
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -2587,9 +2551,7 @@ public class MainViewModelTests : IDisposable
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-signal-blocked-cancel");
 
         var blocked = PendingRebootResult.Block(PendingRebootReason.InstallerInProgressMarker);
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult(
-                (IReadOnlyList<string>)ci[0]!, Array.Empty<string>(), InstallerActivity: blocked));
+        BatchCheckEnds(BatchEndReason.SignalWaitCannotClear, blocked);
 
         var button = new CancelButtonState(vm.Cleanup);
         bool? operating = null, canCancel = null, live = null;
@@ -2613,7 +2575,7 @@ public class MainViewModelTests : IDisposable
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task A_clean_signal_read_at_the_re_verify_goes_on_to_the_batch(bool deleting)
+    public async Task A_clean_signal_read_by_the_check_before_the_batch_goes_on_to_the_batch(bool deleting)
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -2622,18 +2584,17 @@ public class MainViewModelTests : IDisposable
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>()));
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-signal-clean");
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>(),
-                InstallerActivity: PendingRebootResult.Clean));
+        BatchCheckStands(files => new ReverifyResult(files, Array.Empty<string>(),
+            InstallerActivity: PendingRebootResult.Clean));
 
         if (deleting) await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
         else await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
@@ -2641,198 +2602,13 @@ public class MainViewModelTests : IDisposable
         Assert.False(vm.Scan.HasPendingReboot);
         if (deleting)
             await _deleteService.Received(1).DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         else
             await _moveService.Received(1).MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
-    }
-
-    // The pair below covers the one case in which Check() throws rather than
-    // answering: a read of Windows Installer's in-progress file that failed in a
-    // way it has no reading for. At the click that throw arrives before anything
-    // has been touched, so each command ends in its own failure dialog, acts on
-    // nothing, and is available again afterwards.
-
-    [Fact]
-    public async Task MoveAllAsync_reboot_gate_throwing_at_action_time_shows_the_move_failed_dialog_and_moves_nothing()
-    {
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        _rebootService.Check().Returns(
-            _ => PendingRebootResult.Clean,
-            _ => throw new IOException("boom"));
-        _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        var dest = Path.Combine(Path.GetTempPath(), "ic-test-reboot-gate-throws");
-        vm.Cleanup.MoveDestination = dest;
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        _dialogService.Received(1).ShowWarning(
-            Arg.Is<string>(s => s.Contains(nameof(IOException))), Strings.Error_MoveFailedTitle);
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
-        await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
-        Assert.False(vm.Completion.IsComplete);
-        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
-        // The folder the pre-flight made is removed, as on every other arm that
-        // stops before the batch, and both commands come back for the next click.
-        Assert.False(_fileSystem.Directory.Exists(dest));
-        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
-        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
-    }
-
-    [Fact]
-    public async Task DeleteAllAsync_reboot_gate_throwing_at_action_time_shows_the_delete_failed_dialog_and_deletes_nothing()
-    {
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        _rebootService.Check().Returns(
-            _ => PendingRebootResult.Clean,
-            _ => throw new IOException("boom"));
-        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        _dialogService.Received(1).ShowWarning(
-            Arg.Is<string>(s => s.Contains(nameof(IOException))), Strings.Error_DeleteFailedTitle);
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
-        await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
-        Assert.False(vm.Completion.IsComplete);
-        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
-        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
-        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
-    }
-
-    [Fact]
-    public async Task MoveAllAsync_installer_busy_result_paints_the_banner_and_reports_no_completion()
-    {
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        // Clean at the scan and at the act-time gate; a Windows Installer
-        // transaction then grabs the mutex in the residual race, so the service
-        // returns InstallerBusy and the re-run gate reports the held mutex.
-        _rebootService.Check().Returns(
-            PendingRebootResult.Clean,
-            PendingRebootResult.Clean,
-            PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
-        _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-busy");
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        // The banner paints and nothing is reported as completed.
-        Assert.True(vm.Scan.HasPendingReboot);
-        Assert.False(vm.Completion.IsComplete);
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task MoveAllAsync_lock_refused_result_shows_the_dialog_and_paints_the_banner()
-    {
-        // The third of the three lock answers, and it takes something from each of
-        // the other two. A dialog, because the click is owed an answer naming what
-        // did not happen to the files, and then the gate, because the gate has a
-        // reason for a refused lock and a banner of its own for it. Clean at the
-        // scan and at the act-time gate, so the refusal the service meets began
-        // after that gate, which is the only way this arm is reached.
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        _rebootService.Check().Returns(
-            PendingRebootResult.Clean,
-            PendingRebootResult.Clean,
-            PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexAccessRefused));
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
-                InstallerLockAccessRefused: true));
-        _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-lock-refused");
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        _dialogService.Received(1).ShowWarning(
-            Strings.Error_MoveInstallerLockAccessRefused,
-            Strings.Error_MoveInstallerLockUnavailableTitle);
-        // Three: the scan, the act-time gate, and the re-check this arm runs.
-        _rebootService.Received(3).Check();
-        Assert.True(vm.Scan.HasPendingReboot);
-        Assert.Equal(Strings.Body_PendingReboot_MsiExecuteMutexAccessRefused, vm.Scan.PendingRebootBannerText);
-        Assert.False(vm.Completion.IsComplete);
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task MoveAllAsync_lock_unavailable_result_shows_the_dialog_and_leaves_the_gate_alone()
-    {
-        // The twin of the installer-busy test above, and of the delete path's own
-        // pair, which is why this is a second flag rather than a second cause
-        // behind the first. Busy re-runs the pending-reboot gate, which meets the
-        // held mutex and paints its banner. This one must NOT, because the gate
-        // has no account of the condition: its probe reads the same failure as not
-        // held, so a re-check comes back clean and leaves the user refused with no
-        // reason on screen. The dialog carries it instead, and the title is pinned
-        // as well as the body because the Move copy is a separate pair from the
-        // Delete copy and either could be wired to the other's.
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
-                InstallerLockUnavailable: true));
-        _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-lock-unavailable");
-
-        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
-
-        _dialogService.Received(1).ShowWarning(
-            Strings.Error_MoveInstallerLockUnavailable,
-            Strings.Error_MoveInstallerLockUnavailableTitle);
-        // Twice and no more: once for the scan, once for the act-time gate. A
-        // third would be the busy arm's re-check, which this arm must not run.
-        _rebootService.Received(2).Check();
-        Assert.False(vm.Scan.HasPendingReboot);
-        Assert.False(vm.Completion.IsComplete);
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -2848,13 +2624,12 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         // A program needs b.msi again since the scan, so the re-verify drops it.
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
+        BatchCheckStands(_ => new ReverifyResult(
                 new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\c.msi" },
                 new[] { @"C:\Windows\Installer\b.msi" },
                 new HeldBackReasons(Reclaimed: 1)));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
@@ -2867,9 +2642,9 @@ public class MainViewModelTests : IDisposable
 
         // The service acts on only the two survivors, never the dropped one.
         await _moveService.Received(1).MoveFilesAsync(
-            Arg.Is<IEnumerable<string>>(paths =>
-                paths != null && paths.Count() == 2 && !paths.Contains(@"C:\Windows\Installer\b.msi")),
-            Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Is<StandingCheck>(check =>
+                check != null && check.Files.Count == 2 && !check.Files.Contains(@"C:\Windows\Installer\b.msi")),
+            Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         Assert.NotEqual(string.Empty, vm.Completion.Skipped);
         Assert.Contains("1", vm.Completion.Skipped);
@@ -2903,12 +2678,11 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci =>
-            {
-                samples.DuringReverify = vm.Cleanup.IsOperationProgressIndeterminate;
-                return new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>());
-            });
+        BatchCheckStands(files =>
+        {
+            samples.DuringReverify = vm.Cleanup.IsOperationProgressIndeterminate;
+            return new ReverifyResult(files, Array.Empty<string>());
+        });
         return samples;
     }
 
@@ -2918,11 +2692,11 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         var samples = SampleTheBarThroughTheReverify(vm);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(ci =>
             {
-                samples.Batch(vm, (IProgress<OperationProgress>?)ci[3]);
+                samples.Batch(vm, ci.Arg<IProgress<OperationProgress>>());
                 return new MoveResult(1, Array.Empty<FileOperationError>());
             });
         _confirmationService.ConfirmMove(
@@ -2944,11 +2718,11 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         var samples = SampleTheBarThroughTheReverify(vm);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(ci =>
             {
-                samples.Batch(vm, (IProgress<OperationProgress>?)ci[2]);
+                samples.Batch(vm, ci.Arg<IProgress<OperationProgress>>());
                 return new DeleteResult(1, Array.Empty<FileOperationError>());
             });
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -2968,8 +2742,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
+        BatchCheckThrows(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -2980,7 +2753,7 @@ public class MainViewModelTests : IDisposable
 
         // Never act on an un-verified batch: the move service is not called.
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         // The failure surfaces through the scan error ladder, not a completion.
         _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_StoppedTitle);
@@ -2993,8 +2766,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
+        BatchCheckThrows(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -3003,7 +2775,7 @@ public class MainViewModelTests : IDisposable
 
         // Never act on an un-verified batch: the delete service is not called.
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         // The same rung and the same heading as a Move that stops here.
         _dialogService.Received(1).ShowError(
@@ -3024,8 +2796,7 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
+        BatchCheckStands(_ => new ReverifyResult(
                 Array.Empty<string>(),
                 new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msi" },
                 new HeldBackReasons(Reclaimed: 2)));
@@ -3038,7 +2809,7 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("2", vm.Completion.Summary);
@@ -3059,8 +2830,7 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
+        BatchCheckStands(_ => new ReverifyResult(
                 Array.Empty<string>(),
                 new[] { @"C:\Windows\Installer\a.msp" },
                 new HeldBackReasons(RecordsUnreadable: 1)));
@@ -3073,7 +2843,7 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.Equal(
             string.Format(Strings.Completion_HeldBack_Singular, 1),
@@ -3091,13 +2861,12 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
+        BatchCheckStands(_ => new ReverifyResult(
                 new[] { @"C:\Windows\Installer\b.msi" },
                 new[] { @"C:\Windows\Installer\a.msp" },
                 new HeldBackReasons(Reclaimed: 1)));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
@@ -3124,13 +2893,12 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
+        BatchCheckStands(_ => new ReverifyResult(
                 new[] { @"C:\Windows\Installer\x.msi" },
                 new[] { @"C:\Windows\Installer\y.msi" },
                 new HeldBackReasons(Reclaimed: 1)));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -3140,23 +2908,21 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.Received(1).DeleteFilesAsync(
-            Arg.Is<IEnumerable<string>>(paths =>
-                paths != null && paths.Count() == 1 && paths.Contains(@"C:\Windows\Installer\x.msi")), Arg.Any<UnderLeaseClaims>(),
+            Arg.Is<StandingCheck>(check =>
+                check != null && check.Files.Count == 1 && check.Files.Contains(@"C:\Windows\Installer\x.msi")),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("1", vm.Completion.Skipped);
     }
 
-    // The two below pin the wire between the pre-act re-verify and the action
-    // services. Each half is covered elsewhere and neither covers the join:
-    // RemovableReverifierTests pins that the re-verify produces the claims, and
-    // each service's own tests pin that it hands what it was given to the
-    // under-lease re-read untouched. The claim a service is never given is the
-    // one it can never re-ask about, and it would be silently absent: an empty
-    // list is the ordinary case, since a true orphan carries no claim.
+    // The two below pin the wire between the check before the batch and the action
+    // services. Each half is covered elsewhere and neither covers the join: the batch
+    // check's own tests pin what it makes, and each service's own tests pin what it
+    // does with the check it is handed. A service handed some other check would act on a
+    // watch and a file list the window never saw, and nothing else would say so.
 
     [Fact]
-    public async Task MoveAllAsync_hands_the_re_verifys_claims_to_the_service()
+    public async Task MoveAllAsync_hands_the_check_before_the_batch_to_the_service()
     {
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
@@ -3165,36 +2931,28 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        var claims = new[] { Claim(@"C:\Windows\Installer\a.msp") };
-        // The sibling half is the wire D7 added, and a wire that is not asserted is
-        // a wire that can quietly come loose.
-        var siblings = new[] { Claim(@"C:\Windows\Installer\a.msp"), Claim(@"C:\Windows\Installer\sibling.msp") };
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
-                new[] { @"C:\Windows\Installer\a.msp" }, Array.Empty<string>(),
-                SurvivingPatchClaims: claims,
-                SiblingPatchClaims: siblings));
+        var made = StandingChecks.Stood(new ReverifyResult(
+            new[] { @"C:\Windows\Installer\a.msp" }, Array.Empty<string>()));
+        BatchCheckAnswers(_ => Task.FromResult(made));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-claims-move");
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-check-wire-move");
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         await _moveService.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Is<UnderLeaseClaims>(c =>
-                c.Batch.SequenceEqual(claims)
-                && c.Siblings.SequenceEqual(siblings)),
+            Arg.Is<StandingCheck>(check => ReferenceEquals(check, made.Stood)), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task DeleteAllAsync_hands_the_re_verifys_claims_to_the_service()
+    public async Task DeleteAllAsync_hands_the_check_before_the_batch_to_the_service()
     {
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
@@ -3203,18 +2961,11 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        var claims = new[] { Claim(@"C:\Windows\Installer\x.msp") };
-        // The sibling half is the wire D7 added, and a wire that is not asserted is
-        // a wire that can quietly come loose: the batch would then be re-checked
-        // against the narrower question with nothing to say so.
-        var siblings = new[] { Claim(@"C:\Windows\Installer\x.msp"), Claim(@"C:\Windows\Installer\sibling.msp") };
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
-                new[] { @"C:\Windows\Installer\x.msp" }, Array.Empty<string>(),
-                SurvivingPatchClaims: claims,
-                SiblingPatchClaims: siblings));
+        var made = StandingChecks.Stood(new ReverifyResult(
+            new[] { @"C:\Windows\Installer\x.msp" }, Array.Empty<string>()));
+        BatchCheckAnswers(_ => Task.FromResult(made));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -3224,9 +2975,7 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.Received(1).DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Is<UnderLeaseClaims>(c =>
-                c.Batch.SequenceEqual(claims)
-                && c.Siblings.SequenceEqual(siblings)),
+            Arg.Is<StandingCheck>(check => ReferenceEquals(check, made.Stood)),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -3234,8 +2983,8 @@ public class MainViewModelTests : IDisposable
     // with the paths an action service hands BACK. The production of both signals
     // was tested and the consumption of neither, and three defects landed inside
     // that gap. Every one of these stages a result with HeldBack non-empty, which
-    // is the shape a batch takes when the re-read under the installer mutex found
-    // a claim had moved.
+    // is the shape a batch takes when a check made in the middle of it found a file
+    // claimed again.
 
     [Fact]
     public async Task DeleteAllAsync_a_path_held_back_leaves_the_batchs_account_of_itself()
@@ -3253,7 +3002,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\c.msp" },
@@ -3292,11 +3041,11 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
@@ -3350,7 +3099,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
@@ -3392,7 +3141,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
@@ -3430,7 +3179,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true,
                 HeldBack: new[] { @"C:\Windows\Installer\c.msp" },
@@ -3472,7 +3221,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped",
@@ -3519,7 +3268,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
@@ -3558,7 +3307,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
@@ -3596,7 +3345,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
@@ -3615,9 +3364,9 @@ public class MainViewModelTests : IDisposable
     public async Task DeleteAllAsync_a_hold_back_the_records_could_not_read_reaches_the_screen()
     {
         // The tallies are added across the two halves of the check, because either
-        // can fail to read a record. Here the pre-act re-verify was healthy and the
-        // under-lease re-read was not, so the file is kept back by the second half
-        // alone and the screen has to account for it.
+        // can fail to read a record. Here the check before the batch was healthy and a
+        // check made in the middle of the batch was not, so the file is kept back by the
+        // second half alone and the screen has to account for it.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -3627,7 +3376,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
@@ -3646,9 +3395,9 @@ public class MainViewModelTests : IDisposable
     [Fact]
     public async Task DeleteAllAsync_a_batch_held_back_two_ways_counts_both_in_one_line()
     {
-        // The state neither half of the check can describe on its own: the pre-act
-        // re-verify kept one file back and the under-lease re-read kept a DIFFERENT
-        // one back. Two files, two causes, ONE line, and the number on it is two.
+        // The state neither half of the check can describe on its own: the check before
+        // the batch kept one file back and a check made in the middle of the batch kept
+        // a DIFFERENT one back. Two files, two causes, ONE line, and the number on it is two.
         // The regression this now catches is a fold that loses a side, which would
         // print "1 file held back" over a batch that held back two and leave the
         // overlay's own arithmetic wrong.
@@ -3661,13 +3410,12 @@ public class MainViewModelTests : IDisposable
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(new ReverifyResult(
+        BatchCheckStands(_ => new ReverifyResult(
                 new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msp" },
                 new[] { @"C:\Windows\Installer\c.msp" },
                 new HeldBackReasons(Reclaimed: 1)));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
@@ -3692,11 +3440,10 @@ public class MainViewModelTests : IDisposable
     [Fact]
     public async Task DeleteAllAsync_a_record_that_changed_is_counted_like_any_other_hold_back()
     {
-        // The cause that once had no sentence because it had no outcome: the
-        // under-lease re-read found the records no longer hold the registration the
-        // claim named, and the file was released to the delete instead of kept. It
-        // is kept now, and it reaches the same count as every other cause; the
-        // per-cause tally survives in the result log for anyone asking which.
+        // A check made in the middle of the batch found the records no longer hold the
+        // registration the claim named, so the file is kept back. It reaches the same
+        // count as every other cause; the per-cause tally survives in the result log
+        // for anyone asking which.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -3706,7 +3453,7 @@ public class MainViewModelTests : IDisposable
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
@@ -3722,38 +3469,105 @@ public class MainViewModelTests : IDisposable
             vm.Completion.Skipped);
     }
 
-    [Fact]
-    public async Task DeleteAllAsync_lock_refused_result_shows_the_dialog_and_paints_the_banner()
+    // A batch that ends for a reason of its own, which the check before it reports
+    // with no check standing and a service reports on the result it hands back. Each
+    // scans five files and runs one Move or one Delete.
+
+    private async Task<MainViewModel> ScannedForABatchAsync(string folderName)
     {
-        // The delete path's copy of the Move test above: the dialog for the click,
-        // then the gate, which has a banner for a refused lock. The pair is kept
-        // because the two sentences and the two titles are separate keys and
-        // either could be wired to the other's.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        _rebootService.Check().Returns(
-            PendingRebootResult.Clean,
-            PendingRebootResult.Clean,
-            PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexAccessRefused));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
-                InstallerLockAccessRefused: true));
+            .Returns(ScanResultWithOrphans(5));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-
         await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), folderName);
+        return vm;
+    }
 
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+    /// <summary>Makes the service of <paramref name="deleting"/>'s kind hand back <paramref name="done"/> files done and <paramref name="ended"/>.</summary>
+    private void TheServiceEndsTheBatch(bool deleting, int done, BatchEnd ended)
+    {
+        if (deleting)
+            _deleteService.DeleteFilesAsync(
+                    Arg.Any<StandingCheck>(),
+                    Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                .Returns(new DeleteResult(done, Array.Empty<FileOperationError>(), Ended: ended));
+        else
+            _moveService.MoveFilesAsync(
+                    Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                    Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                .Returns(new MoveResult(done, Array.Empty<FileOperationError>(), Ended: ended));
+    }
+
+    private static string StoppedTitle(bool deleting) =>
+        deleting ? Strings.Error_DeleteStoppedTitle : Strings.Error_MoveStoppedTitle;
+
+    private async Task AssertNoServiceWasHandedABatch()
+    {
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<StandingCheck>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_check_that_ended_because_the_records_kept_changing_shows_its_dialog_and_calls_no_service(
+        bool deleting)
+    {
+        var vm = await ScannedForABatchAsync("ic-test-records-kept-changing");
+        BatchCheckEnds(BatchEndReason.RecordsKeptChanging);
+
+        await RunBatch(vm, deleting);
 
         _dialogService.Received(1).ShowWarning(
-            Strings.Error_InstallerLockAccessRefused, Strings.Error_InstallerLockUnavailableTitle);
-        // Three: the scan, the act-time gate, and the re-check this arm runs.
-        _rebootService.Received(3).Check();
-        Assert.True(vm.Scan.HasPendingReboot);
-        Assert.Equal(Strings.Body_PendingReboot_MsiExecuteMutexAccessRefused, vm.Scan.PendingRebootBannerText);
+            Strings.Error_BatchEnded_RecordsKeptChanging, StoppedTitle(deleting));
+        await AssertNoServiceWasHandedABatch();
         Assert.False(vm.Completion.IsComplete);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_check_that_ended_because_the_watch_was_unavailable_shows_its_dialog_and_calls_no_service(
+        bool deleting)
+    {
+        var vm = await ScannedForABatchAsync("ic-test-watch-unavailable");
+        BatchCheckEnds(BatchEndReason.WatchUnavailable);
+
+        await RunBatch(vm, deleting);
+
+        _dialogService.Received(1).ShowWarning(
+            Strings.Error_BatchEnded_WatchUnavailable, StoppedTitle(deleting));
+        await AssertNoServiceWasHandedABatch();
+        Assert.False(vm.Completion.IsComplete);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_batch_that_ended_part_way_shows_its_reason_then_a_card_carrying_the_same_sentence(
+        bool deleting)
+    {
+        var vm = await ScannedForABatchAsync("ic-test-batch-ended-part-way");
+        TheServiceEndsTheBatch(deleting, done: 2, new BatchEnd(BatchEndReason.RecordsKeptChanging));
+        bool? cardUpAtTheDialog = null;
+        _dialogService.When(d => d.ShowWarning(Strings.Error_BatchEnded_RecordsKeptChanging, Arg.Any<string>()))
+            .Do(_ => cardUpAtTheDialog = vm.Completion.IsComplete);
+
+        await RunBatch(vm, deleting);
+
+        _dialogService.Received(1).ShowWarning(
+            Strings.Error_BatchEnded_RecordsKeptChanging, StoppedTitle(deleting));
+        // The dialog goes up before the card is revealed.
+        Assert.False(cardUpAtTheDialog);
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(Strings.Error_BatchEnded_RecordsKeptChanging, vm.Completion.Restore);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
     }
@@ -3761,91 +3575,100 @@ public class MainViewModelTests : IDisposable
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task DeleteAllAsync_a_gate_re_check_that_throws_after_a_lock_refusal_shows_the_failure_dialog_without_a_rescan(
-        bool accessRefused)
+    public async Task A_batch_that_ended_on_a_blocked_signal_read_paints_the_banner_and_shows_its_sentence(
+        bool deleting)
     {
-        // The two arms that re-run the gate after the service refused at the lock.
-        // The re-check throws, as the gate does when a read of Windows Installer's
-        // in-progress file fails in a way none of its readings names. The service
-        // touched nothing, so the counts on screen still describe the folder: the
-        // window shows the failure dialog and does not rescan. A refused lock has
-        // its own dialog first, and the failure dialog follows it.
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        var checks = 0;
-        _rebootService.Check().Returns(_ => ++checks <= 2
-            ? PendingRebootResult.Clean
-            : throw new IOException("marker unreadable"));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
-                InstallerBusy: !accessRefused, InstallerLockAccessRefused: accessRefused));
-        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+        var vm = await ScannedForABatchAsync("ic-test-batch-ended-on-a-signal");
+        TheServiceEndsTheBatch(deleting, done: 1, new BatchEnd(
+            BatchEndReason.SignalWaitCannotClear,
+            PendingRebootResult.Block(PendingRebootReason.PendingRenameInCache, "x")));
 
-        await vm.Scan.ScanWithProgressAsync(null);
+        await RunBatch(vm, deleting);
 
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        _rebootService.Received(3).Check();
-        _dialogService.Received(accessRefused ? 2 : 1).ShowWarning(Arg.Any<string>(), Arg.Any<string>());
-        _dialogService.Received(1).ShowWarning(
-            Arg.Is<string>(s => s.Contains(nameof(IOException))), Strings.Error_DeleteFailedTitle);
-        if (accessRefused)
-        {
-            Received.InOrder(() =>
-            {
-                _dialogService.ShowWarning(
-                    Strings.Error_InstallerLockAccessRefused, Strings.Error_InstallerLockUnavailableTitle);
-                _dialogService.ShowWarning(Arg.Any<string>(), Strings.Error_DeleteFailedTitle);
-            });
-        }
-        await _scanService.Received(1).ScanAsync(
-            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
-        Assert.Equal(2, vm.Scan.OrphanedFileCount);
-        Assert.False(vm.Completion.IsComplete);
-        Assert.False(vm.Cleanup.IsOperating);
-        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
-        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
-        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.True(vm.Scan.HasPendingReboot);
+        var banner = vm.Scan.PendingRebootBannerText;
+        Assert.NotEqual(string.Empty, banner);
+        _dialogService.Received(1).ShowWarning(banner, StoppedTitle(deleting));
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(banner, vm.Completion.Restore);
     }
 
-    [Fact]
-    public async Task DeleteAllAsync_lock_unavailable_result_shows_the_dialog_and_leaves_the_gate_alone()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task A_batch_that_ended_before_its_first_file_because_the_in_hand_folder_was_unavailable_shows_its_dialog_and_no_card(
+        bool deleting)
     {
-        // The twin of the installer-busy test above, and the difference between
-        // them is the whole reason this is a second flag rather than a second
-        // cause behind the first. Busy re-runs the pending-reboot gate, which now
-        // meets the held mutex and paints its banner. This one must NOT, because
-        // the gate has no account of the condition: its probe reads the same
-        // failure as not held, so a re-check comes back clean and leaves the user
-        // refused with no reason on screen. The dialog carries it instead, and the
-        // title is pinned as well as the body because this arm borrowed the crash
-        // arm's title once.
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(2));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
-                InstallerLockUnavailable: true));
-        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+        var vm = await ScannedForABatchAsync("ic-test-in-hand-folder-unavailable");
+        TheServiceEndsTheBatch(deleting, done: 0, new BatchEnd(BatchEndReason.InHandFolderUnavailable, WindowsError: 5));
 
-        await vm.Scan.ScanWithProgressAsync(null);
-
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+        await RunBatch(vm, deleting);
 
         _dialogService.Received(1).ShowWarning(
-            Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
-        // Twice and no more: once for the scan, once for the act-time gate. A
-        // third would be the busy arm's re-check, which this arm must not run.
-        _rebootService.Received(2).Check();
-        Assert.False(vm.Scan.HasPendingReboot);
+            string.Format(Strings.Error_BatchEnded_InHandFolderUnavailable, InHandFolders.FolderName, 5),
+            StoppedTitle(deleting));
         Assert.False(vm.Completion.IsComplete);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// A wait takes the heading and the next file gives it back. The line for a wait on an
+    /// installation under way says only that the app is waiting; the line for the two
+    /// reads an interrupted installation leaves behind says that a restart may be needed.
+    /// </summary>
+    [Theory]
+    [InlineData(false, PendingRebootReason.InstallerServiceRunning, false)]
+    [InlineData(true, PendingRebootReason.InstallerServiceRunning, false)]
+    [InlineData(false, PendingRebootReason.MsiExecuteMutexHeld, false)]
+    [InlineData(false, PendingRebootReason.InstallerInProgress, true)]
+    [InlineData(true, PendingRebootReason.InstallerInProgress, true)]
+    [InlineData(false, PendingRebootReason.InstallerInProgressMarker, true)]
+    public async Task A_wait_in_the_middle_of_the_batch_takes_the_heading_and_the_next_file_gives_it_back(
+        bool deleting, PendingRebootReason waitingOn, bool unfinishedInstallation)
+    {
+        var vm = await ScannedForABatchAsync("ic-test-heading-mid-batch");
+        var verb = deleting ? Strings.Status_Deleting : Strings.Status_Moving;
+        var waitingLine = unfinishedInstallation
+            ? Strings.Status_WaitingForUnfinishedInstall
+            : Strings.Status_WaitingForInstaller;
+        string? whileWaiting = null, afterTheNextFile = null;
+
+        void Drive(IProgress<OperationProgress> progress)
+        {
+            progress.Report(new OperationProgress(2, 5, string.Empty, new BatchCheckProgress(
+                BatchCheckStage.Waiting, PendingRebootResult.Block(waitingOn))));
+            SpinWait.SpinUntil(() => vm.Cleanup.OperationProgress == waitingLine, TimeSpan.FromSeconds(5));
+            whileWaiting = vm.Cleanup.OperationProgress;
+            progress.Report(new OperationProgress(3, 5, "c.msi"));
+            SpinWait.SpinUntil(() => vm.Cleanup.OperationProgress == verb, TimeSpan.FromSeconds(5));
+            afterTheNextFile = vm.Cleanup.OperationProgress;
+        }
+
+        if (deleting)
+            _deleteService.DeleteFilesAsync(
+                    Arg.Any<StandingCheck>(),
+                    Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                .Returns(ci =>
+                {
+                    Drive(ci.Arg<IProgress<OperationProgress>>());
+                    return new DeleteResult(5, Array.Empty<FileOperationError>());
+                });
+        else
+            _moveService.MoveFilesAsync(
+                    Arg.Any<StandingCheck>(), Arg.Any<string>(),
+                    Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                .Returns(ci =>
+                {
+                    Drive(ci.Arg<IProgress<OperationProgress>>());
+                    return new MoveResult(5, Array.Empty<FileOperationError>());
+                });
+
+        await RunBatch(vm, deleting);
+
+        Assert.NotEqual(Strings.Status_WaitingForInstaller, Strings.Status_WaitingForUnfinishedInstall);
+        Assert.Equal(waitingLine, whileWaiting);
+        Assert.Equal(verb, afterTheNextFile);
     }
 
     [Fact]
@@ -4419,9 +4242,8 @@ public class MainViewModelTests : IDisposable
         var vm = FirstRunAllClear();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(1), EmptyScanResult());
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult(
-                Array.Empty<string>(), (IReadOnlyList<string>)ci[0]!, new HeldBackReasons(Reclaimed: 1)));
+        BatchCheckStands(files => new ReverifyResult(
+            Array.Empty<string>(), files, new HeldBackReasons(Reclaimed: 1)));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -4452,10 +4274,10 @@ public class MainViewModelTests : IDisposable
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         Task<MoveResult> MoveCall() => _moveService.MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Task<DeleteResult> DeleteCall() => _deleteService.DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         switch (run)
         {
@@ -4509,7 +4331,7 @@ public class MainViewModelTests : IDisposable
             .Returns(ScanResultWithOrphans(2), EmptyScanResult());
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), Cancelled: true));
 
@@ -4947,13 +4769,12 @@ public class MainViewModelTests : IDisposable
         _confirmationService.DidNotReceive().ConfirmDelete(Arg.Any<int>(), Arg.Any<string>());
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
-        await _reverifier.DidNotReceive().ReverifyAsync(
-            Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>());
+        AssertNoBatchCheckWasMade();
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         await _moveService.DidNotReceive().MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         _windowService.DidNotReceive().ShowOrphanedDetails(Arg.Any<OrphanedFilesViewModel>());
         _windowService.DidNotReceive().ShowRegisteredDetails(Arg.Any<RegisteredFilesViewModel>());
@@ -4967,7 +4788,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         ScansReturn(AnOfferAndAFileLeftAlone());
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(3, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -5009,7 +4830,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         ScansReturn(AnOfferAndAFileLeftAlone());
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(3, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
@@ -5021,7 +4842,7 @@ public class MainViewModelTests : IDisposable
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         await _moveService.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<StandingCheck>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         AssertNoListAndNothingActsOnOne(vm);
@@ -5035,7 +4856,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         ScansReturn(AnOfferAndAFileLeftAlone());
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -5137,7 +4958,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         ScansReturn(AnOfferAndAFileLeftAlone());
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -5174,7 +4995,7 @@ public class MainViewModelTests : IDisposable
         var vm = CreateViewModel();
         ScansReturn(AnOfferAndAFileLeftAlone());
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);

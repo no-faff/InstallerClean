@@ -88,6 +88,9 @@ public static class CoreComposition
         // the scan's own steps on every file no record names, which is why it
         // takes the scan's readers.
         services.AddSingleton<IRemovableReverifier, RemovableReverifier>();
+        // Makes that check stand: a watch on the records armed before it, the signals
+        // read at both its ends, and the wait for a busy Windows Installer.
+        services.AddSingleton<IBatchCheck, BatchCheck>();
 
         // File-mutating services.
         services.AddSingleton<IFileSystemScanService, FileSystemScanService>();

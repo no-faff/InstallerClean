@@ -21,14 +21,14 @@ internal static class CliRunFixtures
     internal static IServiceProvider Services(
         IFileSystemScanService scan,
         IPendingRebootService? reboot = null,
-        IRemovableReverifier? reverifier = null,
+        IBatchCheck? batchCheck = null,
         IDeleteFilesService? delete = null,
         IMoveFilesService? move = null,
         IFirstRunMark? firstRunMark = null) =>
         new ServiceCollection()
             .AddSingleton(scan)
             .AddSingleton(reboot ?? Substitute.For<IPendingRebootService>())
-            .AddSingleton(reverifier ?? Substitute.For<IRemovableReverifier>())
+            .AddSingleton(batchCheck ?? BatchCheckStandingOverEverything())
             .AddSingleton(delete ?? Substitute.For<IDeleteFilesService>())
             .AddSingleton(move ?? Substitute.For<IMoveFilesService>())
             .AddSingleton(Substitute.For<ISettingsService>())
@@ -36,8 +36,43 @@ internal static class CliRunFixtures
             .BuildServiceProvider();
 
     /// <summary>
+    /// A batch check that stands over exactly the paths it is given and drops none, a new
+    /// result for each call.
+    /// </summary>
+    internal static IBatchCheck BatchCheckStandingOverEverything() =>
+        BatchCheckStanding(files => new ReverifyResult(files, Array.Empty<string>()));
+
+    /// <summary>
+    /// A batch check that stands with whatever <paramref name="result"/> makes of the paths
+    /// it is given, a new result for each call.
+    /// </summary>
+    internal static IBatchCheck BatchCheckStanding(Func<IReadOnlyList<string>, ReverifyResult> result)
+    {
+        var batchCheck = Substitute.For<IBatchCheck>();
+        batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(),
+                Arg.Any<IProgress<BatchCheckProgress>>(), Arg.Any<CancellationToken>())
+            .Returns(ci => Task.FromResult(StandingChecks.Stood(result(ci.Arg<IReadOnlyList<string>>()))));
+        return batchCheck;
+    }
+
+    /// <summary>A batch check that stands with <paramref name="result"/>, a new copy of it for each call.</summary>
+    internal static IBatchCheck BatchCheckStanding(ReverifyResult result) => BatchCheckStanding(_ => result);
+
+    /// <summary>A batch check that ends with no check standing, for the reason and signals given.</summary>
+    internal static IBatchCheck BatchCheckEnding(BatchEndReason reason, PendingRebootResult? signals = null)
+    {
+        var batchCheck = Substitute.For<IBatchCheck>();
+        batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(),
+                Arg.Any<IProgress<BatchCheckProgress>>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Task.FromResult(StandingChecks.Ended(reason, signals)));
+        return batchCheck;
+    }
+
+    /// <summary>
     /// The services the work method resolves for a scan returning <paramref name="scan"/>: a
-    /// clean pending-reboot gate and a re-verify keeping every file the scan offers, so the
+    /// clean read of Windows Installer's signals and a batch check standing over every file the scan offers, so the
     /// run reaches whichever service the test scripted.
     /// </summary>
     internal static IServiceProvider ServicesKeepingTheOffer(
@@ -48,10 +83,8 @@ internal static class CliRunFixtures
             .Returns(scan);
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(scan.RemovableFiles.Select(f => f.FullPath).ToList(), Array.Empty<string>()));
-        return Services(scanService, reboot: reboot, reverifier: reverifier, delete: delete, move: move);
+        return Services(scanService, reboot: reboot, batchCheck: BatchCheckStandingOverEverything(),
+            delete: delete, move: move);
     }
 
     /// <summary>

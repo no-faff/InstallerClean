@@ -38,17 +38,21 @@ public class DialogHeadingBodyTests
         { Strings.Error_DestinationWriteFailedTitle, Strings.Error_WriteDestination_NoLog },
         { Strings.Error_DestinationWriteFailedTitle, Strings.Error_CannotWriteFolder },
         { Strings.Error_DestinationWriteFailedTitle, Strings.Error_FolderWillNotGiveFilesBack },
-        { Strings.Error_MoveInstallerLockUnavailableTitle, Strings.Error_MoveInstallerLockUnavailable },
-        { Strings.Error_InstallerLockUnavailableTitle, Strings.Error_InstallerLockUnavailable },
-        // The same two headings over the access-refused bodies: one refusal, two
-        // causes, and the heading is true of both because the outcome is the same.
-        { Strings.Error_MoveInstallerLockUnavailableTitle, Strings.Error_MoveInstallerLockAccessRefused },
-        { Strings.Error_InstallerLockUnavailableTitle, Strings.Error_InstallerLockAccessRefused },
         { Strings.Error_MoveFailedTitle, Strings.Status_MoveFailed },
         { Strings.Error_MoveFailedTitle, Strings.Status_MoveFailed_NoLog },
         { Strings.Error_DeleteFailedTitle, Strings.Status_DeleteFailed },
         { Strings.Error_DeleteFailedTitle, Strings.Status_DeleteFailed_NoLog },
         { Strings.Error_MoveStoppedTitle, Strings.Error_DestinationChangedMidBatch },
+        // A batch that ended before its last file, or before its first, carries one
+        // of these bodies under the heading for the action that ran. A read of
+        // Windows Installer's signals that ended one carries the banner's own
+        // sentence, which the banner's tests hold.
+        { Strings.Error_MoveStoppedTitle, Strings.Error_BatchEnded_RecordsKeptChanging },
+        { Strings.Error_MoveStoppedTitle, Strings.Error_BatchEnded_WatchUnavailable },
+        { Strings.Error_MoveStoppedTitle, Strings.Error_BatchEnded_InHandFolderUnavailable },
+        { Strings.Error_DeleteStoppedTitle, Strings.Error_BatchEnded_RecordsKeptChanging },
+        { Strings.Error_DeleteStoppedTitle, Strings.Error_BatchEnded_WatchUnavailable },
+        { Strings.Error_DeleteStoppedTitle, Strings.Error_BatchEnded_InHandFolderUnavailable },
         { Strings.Error_SettingNotSavedTitle, Strings.Error_SettingNotSavedBody },
         { Strings.Startup_AlreadyRunningTitle, Strings.Startup_AlreadyRunningBody },
         { Strings.Startup_AdminRightsNeededTitle, Strings.Startup_AdminRightsNeededBody },

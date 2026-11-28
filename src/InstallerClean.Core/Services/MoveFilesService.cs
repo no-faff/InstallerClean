@@ -1,621 +1,737 @@
+using System.ComponentModel;
 using System.IO.Abstractions;
 using InstallerClean.Helpers;
+using InstallerClean.Interop.Native;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
 
+/// <summary>
+/// Default <see cref="IMoveFilesService"/>. Once the destination has passed its gates, the
+/// service asks Windows whether a rename from the app's own folder inside the Installer
+/// folder reaches it (<see cref="IInHandBatch.ReachOf"/>), and every file of the batch
+/// then goes one of two ways.
+///
+/// WHERE A RENAME REACHES THE DESTINATION, each file goes through four steps:
+/// 1. Look (<see cref="BatchRun.Look"/>). Not clean: settle, and start the file again if
+///    it is still in the batch.
+/// 2. Ask the host's question, open the file so that nothing else can open it, and rename
+///    it out of its place into the batch's folder.
+/// 3. Look again. Not clean: put the file back, settle, and start it again.
+/// 4. Rename the file through its handle to its name in the destination, replacing
+///    nothing.
+///
+/// WHERE IT DOES NOT, THE COPY COMES FIRST, with the original untouched in its place:
+/// 1. Look, so that a copy is not made for nothing.
+/// 2. Open the original to read, sharing reading, and copy it into the destination under
+///    a temporary name. Finish the copy: write it through to the device, check its length,
+///    carry the attributes and the last-write time across, and give it its real name.
+/// 3. Look. Not clean: settle, keeping the copy.
+/// 4. Ask the host's question, open the original so that nothing else can open it, check
+///    that it is still the file the copy was made from, and rename it into the batch's
+///    folder.
+/// 5. Look again. Not clean: put the original back and settle, keeping the copy.
+/// 6. Delete the original through its handle.
+/// A copy whose original then stays where it was, for any reason, is removed.
+///
+/// THE FILE LEAVES ITS PLACE BEFORE THE LAST LOOK ON BOTH WAYS, for the reason
+/// <see cref="DeleteFilesService"/> gives, and nothing that can block runs between the
+/// open that shares nothing and the finish. That is why the copy is made, finished and
+/// named before the original is taken: a destination that is slow or fails is never what
+/// keeps a file out of its place.
+/// </summary>
 public sealed class MoveFilesService : IMoveFilesService
 {
+    /// <summary>How much of a file one read of a copy takes. A cancel is honoured between reads.</summary>
+    private const int CopyBufferBytes = 1 << 20;
+
+    /// <summary>
+    /// How many times running a file's copy may be made again because the file changed
+    /// between the copy and the take, before the file is filed as an IO failure.
+    /// </summary>
+    private const int CopyAttemptsLimit = 3;
+
     private readonly IFileSystem _fs;
-    private readonly IMutexProbe _mutex;
+    private readonly IPendingRebootService _signals;
+    private readonly IBatchCheck _batchCheck;
+    private readonly IInHandFolder _hand;
     private readonly IDestinationGuard _destinationGuard;
 
     /// <summary>
-    /// Re-reads the batch's patch claims once the installer mutex is held. Held
-    /// by the service rather than called by the caller because the hold is taken
-    /// here: a check that has to happen inside it cannot live outside it.
-    /// </summary>
-    private readonly IRemovableReverifier _reverifier;
-
-    /// <summary>
-    /// Test-only real-folder override for the containment guard's cache root
-    /// (null in production, which uses the real <c>C:\Windows\Installer</c>).
-    /// Lets the real-filesystem integration tests treat a %TEMP% sandbox as the
-    /// cache so a legitimately in-bounds source is not refused, without ever
-    /// touching the real cache. Mirrors <c>FileSystemScanService</c>'s own
-    /// installer-folder override.
+    /// Test-only real-folder override for the Installer folder (null in production, which
+    /// uses the real <c>C:\Windows\Installer</c>). Lets the real-filesystem integration
+    /// tests treat a %TEMP% sandbox as the cache so a legitimately in-bounds source is not
+    /// refused, without ever touching the real cache. Mirrors
+    /// <c>FileSystemScanService</c>'s own installer-folder override.
     /// </summary>
     private readonly string? _installerFolderOverride;
 
-    /// <summary>
-    /// Constructor. The DI container injects the registered
-    /// <see cref="IFileSystem"/>, <see cref="IMutexProbe"/> and
-    /// <see cref="IDestinationGuard"/> singletons in production; the mutex is taken
-    /// for the batch, and a batch refuses where a live install owns it.
-    /// </summary>
-    public MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex, IRemovableReverifier reverifier,
+    public MoveFilesService(
+        IFileSystem fileSystem, IPendingRebootService signals, IBatchCheck batchCheck, IInHandFolder hand,
         IDestinationGuard destinationGuard)
-        : this(fileSystem, mutex, null, reverifier, destinationGuard) { }
-
-    /// <summary>Test constructor. No mutex hold and no under-lease re-read (both are exercised via the seam constructor below).</summary>
-    internal MoveFilesService(IFileSystem fileSystem)
-        : this(fileSystem, NullMutexProbe.Instance, null, NullRemovableReverifier.Instance) { }
-
-    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder; no mutex hold.</summary>
-    internal MoveFilesService(IFileSystem fileSystem, string? installerFolderOverride)
-        : this(fileSystem, NullMutexProbe.Instance, installerFolderOverride, NullRemovableReverifier.Instance) { }
+        : this(fileSystem, signals, batchCheck, hand, destinationGuard, null) { }
 
     /// <summary>
-    /// Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.
-    /// The destination guard defaults to the by-path one, which the test seam's substituted filesystem needs;
-    /// the production constructor above passes the one it is given.
+    /// Test constructor for a substituted filesystem: signals that read clean, a hand and
+    /// a destination guard that act by path through <paramref name="fileSystem"/>, and no
+    /// later check, so a test whose look is not clean fails loudly unless it passes a
+    /// batch check of its own through the seam constructor.
     /// </summary>
-    internal MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride,
-        IRemovableReverifier? reverifier = null, IDestinationGuard? destinationGuard = null)
+    internal MoveFilesService(IFileSystem fileSystem)
+        : this(fileSystem, null, null, null, null, null) { }
+
+    /// <summary>Seam constructor: each piece a test passes as null takes the quiet form the constructor above names.</summary>
+    internal MoveFilesService(
+        IFileSystem fileSystem, IPendingRebootService? signals, IBatchCheck? batchCheck, IInHandFolder? hand,
+        IDestinationGuard? destinationGuard, string? installerFolderOverride)
     {
         _fs = fileSystem;
-        _mutex = mutex;
-        _installerFolderOverride = installerFolderOverride;
-        _reverifier = reverifier ?? NullRemovableReverifier.Instance;
+        _signals = signals ?? QuietInstallerSignals.Instance;
+        _batchCheck = batchCheck ?? NoLaterBatchCheck.Instance;
+        _hand = hand ?? new ByPathInHandFolder(fileSystem);
         _destinationGuard = destinationGuard ?? new ByPathDestinationGuard(fileSystem);
+        _installerFolderOverride = installerFolderOverride;
     }
 
     /// <summary>The destination guard this service acts through, so a test can confirm the production path holds the handle one.</summary>
     internal IDestinationGuard DestinationGuard => _destinationGuard;
 
+    /// <summary>The hand this service takes files through, so a test can confirm the production path holds the handle one.</summary>
+    internal IInHandFolder Hand => _hand;
+
     public Task<MoveResult> MoveFilesAsync(
-        IEnumerable<string> filePaths,
+        StandingCheck check,
         string destinationFolder,
-        UnderLeaseClaims underLeaseClaims,
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default,
-        Func<string, bool>? mayAct = null)
+        Func<string, bool>? mayAct = null) =>
+        Task.Run(() => RunAsync(check, destinationFolder, progress, cancellationToken, mayAct), cancellationToken);
+
+    private async Task<MoveResult> RunAsync(
+        StandingCheck check, string destinationFolder, IProgress<OperationProgress>? progress,
+        CancellationToken cancellationToken, Func<string, bool>? mayAct)
     {
-        return Task.Run(() =>
+        // The check is this call's from here, whichever way the call ends.
+        using var owned = check;
+
+        // The destination gates are inside the worker, not on the
+        // caller's thread, which for the GUI is the dispatcher: two of them
+        // resolve a user-chosen path through CreateFile and
+        // GetFinalPathNameByHandle, twice over, and for a share path open its
+        // nearest folder through the share again to read its file id, and a
+        // mapped drive or a UNC share that has gone away stalls each one for
+        // the SMB timeout with the operating overlay already up and its
+        // Cancel button unpressable.
+
+        // Reject relative destinations: FullPaths.GetFullPath would otherwise
+        // resolve them against the process CWD, and the CLI host's CWD
+        // is whatever the caller invoked it from.
+        if (!PathText.IsPathFullyQualified(destinationFolder))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
+
+        // A destination where a moved file's path would reach MAX_PATH is refused before
+        // any check below reads the destination, so a refusal touches nothing.
+        if (MoveDestinationLength.TooLong(destinationFolder, check.Files))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_PathTooLong, destinationFolder));
+
+        // Destination must not resolve inside C:\Windows\Installer;
+        // ResolveFinalPath expands junctions so a reparse-point
+        // destination cannot smuggle the batch into the cache folder.
+        if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+
+        // System-folder gate at the service boundary, not just at the
+        // call sites: %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%
+        // and %ProgramData% sit on the Win32 DLL search path and the
+        // SxS resolution path. Anchoring the check inside MoveFilesAsync
+        // means any future caller (integration test, new automation
+        // entry point) that bypasses the GUI/CLI validation block still
+        // hits the same gate.
+        if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
+
+        // The create makes the destination and every missing folder above it.
+        // A create that fails, or a write test that fails, comes before the
+        // first file moves, so the folders this call made are removed again,
+        // each only while it is empty. The gates between the two leave them: a
+        // destination that has just been shown to resolve into the installer
+        // cache or a system folder is not a place to remove a folder from.
+        var createdFolders = new List<string>();
+        try
         {
-            // The destination gates are inside the worker, not on the
-            // caller's thread, which for the GUI is the dispatcher: two of them
-            // resolve a user-chosen path through CreateFile and
-            // GetFinalPathNameByHandle, twice over, and for a share path open its
-            // nearest folder through the share again to read its file id, and a
-            // mapped drive or a UNC share that has gone away stalls each one for
-            // the SMB timeout with the operating overlay already up and its
-            // Cancel button unpressable.
+            CreateDestinationFolder(destinationFolder, createdFolders);
+        }
+        catch
+        {
+            CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders);
+            throw;
+        }
 
-            // Reject relative destinations: FullPaths.GetFullPath would otherwise
-            // resolve them against the process CWD, and the CLI host's CWD
-            // is whatever the caller invoked it from.
-            if (!PathText.IsPathFullyQualified(destinationFolder))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
+        // Re-check after the create closes the TOCTOU window
+        // where a junction could be swapped into the leaf.
+        if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+        if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
 
-            // A destination where a moved file's path would reach MAX_PATH is refused before
-            // any check below reads the destination, so a refusal touches nothing. The batch
-            // measured is the one handed in, the files the re-read under the lease leaves
-            // being among them.
-            var batch = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
-            if (MoveDestinationLength.TooLong(destinationFolder, batch))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_PathTooLong, destinationFolder));
+        // Capture the canonical destination once, then re-resolve
+        // per iteration. The per-iteration check catches a junction
+        // swap on the destination's parent folder during the loop:
+        // without it, a relabelled leaf folder would silently route
+        // the remaining files into the junction's target. None of
+        // these checks is redundant on another: each answers for a
+        // moment the others cannot see, the pre-loop pair for the
+        // CreateDirectory point, the pair below for the value this
+        // capture hands the loop, and the loop-body check for every
+        // per-file move.
+        // The bool is kept, not discarded: it says whether the kernel really
+        // expanded this path, and the per-iteration check below compares
+        // proof states as well as strings.
+        var canonicalProven = InstallerCacheHelpers.TryResolveFinalPath(
+            destinationFolder, out var canonicalRaw);
+        var canonicalDestination = canonicalRaw.TrimEnd(Path.DirectorySeparatorChar);
 
-            // Destination must not resolve inside C:\Windows\Installer;
-            // ResolveFinalPath expands junctions so a reparse-point
-            // destination cannot smuggle the batch into the cache folder.
-            if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+        // THE GATES ABOVE APPROVED A DIFFERENT RESOLUTION FROM THE ONE THE
+        // LOOP DEFENDS. They ask about destinationFolder and resolve it
+        // themselves; the line above resolves the same string again, later,
+        // and it is that answer the per-file comparison then holds everything
+        // to. Without the pair below, a junction swapped in between the two
+        // would leave the loop faithfully defending a baseline no gate had
+        // seen, and ClassifyAbort could not notice: it asks whether the
+        // resolution moved and whether proof was lost, and containment is
+        // neither of those questions.
+        //
+        // Asked of the captured value rather than of the path a third time,
+        // which is the point: the question has to be about the string being
+        // defended. A capture whose resolution degraded answers "not inside"
+        // and is let through, exactly as the gates above treat one, because
+        // refusing on a path that merely could not be expanded would strand a
+        // user with nowhere to move to.
+        //
+        // The per-file check in the loop is what holds each later resolution of
+        // destinationFolder to this capture.
+        if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination, canonicalProven))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+        if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination, canonicalProven))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
 
-            // System-folder gate at the service boundary, not just at the
-            // call sites: %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%
-            // and %ProgramData% sit on the Win32 DLL search path and the
-            // SxS resolution path. Anchoring the check inside MoveFilesAsync
-            // means any future caller (integration test, new automation
-            // entry point) that bypasses the GUI/CLI validation block still
-            // hits the same gate.
-            if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
+        try
+        {
+            ProbeDestinationWriteable(destinationFolder);
+        }
+        catch
+        {
+            CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders);
+            throw;
+        }
 
-            // Take Global\_MSIExecute for the batch on this worker thread. The
-            // acquire refuses the batch where a live install owns it, and for the
-            // batch the object reads owned to anything that opens it. Acquired
-            // here (not on the dispatcher) and released in the
-            // finally on the SAME thread (Win32 owner-thread rule); the body is
-            // synchronous, so no await hops threads between acquire and release.
-            //
-            // No way of missing the hold proceeds, and they are reported separately
-            // because the caller owes the user a different sentence for each. Held
-            // by a live transaction => the pending-reboot gate the caller re-runs
-            // meets the same mutex and paints its banner, which says an install is
-            // in progress, which it is. Refused because the object's security would
-            // not let us open it => the app was not allowed to look, and the caller
-            // says so in those words. The gate's probe asks for the rights this
-            // acquire asks for, so a refusal standing when the gate ran stopped the
-            // batch there, and one met here began after it. Refused any other way
-            // with nothing shown to be holding it => the gate has no account of it,
-            // its probe reading such a failure as not held, so this result carries
-            // its own sentence. The acquire is the last sample of the lock, taken
-            // after the host-side gate's re-check.
-            //
-            // Both refusals stop the batch rather than letting it run on unheld.
-            // Neither says nothing is installing; each says this process could not
-            // find out, because failing to open or take the object is silence
-            // about who owns it. The object is not permanent, so being refused it
-            // is evidence rather than noise: Windows Installer creates _MSIExecute
-            // when an install begins and drops it when the install ends, so
-            // between installs the create-or-open path below makes the object and
-            // succeeds, and the only object that can refuse this process is one
-            // something else has already made. A move refuses on the same answers
-            // as a delete because a moved file is as absent from the cache as a
-            // deleted one; only the recovery differs, and the recovery a move
-            // leaves the user is not a reason to act without the hold.
-            //
-            // What the hold costs, so nobody widens it and nobody removes it:
-            // _MSIExecute is the machine-wide Windows Installer serialisation
-            // mutex, which Windows Installer's client takes at the start of every
-            // install, so for as long as this batch runs that client cannot take
-            // it. A single file operation that hangs (a stalled network
-            // destination) therefore holds the machine's installer lock until this
-            // process is killed.
-            //
-            // One more thing inside the hold is unbounded by the batch, and it
-            // is not a file operation at all. The progress callback below hands
-            // control to a consumer that can run for as long as it likes, which
-            // is the property the destination re-check is ordered around; in the
-            // command-line host that consumer is a console write, and a console
-            // in QuickEdit selection blocks one until the operator clears it.
-            //
-            // Delete acquires immediately, having nothing to set up first, and
-            // this cannot: everything between here and the loop is the
-            // destination work, and running it before the acquire would create
-            // the destination folder even on the runs the checks below refuse. A
-            // refusal that has touched nothing is worth more than a shorter hold,
-            // and both refusals below are reached before any of that work.
-            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var outcome);
-            if (lease is null && outcome == MutexAcquireOutcome.HeldByAnother)
-                return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
-            if (lease is null && outcome == MutexAcquireOutcome.AccessRefused)
+        // An empty batch has made and tested its destination, as any batch does, and has
+        // nothing more to do.
+        if (check.Files.Count == 0)
+            return new MoveResult(0, Array.Empty<FileOperationError>());
+
+        MoveResult result;
+        MoveAbortReason? abortReason;
+        try
+        {
+            (result, abortReason) = await RunBatchAsync(
+                check, destinationFolder, canonicalDestination, canonicalProven, progress, cancellationToken,
+                mayAct).ConfigureAwait(false);
+        }
+        catch (LocalisedAccessException)
+        {
+            // The destination would not open for the batch, which comes before the
+            // first file, as a write test that fails does.
+            CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders);
+            throw;
+        }
+
+        // A guard that trips mid-flight throws, like this service's other guards and
+        // unlike a cancel, which is the user's own choice. What it must not do is take
+        // the batch's account of itself with it, which is why the result is built first
+        // and travels on the exception.
+        //
+        // The message names the folder the CALLER asked for, because it asks the reader
+        // to go and check that folder and that is the one they configured. Where the
+        // files ended up is a different question and travels separately.
+        if (abortReason is { } abort)
+            throw new MoveAbortedException(
+                string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder),
+                result, DisplayPath(canonicalDestination), abort);
+
+        // A batch that moved nothing leaves no folder behind: the folders this call made
+        // are removed again, each only while it is empty, once the batch has let go of
+        // the destination. A batch the destination guard stopped leaves them, a path that
+        // has just been shown to lead somewhere else not being a place to remove a
+        // folder from.
+        if (result.MovedCount == 0)
+            CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Runs the batch against a destination that has passed its gates, and returns its
+    /// result with the condition the destination guard stopped it on, where it did.
+    /// Everything the batch holds open is closed by the time this returns.
+    /// </summary>
+    private async Task<(MoveResult Result, MoveAbortReason? AbortReason)> RunBatchAsync(
+        StandingCheck check, string destinationFolder, string canonicalDestination, bool canonicalProven,
+        IProgress<OperationProgress>? progress, CancellationToken cancellationToken, Func<string, bool>? mayAct)
+    {
+        // Resolved once for the batch; the containment guard resolves each SOURCE per
+        // file against it (see InstallerCacheRoot). Separate from canonicalDestination
+        // above, which guards the other end and is re-resolved per file for a reason of
+        // its own.
+        var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
+        using var run = new BatchRun(
+            check, _batchCheck, _signals, _fs, cacheRoot, "Move", progress, cancellationToken);
+
+        // The batch's folder is made after the destination has taken its write test and
+        // before any file is opened, and removed when the batch ends where it is empty.
+        // Declared after the run so that it is disposed of first; every held file is
+        // closed before either.
+        using var hand = _hand.OpenBatch(
+            _installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder, out var handError);
+        if (hand is null)
+        {
+            CrashLog.TryWrite(new IOException(
+                "Move ended before its first file: the app's own folder inside the Installer folder could not be made.",
+                new Win32Exception(handError)));
+            return (new MoveResult(0, Array.Empty<FileOperationError>(),
+                Ended: new BatchEnd(BatchEndReason.InHandFolderUnavailable, WindowsError: handError)), null);
+        }
+
+        // The destination is opened once and stays open for the batch. Every file sent
+        // into it, every copy made in it and every copy removed from it is reached
+        // relative to this handle, so each lands in the folder that passed the gates
+        // above and not in one put in its place under the same name.
+        using var destination = _destinationGuard.Open(destinationFolder, out var openError);
+        if (destination is null)
+            throw new LocalisedAccessException(
+                string.Format(Strings.Error_CannotWriteFolder, destinationFolder),
+                new Win32Exception(openError));
+
+        // Asked once, before any file is taken, because a file that cannot go by a rename
+        // has to be copied before it is taken. An answer that was not established is
+        // treated as another volume: a copy made first is right on any volume.
+        var byCopy = hand.ReachOf(destination, out _) != RenameReach.SameVolume;
+
+        var batch = new Batch(
+            this, run, hand, destination, destinationFolder, canonicalDestination, canonicalProven, byCopy,
+            cancellationToken, mayAct);
+        var cancelled = false;
+        try
+        {
+            // The batch's files, and then one more try for each that was in use.
+            foreach (var lastTry in new[] { false, true })
             {
-                // The object is there and its security refused us the rights to
-                // open it, so ownership was never sampled. Reported apart from the
-                // arm below because the user is owed a different sentence: this one
-                // is a setting somebody can go and look at, and saying the lock was
-                // busy would name a cause nothing here established.
-                //
-                // Recorded as well as refused, on the same terms as the arm below.
-                Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Move refused: access to the Windows Installer mutex was denied, so whether an installation was in progress could not be established."));
-                return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerLockAccessRefused: true);
-            }
-            if (lease is null)
-            {
-                // Every other non-fatal way the acquire can fail, with nothing
-                // shown to be holding the object. Recorded as well as refused: the
-                // refusal is what the user is told, and the crash log is the only
-                // place the machine's own condition is written down. Once per
-                // batch, so it costs nothing at any file count.
-                //
-                // An outcome added to MutexAcquireOutcome later arrives here and
-                // is refused with this general wording, which is the safe
-                // direction. One that owes the user something else takes an arm of
-                // its own above, which is the failure worth having.
-                Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Move refused: the Windows Installer mutex could not be acquired and nothing could be shown to be holding it."));
-                return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);
-            }
-
-            try
-            {
-            // The act-time re-read, before any destination work so a batch it
-            // empties leaves no folder behind. It is HERE and not at the caller
-            // because the caller's full re-verify runs before this method is
-            // entered, so this is the read of the records made closest to the
-            // first file operation: a verdict that moved while that enumeration
-            // ran is read again here.
-            //
-            // Only the claims, never the enumeration. An enumeration is kept
-            // outside the machine-wide installer lock, so what this re-reads is the
-            // set of claims the caller's enumeration built, each asked about by
-            // key.
-            //
-            // Synchronous on the acquiring thread by necessity, not by taste: the
-            // lease is released by the thread that took it, so nothing between the
-            // acquire and the release may await.
-            var recheck = _reverifier.RecheckUnderLease(underLeaseClaims);
-            var heldBack = recheck.HeldBack;
-            var pathList = batch;
-            if (heldBack.Count > 0)
-            {
-                var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
-                pathList = pathList.Where(p => !reclaimed.Contains(p)).ToList();
-                // Only when the re-read is what emptied it. An empty batch handed
-                // in still falls through and creates the destination, which the
-                // command line relies on not changing.
-                if (pathList.Count == 0)
-                    return new MoveResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
-            }
-
-            // The create makes the destination and every missing folder above it.
-            // A create that fails, or a write test that fails, comes before the
-            // first file moves, so the folders this call made are removed again,
-            // each only while it is empty. The gates between the two leave them: a
-            // destination that has just been shown to resolve into the installer
-            // cache or a system folder is not a place to remove a folder from.
-            var createdFolders = new List<string>();
-            try
-            {
-                CreateDestinationFolder(destinationFolder, createdFolders);
-            }
-            catch
-            {
-                CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders);
-                throw;
-            }
-
-            // Re-check after the create closes the TOCTOU window
-            // where a junction could be swapped into the leaf.
-            if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
-            if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
-
-            // Capture the canonical destination once, then re-resolve
-            // per iteration. The per-iteration check catches a junction
-            // swap on the destination's parent folder during the loop:
-            // without it, a relabelled leaf folder would silently route
-            // the remaining files into the junction's target. None of
-            // these checks is redundant on another: each answers for a
-            // moment the others cannot see, the pre-loop pair for the
-            // CreateDirectory point, the pair below for the value this
-            // capture hands the loop, and the loop-body check for every
-            // per-file move.
-            // The bool is kept, not discarded: it says whether the kernel really
-            // expanded this path, and the per-iteration check below compares
-            // proof states as well as strings.
-            var canonicalProven = InstallerCacheHelpers.TryResolveFinalPath(
-                destinationFolder, out var canonicalRaw);
-            var canonicalDestination = canonicalRaw.TrimEnd(Path.DirectorySeparatorChar);
-
-            // THE GATES ABOVE APPROVED A DIFFERENT RESOLUTION FROM THE ONE THE
-            // LOOP DEFENDS. They ask about destinationFolder and resolve it
-            // themselves; the line above resolves the same string again, later,
-            // and it is that answer the per-file comparison then holds everything
-            // to. Without the pair below, a junction swapped in between the two
-            // would leave the loop faithfully defending a baseline no gate had
-            // seen, and ClassifyAbort could not notice: it asks whether the
-            // resolution moved and whether proof was lost, and containment is
-            // neither of those questions.
-            //
-            // Asked of the captured value rather than of the path a third time,
-            // which is the point: the question has to be about the string being
-            // defended. A capture whose resolution degraded answers "not inside"
-            // and is let through, exactly as the gates above treat one, because
-            // refusing on a path that merely could not be expanded would strand a
-            // user with nowhere to move to.
-            //
-            // The per-file check in the loop is what holds each later resolution of
-            // destinationFolder to this capture.
-            if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination, canonicalProven))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
-            if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination, canonicalProven))
-                throw new LocalisedInvalidOperationException(
-                    string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
-
-            try
-            {
-                ProbeDestinationWriteable(destinationFolder);
-            }
-            catch
-            {
-                CreatedFolders.RemoveWhileEmpty(_fs, _destinationGuard, createdFolders);
-                throw;
-            }
-
-            int moved = 0;
-            var errors = new List<FileOperationError>();
-            var failureLog = new PerItemFailureLog("Move",
-                "The per-file list is on the completion screen.");
-            // Resolved once for the batch; the guard resolves each SOURCE per
-            // file against it (see InstallerCacheRoot). Separate from
-            // canonicalDestination above, which guards the other end and is
-            // re-resolved per iteration for a reason of its own.
-            var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
-            var total = pathList.Count;
-            bool cancelled = false;
-            MoveAbortReason? abortReason = null;
-
-            try
-            {
-            for (int i = 0; i < total; i++)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var sourcePath = pathList[i];
-
-                try
+                if (lastTry) await run.BeforeTheSecondTryAsync().ConfigureAwait(false);
+                var pass = lastTry ? run.InUse.ToList() : run.Files;
+                foreach (var sourcePath in pass)
                 {
-                    // The host's question is asked before the report as well as last before
-                    // the act, so a batch the host has stopped covering stops before this
-                    // file's progress line rather than after it.
-                    if (mayAct is not null && !mayAct(sourcePath)) throw new BatchStoppedException();
-                    // First statement inside the per-file try after that question,
-                    // and both halves of that are load-bearing. Before the skip
-                    // checks below, so the visible counter advances on missing and
-                    // reparse-point entries instead of jumping over them. Inside the
-                    // try, so a progress consumer that throws costs this one file a
-                    // categorised error instead of costing the batch: from outside
-                    // the try the throw leaves the loop altogether, and the files
-                    // already moved are never reported, the result and the failure
-                    // log's closing entry both being built past the loop.
-                    progress?.Report(new OperationProgress(i + 1, total, PathText.GetFileName(sourcePath)));
-                    // Asked again after the report, which can block on the console: a cancel
-                    // that came meanwhile leaves this file alone. The catch-all below lets the
-                    // batch's own cancellation through (BatchStop.EndsBatch).
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    // Re-resolve and compare to the canonical capture, AFTER the
-                    // report and not before it. The report hands control to a
-                    // consumer that can run for as long as it likes, and the check
-                    // comes after it so that no consumer runs between the check and
-                    // the move. Every statement between here and File.Move is this
-                    // service's own, and on the way to the move four of them go to
-                    // the filesystem: the source Exists test, the reparse read, the
-                    // containment guard's real-filesystem resolution and the
-                    // destination Exists test. KEEP THE DESTINATION TEST A SINGLE
-                    // PROBE: a collision loop would put as many round trips between
-                    // the check and the move as it is bounded at.
-                    //
-                    // THAT LIST OF FOUR IS A SPECIFICATION AND NOT A DESCRIPTION. A
-                    // fifth filesystem call added between here and File.Move puts
-                    // more between the check and the move, and nothing in the build
-                    // will say so. Anything going in there belongs in this list, or
-                    // it belongs above this check.
-                    //
-                    // WHAT IS COMPARED: whether the kernel expanded the path, and the
-                    // path it expanded to, each against the capture. A re-resolve
-                    // that has lost the proof the capture had stops the batch
-                    // whatever its string says, because a resolve that DEGRADED is
-                    // exactly a path whose reparse points went UNexpanded, which is
-                    // the one thing a containment check exists to see through. A
-                    // re-resolve naming a different folder stops it too. See
-                    // ClassifyAbort, which keeps the two apart.
-                    var resolveProven = InstallerCacheHelpers.TryResolveFinalPath(
-                        destinationFolder, out var currentRaw);
-                    var currentResolved = currentRaw.TrimEnd(Path.DirectorySeparatorChar);
-                    abortReason = ClassifyAbort(
-                        canonicalProven, resolveProven, canonicalDestination, currentResolved);
-                    if (abortReason is not null)
-                    {
-                        // The only record of which condition fired. Nothing else
-                        // keeps it: the host is told the batch stopped and where
-                        // the files are, which is the same either way, so a report
-                        // of one of these could not otherwise be told from a report
-                        // of the other. Once per batch, on a path that ends it.
-                        // The noun agrees with the batch size, which is what
-                        // "of {total}" governs, rather than with the count moved.
-                        var batchFiles = total == 1 ? "file" : "files";
-                        Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                            $"Move stopped by the destination guard ({abortReason}). Captured "
-                            + $"'{canonicalDestination}' (resolved: {canonicalProven}); re-resolved "
-                            + $"'{currentResolved}' (resolved: {resolveProven}). "
-                            + $"{moved} of {total} {batchFiles} had moved."));
-
-                        // Out through the one exit below rather than straight up the
-                        // stack: everything a stopped batch still owes is under this
-                        // frame. Files have already left C:\Windows\Installer, so the
-                        // count, the size and the line telling the user they can put
-                        // them back are all real, and the failure log's closing entry
-                        // accounts for what the batch's failures cost it.
-                        //
-                        // A break is not an exception, so sitting inside the per-file
-                        // try does not hand the abort to the catch arms below: it
-                        // leaves the loop exactly as it did from outside them.
-                        break;
-                    }
-
-                    if (!_fs.File.Exists(sourcePath))
-                    {
-                        errors.Add(new MissingSourceFile(sourcePath));
-                        continue;
-                    }
-
-                    // Refuse a source that's a symlink or junction: a move can
-                    // read through one and copy the target's contents into the
-                    // user's folder, the receipts being with the check itself
-                    // (StorageHelpers.CheckReparsePoint). Real-FS check
-                    // (MockFileSystem cannot bypass). An attribute read that
-                    // FAILS refuses the file too, but as UnknownError:
-                    // SourceIsReparsePoint tells the
-                    // user the file is a symlink, and a read that could not be
-                    // made has not shown that.
-                    var reparse = Helpers.StorageHelpers.CheckReparsePoint(sourcePath, out var reparseError);
-                    if (reparse == Helpers.StorageHelpers.ReparseCheck.Yes)
-                    {
-                        errors.Add(new SourceIsReparsePoint(sourcePath));
-                        continue;
-                    }
-                    if (reparse == Helpers.StorageHelpers.ReparseCheck.Unreadable)
-                    {
-                        failureLog.Record(reparseError!);
-                        errors.Add(new UnknownError(sourcePath));
-                        continue;
-                    }
-
-                    // Containment guard at the service boundary, matching the
-                    // IsSystemFolderOrChild anchoring above: never move a source
-                    // that does not resolve to a file directly in
-                    // C:\Windows\Installer. The scan already filters candidates,
-                    // but a corrupt LocalPackage value or a future caller could
-                    // reach here with an out-of-bounds path; this is the choke
-                    // point that refuses it. Reparse is handled just above, so a
-                    // Refused here is an out-of-bounds path and
-                    // CandidateOutsideCache says so; an Unproven one is a path
-                    // that could not be resolved at all, which is the same
-                    // refusal without the same claim.
-                    // Inverted, so the move below is reached only by an answer that
-                    // positively said Safe, and the reason is switched on inside.
-                    // Two positive equality tests naming Refused and Unproven fell
-                    // through to File.Move for anything they did not name, which
-                    // made any RemovalSafety member added later a move out of the
-                    // cache until somebody remembered to come back here. The enum
-                    // grew once already, splitting one refusal into Refused and
-                    // Unproven, so that is a thing that happens rather than a thing
-                    // that might. Matches the Delete path's own guard site.
-                    //
-                    // The default arm files the same UnknownError as Unproven but
-                    // will not borrow its sentence, because a member nobody has
-                    // written yet has not been shown to be a path that could not be
-                    // resolved, and CandidateGuard's contract is that a caller must
-                    // not name a cause it has not shown.
-                    var safety = CandidateGuard.CheckSafeToRemove(sourcePath, cacheRoot);
-                    if (safety != CandidateGuard.RemovalSafety.Safe)
-                    {
-                        switch (safety)
-                        {
-                            case CandidateGuard.RemovalSafety.Refused:
-                                errors.Add(new CandidateOutsideCache(sourcePath));
-                                break;
-                            case CandidateGuard.RemovalSafety.Unproven:
-                                failureLog.Record(new InvalidOperationException(
-                                    $"Move refused: {sourcePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
-                                errors.Add(new UnknownError(sourcePath));
-                                break;
-                            default:
-                                failureLog.Record(new InvalidOperationException(
-                                    $"Move refused: the containment guard answered {safety} for {sourcePath}, which this service has no handling for."));
-                                errors.Add(new UnknownError(sourcePath));
-                                break;
-                        }
-                        continue;
-                    }
-
-                    // A NAME ALREADY IN THE DESTINATION IS REFUSED AND NOT WORKED
-                    // AROUND, and what decides that is a promise the main window
-                    // makes before the move. It tells the reader that putting the
-                    // moved files back into the cache folder restores everything,
-                    // and Windows Installer looks for a cached package by the exact
-                    // path it recorded. A file parked as "thing (1).msi" does not go
-                    // back as "thing.msi", so a suffix appended here would quietly
-                    // make that sentence false for the file it renamed, and nothing
-                    // anywhere would record which file that was.
-                    //
-                    // The promise cannot qualify itself either: it is read before
-                    // any folder is chosen and names no file, so there is nowhere in
-                    // it for a rename to be declared. Refusing the one file keeps the
-                    // promise true for every file that did move, costs the user
-                    // nothing they cannot recover (the file is still in the cache and
-                    // a different folder or an emptied one moves it), and puts the
-                    // refusal on a surface that already exists.
-                    //
-                    // AND IT SITS AFTER THE CONTAINMENT GUARD DELIBERATELY, which
-                    // nothing but the ordering itself records, so it is written down
-                    // here rather than left to be inferred. Moving this cheap Exists
-                    // test above the guard looks tidier and saves a syscall on the
-                    // files that clash, and it changes what the app tells somebody
-                    // about a source that does not resolve inside the cache: such a
-                    // path would be reported as a name clash in the backup folder,
-                    // which is a cause nobody has shown, instead of as the
-                    // out-of-bounds or unresolvable path the guard established it to
-                    // be. A refusal has to name the reason it was refused for, and
-                    // the guard's reason outranks this one wherever both apply.
-                    var fileName = PathText.GetFileName(sourcePath);
-                    var destPath = PathText.Combine(destinationFolder, fileName);
-                    if (_fs.File.Exists(destPath))
-                    {
-                        errors.Add(new DestinationCollision(sourcePath, fileName));
-                        continue;
-                    }
-
-                    // The non-overwriting form, so a file or a link that appears at
-                    // destPath in the window this check leaves open stays as it is
-                    // and the move ends in a per-file error; overwrite=true would
-                    // write over whatever is there. The check above is what makes
-                    // the ordinary collision a stated refusal rather than that
-                    // error; it is not what makes the move safe.
-                    // The host's question is the last thing before the act, after every
-                    // check on the file.
-                    if (mayAct is not null && !mayAct(sourcePath)) throw new BatchStoppedException();
-                    _fs.File.Move(sourcePath, destPath);
-
-                    // A move that returned without throwing has not necessarily
-                    // happened: see ReconcileMove.
-                    var halfMove = ReconcileMove(sourcePath, destPath, failureLog);
-                    if (halfMove is null)
-                        moved++;
-                    else
-                        errors.Add(halfMove);
-                }
-                // A source that goes between the existence check above and the move is
-                // filed as that check files it: the file is no longer there. The arm
-                // takes a not-found only once the source is confirmed gone and nothing
-                // stands under its name in the destination, so a move to another drive
-                // that copied the file before failing is filed below with every other
-                // file error, as is a missing destination folder, which raises
-                // DirectoryNotFoundException.
-                catch (FileNotFoundException) when (
-                    !_fs.File.Exists(sourcePath)
-                    && !_fs.File.Exists(PathText.Combine(destinationFolder, PathText.GetFileName(sourcePath))))
-                {
-                    errors.Add(new MissingSourceFile(sourcePath));
-                }
-                // Framework exceptions carry detail that exists nowhere else once
-                // the category has been filed, so without this a move that failed
-                // for an unforeseen reason leaves no trace at all. A destination
-                // collision does not come through here and is not logged: it is an
-                // ordinary per-file outcome refused in the loop above, and its error
-                // entry already states the whole cause.
-                catch (Exception ex) when (!BatchStop.EndsBatch(ex, cancellationToken))
-                {
-                    failureLog.Record(ex);
-                    errors.Add(Categorise(ex, sourcePath));
+                    var outcome = await batch.MoveOneAsync(sourcePath, lastTry).ConfigureAwait(false);
+                    if (outcome == FileOutcome.Acted) batch.Moved++;
+                    if (outcome == FileOutcome.BatchEnded) goto finished;
                 }
             }
-            }
-            catch (OperationCanceledException)
+        finished:;
+        }
+        catch (OperationCanceledException)
+        {
+            // What moved before the cancel is returned, not thrown away. The cancel
+            // checks, a cancel inside a copy or a settle and the host's mayAct answering
+            // no are the only sources: the per-file catch-all lets only those through
+            // (BatchStop.EndsBatch).
+            cancelled = true;
+        }
+
+        // A batch that stopped before the second try at its in-use files files them now.
+        run.FileWhatIsStillInUse();
+
+        // Outside the cancel catch so a batch the user stopped still accounts for what
+        // its failures cost the log.
+        run.FailureLog.WriteClosingEntry();
+
+        return (new MoveResult(batch.Moved, run.Errors.AsReadOnly(), cancelled,
+            run.HeldBack.ToList().AsReadOnly(), run.HeldBackReasons, run.Ended,
+            run.SourceRootsGivenUp.ToList().AsReadOnly(), run.SourceWaitCount, run.CheckCounts), batch.AbortReason);
+    }
+
+    /// <summary>
+    /// One call's batch: what the steps on each file need, kept for the length of the call
+    /// and no longer.
+    /// </summary>
+    private sealed class Batch(
+        MoveFilesService service, BatchRun run, IInHandBatch hand, DestinationFolder destination,
+        string destinationFolder, string canonicalDestination, bool canonicalProven, bool byCopy,
+        CancellationToken cancellationToken, Func<string, bool>? mayAct)
+    {
+        private byte[]? _copyBuffer;
+
+        /// <summary>How many files have moved.</summary>
+        internal int Moved { get; set; }
+
+        /// <summary>Set where the destination guard stopped the batch, to the condition it stopped on.</summary>
+        internal MoveAbortReason? AbortReason { get; private set; }
+
+        /// <summary>
+        /// Moves one file, and removes its copy from the destination wherever a copy was
+        /// made and the original then stayed: the file was dropped by a settle, was
+        /// refused at the take, could not be deleted, or the batch ended or was cancelled
+        /// first. A file reported as not moved is then one the user has exactly one of.
+        /// </summary>
+        internal async Task<FileOutcome> MoveOneAsync(string sourcePath, bool lastTry)
+        {
+            var copy = new Copy();
+            var outcome = FileOutcome.NotActed;
+            try
             {
-                // Return what moved before the cancel rather than throwing the
-                // tally away. The per-file loop's ThrowIfCancellationRequested and the
-                // host's mayAct answering no are the only sources, and the inner
-                // per-file catch-all lets only those through (BatchStop.EndsBatch), so
-                // only a real cancel or stop lands here; a genuine
-                // mid-batch error (a destination junction swap) still propagates.
-                cancelled = true;
-            }
-
-            // Outside the cancel catch so a batch the user stopped still
-            // accounts for what its failures cost the log.
-            failureLog.WriteClosingEntry();
-
-            var result = new MoveResult(moved, errors.AsReadOnly(), cancelled, HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
-
-            // A guard that trips mid-flight throws, like this service's other
-            // guards and unlike a cancel, which is the user's own choice. What it
-            // must not do is take the batch's account of itself with it, which is
-            // why the result is built first and travels on the exception.
-            //
-            // The message names the folder the CALLER asked for, because it asks
-            // the reader to go and check that folder and that is the one they
-            // configured. Where the files ended up is a different question and
-            // travels separately.
-            if (abortReason is not null)
-                throw new MoveAbortedException(
-                    string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder),
-                    result, DisplayPath(canonicalDestination), abortReason.Value);
-
-            return result;
+                outcome = await TryMoveAsync(sourcePath, lastTry, copy).ConfigureAwait(false);
+                return outcome;
             }
             finally
             {
-                // Release on this same worker thread (Win32 owner-thread rule).
-                // Non-null by the time this try is entered: both ways of failing
-                // to acquire return above, so a batch that reaches here holds the
-                // mutex and a batch that does not never started.
-                lease.Dispose();
+                if (copy.Made && outcome != FileOutcome.Acted) Discard(copy, PathText.GetFileName(sourcePath));
             }
-        }, cancellationToken);
+        }
+
+        private async Task<FileOutcome> TryMoveAsync(string sourcePath, bool lastTry, Copy copy)
+        {
+            var fileName = PathText.GetFileName(sourcePath);
+
+            // Each turn is one try at the file. A settle that keeps the file in the batch
+            // starts it again from the top, so every check on it and on the destination is
+            // made again; a copy already made and finished is kept and not made twice.
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!run.InBatch(sourcePath)) return FileOutcome.NotActed;
+
+                IHeldFile? held = null;
+                try
+                {
+                    // The host's question is asked before the report as well as before the
+                    // take, so a batch the host has stopped covering stops before this
+                    // file's progress line.
+                    if (mayAct is not null && !mayAct(sourcePath)) throw new BatchStoppedException();
+                    // Before the checks below, so the visible counter advances on missing
+                    // and reparse-point entries. Inside the try, so a progress consumer
+                    // that throws costs this one file an error and not the batch.
+                    run.ReportReached(sourcePath);
+                    // Asked again after the report, which can block on the console: a
+                    // cancel that came meanwhile leaves this file alone.
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // Re-resolve the destination and compare it with the capture, AFTER
+                    // the report and not before it: the report hands control to a consumer
+                    // that can run for as long as it likes, and the check comes after it
+                    // so that no consumer runs between the check and the move.
+                    //
+                    // WHAT THE CHECK IS FOR. Each file is sent relative to the handle
+                    // opened on the destination when the batch began, so a folder put in
+                    // the destination's place cannot take a file. What a swap would do is
+                    // leave the path the user chose naming a folder the files are not in.
+                    // The batch stops at the first file that finds the path resolving
+                    // elsewhere, and reports the folder the files are in.
+                    //
+                    // WHAT IS COMPARED: whether the kernel expanded the path, and the path
+                    // it expanded to, each against the capture. A re-resolve that has lost
+                    // the proof the capture had stops the batch whatever its string says,
+                    // because a resolve that DEGRADED is exactly a path whose reparse
+                    // points went UNexpanded, which is the one thing a containment check
+                    // exists to see through. A re-resolve naming a different folder stops
+                    // it too. See ClassifyAbort, which keeps the two apart.
+                    var resolveProven = InstallerCacheHelpers.TryResolveFinalPath(
+                        destinationFolder, out var currentRaw);
+                    var currentResolved = currentRaw.TrimEnd(Path.DirectorySeparatorChar);
+                    if (ClassifyAbort(canonicalProven, resolveProven, canonicalDestination, currentResolved)
+                        is { } abort)
+                    {
+                        AbortReason = abort;
+
+                        // The only record of which condition fired. The host is told the
+                        // batch stopped and where the files are, which is the same either
+                        // way. Once per batch, on a path that ends it. The noun agrees
+                        // with the batch size, which is what "of {total}" governs.
+                        var total = run.Files.Count;
+                        var batchFiles = total == 1 ? "file" : "files";
+                        CrashLog.TryWrite(new InvalidOperationException(
+                            $"Move stopped by the destination guard ({abort}). Captured "
+                            + $"'{canonicalDestination}' (resolved: {canonicalProven}); re-resolved "
+                            + $"'{currentResolved}' (resolved: {resolveProven}). "
+                            + $"{Moved} of {total} {batchFiles} had moved."));
+
+                        // Out through the batch's one exit and not up the stack: files
+                        // have already left C:\Windows\Installer, so the count, the size
+                        // and the line telling the user they can put them back are all
+                        // real, and the failure log's closing entry is still owed.
+                        return FileOutcome.BatchEnded;
+                    }
+
+                    if (!run.PassesSourceChecks(sourcePath)) return FileOutcome.NotActed;
+
+                    if (!copy.Made)
+                    {
+                        // A NAME ALREADY IN THE DESTINATION IS REFUSED AND NOT WORKED
+                        // AROUND, and what decides that is a promise the main window makes
+                        // before the move. It tells the reader that putting the moved
+                        // files back into the cache folder restores everything, and
+                        // Windows Installer looks for a cached package by the exact path
+                        // it recorded. A file parked as "thing (1).msi" does not go back
+                        // as "thing.msi", so a suffix appended here would make that
+                        // sentence false for the file it renamed, with nothing recording
+                        // which file that was. Refusing the one file keeps the promise
+                        // true for every file that did move, and costs the user nothing
+                        // they cannot recover: the file is still in the cache, and a
+                        // different folder or an emptied one moves it.
+                        //
+                        // IT SITS AFTER THE CONTAINMENT GUARD DELIBERATELY. Above the
+                        // guard, a source that does not resolve inside the cache would be
+                        // reported as a name clash in the backup folder, a cause nobody
+                        // has shown, and not as the out-of-bounds or unresolvable path the
+                        // guard established it to be. The guard's reason outranks this one
+                        // wherever both apply.
+                        //
+                        // The rename and the copy's own naming both replace nothing, so a
+                        // file or a link that appears at the name after this test stays as
+                        // it is and the file is refused then. This test is what makes the
+                        // ordinary clash a stated refusal before anything is opened or
+                        // copied.
+                        if (service._fs.File.Exists(PathText.Combine(destinationFolder, fileName)))
+                        {
+                            run.Refuse(new DestinationCollision(sourcePath, fileName));
+                            return FileOutcome.NotActed;
+                        }
+
+                        if (byCopy)
+                        {
+                            // The look before the copy. The copy would do no harm; the
+                            // look spares making one for nothing.
+                            var before = run.Look();
+                            if (before != LookResult.Clean)
+                            {
+                                if (!await run.SettleAsync(before).ConfigureAwait(false))
+                                    return FileOutcome.BatchEnded;
+                                continue;
+                            }
+
+                            if (!MakeCopy(sourcePath, fileName, lastTry, copy)) return FileOutcome.NotActed;
+                        }
+                    }
+
+                    // The look before the take.
+                    var look = run.Look();
+                    if (look != LookResult.Clean)
+                    {
+                        if (!await run.SettleAsync(look).ConfigureAwait(false)) return FileOutcome.BatchEnded;
+                        continue;
+                    }
+
+                    // The host's question is the last thing before the file is opened.
+                    if (mayAct is not null && !mayAct(sourcePath)) throw new BatchStoppedException();
+                    held = run.Hold(hand, sourcePath, lastTry);
+                    if (held is null) return FileOutcome.NotActed;
+
+                    if (byCopy)
+                    {
+                        // The copy was read through one open and the file is taken through
+                        // another. Only a file whose identity, length and last-write time
+                        // are those the copy was made from is the file the copy is of.
+                        if (!held.TryReadStamp(out var now))
+                        {
+                            held.Dispose();
+                            held = null;
+                            run.FailureLog.Record(new IOException(
+                                $"Move: {sourcePath} could not be read again after its copy was made, so the copy was not shown to be of it."));
+                            run.Refuse(new IOFailure(sourcePath));
+                            return FileOutcome.NotActed;
+                        }
+                        if (now != copy.Stamp)
+                        {
+                            held.Dispose();
+                            held = null;
+                            Discard(copy, fileName);
+                            if (copy.Attempts >= CopyAttemptsLimit)
+                            {
+                                run.FailureLog.Record(new IOException(
+                                    $"Move: {sourcePath} changed after each of {copy.Attempts} copies of it was made."));
+                                run.Refuse(new IOFailure(sourcePath));
+                                return FileOutcome.NotActed;
+                            }
+                            continue;
+                        }
+                    }
+
+                    if (!run.TakeOut(held, lastTry))
+                    {
+                        held = null;
+                        return FileOutcome.NotActed;
+                    }
+
+                    // The look with the file out of its place.
+                    look = run.Look();
+                    if (look != LookResult.Clean)
+                    {
+                        var back = run.PutBack(held, hand);
+                        held = null;
+                        if (!await run.SettleAsync(look).ConfigureAwait(false)) return FileOutcome.BatchEnded;
+                        if (!back) return FileOutcome.NotActed;
+                        continue;
+                    }
+
+                    // The finish. By copy, the original is deleted through its handle,
+                    // where a true answer means closing the handle deletes it. By rename,
+                    // the file goes on to its name in the destination. A refusal of either
+                    // puts the file back.
+                    if (byCopy ? held.Delete(out var finishError) : held.MoveInto(destination, fileName, out finishError))
+                    {
+                        held.Dispose();
+                        held = null;
+                        run.Done(sourcePath);
+                        return FileOutcome.Acted;
+                    }
+
+                    var returned = run.PutBack(held, hand);
+                    held = null;
+                    if (!returned) return FileOutcome.NotActed;
+                    if (byCopy)
+                        run.RefuseByWindowsError(sourcePath, finishError, "the delete of the original");
+                    else if (finishError == Kernel32.ERROR_ALREADY_EXISTS)
+                        run.Refuse(new DestinationCollision(sourcePath, fileName));
+                    else
+                        // ERROR_NOT_SAME_DEVICE is filed here with every other refusal. The
+                        // rename is made relative to the destination's open handle, which
+                        // stays on the volume it was opened on, so the answer says nothing
+                        // about where the destination's path now leads.
+                        run.RefuseForDestination(sourcePath, finishError, "the rename into the destination");
+                    return FileOutcome.NotActed;
+                }
+                // Framework exceptions carry detail that exists nowhere else once the
+                // category has been filed, so each is logged.
+                catch (Exception ex) when (!BatchStop.EndsBatch(ex, cancellationToken))
+                {
+                    run.FailureLog.Record(ex);
+                    var returned = held is null || run.PutBack(held, hand);
+                    held = null;
+                    if (returned) run.Refuse(Categorise(ex, sourcePath));
+                    return FileOutcome.NotActed;
+                }
+                finally
+                {
+                    // Every way out with a file in hand ends in a put-back: closing the
+                    // handle alone leaves the file in the batch's folder.
+                    if (held is not null) run.PutBack(held, hand);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copies <paramref name="sourcePath"/> into the destination and finishes the
+        /// copy under its real name. False where no finished copy was made, with the file
+        /// filed, or remembered as in use, and nothing of the copy left in the
+        /// destination. The original is read through a handle that shares reading, which
+        /// Windows Installer's own opens of a cached file succeed beside, and is not
+        /// otherwise touched.
+        /// </summary>
+        private bool MakeCopy(string sourcePath, string fileName, bool lastTry, Copy copy)
+        {
+            copy.Attempts++;
+            using var source = run.OpenToCopy(hand, sourcePath, lastTry);
+            if (source is null) return false;
+
+            var target = service._destinationGuard.CreateCopy(destination, out var createError);
+            if (target is null)
+            {
+                run.RefuseForDestination(sourcePath, createError, "the creation of the copy");
+                return false;
+            }
+
+            // Disposing of a target that did not finish removes its temporary file.
+            using (target)
+            {
+                var buffer = _copyBuffer ??= new byte[CopyBufferBytes];
+                try
+                {
+                    // Whole arrays, each written straight through: the target's stream
+                    // keeps no buffer of its own.
+                    int read;
+                    while ((read = source.Content.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        target.Content.Write(buffer, 0, read);
+                    }
+                }
+                catch (Exception ex) when (!BatchStop.EndsBatch(ex, cancellationToken))
+                {
+                    run.FailureLog.Record(ex);
+                    run.Refuse(Categorise(ex, sourcePath));
+                    return false;
+                }
+
+                // The read handle is closed before the copy takes its real name.
+                var stamp = source.Stamp;
+                var attributes = source.Attributes;
+                source.Dispose();
+
+                switch (target.Finish(fileName, stamp.Length, attributes, stamp.LastWriteTime, out var finishError))
+                {
+                    case CopyFinish.Finished:
+                        copy.Made = true;
+                        copy.Stamp = stamp;
+                        return true;
+                    case CopyFinish.NameTaken:
+                        run.Refuse(new DestinationCollision(sourcePath, fileName));
+                        return false;
+                    case CopyFinish.LengthDiffers:
+                        run.FailureLog.Record(new IOException(
+                            $"Move: the copy of {sourcePath} was not the length of the file, so it was removed."));
+                        run.Refuse(new IOFailure(sourcePath));
+                        return false;
+                    default:
+                        run.RefuseForDestination(sourcePath, finishError, "the finish of the copy");
+                        return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes a finished copy from the destination, relative to the handle the copy
+        /// was created through. A copy that will not go is the one state with nothing to
+        /// say for itself: the error filed for the file says it was not moved, which is
+        /// true, and does not mention the copy. It is recorded.
+        /// </summary>
+        private void Discard(Copy copy, string fileName)
+        {
+            copy.Made = false;
+            if (!service._destinationGuard.TryDiscardCopy(destination, fileName, out var failureCode))
+                run.FailureLog.Record(new InvalidOperationException(
+                    $"A copy of {fileName} could not be removed from {destinationFolder} after its original stayed "
+                    + "where it was, so that file now exists in both places.",
+                    new Win32Exception(failureCode)));
+        }
+    }
+
+    /// <summary>The copy of one file, across the tries a settle makes at that file.</summary>
+    private sealed class Copy
+    {
+        /// <summary>Whether a finished copy stands under the file's name in the destination.</summary>
+        internal bool Made { get; set; }
+
+        /// <summary>The stamp of the file as the copy was read from it.</summary>
+        internal FileStamp Stamp { get; set; }
+
+        /// <summary>How many times the copy has been begun.</summary>
+        internal int Attempts { get; set; }
     }
 
     /// <summary>
@@ -665,133 +781,10 @@ public sealed class MoveFilesService : IMoveFilesService
         resolved.EndsWith(':') ? resolved + Path.DirectorySeparatorChar : resolved;
 
     /// <summary>
-    /// Settles what actually happened to a file <c>File.Move</c> reported as
-    /// moved, and returns null when the file really has gone or the error to
-    /// file when it has not.
-    ///
-    /// A move that returns without throwing is not proof the source is gone. The
-    /// move calls MoveFileEx with MOVEFILE_COPY_ALLOWED, as .NET 10's File.Move
-    /// does (dotnet/runtime, Interop.MoveFileEx.cs), and Win32 documents that flag
-    /// as simulating a cross-volume move with CopyFile plus DeleteFile, then says
-    /// outright: "If the file is successfully copied to a different volume and the
-    /// original file is unable to be deleted, the function succeeds leaving the
-    /// source file intact." A read-only source is exactly that case, DeleteFile
-    /// being documented to fail with ERROR_ACCESS_DENIED on one, and a file another
-    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive moves
-    /// never reach this state: a rename either happens or throws.
-    ///
-    /// Checked after the fact rather than pre-empted, because pre-clearing the
-    /// attribute would mutate sources that never needed it and would need a
-    /// same-volume test that cannot be had: a mount point inside one drive
-    /// letter falls back to copy-and-delete like any other volume boundary.
-    ///
-    /// Clearing the read-only bit is safe here for the reasons the delete path's
-    /// own comment sets out: the same two gates passed, the same confirmed
-    /// intent.
-    /// </summary>
-    private FileOperationError? ReconcileMove(string sourcePath, string destPath, PerItemFailureLog failureLog)
-    {
-        if (!_fs.File.Exists(sourcePath)) return null;
-
-        var clearedReadOnly = false;
-        try
-        {
-            clearedReadOnly = ClearReadOnly(sourcePath);
-            _fs.File.Delete(sourcePath);
-            return null;
-        }
-        catch (Exception ex)
-        {
-            // An antivirus quarantining the file it has just watched being
-            // copied takes the source out between the Exists above and this
-            // throw. Source gone with the copy in place is the end state a
-            // completed move produces, so that is a success; discarding the
-            // copy would leave the user with neither.
-            if (!_fs.File.Exists(sourcePath)) return null;
-
-            failureLog.Record(ex);
-            RestoreReadOnly(sourcePath, clearedReadOnly, failureLog);
-            DiscardDestinationCopy(destPath, failureLog);
-            return Categorise(ex, sourcePath);
-        }
-    }
-
-    /// <summary>
-    /// Removes the copy a half-completed move left in the destination, so a
-    /// file reported as failed is a file the user still has exactly one of.
-    ///
-    /// A failure here is the one state with nothing to say for itself: the
-    /// error the caller files says the file was left in place, which is true,
-    /// and does not mention the copy. It is recorded rather than surfaced.
-    ///
-    /// The guard reaches the copy through a handle opened on the destination
-    /// folder and removes it though it carries a read-only attribute across
-    /// from a read-only source, leaving the attribute as it was where the
-    /// delete fails. A destination the copy was never written to answers that
-    /// the file is gone, so a move that failed
-    /// before it copied anything files no spurious leftover.
-    /// </summary>
-    private void DiscardDestinationCopy(string destPath, PerItemFailureLog failureLog)
-    {
-        if (!_destinationGuard.TryDiscardCopy(destPath, out var failureCode))
-            failureLog.Record(new InvalidOperationException(
-                $"A copy of {destPath} could not be removed after the move failed to remove its source, "
-                + "so that file now exists in both places.",
-                new System.ComponentModel.Win32Exception(failureCode)));
-    }
-
-    /// <summary>
-    /// Clears the read-only attribute, reporting whether there was one to clear
-    /// so a caller that then fails can put it back.
-    ///
-    /// Throws are the caller's: this is one step of an operation that fails
-    /// closed as a whole.
-    /// </summary>
-    private bool ClearReadOnly(string filePath)
-    {
-        var attributes = _fs.File.GetAttributes(filePath);
-        if (!attributes.HasFlag(FileAttributes.ReadOnly)) return false;
-        _fs.File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
-        return true;
-    }
-
-    /// <summary>
-    /// Puts back a read-only attribute cleared from a source the delete then
-    /// refused. What this service says about a file it reports as failed is that
-    /// the user still has exactly one of it and exactly as it was, and a source
-    /// left writable is one step of that operation committed after the operation
-    /// gave up.
-    ///
-    /// Guarded where <see cref="ClearReadOnly"/> is not, because this runs inside
-    /// the failure arm: a throw here would replace the error the caller is about
-    /// to file with one about the tidying up after it.
-    /// </summary>
-    private void RestoreReadOnly(string filePath, bool wasCleared, PerItemFailureLog failureLog)
-    {
-        if (!wasCleared) return;
-        try
-        {
-            _fs.File.SetAttributes(filePath,
-                _fs.File.GetAttributes(filePath) | FileAttributes.ReadOnly);
-        }
-        catch (Exception ex)
-        {
-            failureLog.Record(new InvalidOperationException(
-                $"The read-only attribute cleared from {filePath} could not be put back after the "
-                + "move failed to remove it, so that file is no longer read-only.", ex));
-        }
-    }
-
-    /// <summary>
-    /// Shared so the loop's own failures and the reconciliation's are named the
-    /// same way.
-    ///
-    /// ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as HRESULTs: another
-    /// program holds the file open, which is the one IO failure here with a
-    /// cause the user can act on and the one that is not a fault. The Delete
-    /// path discriminates the same two codes off the HRESULT of the IOException
-    /// its own File.Delete raises, so both halves of the app name the same
-    /// condition the same way.
+    /// Files an exception a read or a write raised by its kind, so the copy's own
+    /// failures are named as a refusal by Windows is (<see cref="BatchRun.RefuseByWindowsError"/>):
+    /// a sharing or lock violation as in use, another IO error as an IO failure, an access
+    /// refusal as that.
     /// </summary>
     private static FileOperationError Categorise(Exception ex, string sourcePath) => ex switch
     {
@@ -847,5 +840,4 @@ public sealed class MoveFilesService : IMoveFilesService
                     folder),
                 new System.ComponentModel.Win32Exception(failureCode));
     }
-
 }

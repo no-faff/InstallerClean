@@ -189,15 +189,6 @@ jobs:
         if: success() || failure()
         run: node scripts/check-font-coverage.mjs
 
-      # A production caller may pass the action services an empty set of claims and
-      # the compiler cannot see it: the argument is required, so passing the wrong
-      # value satisfies it. The under-lease re-read then returns a pass at its first
-      # line without having asked anything. The tests below drive the call sites that
-      # exist; this is what fails on the day somebody writes a new one.
-      - name: Check the under-lease claims reach the action services
-        if: success() || failure()
-        run: node scripts/check-under-lease-claims.mjs
-
       # An Application-channel value is machine-read and is built in en-GB at the
       # write site, whatever the machine's language. This fails where a test
       # composes one outside MachineContract.English or MachineContract.WriteEventLog,

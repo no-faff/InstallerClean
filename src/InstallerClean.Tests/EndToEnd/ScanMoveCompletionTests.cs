@@ -20,10 +20,6 @@ namespace InstallerClean.Tests.EndToEnd;
 /// </summary>
 public class ScanMoveCompletionTests : IDisposable
 {
-    // The action-service stubs below name the trailing under-lease argument: it
-    // is optional on the interface and never omitted in practice, so a stub that
-    // leaves it out matches nothing the view-model actually calls and hands back
-    // a null result instead of the canned one.
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
     private readonly IDeleteFilesService _deleteService = Substitute.For<IDeleteFilesService>();
@@ -35,7 +31,7 @@ public class ScanMoveCompletionTests : IDisposable
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
     private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
-    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
+    private readonly IBatchCheck _batchCheck = Substitute.For<IBatchCheck>();
     private readonly IEarlierRunCheck _earlierRunCheck = Substitute.For<IEarlierRunCheck>();
     private readonly IFirstRunMark _firstRunMark = FirstRunMarks.Claiming();
     private readonly IWindowsRegion _windowsRegion = Substitute.For<IWindowsRegion>();
@@ -56,16 +52,19 @@ public class ScanMoveCompletionTests : IDisposable
     private MainViewModel CreateMain()
     {
         _settingsService.Load().Returns(new AppSettings());
-        // Clean gate and a no-op re-verify, so the act-time re-checks proceed and
-        // a Move/Delete acts on the full set.
+        // Clean gate and a check before the batch that stands over every file it is
+        // given, so a Move/Delete acts on the full set.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(ci => Task.FromResult(StandingChecks.Stood(
+                new ReverifyResult(ci.Arg<IReadOnlyList<string>>(), Array.Empty<string>()))));
         return _made.Add(new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _updateCheckService, _reverifier,
+            _fileSystem, _resultLogService, _updateCheckService, _batchCheck,
             _earlierRunCheck, _firstRunMark, _windowsRegion,
             destinationGuard: new ByPathDestinationGuard(_fileSystem)));
     }
@@ -83,7 +82,7 @@ public class ScanMoveCompletionTests : IDisposable
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
@@ -137,7 +136,7 @@ public class ScanMoveCompletionTests : IDisposable
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
@@ -212,11 +211,13 @@ public class ScanMoveCompletionTests : IDisposable
         settingsService.Update(Arg.Any<Action<AppSettings>>()).Returns(true);
         var rebootService = Substitute.For<IPendingRebootService>();
         rebootService.Check().Returns(PendingRebootResult.Clean);
-        // Real re-verifier over the same query service: it re-runs the same
-        // enumeration the scan did, so the two orphans (unclaimed by the API) stay
-        // removable and nothing is dropped, exercising the act-time re-verify
-        // end to end.
-        var reverifier = new RemovableReverifier(queryService, Substitute.For<InstallerClean.Interop.IMsiApi>());
+        rebootService.CheckBusy().Returns(PendingRebootResult.Clean);
+        // Real re-verifier over the same query service, inside the real check made
+        // before the batch: it re-runs the same enumeration the scan did, so the two
+        // orphans (unclaimed by the API) stay removable and nothing is dropped,
+        // exercising the check before the batch end to end.
+        var reverifier = new RemovableReverifier(queryService);
+        var batchCheck = new BatchCheck(rebootService, reverifier, new FakeRecordsWatchFactory());
         var msiInfoService = Substitute.For<IMsiFileInfoService>();
         var dialogService = Substitute.For<IDialogService>();
         var confirmationService = Substitute.For<IConfirmationService>();
@@ -236,7 +237,7 @@ public class ScanMoveCompletionTests : IDisposable
             scanService, moveService, deleteService,
             settingsService, rebootService, msiInfoService,
             dialogService, confirmationService, windowService,
-            fs, resultLogService, updateCheckService, reverifier,
+            fs, resultLogService, updateCheckService, batchCheck,
             Substitute.For<IEarlierRunCheck>(), FirstRunMarks.Claiming(), Substitute.For<IWindowsRegion>(),
             destinationGuard: new ByPathDestinationGuard(fs)));
 
@@ -285,7 +286,7 @@ public class ScanMoveCompletionTests : IDisposable
             new MissingSourceFile(@"C:\Windows\Installer\c.msi"),
         };
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, errors));
 

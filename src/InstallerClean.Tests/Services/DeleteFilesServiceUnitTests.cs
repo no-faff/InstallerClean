@@ -10,10 +10,11 @@ namespace InstallerClean.Tests.Services;
 /// <summary>
 /// Unit tests for <see cref="DeleteFilesService"/> against an in-memory
 /// <see cref="MockFileSystem"/>. These prove the per-file outcome mapping,
-/// progress, cancellation and the installer-mutex hold. The two safety gates
-/// they exercise (reparse point, containment) deliberately read the REAL
-/// filesystem whatever is injected, which is what the refusal tests below turn
-/// on: a mock cannot talk its way past either.
+/// progress and cancellation. A file really moves on the mock, so each test
+/// asserts where the file ended. The two safety gates they exercise (reparse
+/// point, containment) deliberately read the REAL filesystem whatever is
+/// injected, which is what the refusal tests below turn on: a mock cannot talk
+/// its way past either.
 /// </summary>
 public class DeleteFilesServiceUnitTests
 {
@@ -26,6 +27,9 @@ public class DeleteFilesServiceUnitTests
         return path;
     }
 
+    private static DeleteFilesService ServiceWith(MockFileSystem fs, ScriptedInHandFolder hand) =>
+        new(fs, null, null, hand, null);
+
     [Fact]
     public async Task Deletes_all_files_in_a_clean_batch()
     {
@@ -34,7 +38,7 @@ public class DeleteFilesServiceUnitTests
         var b = AddFile(fs, "b.msi");
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { a, b }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(new[] { a, b }));
 
         Assert.Equal(2, result.DeletedCount);
         Assert.Empty(result.Errors);
@@ -49,7 +53,7 @@ public class DeleteFilesServiceUnitTests
         var ghost = $@"{Dir}\ghost.msi"; // never added to the mock filesystem
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { ghost }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(new[] { ghost }));
 
         Assert.Equal(0, result.DeletedCount);
         var err = Assert.Single(result.Errors);
@@ -66,7 +70,7 @@ public class DeleteFilesServiceUnitTests
         var ok2 = AddFile(fs, "ok2.msi");
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(new[] { ok1, missing, ok2 }));
 
         Assert.Equal(2, result.DeletedCount);
         var err = Assert.Single(result.Errors);
@@ -83,12 +87,13 @@ public class DeleteFilesServiceUnitTests
         var progress = new SyncProgress<OperationProgress>(reports.Add);
         var svc = new DeleteFilesService(fs);
 
-        await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
+        await svc.DeleteFilesAsync(StandingChecks.Of(files), progress: progress);
 
         Assert.Equal(3, reports.Count);
         Assert.Equal(1, reports[0].CurrentFile);
         Assert.Equal(3, reports[2].CurrentFile);
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
+        Assert.All(reports, r => Assert.Null(r.Check));
     }
 
     // The window's progress label counts the file a report names as still in hand.
@@ -101,7 +106,7 @@ public class DeleteFilesServiceUnitTests
         var progress = new SyncProgress<OperationProgress>(p => stillThere.Add(fs.File.Exists(files[p.CurrentFile - 1])));
         var svc = new DeleteFilesService(fs);
 
-        await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
+        await svc.DeleteFilesAsync(StandingChecks.Of(files), progress: progress);
 
         Assert.Equal(new[] { true, true, true }, stillThere);
         Assert.All(files, f => Assert.False(fs.File.Exists(f)));
@@ -118,7 +123,7 @@ public class DeleteFilesServiceUnitTests
         });
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(files), progress: progress);
 
         // The report is inside the per-file try, so a consumer that throws is
         // categorised like any other per-file failure and the batch carries on.
@@ -143,7 +148,7 @@ public class DeleteFilesServiceUnitTests
         var progress = new SyncProgress<OperationProgress>(reports.Add);
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { present, ghost }, UnderLeaseClaims.None, progress: progress);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(new[] { present, ghost }), progress: progress);
 
         // Pins the half of the report's placement that moving it inside the try
         // had to preserve: it runs ahead of the File.Exists skip, so a file the
@@ -165,7 +170,7 @@ public class DeleteFilesServiceUnitTests
         // No throw on a mid-batch cancel: the partial result comes back with
         // Cancelled set and the tally of what was deleted before the stop. The
         // cancel comes during the second file's report, so that file is left alone.
-        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress, cancellationToken: cts.Token);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(files), progress: progress, cancellationToken: cts.Token);
 
         Assert.True(result.Cancelled);
         Assert.Equal(1, result.DeletedCount);
@@ -188,7 +193,7 @@ public class DeleteFilesServiceUnitTests
         fs.AddFile(outside, new MockFileData("payload"));
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { outside }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(new[] { outside }));
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
@@ -196,129 +201,76 @@ public class DeleteFilesServiceUnitTests
     }
 
     /// <summary>
-    /// A filesystem reporting exactly one path as existing, and optionally
-    /// throwing <paramref name="deleteThrows"/> when asked to delete it. See
-    /// the twin in <see cref="MoveFilesServiceUnitTests"/>: the reparse and
-    /// containment gates consult the REAL filesystem whatever is injected, so
-    /// reaching them means handing the service a source string the real
-    /// filesystem cannot hold, which MockFileSystem will not store.
+    /// A filesystem reporting exactly one path as existing, with every other call
+    /// unwired. See the twin in <see cref="MoveFilesServiceUnitTests"/>: the
+    /// reparse and containment gates consult the REAL filesystem whatever is
+    /// injected, so reaching them means handing the service a source string the
+    /// real filesystem cannot hold, which MockFileSystem will not store.
     /// </summary>
-    private static IFileSystem FileSystemReporting(string source, Exception? deleteThrows = null)
+    private static IFileSystem FileSystemReporting(string source, out IFile file)
     {
         var fs = Substitute.For<IFileSystem>();
         fs.Directory.Returns(Substitute.For<IDirectory>());
-        var file = Substitute.For<IFile>();
+        file = Substitute.For<IFile>();
         fs.File.Returns(file);
         file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source);
-        if (deleteThrows is not null)
-            file.When(f => f.Delete(source)).Do(_ => throw deleteThrows);
-        return fs;
-    }
-
-    /// <summary>
-    /// The same filesystem posing as one holding a READ-ONLY file: the first
-    /// Delete refuses, and a Delete after the attribute has been cleared
-    /// succeeds. <paramref name="clearThrows"/> makes SetAttributes refuse too,
-    /// which is the fail-closed leg. <paramref name="retryThrows"/> lets the
-    /// clear succeed and beats the retry anyway, which is the only way to reach
-    /// the arm that has an attribute to put back.
-    /// </summary>
-    private static IFileSystem FileSystemHoldingAReadOnlyFile(
-        string source, out IFile file, Exception? clearThrows = null, Exception? retryThrows = null)
-    {
-        var fs = FileSystemReporting(source);
-        file = fs.File;
-        // Archive as well as ReadOnly, which is what a real file in the cache
-        // carries, so the clear has something to preserve and the assertion can
-        // say it did.
-        var attributes = FileAttributes.ReadOnly | FileAttributes.Archive;
-        file.GetAttributes(source).Returns(_ => attributes);
-        file.When(f => f.SetAttributes(source, Arg.Any<FileAttributes>())).Do(ci =>
-        {
-            if (clearThrows is not null) throw clearThrows;
-            attributes = ci.Arg<FileAttributes>();
-        });
-        file.When(f => f.Delete(source)).Do(_ =>
-        {
-            if (attributes.HasFlag(FileAttributes.ReadOnly))
-                throw new UnauthorizedAccessException("read-only");
-            if (retryThrows is not null) throw retryThrows;
-        });
         return fs;
     }
 
     [Fact]
-    public async Task A_read_only_file_has_the_attribute_cleared_and_the_delete_retried()
+    public async Task A_read_only_file_is_deleted()
     {
-        // The shell delete this replaced cleared the attribute and carried on,
-        // so a read-only file in the cache went. Without the retry it comes back
-        // as "Windows refused access to this file", which is true, useless and
+        // A read-only file in the cache goes: the hand clears the attribute as
+        // part of its delete. Without that it would come back as "Windows
+        // refused access to this file", which is true, useless and
         // indistinguishable from a permissions problem.
+        var fs = new MockFileSystem();
         var source = $@"{Dir}\readonly.msi";
-        var fs = FileSystemHoldingAReadOnlyFile(source, out var file);
+        fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly | FileAttributes.Archive });
+        var svc = new DeleteFilesService(fs);
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(source));
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Empty(result.Errors);
-        // Cleared, and cleared to exactly that: only the read-only bit comes
-        // off, and the retry hands the file no attribute it did not have.
-        file.Received(1).SetAttributes(source, FileAttributes.Archive);
+        Assert.False(fs.File.Exists(source));
     }
 
     [Fact]
-    public async Task A_permissions_refusal_is_still_access_denied_and_is_not_retried()
+    public async Task A_permissions_refusal_is_access_denied_and_is_asked_once()
     {
-        // Not read-only, so there is nothing for the clear to fix and the retry
-        // is not attempted. The narrowness is the point: this must not become a
-        // second try at every refused delete.
-        var source = $@"{Dir}\refused.msi";
-        var fs = FileSystemReporting(source, new UnauthorizedAccessException("refused"));
-        fs.File.GetAttributes(source).Returns(FileAttributes.Normal);
+        // The narrowness is the point: a refused delete is filed, with the file
+        // back where it was, and is not tried a second time.
+        var fs = new MockFileSystem();
+        var source = AddFile(fs, "refused.msi");
+        var hand = new ScriptedInHandFolder(fs).Refuse("delete", source, 5);
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var result = await ServiceWith(fs, hand).DeleteFilesAsync(StandingChecks.Of(source));
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
-        fs.File.DidNotReceive().SetAttributes(source, Arg.Any<FileAttributes>());
+        Assert.True(fs.File.Exists(source));
+        Assert.Equal(1, hand.Steps.Count(step => step == "delete refused.msi"));
     }
 
     [Fact]
-    public async Task A_read_only_file_whose_attribute_cannot_be_cleared_fails_closed()
+    public async Task A_read_only_file_whose_delete_is_refused_goes_back_keeping_its_attribute()
     {
-        var source = $@"{Dir}\stuck.msi";
-        var fs = FileSystemHoldingAReadOnlyFile(
-            source, out var file, clearThrows: new UnauthorizedAccessException("refused"));
-
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
-
-        Assert.Equal(0, result.DeletedCount);
-        Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
-        // One attempt, then the same error as before: a clear that throws leaves
-        // the file exactly where a delete that throws leaves it.
-        file.Received(1).Delete(source);
-    }
-
-    [Fact]
-    public async Task A_read_only_file_the_retry_could_not_delete_keeps_its_attribute()
-    {
-        // The clear succeeds and the retried delete is beaten anyway, which is
-        // the arm that was leaving one step of an abandoned operation committed:
-        // the file stays in the cache, the screen says it could not be deleted,
-        // and the read-only bit it arrived with had come off. Neither test above
-        // reaches this, one retrying successfully and the other never clearing.
+        // The file is out of its place when the delete is refused. It goes back
+        // where it was, with the read-only bit it arrived with, and the screen
+        // says it could not be deleted.
+        var fs = new MockFileSystem();
         var source = $@"{Dir}\readonly-refused.msi";
-        var fs = FileSystemHoldingAReadOnlyFile(source, out var file,
-            retryThrows: new UnauthorizedAccessException("refused after the clear"));
+        fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly | FileAttributes.Archive });
+        var hand = new ScriptedInHandFolder(fs).Refuse("delete", source, 5);
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var result = await ServiceWith(fs, hand).DeleteFilesAsync(StandingChecks.Of(source));
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
-        // The clear happened, so the end state below is a restore rather than an
-        // attribute nothing ever touched.
-        file.Received(1).SetAttributes(source, FileAttributes.Archive);
-        Assert.Equal(FileAttributes.ReadOnly | FileAttributes.Archive, file.GetAttributes(source));
+        Assert.True(fs.File.Exists(source));
+        Assert.True(fs.File.GetAttributes(source).HasFlag(FileAttributes.ReadOnly));
+        Assert.Contains("put-back readonly-refused.msi", hand.Steps);
     }
 
     [Fact]
@@ -330,13 +282,18 @@ public class DeleteFilesServiceUnitTests
         // on a failed read would let the file through to the delete call.
         var source = $"{Dir}\\unreadable\0.msi";
 
-        var svc = new DeleteFilesService(FileSystemReporting(source));
-        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var fs = FileSystemReporting(source, out var file);
+        var svc = new DeleteFilesService(fs);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(source));
 
         // UnknownError, NOT SourceIsReparsePoint: a read that could not be made
         // has not shown the file is a symlink.
         Assert.IsType<UnknownError>(Assert.Single(result.Errors));
         Assert.Equal(0, result.DeletedCount);
+        // The source checks refuse the file before it is taken, so nothing is
+        // renamed or deleted.
+        file.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+        file.DidNotReceive().Delete(Arg.Any<string>());
     }
 
     [Fact]
@@ -351,264 +308,98 @@ public class DeleteFilesServiceUnitTests
 
         var source = $@"{unmounted}:\Windows\Installer\unresolvable.msi";
 
-        var svc = new DeleteFilesService(FileSystemReporting(source));
-        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var fs = FileSystemReporting(source, out var file);
+        var svc = new DeleteFilesService(fs);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(source));
 
         Assert.IsType<UnknownError>(Assert.Single(result.Errors));
         Assert.Equal(0, result.DeletedCount);
+        file.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+        file.DidNotReceive().Delete(Arg.Any<string>());
     }
 
     [Theory]
-    // ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as HRESULTs: another
-    // program holds the file open, the one IO failure with a cause the user can
-    // act on. Discriminated off exactly the two codes MoveFilesService uses, so
-    // both halves of the app name the same condition the same way.
-    [InlineData(unchecked((int)0x80070020), typeof(FileInUse))]
-    [InlineData(unchecked((int)0x80070021), typeof(FileInUse))]
+    // ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION: another program holds
+    // the file open, the one IO failure with a cause the user can act on.
+    // Discriminated off exactly the two codes MoveFilesService uses, so both
+    // halves of the app name the same condition the same way.
+    [InlineData(32, typeof(FileInUse))]
+    [InlineData(33, typeof(FileInUse))]
     // Anything else is an IO failure with no cause worth naming.
-    [InlineData(unchecked((int)0x80070070), typeof(IOFailure))]
-    public async Task An_io_failure_is_filed_as_in_use_only_for_a_sharing_or_lock_violation(
-        int hresult, Type expected)
+    [InlineData(112, typeof(IOFailure))]
+    public async Task A_refused_delete_is_filed_as_in_use_only_for_a_sharing_or_lock_violation(
+        int windowsError, Type expected)
     {
-        var source = $@"{Dir}\held.msi";
-        var svc = new DeleteFilesService(
-            FileSystemReporting(source, new IOException("held", hresult)));
+        var fs = new MockFileSystem();
+        var source = AddFile(fs, "held.msi");
+        var hand = new ScriptedInHandFolder(fs).Refuse("delete", source, windowsError);
 
-        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var result = await ServiceWith(fs, hand).DeleteFilesAsync(StandingChecks.Of(source));
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType(expected, Assert.Single(result.Errors));
+        // A refused delete leaves the file where it was.
+        Assert.True(fs.File.Exists(source));
+        Assert.Contains("put-back held.msi", hand.Steps);
+    }
+
+    [Fact]
+    public async Task A_file_something_else_holds_open_is_tried_twice_and_filed_as_in_use()
+    {
+        var fs = new MockFileSystem();
+        var source = AddFile(fs, "held.msi");
+        var hand = new ScriptedInHandFolder(fs).InUse(source, times: 2);
+
+        var result = await ServiceWith(fs, hand).DeleteFilesAsync(StandingChecks.Of(source));
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.IsType<FileInUse>(Assert.Single(result.Errors));
+        Assert.True(fs.File.Exists(source));
+        // The second try comes after the last file.
+        Assert.Equal(new[] { "hold held.msi", "hold held.msi" }, hand.Steps);
+    }
+
+    [Fact]
+    public async Task A_file_that_goes_as_the_open_reaches_it_is_filed_as_no_longer_there()
+    {
+        var fs = new MockFileSystem();
+        var source = AddFile(fs, "gone.msi");
+        var hand = new ScriptedInHandFolder(fs);
+        // The step is recorded before the hand's own open, so the file is gone when that open looks.
+        hand.OnStep = (step, path) =>
+        {
+            if (step == "hold" && path == source) fs.RemoveFile(source);
+        };
+
+        var result = await ServiceWith(fs, hand).DeleteFilesAsync(StandingChecks.Of(source));
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.IsType<MissingSourceFile>(Assert.Single(result.Errors));
     }
 
     [Fact]
     public async Task An_access_refusal_is_filed_as_access_denied()
     {
-        var source = $@"{Dir}\refused.msi";
-        var svc = new DeleteFilesService(
-            FileSystemReporting(source, new UnauthorizedAccessException("refused")));
+        var fs = new MockFileSystem();
+        var source = AddFile(fs, "refused.msi");
+        var hand = new ScriptedInHandFolder(fs).Refuse("delete", source, 5);
 
-        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
+        var result = await ServiceWith(fs, hand).DeleteFilesAsync(StandingChecks.Of(source));
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
+        Assert.True(fs.File.Exists(source));
     }
 
     [Fact]
-    public async Task Refuses_when_the_installer_mutex_is_held()
+    public async Task Zero_files_returns_an_empty_result()
     {
         var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.HeldByAnother);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
+        var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        Assert.True(result.InstallerBusy);
-        Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(a));
-    }
-
-    [Fact]
-    public async Task Refuses_when_the_installer_mutex_cannot_be_acquired_and_nobody_holds_it()
-    {
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
-
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        // A delete without the hold has nothing stopping a program registering a
-        // package part-way through it, and no bin to fetch a wrongly-removed file
-        // back from, so the batch does not run. The Move path answers this input
-        // the same way, for a reason of its own that its test states.
-        Assert.True(result.InstallerLockUnavailable);
-        Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(a));
-        // Distinguishable from the held case, because the caller answers them
-        // differently: the pending-reboot gate can explain that one and can
-        // account for this one neither way.
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(0, mutex.Released);
-    }
-
-    [Fact]
-    public async Task Refuses_when_the_installer_mutex_refuses_it_the_rights_to_open_it()
-    {
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.AccessRefused);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
-
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        // Refused, touching nothing, and under its own flag: the app was not allowed
-        // to look, which is neither the lock being held nor an acquire that failed
-        // some other way, and the caller tells the user each in different words.
-        Assert.True(result.InstallerLockAccessRefused);
-        Assert.False(result.InstallerBusy);
-        Assert.False(result.InstallerLockUnavailable);
-        Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(a));
-        Assert.Equal(1, mutex.AcquireAttempts);
-        Assert.Equal(0, mutex.Released);
-    }
-
-    [Fact]
-    public async Task Holds_and_releases_the_installer_mutex_when_acquired()
-    {
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
-
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        Assert.Equal(1, result.DeletedCount);
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(1, mutex.Acquired);
-        Assert.Equal(1, mutex.Released);
-    }
-
-    [Fact]
-    public async Task The_under_lease_re_read_runs_inside_the_hold_and_before_any_file_is_touched()
-    {
-        // The property the whole check rests on. A re-read taken after the lease
-        // was released, or before it was taken, would satisfy every other
-        // assertion in this file and be worth nothing: the window it exists to
-        // close is exactly the one outside the hold.
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        bool? sourcePresentAtRecheck = null;
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex,
-            atRecheck: () => sourcePresentAtRecheck = fs.File.Exists(a));
-        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
-
-        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
-
-        Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
-        Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
-        // The other half of the name, and it needs a real observation rather than
-        // a lease count: a re-read taken after the first delete holds the lease
-        // just as truthfully. The Move twin makes it on the destination folder;
-        // here the batch's own file is what a delete would have taken.
-        Assert.True(sourcePresentAtRecheck);
-        // Without these the assertion above passes on a batch that deleted
-        // nothing at all, which is the shape of vacuous pass this file exists to
-        // keep out.
-        Assert.Equal(1, result.DeletedCount);
-        Assert.False(fs.File.Exists(a));
-    }
-
-    [Fact]
-    public async Task A_re_read_that_throws_still_releases_the_installer_mutex()
-    {
-        // The lease is released by a finally that encloses the re-read, so this
-        // holds today. Nothing exercised it, and the identity work is about to
-        // build in this exact region: a refactor narrowing that try would leave
-        // the machine-wide installer mutex held until the process exits, with the
-        // suite green.
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex,
-            atRecheck: () => throw new InvalidOperationException("the re-read failed"));
-        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
-
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None));
-
-        Assert.Equal(1, mutex.Acquired);
-        Assert.Equal(1, mutex.Released);
-        // A re-read that could not answer is not permission to act.
-        Assert.True(fs.File.Exists(a));
-    }
-
-    [Fact]
-    public async Task A_path_reclaimed_under_the_lease_is_kept_back_and_the_rest_go()
-    {
-        var fs = new MockFileSystem();
-        var keep = AddFile(fs, "reclaimed.msp");
-        var go = AddFile(fs, "orphan.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, null,
-            new FakeReclaimingReverifier(new[] { keep }));
-
-        var result = await svc.DeleteFilesAsync(new[] { keep, go }, UnderLeaseClaims.None);
-
-        Assert.Equal(1, result.DeletedCount);
-        Assert.Equal(new[] { keep }, result.HeldBack);
-        // Held back is not failed: nothing went wrong with this file, a program
-        // simply wants it again, so it is not in the per-file error list.
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(keep));
-        Assert.False(fs.File.Exists(go));
-    }
-
-    [Fact]
-    public async Task A_batch_the_re_read_empties_reports_what_it_kept_back()
-    {
-        var fs = new MockFileSystem();
-        var only = AddFile(fs, "reclaimed.msp");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, null,
-            new FakeReclaimingReverifier(new[] { only }));
-
-        var result = await svc.DeleteFilesAsync(new[] { only }, UnderLeaseClaims.None);
+        var result = await svc.DeleteFilesAsync(StandingChecks.Of(Array.Empty<string>()));
 
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);
-        Assert.Equal(new[] { only }, result.HeldBack);
-        Assert.True(fs.File.Exists(only));
-        // The lease is still released on the short-circuit: the batch ended, and
-        // an unreleased machine-wide installer mutex would outlive it.
-        Assert.Equal(1, mutex.Released);
-    }
-
-    [Fact]
-    public async Task The_claims_are_handed_to_the_re_read_untouched()
-    {
-        var fs = new MockFileSystem();
-        var a = AddFile(fs, "a.msp");
-        var claims = new[]
-        {
-            new PatchClaim(a, "{AAAA0000-0000-0000-0000-000000000001}",
-                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
-        };
-        // The siblings half is a list of its own, so each half is pinned to its own.
-        var siblings = new[]
-        {
-            new PatchClaim(a.Replace("a.msp", "b.msp"), "{AAAA0000-0000-0000-0000-000000000002}",
-                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
-        };
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
-        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
-
-        await svc.DeleteFilesAsync(new[] { a }, new UnderLeaseClaims(claims, siblings));
-
-        Assert.Equal(claims, reverifier.ClaimsSeen);
-        Assert.Equal(siblings, reverifier.SiblingsSeen);
-    }
-
-    [Fact]
-    public async Task Zero_files_returns_an_empty_result_without_taking_the_mutex()
-    {
-        var fs = new MockFileSystem();
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
-
-        var result = await svc.DeleteFilesAsync(Array.Empty<string>(), UnderLeaseClaims.None);
-
-        Assert.Equal(0, result.DeletedCount);
-        Assert.Empty(result.Errors);
-        // An empty batch mutates nothing, so it never takes the machine-wide
-        // installer lock: taking it would block every installer on the machine
-        // for a run with no work in it.
-        Assert.Equal(0, mutex.AcquireAttempts);
     }
 }

@@ -110,8 +110,9 @@ public sealed record CandidateOutsideCache(string FilePath)
 
 /// <summary>
 /// The file is open or locked by another program, so it could not be
-/// removed and was left in place. Move and Delete both reach it, both
-/// discriminating the same two HRESULTs off an IOException, which is why the
+/// removed and was left in place. Move and Delete both reach it, on the same
+/// answers from Windows: a sharing or lock violation when the file is opened to
+/// be taken, tried once more after the batch's last file. That is why the
 /// sentence says "remove" rather than naming either verb.
 ///
 /// Split out of <see cref="IOFailure"/> because it is the one IO failure
@@ -163,4 +164,16 @@ public sealed record UnknownError(string FilePath)
     public override string LocalisedGroupHeading(int count) =>
         DisplayHelpers.Pluralise(count, Strings.Error_UnknownError_Singular,
             Strings.Error_UnknownError_Plural, "Error.UnknownError");
+}
+
+/// <summary>
+/// A file the batch had renamed into its own folder inside the Installer folder, and
+/// could not rename back when it then had to. The file is whole, in
+/// <paramref name="InHandFolder"/>, which the message names so that a person can find it.
+/// </summary>
+public sealed record FileLeftInHand(string FilePath, string InHandFolder)
+    : FileOperationError(FilePath)
+{
+    public override string LocalisedMessage =>
+        string.Format(Strings.Error_FileLeftInHand, InHandFolder);
 }

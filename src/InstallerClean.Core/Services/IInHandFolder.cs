@@ -12,9 +12,9 @@ namespace InstallerClean.Services;
 /// use before it looks. So a file that has left its place, with the records then read
 /// unchanged, has not been taken up, however long the app's own calls took.
 ///
-/// AT MOST ONE FILE IS EVER OUT OF ITS PLACE, and only for the calls that remove it. An
-/// installation that first opens a cached file while the file is away or held can fail
-/// though the file is back a moment later, so nothing is taken that is not about to go.
+/// AT MOST ONE FILE IS EVER OUT OF ITS PLACE, and only for the calls that remove it.
+/// Windows Installer looks for a cached file at its recorded path and nowhere else, so
+/// nothing is taken that is not about to go.
 ///
 /// <see cref="HandleInHandFolder"/> is the way the app does it, on file handles;
 /// <see cref="ByPathInHandFolder"/> is the one the test seams use, where the filesystem

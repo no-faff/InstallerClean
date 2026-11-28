@@ -48,7 +48,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir);
 
         Assert.Equal(1, result.MovedCount);
         Assert.Empty(result.Errors);
@@ -73,7 +73,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(existing, new MockFileData("existing bytes"));
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir);
 
         Assert.Equal(0, result.MovedCount);
         var error = Assert.Single(result.Errors);
@@ -104,7 +104,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile($@"{DestDir}\dup.msi", new MockFileData("existing bytes"));
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { clash, fine }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { clash, fine }), DestDir);
 
         Assert.Equal(1, result.MovedCount);
         Assert.IsType<DestinationCollision>(Assert.Single(result.Errors));
@@ -120,7 +120,7 @@ public class MoveFilesServiceUnitTests
         var ghost = $@"{SourceDir}\ghost.msi";
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { ghost }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { ghost }), DestDir);
 
         Assert.Equal(0, result.MovedCount);
         var error = Assert.Single(result.Errors);
@@ -140,7 +140,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { ok1, missing, ok2 }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { ok1, missing, ok2 }), DestDir);
 
         Assert.Equal(2, result.MovedCount);
         var error = Assert.Single(result.Errors);
@@ -160,7 +160,7 @@ public class MoveFilesServiceUnitTests
         // service's directory-create path.
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir);
 
         Assert.Equal(1, result.MovedCount);
         Assert.True(fs.Directory.Exists(DestDir));
@@ -179,12 +179,13 @@ public class MoveFilesServiceUnitTests
         var progress = new Helpers.SyncProgress<OperationProgress>(reports.Add);
 
         var svc = new MoveFilesService(fs);
-        await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
+        await svc.MoveFilesAsync(Helpers.StandingChecks.Of(sources), DestDir, progress);
 
         Assert.Equal(3, reports.Count);
         Assert.Equal(1, reports[0].CurrentFile);
         Assert.Equal(3, reports[2].CurrentFile);
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
+        Assert.All(reports, r => Assert.Null(r.Check));
     }
 
     // The window's progress label counts the file a report names as still in hand.
@@ -202,7 +203,7 @@ public class MoveFilesServiceUnitTests
             stillThere.Add(fs.File.Exists(sources[p.CurrentFile - 1])));
 
         var svc = new MoveFilesService(fs);
-        await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
+        await svc.MoveFilesAsync(Helpers.StandingChecks.Of(sources), DestDir, progress);
 
         Assert.Equal(new[] { true, true, true }, stillThere);
         Assert.All(sources, s => Assert.False(fs.File.Exists(s)));
@@ -223,7 +224,7 @@ public class MoveFilesServiceUnitTests
         });
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(sources), DestDir, progress);
 
         // The report is inside the per-file try, so a consumer that throws is
         // categorised like any other per-file failure and the batch carries on.
@@ -251,7 +252,7 @@ public class MoveFilesServiceUnitTests
         var progress = new Helpers.SyncProgress<OperationProgress>(reports.Add);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { present, ghost }, DestDir, UnderLeaseClaims.None, progress);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { present, ghost }), DestDir, progress);
 
         // Pins the half of the report's placement that moving it inside the try
         // had to preserve: it runs ahead of the skip checks, so a file the batch
@@ -282,7 +283,7 @@ public class MoveFilesServiceUnitTests
 
         // No throw on a mid-batch cancel: the accumulated result comes back with
         // Cancelled set and the count of what completed before the stop.
-        var result = await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress, cts.Token);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(sources), DestDir, progress, cts.Token);
 
         Assert.True(result.Cancelled);
         Assert.Equal(1, result.MovedCount);
@@ -306,211 +307,11 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { outside }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { outside }), DestDir);
 
         Assert.Equal(0, result.MovedCount);
         Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
         Assert.True(fs.File.Exists(outside)); // left where it was
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_refuses_when_the_installer_mutex_is_held()
-    {
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.HeldByAnother);
-
-        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        Assert.True(result.InstallerBusy);
-        Assert.Equal(0, result.MovedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(source)); // nothing moved
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_holds_and_releases_the_installer_mutex_when_acquired()
-    {
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
-
-        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(1, result.MovedCount);
-        Assert.Equal(1, mutex.Acquired);
-        Assert.Equal(1, mutex.Released); // released exactly once, on the worker thread
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_refuses_when_the_installer_mutex_cannot_be_acquired_and_nobody_holds_it()
-    {
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        // The destination is deliberately NOT pre-created, which is half of what
-        // this test is for: a refusal must leave the folder unmade as well as the
-        // file unmoved. The service creates it on any run that gets past the
-        // acquire, so an assertion that it does not exist afterwards is an
-        // assertion that the acquire is what stopped the batch.
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.RefusedNotHeld);
-
-        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        // Without the hold nothing stops a program registering a package part-way
-        // through, so the act-time proof can go stale under the batch. A file this
-        // moves out of the cache is as absent from it as a deleted one, so the
-        // exposure is the delete path's and the answer matches it.
-        Assert.True(result.InstallerLockUnavailable);
-        Assert.Equal(0, result.MovedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(source));
-        Assert.False(fs.Directory.Exists(DestDir));
-        // Distinguishable from the held case, because the caller answers them
-        // differently: the pending-reboot gate can explain that one and can
-        // account for this one neither way.
-        Assert.False(result.InstallerBusy);
-        Assert.Equal(0, mutex.Released);
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_refuses_when_the_installer_mutex_refuses_it_the_rights_to_open_it()
-    {
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        // Not pre-created, for the reason the test above gives: a folder left
-        // unmade is the proof that the acquire is what stopped the batch.
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.AccessRefused);
-
-        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        // Refused, touching nothing, and under its own flag: the app was not allowed
-        // to look, which is neither the lock being held nor an acquire that failed
-        // some other way, and the caller tells the user each in different words.
-        Assert.True(result.InstallerLockAccessRefused);
-        Assert.False(result.InstallerBusy);
-        Assert.False(result.InstallerLockUnavailable);
-        Assert.Equal(0, result.MovedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(source));
-        Assert.False(fs.Directory.Exists(DestDir));
-        Assert.Equal(1, mutex.AcquireAttempts);
-        Assert.Equal(0, mutex.Released);
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_re_reads_inside_the_hold_and_before_the_destination_is_made()
-    {
-        // Two properties at once. Inside the hold, which is the only place the
-        // re-read is worth taking; and ahead of the destination work, so a batch
-        // it empties does not leave a folder the user never asked for.
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
-        var reverifier = new Helpers.FakeReclaimingReverifier(new[] { source }, mutex);
-        var svc = new MoveFilesService(fs, mutex, null, reverifier);
-
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
-        Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
-        Assert.Equal(new[] { source }, result.HeldBack);
-        Assert.Equal(0, result.MovedCount);
-        Assert.True(fs.File.Exists(source));
-        Assert.False(fs.Directory.Exists(DestDir));
-        Assert.Equal(1, mutex.Released);
-    }
-
-    [Fact]
-    public async Task A_re_read_that_throws_still_releases_the_installer_mutex()
-    {
-        // See the delete twin. The lease is released by a finally enclosing the
-        // re-read, nothing exercised that, and a narrowed try would leave the
-        // machine-wide installer mutex held until the process exits.
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
-        var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex,
-            atRecheck: () => throw new InvalidOperationException("the re-read failed"));
-        var svc = new MoveFilesService(fs, mutex, null, reverifier);
-
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
-
-        Assert.Equal(1, mutex.Acquired);
-        Assert.Equal(1, mutex.Released);
-        Assert.True(fs.File.Exists(source));
-        // The re-read runs ahead of the destination work, so a throw from it
-        // leaves no folder behind either.
-        Assert.False(fs.Directory.Exists(DestDir));
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_keeps_back_a_reclaimed_path_and_moves_the_rest()
-    {
-        var fs = new MockFileSystem();
-        var keep = $@"{SourceDir}\reclaimed.msp";
-        var go = $@"{SourceDir}\orphan.msi";
-        fs.AddFile(keep, new MockFileData("a"));
-        fs.AddFile(go, new MockFileData("b"));
-        fs.AddDirectory(DestDir);
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
-        var svc = new MoveFilesService(fs, mutex, null,
-            new Helpers.FakeReclaimingReverifier(new[] { keep }));
-
-        var result = await svc.MoveFilesAsync(new[] { keep, go }, DestDir, UnderLeaseClaims.None);
-
-        Assert.Equal(1, result.MovedCount);
-        Assert.Equal(new[] { keep }, result.HeldBack);
-        // Held back is not failed, so it is not in the per-file error list.
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists(keep));
-        Assert.True(fs.File.Exists($@"{DestDir}\orphan.msi"));
-    }
-
-    [Fact]
-    public async Task The_claims_are_handed_to_the_re_read_untouched()
-    {
-        // The re-read can only re-ask about what it is given, and a service that
-        // dropped, merged, swapped or reordered the claims on the way in would still
-        // pass every held-back assertion above, because the fake decides what to
-        // reclaim without looking at them. The batch half and the siblings half are
-        // two different lists, so each is pinned to its own. Its Delete twin pins
-        // the same thing.
-        var fs = new MockFileSystem();
-        var source = $@"{SourceDir}\a.msp";
-        fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        var claims = new[]
-        {
-            new PatchClaim(source, "{AAAA0000-0000-0000-0000-000000000001}",
-                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
-        };
-        var siblings = new[]
-        {
-            new PatchClaim($@"{SourceDir}\b.msp", "{AAAA0000-0000-0000-0000-000000000002}",
-                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
-        };
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
-        var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex);
-        var svc = new MoveFilesService(fs, mutex, null, reverifier);
-
-        await svc.MoveFilesAsync(new[] { source }, DestDir, new UnderLeaseClaims(claims, siblings));
-
-        Assert.Equal(claims, reverifier.ClaimsSeen);
-        Assert.Equal(siblings, reverifier.SiblingsSeen);
     }
 
     [Fact]
@@ -520,37 +321,10 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(Array.Empty<string>(), DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(Array.Empty<string>()), DestDir);
 
         Assert.Equal(0, result.MovedCount);
         Assert.Empty(result.Errors);
-    }
-
-    /// <summary>
-    /// A filesystem whose File.Move throws <paramref name="onMove"/> for the one
-    /// source path, and which reports nothing else as existing so the destination
-    /// is clear and the move is actually attempted. MockFileSystem cannot raise
-    /// an IOException carrying a chosen HRESULT, and the HRESULT is the whole
-    /// subject of the tests below.
-    /// </summary>
-    private static IFileSystem FileSystemThatFailsMove(string source, Exception onMove)
-    {
-        var fs = Substitute.For<IFileSystem>();
-        // MockFileSystem's Path is a working implementation; a bare substitute
-        // returns an empty string from GetFullPath and GetRandomFileName.
-        fs.Path.Returns(new MockFileSystem().Path);
-        // The service creates the destination folder through IFileSystem.Directory
-        // before the loop. A bare IFileSystem substitute returns null there, so the
-        // batch would die on a NullReferenceException before reaching File.Move,
-        // and the HRESULT these tests are named for would never be raised.
-        fs.Directory.Returns(Substitute.For<IDirectory>());
-
-        var file = Substitute.For<IFile>();
-        fs.File.Returns(file);
-        file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source);
-        file.When(f => f.Move(source, Arg.Any<string>())).Do(_ => throw onMove);
-        fs.File.Returns(file);
-        return fs;
     }
 
     /// <summary>
@@ -564,7 +338,11 @@ public class MoveFilesServiceUnitTests
     {
         var fs = Substitute.For<IFileSystem>();
         fs.Path.Returns(new MockFileSystem().Path);
-        fs.Directory.Returns(Substitute.For<IDirectory>());
+        // The destination answers that it is there, as a folder the move has just made
+        // does, so the move opens it for the batch and goes on to the file.
+        var directory = Substitute.For<IDirectory>();
+        directory.Exists(DestDir).Returns(true);
+        fs.Directory.Returns(directory);
         var file = Substitute.For<IFile>();
         fs.File.Returns(file);
         file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source);
@@ -582,7 +360,7 @@ public class MoveFilesServiceUnitTests
         var (fs, file) = FileSystemReporting(source);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir);
 
         // UnknownError, NOT SourceIsReparsePoint: that entry tells the user the
         // file IS a symlink, which a read that could not be made has not shown.
@@ -606,7 +384,7 @@ public class MoveFilesServiceUnitTests
         var (fs, file) = FileSystemReporting(source);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir);
 
         // UnknownError rather than CandidateOutsideCache, for the same reason
         // as the test above: the check did not place the file anywhere, so the
@@ -617,221 +395,172 @@ public class MoveFilesServiceUnitTests
     }
 
     [Theory]
-    [InlineData(0x80070020)] // ERROR_SHARING_VIOLATION
-    [InlineData(0x80070021)] // ERROR_LOCK_VIOLATION
-    public async Task MoveFilesAsync_files_a_held_open_file_as_in_use(long hresult)
+    [InlineData(32)] // ERROR_SHARING_VIOLATION
+    [InlineData(33)] // ERROR_LOCK_VIOLATION
+    public async Task MoveFilesAsync_files_a_held_open_file_as_in_use(int windowsError)
     {
+        var fs = new MockFileSystem();
         var source = $@"{SourceDir}\locked.msi";
-        var fs = FileSystemThatFailsMove(source,
-            new IOException("held open", unchecked((int)hresult)));
+        fs.AddFile(source, new MockFileData("payload"));
+        var hand = new Helpers.ScriptedInHandFolder(fs).Refuse("delete", source, windowsError);
 
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
 
         // The one IO failure with a cause the user can act on, so it must not
         // be flattened into the generic "Windows reported a file error".
         var error = Assert.Single(result.Errors);
         Assert.IsType<FileInUse>(error);
         Assert.Equal(0, result.MovedCount);
+        // The user has exactly one copy of the file, where it started.
+        Assert.True(fs.File.Exists(source));
+        Assert.False(fs.File.Exists($@"{DestDir}\locked.msi"));
+        Assert.Contains("put-back locked.msi", hand.Steps);
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_tries_a_file_something_has_open_a_second_time_and_files_it_as_in_use()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\locked.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var hand = new Helpers.ScriptedInHandFolder(fs).InUse(source, times: 2);
+
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
+
+        Assert.IsType<FileInUse>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        Assert.True(fs.File.Exists(source));
+        Assert.False(fs.File.Exists($@"{DestDir}\locked.msi"));
+        // This destination is on another drive, so the file is opened to be copied first, and the second try follows the last file.
+        Assert.Equal(new[] { "copy-open locked.msi", "copy-open locked.msi" }, hand.Steps);
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_moves_a_file_that_was_in_use_only_for_the_first_try()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\scanned.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var hand = new Helpers.ScriptedInHandFolder(fs).InUse(source, times: 1);
+
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
+
+        Assert.Equal(1, result.MovedCount);
+        Assert.Empty(result.Errors);
+        Assert.False(fs.File.Exists(source));
+        Assert.True(fs.File.Exists($@"{DestDir}\scanned.msi"));
     }
 
     [Fact]
     public async Task MoveFilesAsync_files_any_other_io_error_as_a_generic_failure()
     {
+        var fs = new MockFileSystem();
         var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
         // ERROR_DISK_FULL: real, and nothing to do with the file being held.
-        var fs = FileSystemThatFailsMove(source,
-            new IOException("disk full", unchecked((int)0x80070070)));
+        var hand = new Helpers.ScriptedInHandFolder(fs).Refuse("delete", source, 112);
 
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
 
         var error = Assert.Single(result.Errors);
         Assert.IsType<IOFailure>(error);
-    }
-
-    [Fact]
-    public async Task A_source_that_goes_as_the_move_reaches_it_is_filed_as_no_longer_there()
-    {
-        // The file is there for the existence check and gone when File.Move reaches
-        // it, as when Windows Installer removes a copy it has finished with. The
-        // generic file error says the file was left in place, which it was not.
-        var source = $@"{SourceDir}\a.msi";
-        var gone = false;
-        var (fs, file) = FileSystemReporting(source);
-        file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source && !gone);
-        file.When(f => f.Move(source, Arg.Any<string>())).Do(_ =>
-        {
-            gone = true;
-            throw new FileNotFoundException("gone", source);
-        });
-
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        Assert.IsType<MissingSourceFile>(Assert.Single(result.Errors));
-        Assert.Equal(0, result.MovedCount);
-    }
-
-    [Fact]
-    public async Task A_not_found_from_the_move_with_a_copy_in_the_destination_is_a_file_error()
-    {
-        // The source is gone and a file stands under its name in the backup folder, as
-        // after a move to another drive that copied the file and then failed. "No longer
-        // exists" would leave that copy out of the account, so it is the file error.
-        var source = $@"{SourceDir}\a.msi";
-        var gone = false;
-        var (fs, file) = FileSystemReporting(source);
-        var dest = fs.Path.Combine(DestDir, fs.Path.GetFileName(source));
-        file.Exists(Arg.Any<string>()).Returns(ci =>
-            (string?)ci[0] == source ? !gone : (string?)ci[0] == dest && gone);
-        file.When(f => f.Move(source, Arg.Any<string>())).Do(_ =>
-        {
-            gone = true;
-            throw new FileNotFoundException("gone", source);
-        });
-
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        Assert.IsType<IOFailure>(Assert.Single(result.Errors));
-        Assert.Equal(0, result.MovedCount);
-    }
-
-    [Fact]
-    public async Task A_not_found_from_the_move_with_the_source_still_there_is_a_file_error()
-    {
-        // The not-found arm needs the source confirmed gone. With the file still in
-        // the folder, "no longer exists" would be false, so it is the file error.
-        var source = $@"{SourceDir}\a.msi";
-        var fs = FileSystemThatFailsMove(source, new FileNotFoundException("not found", source));
-
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        Assert.IsType<IOFailure>(Assert.Single(result.Errors));
-        Assert.Equal(0, result.MovedCount);
-    }
-
-    // The five below drive the state Win32 documents and nothing else in the
-    // suite can reach: a File.Move that returns success having copied the file
-    // and left the original where it was. See HalfMoveFileSystem.
-
-    [Fact]
-    public async Task MoveFilesAsync_finishes_a_move_whose_source_was_read_only()
-    {
-        var fs = new Helpers.HalfMoveFileSystem();
-        var source = $@"{SourceDir}\readonly.msi";
-        fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly });
-        fs.AddDirectory(DestDir);
-
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        // The file the user asked to move has moved: one copy, in the
-        // destination, and nothing left in the cache folder.
-        Assert.Equal(1, result.MovedCount);
-        Assert.Empty(result.Errors);
-        Assert.False(fs.File.Exists(source));
-        Assert.True(fs.File.Exists($@"{DestDir}\readonly.msi"));
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_removes_the_copy_when_the_source_cannot_be_deleted()
-    {
-        var fs = new Helpers.HalfMoveFileSystem();
-        var source = $@"{SourceDir}\locked.msi";
-        var destPath = $@"{DestDir}\locked.msi";
-        fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        fs.DeleteFailures[source] =
-            new IOException("held open", unchecked((int)0x80070020));
-
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        // Reported as failed, and true: the user has exactly one copy of the
-        // file, where it started. A duplicate in the backup folder would be the
-        // worse outcome, being one the completion screen never mentions.
-        Assert.IsType<FileInUse>(Assert.Single(result.Errors));
         Assert.Equal(0, result.MovedCount);
         Assert.True(fs.File.Exists(source));
-        Assert.False(fs.File.Exists(destPath));
+        Assert.False(fs.File.Exists($@"{DestDir}\a.msi"));
+        Assert.Contains("put-back a.msi", hand.Steps);
     }
 
     [Fact]
-    public async Task MoveFilesAsync_files_a_failure_when_even_the_copy_cannot_be_removed()
+    public async Task MoveFilesAsync_files_an_access_refusal_as_access_denied_and_leaves_no_copy()
     {
-        var fs = new Helpers.HalfMoveFileSystem();
-        var source = $@"{SourceDir}\stuck.msi";
-        var destPath = $@"{DestDir}\stuck.msi";
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
         fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        fs.DeleteFailures[source] = new UnauthorizedAccessException("source refused");
-        fs.DeleteFailures[destPath] = new UnauthorizedAccessException("destination refused");
+        var hand = new Helpers.ScriptedInHandFolder(fs).Refuse("delete", source, 5);
 
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
 
-        // Needs a destination that took a create and refuses a delete, which
-        // the write probe has already passed once. The file is still reported
-        // as failed rather than moved, which is the half that must hold.
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
         Assert.Equal(0, result.MovedCount);
         Assert.True(fs.File.Exists(source));
+        Assert.False(fs.File.Exists($@"{DestDir}\a.msi"));
     }
 
     [Fact]
-    public async Task MoveFilesAsync_removes_a_read_only_copy_of_a_source_it_could_not_delete()
+    public async Task A_source_that_goes_as_the_open_reaches_it_is_filed_as_no_longer_there()
     {
-        var fs = new Helpers.HalfMoveFileSystem();
-        var source = $@"{SourceDir}\readonly-locked.msi";
-        var destPath = $@"{DestDir}\readonly-locked.msi";
-        fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly });
-        fs.AddDirectory(DestDir);
-        fs.DeleteFailures[source] =
-            new IOException("held open", unchecked((int)0x80070020));
-
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
-
-        // CopyFile carries the source's attributes to the copy, so the copy of
-        // a read-only source is read-only and the discard's own delete is
-        // refused unless the attribute comes off first. Without that, the file
-        // is in both places under an error saying it was left in place.
-        Assert.IsType<FileInUse>(Assert.Single(result.Errors));
-        Assert.Equal(0, result.MovedCount);
-        Assert.True(fs.File.Exists(source));
-        Assert.False(fs.File.Exists(destPath));
-
-        // "Left in place" has to hold of the file's attributes as well as of the
-        // file. The reconcile clears read-only so it can delete the source and
-        // the delete then fails, so without the restore the run ends with one
-        // step of an abandoned operation committed and nothing recording it.
-        Assert.True(fs.File.GetAttributes(source).HasFlag(FileAttributes.ReadOnly));
-    }
-
-    [Fact]
-    public async Task MoveFilesAsync_keeps_the_copy_when_the_source_goes_mid_reconcile()
-    {
-        var fs = new Helpers.HalfMoveFileSystem();
-        var source = $@"{SourceDir}\quarantined.msi";
-        var destPath = $@"{DestDir}\quarantined.msi";
+        // The file is there for the existence check and gone when the hand opens
+        // it, as when Windows Installer removes a copy it has finished with. The
+        // generic file error says the file was left in place, which it was not.
+        // The copy made before the open is removed again, so nothing of the file
+        // is left in the destination.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
         fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        fs.VanishOnAttributeRead.Add(source);
+        var hand = new Helpers.ScriptedInHandFolder(fs);
+        // The step is recorded before the hand's own open, so the file is gone when that open looks.
+        hand.OnStep = (step, path) =>
+        {
+            if (step == "hold" && path == source) fs.RemoveFile(source);
+        };
 
-        var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
 
-        // Source gone and the copy in place is what a completed move leaves, so
-        // this is one, however it got there. Treating the attribute read's
-        // failure as the move's would discard the copy and file the result as
-        // "still in the cache", leaving the user with no copy at all.
+        Assert.IsType<MissingSourceFile>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        Assert.False(fs.File.Exists($@"{DestDir}\a.msi"));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_to_a_folder_on_the_same_drive_goes_by_rename()
+    {
+        // A destination on the Installer folder's own drive letter is reached by a
+        // rename, so the file is not copied first.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        const string sameDrive = @"C:\ic-test-backup";
+        fs.AddFile(source, new MockFileData("payload"));
+        var hand = new Helpers.ScriptedInHandFolder(fs);
+
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), sameDrive);
+
         Assert.Equal(1, result.MovedCount);
         Assert.Empty(result.Errors);
+        Assert.Contains("move-into a.msi", hand.Steps);
+        Assert.DoesNotContain("copy-open a.msi", hand.Steps);
         Assert.False(fs.File.Exists(source));
-        Assert.True(fs.File.Exists(destPath));
+        Assert.True(fs.File.Exists($@"{sameDrive}\a.msi"));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_to_a_folder_on_another_drive_goes_by_copy()
+    {
+        // A destination on another drive letter cannot be reached by a rename, so
+        // the file is copied first and the original is deleted once it is taken.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var hand = new Helpers.ScriptedInHandFolder(fs);
+
+        var svc = new MoveFilesService(fs, null, null, hand, null, null);
+        var result = await svc.MoveFilesAsync(Helpers.StandingChecks.Of(source), DestDir);
+
+        Assert.Equal(1, result.MovedCount);
+        Assert.Empty(result.Errors);
+        var copyOpen = hand.Steps.IndexOf("copy-open a.msi");
+        Assert.True(copyOpen >= 0);
+        Assert.True(copyOpen < hand.Steps.IndexOf("hold a.msi"));
+        Assert.True(copyOpen < hand.Steps.IndexOf("delete a.msi"));
+        Assert.DoesNotContain("move-into a.msi", hand.Steps);
+        Assert.False(fs.File.Exists(source));
+        Assert.True(fs.File.Exists($@"{DestDir}\a.msi"));
     }
 
     // THE TWO CONTAINMENT GATES AT THE SERVICE BOUNDARY, one test each, driven
@@ -857,7 +586,7 @@ public class MoveFilesServiceUnitTests
 
         var svc = new MoveFilesService(fs);
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
-            svc.MoveFilesAsync(new[] { source }, InsideInstallerCache, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), InsideInstallerCache));
 
         Assert.Equal(
             string.Format(InstallerClean.Resources.Strings.Error_MoveIntoInstaller, InsideInstallerCache),
@@ -875,7 +604,7 @@ public class MoveFilesServiceUnitTests
 
         var svc = new MoveFilesService(fs);
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
-            svc.MoveFilesAsync(new[] { source }, InsideSystemFolder, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), InsideSystemFolder));
 
         Assert.Equal(
             string.Format(InstallerClean.Resources.Strings.Error_DestinationInSystemFolder, InsideSystemFolder),
@@ -895,7 +624,7 @@ public class MoveFilesServiceUnitTests
 
         var svc = new MoveFilesService(fs);
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
-            svc.MoveFilesAsync(new[] { source }, destination, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), destination));
 
         Assert.Equal(
             string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
@@ -916,7 +645,7 @@ public class MoveFilesServiceUnitTests
 
         var svc = new MoveFilesService(fs);
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
-            svc.MoveFilesAsync(new[] { source }, destination, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), destination));
 
         Assert.Equal(
             string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
@@ -945,9 +674,9 @@ public class MoveFilesServiceUnitTests
                 return false;
             });
 
-        var svc = new MoveFilesService(fs, NullMutexProbe.Instance, installerFolderOverride: null, destinationGuard: guard);
+        var svc = new MoveFilesService(fs, null, null, null, guard, null);
         var ex = await Assert.ThrowsAsync<LocalisedAccessException>(() =>
-            svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir));
 
         // The service names a cause only for a read-back refused access; every other
         // refusal is a folder the Move cannot write to.
@@ -986,10 +715,10 @@ public class MoveFilesServiceUnitTests
         var source = $@"{SourceDir}\a.msi";
         fs.AddFile(source, new MockFileData("payload"));
         var svc = new MoveFilesService(
-            fs, NullMutexProbe.Instance, installerFolderOverride: null, destinationGuard: GuardRefusingTheWriteTest(fs));
+            fs, null, null, null, GuardRefusingTheWriteTest(fs), null);
 
         await Assert.ThrowsAsync<LocalisedAccessException>(() =>
-            svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir));
 
         Assert.False(fs.Directory.Exists(DestDir));
         Assert.False(fs.Directory.Exists(@"D:\backup"));
@@ -1007,7 +736,7 @@ public class MoveFilesServiceUnitTests
         var svc = new MoveFilesService(fs);
 
         await Assert.ThrowsAsync<LocalisedAccessException>(() =>
-            svc.MoveFilesAsync(new[] { $@"{SourceDir}\a.msi" }, DestDir, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { $@"{SourceDir}\a.msi" }), DestDir));
 
         directory.Received(1).Delete(@"D:\backup");
         directory.Received(1).Delete(Arg.Any<string>());
@@ -1028,10 +757,10 @@ public class MoveFilesServiceUnitTests
         guard.TryRemoveEmptyFolder(Arg.Any<string>(), Arg.Any<string>())
             .Returns(call => removal.TryRemoveEmptyFolder(call.ArgAt<string>(0), call.ArgAt<string>(1)));
         var svc = new MoveFilesService(
-            fs, NullMutexProbe.Instance, installerFolderOverride: null, destinationGuard: guard);
+            fs, null, null, null, guard, null);
 
         await Assert.ThrowsAsync<IOException>(() =>
-            svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir));
 
         Assert.False(fs.Directory.Exists(DestDir));
         Assert.False(fs.Directory.Exists(@"D:\backup"));
@@ -1046,10 +775,10 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(source, new MockFileData("payload"));
         fs.AddDirectory(@"D:\backup");
         var svc = new MoveFilesService(
-            fs, NullMutexProbe.Instance, installerFolderOverride: null, destinationGuard: GuardRefusingTheWriteTest(fs));
+            fs, null, null, null, GuardRefusingTheWriteTest(fs), null);
 
         await Assert.ThrowsAsync<LocalisedAccessException>(() =>
-            svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir));
 
         Assert.False(fs.Directory.Exists(DestDir));
         Assert.True(fs.Directory.Exists(@"D:\backup"));
@@ -1063,10 +792,10 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(source, new MockFileData("payload"));
         fs.AddDirectory(DestDir);
         var svc = new MoveFilesService(
-            fs, NullMutexProbe.Instance, installerFolderOverride: null, destinationGuard: GuardRefusingTheWriteTest(fs));
+            fs, null, null, null, GuardRefusingTheWriteTest(fs), null);
 
         await Assert.ThrowsAsync<LocalisedAccessException>(() =>
-            svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
+            svc.MoveFilesAsync(Helpers.StandingChecks.Of(new[] { source }), DestDir));
 
         Assert.True(fs.Directory.Exists(DestDir));
     }

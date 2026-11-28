@@ -26,8 +26,6 @@ namespace InstallerClean.Tests.ViewModels;
 /// </summary>
 public class CleanupStopWaitingTests : IDisposable
 {
-    // Every specification of MoveFilesAsync below names the trailing under-lease argument,
-    // which is optional on the interface and never omitted by the app.
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
     private readonly IDeleteFilesService _deleteService = Substitute.For<IDeleteFilesService>();
@@ -38,7 +36,7 @@ public class CleanupStopWaitingTests : IDisposable
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
-    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
+    private readonly IBatchCheck _batchCheck = Substitute.For<IBatchCheck>();
     private readonly IEarlierRunCheck _earlierRunCheck = Substitute.For<IEarlierRunCheck>();
     private readonly IFirstRunMark _firstRunMark = FirstRunMarks.Claiming();
     private readonly IWindowsRegion _windowsRegion = Substitute.For<IWindowsRegion>();
@@ -60,8 +58,11 @@ public class CleanupStopWaitingTests : IDisposable
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         // Everything survives the check unless a test says otherwise.
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
-            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(ci => Task.FromResult(StandingChecks.Stood(
+                new ReverifyResult(ci.Arg<IReadOnlyList<string>>(), Array.Empty<string>()))));
         _fileSystem.Path.Returns(new MockFileSystem().Path);
         _fileSystem.Directory.Returns(_directory);
         _fileSystem.File.Returns(_file);
@@ -78,7 +79,7 @@ public class CleanupStopWaitingTests : IDisposable
         _made.Add(new MainViewModel(_scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _updateCheckService, _reverifier,
+            _fileSystem, _resultLogService, _updateCheckService, _batchCheck,
             _earlierRunCheck, _firstRunMark, _windowsRegion,
             destinationGuard: new ByPathDestinationGuard(_fileSystem)));
 
@@ -128,19 +129,29 @@ public class CleanupStopWaitingTests : IDisposable
     /// reporter the card gave the check and the check's token.
     /// </summary>
     private void CheckReports(params Func<IProgress<ScanProgressUpdate>, CancellationToken, Task>[] steps) =>
-        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
+        _batchCheck.RunAsync(
+                Arg.Any<IReadOnlyList<string>>(), Arg.Any<TimeSpan?>(), Arg.Any<IProgress<BatchCheckProgress>>(),
+                Arg.Any<CancellationToken>())
             .Returns(ci =>
             {
-                var files = (IReadOnlyList<string>)ci[0]!;
-                var token = (CancellationToken)ci[1]!;
-                var progress = (IProgress<ScanProgressUpdate>)ci[2]!;
+                var files = ci.Arg<IReadOnlyList<string>>();
+                var token = ci.Arg<CancellationToken>();
+                var progress = new SourceWaitReporter(ci.Arg<IProgress<BatchCheckProgress>>());
                 return Task.Run(async () =>
                 {
                     foreach (var step in steps) await step(progress, token);
                     token.ThrowIfCancellationRequested();
-                    return new ReverifyResult(Array.Empty<string>(), files, new HeldBackReasons(Reclaimed: files.Count));
+                    return StandingChecks.Stood(
+                        new ReverifyResult(Array.Empty<string>(), files, new HeldBackReasons(Reclaimed: files.Count)));
                 });
             });
+
+    /// <summary>Reports each wait a step tells as the check's own source-wait stage.</summary>
+    private sealed class SourceWaitReporter(IProgress<BatchCheckProgress> check) : IProgress<ScanProgressUpdate>
+    {
+        public void Report(ScanProgressUpdate value) =>
+            check.Report(new BatchCheckProgress(BatchCheckStage.SourceWait, SourceWait: value));
+    }
 
     /// <summary>Starts the Move on the dispatcher, as the button does, and waits for it to end.</summary>
     private async Task MoveAsync(MainViewModel vm)
@@ -262,7 +273,7 @@ public class CleanupStopWaitingTests : IDisposable
         var wait = new SourceFolderWait("D:", () => { });
         bool? upWithItsHeading = null, goneWithIt = null;
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<StandingCheck>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())

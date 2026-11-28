@@ -715,6 +715,9 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        No placeholder: do not reintroduce one. -->
   <data name="Status.Moving" xml:space="preserve"><value>Movendo arquivos desnecessários...</value></data>
   <data name="Status.Deleting" xml:space="preserve"><value>Excluindo arquivos desnecessários...</value></data>
+  <data name="Status.WaitingForInstaller" xml:space="preserve"><value>Waiting for Windows Installer to finish...</value><comment>The line over the progress bar while a Move or Delete waits for Windows Installer. Nothing has gone wrong and the app carries on by itself.</comment></data>
+  <data name="Status.WaitingForUnfinishedInstall" xml:space="preserve"><value>Waiting for an installation that has not finished. If nothing is being installed, cancel and restart Windows.</value><comment>The line over the progress bar while a Move or Delete waits on an installation that was interrupted and may be waiting for a restart, which waiting alone does not end.</comment></data>
+  <data name="Status.CheckingAgain" xml:space="preserve"><value>Checking the remaining files again...</value><comment>The line over the progress bar while a Move or Delete makes its check again in the middle of a batch.</comment></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Movimentação cancelada após processar {0} de {1} {2}.</value></data>
@@ -872,9 +875,9 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        sentence itself cannot differ between them.
 
        AND EACH HOST PRINTS IT ONCE PER RUN, WHICH IS THE OTHER HALF AND WAS NOT
-       TRUE UNTIL 3.0.0. Two producers hold files back, the pre-act re-verify and
-       the action service's re-read under the installer mutex, and each host ADDS
-       their tallies and prints the total. The command line printed one line each
+       TRUE UNTIL 3.0.0. The check before a batch holds files back and so can a
+       check made again in the middle of it, and each host ADDS their tallies and
+       prints the total. The command line printed one line each
        for a while, which read as two findings while the sentences named causes and
        as a repeat once they did not. A second print in one run is the fault rather
        than the wording.
@@ -1353,60 +1356,6 @@ O InstallerClean já estava em execução como administrador, então iniciá-lo 
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
   <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>O InstallerClean não conseguiu que o Windows resolvesse o caminho verdadeiro de {InstallerFolder}, então não foi possível mostrar que algum arquivo estivesse dentro dela e nenhum foi incluído na lista dos que podem ser excluídos com segurança. Esta análise não encontrou nada porque essa verificação falhou, não porque a pasta esteja limpa.</value></data>
-  <!-- The next four keys are two PAIRS, one per action, for one condition: the
-       Windows Installer lock could not be taken and nothing was shown to be
-       holding it, so the batch was refused before it reached a file. The two
-       unprefixed keys are the delete half and the two Move* keys are the move
-       half. The delete half is unprefixed because it is the established name,
-       and an unprefixed name in this file promises nothing about being
-       action-neutral: Error.DestinationInSystemFolder is move-only and carries no
-       prefix either. Each half is word for word its sibling with the action word
-       changed, deliberately, because a second phrasing of one idea is worse than
-       a parallel one.
-
-       The heading over Error.InstallerLockUnavailable below. It is the first
-       thing a screen reader announces when that dialog opens and the first
-       thing a glancing eye takes, so it carries the outcome rather than the
-       condition: the delete was refused before it reached a file, and nothing
-       was attempted. A translation that reads as a failure part-way through, or
-       as a delete that went wrong, says the opposite of what happened. The same
-       sentence as Completion.NothingDeleted, which the completion overlay puts
-       over a delete that reached no file, so a language carries one wording for
-       the two rather than two wordings for one thing. No placeholders. -->
-  <data name="Error.InstallerLockUnavailableTitle" xml:space="preserve"><value>Nada foi excluído</value></data>
-  <!-- Shown when a Delete could not open Global\_MSIExecute because the object's
-       security refused this process the rights, so ownership was never sampled.
-       The pair of Error.InstallerLockUnavailable above: same outcome, different
-       cause, and the cause is the whole reason it is a separate sentence. It does
-       not tell the reader whether to try again: the app was refused the one
-       question that would have said. Takes the "Nothing was deleted" heading. No
-       placeholders. -->
-  <data name="Error.InstallerLockAccessRefused" xml:space="preserve"><value>O Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho, e nada foi excluído.</value></data>
-  <!-- The move half of the heading above, and it takes the same wording as
-       Completion.NothingMoved for the same reason its sibling takes
-       Completion.NothingDeleted's. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nada foi movido</value></data>
-  <!-- The move half of Error.InstallerLockAccessRefused. Takes the "Nothing was
-       moved" heading. No placeholders. -->
-  <data name="Error.MoveInstallerLockAccessRefused" xml:space="preserve"><value>O Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho, e nada foi movido.</value></data>
-  <!-- Shown when a Delete could not take Global\_MSIExecute for a reason that is
-       neither of the two with sentences of their own: another program holding the
-       object, and a security descriptor that refuses this process the rights to
-       open it. Every other non-fatal failure to acquire arrives here, with
-       nothing shown to be holding it. Without that hold nothing stops a program
-       registering a package part-way through the batch, so the proof the
-       act-time re-verify produced can go stale under the delete, and the batch
-       is refused rather than run. Written to the shape of
-       Error.ScanCacheRootUnresolved above, which supplies the middle step of
-       its own causal chain: what the app could not do, what followed from it,
-       and that nothing has been removed. No placeholders. -->
-  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>O InstallerClean não conseguiu obter o bloqueio que o Windows Installer usa para impedir que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho, e nada foi excluído. Tente de novo, e reinicie o Windows se continuar acontecendo.</value></data>
-  <!-- The move half of the sentence above. Move refuses on the same condition
-       because its exposure to it is the delete's: a file moved out of the cache
-       is as absent from it as a deleted one, so a transaction starting part-way
-       through fails to find it either way, and the recovery a move leaves the
-       user does not make the batch safer to run. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>O InstallerClean não conseguiu obter o bloqueio que o Windows Installer usa para impedir que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho, e nada foi movido. Tente de novo, e reinicie o Windows se continuar acontecendo.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destino inválido</value></data>
   <!-- The heading over Error.DestinationChangedMidBatch, which is the one
        destination message that is not about a path being wrong. The guard behind
@@ -1417,6 +1366,10 @@ O InstallerClean já estava em execução como administrador, então iniciá-lo 
        Error.InvalidDestinationTitle are destinations that really are invalid. No
        placeholders. -->
   <data name="Error.MoveStoppedTitle" xml:space="preserve"><value>Movimentação interrompida</value></data>
+  <data name="Error.DeleteStoppedTitle" xml:space="preserve"><value>Delete stopped</value><comment>Heading of the dialog shown when a Delete ends before its last file.</comment></data>
+  <data name="Error.BatchEnded.RecordsKeptChanging" xml:space="preserve"><value>InstallerClean stopped because Windows Installer's records kept changing while it checked the files, which happens while programs are being installed or updated. Files already moved or deleted stay so. The rest were not touched.</value><comment>A Move or Delete ended because three checks running were each interrupted by a write to Windows Installer's records.</comment></data>
+  <data name="Error.BatchEnded.WatchUnavailable" xml:space="preserve"><value>InstallerClean stopped because Windows would not let it watch the registry keys where Windows Installer keeps its records, so it cannot tell whether they change while it works. Files already moved or deleted stay so. The rest were not touched.</value><comment>A Move or Delete ended, or did not start, because the watch on Windows Installer's records could not be set.</comment></data>
+  <data name="Error.BatchEnded.InHandFolderUnavailable" xml:space="preserve"><value>InstallerClean could not make its own folder, {0}, inside the Installer folder (Windows error {1}), so it did not move or delete anything.</value><comment>{0} is the folder's name, {1} a Windows error number.</comment></data>
   <!-- Raised only from the Move flow, so the folder it names is the backup folder
        the user nominated. EIGHT BODIES CAN FOLLOW IT and the heading has to hold
        over every one: five open on a form of "cannot write to", and three name a
@@ -1494,6 +1447,7 @@ Detalhes em {1}.</value></data>
   <data name="Error.IOFailure.Plural" xml:space="preserve"><value>O Windows relatou erros de arquivo; estes arquivos foram deixados onde estavam.</value></data>
   <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Algo deu errado com este arquivo; ele foi deixado onde estava.</value></data>
   <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Algo deu errado com estes arquivos; eles foram deixados onde estavam.</value></data>
+  <data name="Error.FileLeftInHand" xml:space="preserve"><value>This file could not be put back in its place. It is whole, in {0}.</value><comment>A per-file error on the finished screen and in the command line's list: the file was renamed into the app's own folder inside the Installer folder and could not be renamed back. 0 = the full path of that folder.</comment></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Recusando mover arquivos para a pasta do Windows Installer (destino: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
@@ -2070,6 +2024,13 @@ Execute o InstallerClean novamente como administrador.</value></data>
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Erro: o Windows Installer tem algo não concluído, então /m e /d ficam bloqueados e o InstallerClean não vai tocar em {InstallerFolder}. Tente de novo quando isso se resolver.</value></data>
+  <data name="Cli.WaitingForInstaller" xml:space="preserve"><value>Waiting for Windows Installer to finish. InstallerClean carries on by itself when it has.</value><comment>Printed once when a /d or /m begins to wait for Windows Installer, at its start or in the middle of a batch.</comment></data>
+  <data name="Cli.CheckingAgain" xml:space="preserve"><value>Checking the remaining files again.</value><comment>Printed when a /d or /m makes its check again in the middle of a batch.</comment></data>
+  <data name="Cli.BatchEnded.WaitBoundReached" xml:space="preserve"><value>Error: Windows Installer stayed busy for 30 minutes, so InstallerClean stopped. Files already moved or deleted stay so. The rest were not touched. Run the command again later to carry on.</value><comment>A /d or /m ended because Windows Installer stayed busy for the whole of the wait.</comment></data>
+  <data name="Cli.BatchEnded.RecordsKeptChanging" xml:space="preserve"><value>Error: Windows Installer's records kept changing while InstallerClean checked the files, which happens while programs are being installed or updated, so it stopped. Files already moved or deleted stay so. The rest were not touched. Try again once the installations have finished.</value><comment>The console form of Error.BatchEnded.RecordsKeptChanging.</comment></data>
+  <data name="Cli.BatchEnded.WatchUnavailable" xml:space="preserve"><value>Error: Windows would not let InstallerClean watch the registry keys where Windows Installer keeps its records, so it cannot tell whether they change while it works, and it stopped. Files already moved or deleted stay so. The rest were not touched.</value><comment>The console form of Error.BatchEnded.WatchUnavailable.</comment></data>
+  <data name="Cli.BatchEnded.InHandFolderUnavailable" xml:space="preserve"><value>Error: InstallerClean could not make its own folder, {0}, inside {InstallerFolder} (Windows error {1}), so it did not move or delete anything.</value><comment>{0} is the folder's name, {1} a Windows error number.</comment></data>
+  <data name="Cli.BatchEnded.AccessRefused" xml:space="preserve"><value>Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it stopped. Files already moved or deleted stay so. The rest were not touched.</value><comment>A /d or /m ended in the middle of a batch because Windows refused a read of one of Windows Installer's signals.</comment></data>
   <!-- What the command line prints, on every mode, where the scan found one of the
        signals the Cli.PendingRebootBlocked.* lines name set when it read them just
        after its clock, and so held back every file in the folder no record names. They report and
@@ -2108,19 +2069,10 @@ Execute o InstallerClean novamente como administrador.</value></data>
   <!-- The command line's form of Summary.ScanSignal.ClockSetBack, printed where a
        Cli.ScanSignal.* line would be, ending with running it again. -->
   <data name="Cli.ScanSignal.ClockSetBack" xml:space="preserve"><value>O relógio deste PC voltou atrás ou atrasou durante a análise, então o InstallerClean não conseguiu saber quais arquivos tinham acabado de ser adicionados e deixou de lado todos os que podem ser um deles. Execute o comando de novo.</value></data>
-  <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
-       string rather than a shared one because this whole family is: all five
-       Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
-       it, which is the console's shape and not the window's. Same condition,
-       same refusal, /d. No placeholders. -->
-  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Erro: o InstallerClean não conseguiu obter o bloqueio do Windows Installer que impede que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho. Nada foi excluído. Tente de novo, e reinicie o Windows se continuar acontecendo.</value></data>
-  <!-- The /m half of the line above, the pair matching the two Error.* pairs in
-       the window's family. No placeholders. -->
-  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Erro: o InstallerClean não conseguiu obter o bloqueio do Windows Installer que impede que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho. Nada foi movido. Tente de novo, e reinicie o Windows se continuar acontecendo.</value></data>
-  <!-- The console pair of Error.InstallerLockAccessRefused, /d then /m. Opens
-       "Error: " like the rest of this family, and like it says nothing about
-       trying again. Printed for a refused lock wherever it is met, at the
-       pending-reboot check and at the acquire alike. No placeholders. -->
+  <!-- The console pair for a refused lock, /d then /m. Opens
+       "Error: " like the rest of this family, and says nothing about
+       trying again. Printed for a refused lock met before anything has been
+       moved or deleted. No placeholders. -->
   <data name="Cli.InstallerLockAccessRefused" xml:space="preserve"><value>Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi excluído.</value></data>
   <data name="Cli.MoveInstallerLockAccessRefused" xml:space="preserve"><value>Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi movido.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
@@ -2132,7 +2084,7 @@ Execute o InstallerClean novamente como administrador.</value></data>
   <!-- Longer than its siblings: besides the condition it says what the refusal leaves
        unknown and that nothing was moved or deleted, naming both actions because the
        line covers both modes. The line it completes is the one a refused lock writes
-       wherever it is met, at the pending-reboot check or at the acquire. -->
+       where it is met before anything has been moved or deleted. -->
   <!-- The detail Cli.EventLogPendingRebootBlocked carries where the Windows Installer
        lock's check failed on a Windows error: its number, in decimal, and not the text
        Windows gives for it, which is in the language Windows is shown in. English-only like every
@@ -2152,16 +2104,6 @@ Execute o InstallerClean novamente como administrador.</value></data>
        The detail arrives with its own leading separator rather than the template
        spacing it, so the five reasons that never carry one do not each log a
        line ending in a space. -->
-  <!-- 0 = arg ("/d" or "/m"). The audit twin of the two stdout lines above, and
-       ONE line for both modes where they are a pair, because a machine-read line
-       is matched on its shape and {0} already carries which mode ran. It cannot
-       share Cli.EventLogPendingRebootBlocked: that line names a reason from
-       Cli.EventLogReason.*, and none of those describes an acquire that failed
-       with nothing shown holding the object or refusing it. Machine-read like
-       every Cli.EventLog* line, so it is forced English at the emit site and
-       states the condition rather than the advice. The tail names both actions
-       because the line covers both modes; naming one would be false of a run in
-       the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Movendo {0} {1} desnecessários para {2}...</value></data>
@@ -2330,6 +2272,10 @@ Execute o InstallerClean novamente como administrador.</value></data>
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
+  <!-- 0 = mode arg, 1 = files processed, 2 = files in the batch, 3 = pluralised
+       "file"/"files" agreeing with the total, 4 = the reason, as an English label.
+       Audit entry for a /d or /m that ended before its last file. -->
+  <!-- 0 = mode arg, 1 = the reason, as an English label. -->
   <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
        cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
        for every run, not only the ones that committed work. -->

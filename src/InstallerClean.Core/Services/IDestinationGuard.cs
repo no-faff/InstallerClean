@@ -7,9 +7,9 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// The acts a Move makes on its destination: the creation of a folder, a write
-/// test, the discarding of a copy a half-completed move left, the removal of a
-/// folder the Move created, the opening of the folder for the length of the batch, and
-/// the creation of a copy in it. The creation of a folder says from the create itself whether it made the
+/// test, the removal of a folder the Move created, the opening of the folder for the
+/// length of the batch, the creation of a copy in it, and the discarding of a copy
+/// whose original then stayed where it was. The creation of a folder says from the create itself whether it made the
 /// folder. The user may pick a folder another account can write, so the write test, the
 /// discard and the removal are each reached in a way that a folder swapped in under the
 /// same name part way through cannot redirect. The removal reaches the folder through
@@ -40,13 +40,16 @@ public interface IDestinationGuard
     bool TryProbeWritable(string folder, out int failureCode, out WriteProbeRefusal refusal);
 
     /// <summary>
-    /// Removes the file at <paramref name="destinationPath"/>, where it is still there,
-    /// so a file reported as failed is one the user has exactly one of. Answers true
-    /// where it is gone, false where it is present and would not go, with the Win32
-    /// cause in <paramref name="failureCode"/>. A folder at the name is left and
+    /// Removes the file <paramref name="name"/> in <paramref name="destination"/>, where
+    /// it is still there, so a file reported as not moved is one the user has exactly one
+    /// of. Answers true where it is gone, false where it is present and would not go, with
+    /// the Win32 cause in <paramref name="failureCode"/>. A folder at the name is left and
     /// answered false with ERROR_DIRECTORY_NOT_SUPPORTED.
+    ///
+    /// IT REMOVES FROM THE FOLDER THAT WAS OPENED, which is the folder the copy was
+    /// created in, and not from whatever the folder's path names by then.
     /// </summary>
-    bool TryDiscardCopy(string destinationPath, out int failureCode);
+    bool TryDiscardCopy(DestinationFolder destination, string name, out int failureCode);
 
     /// <summary>
     /// Removes <paramref name="folder"/> where it is empty. <paramref name="existingAncestor"/>
@@ -190,13 +193,15 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
     public bool TryProbeWritable(string folder, out int failureCode, out WriteProbeRefusal refusal) =>
         DirectoryGuard.TryProbeWritable(folder, out failureCode, out refusal);
 
-    public bool TryDiscardCopy(string destinationPath, out int failureCode)
+    public bool TryDiscardCopy(DestinationFolder destination, string name, out int failureCode)
     {
         failureCode = 0;
-        var folder = PathText.GetDirectoryName(destinationPath);
-        var leaf = PathText.GetFileName(destinationPath);
-        if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(leaf)) return false;
-        return DirectoryGuard.TryDiscardChildCopy(folder, leaf, out failureCode);
+        if (destination.Handle is not { } folder || string.IsNullOrEmpty(name))
+        {
+            failureCode = Kernel32.ERROR_INVALID_PARAMETER;
+            return false;
+        }
+        return DirectoryGuard.TryDiscardChildCopy(folder, name, out failureCode);
     }
 
     public DestinationFolder? Open(string folder, out int failureCode)
@@ -205,7 +210,7 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
         if (handle is not null) return new DestinationFolder(folder, handle);
 
         // A folder that was not asked of Windows at all, an empty path among them, has
-        // no error of Windows' own, and 0 would read as success.
+        // no Windows error at all, and 0 would read as success.
         if (failureCode == 0) failureCode = Kernel32.ERROR_INVALID_PARAMETER;
         return null;
     }
@@ -448,9 +453,10 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
         }
     }
 
-    public bool TryDiscardCopy(string destinationPath, out int failureCode)
+    public bool TryDiscardCopy(DestinationFolder destination, string name, out int failureCode)
     {
         failureCode = 0;
+        var destinationPath = PathText.Combine(destination.Path, name);
         try
         {
             if (!_fs.File.Exists(destinationPath))

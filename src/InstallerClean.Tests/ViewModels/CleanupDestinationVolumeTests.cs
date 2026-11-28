@@ -329,7 +329,7 @@ public class CleanupDestinationVolumeTests
             Substitute.For<IFileSystem>(),
             scan,
             TestCompletion.Create(),
-            Substitute.For<IRemovableReverifier>(),
+            Substitute.For<IBatchCheck>(),
             destinationGuard: Substitute.For<IDestinationGuard>(),
             resolveIsOnCacheVolume: resolveIsOnCacheVolume);
     }

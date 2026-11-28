@@ -39,7 +39,7 @@ const TESTS = 'src/InstallerClean.Tests';
 // entry, so a test composes it outside any scope and the pattern leaves it out.
 const BUILDERS = [
   'AbortedMoveEventLogLine',
-  'InstallerLockUnavailableEventLogLine',
+  'BatchEndedEventLogLine',
   'PendingRebootEventLogLine',
   'MoveDestinationInsideInstallerEventLogLine',
   'PendingRebootEventLogReason',

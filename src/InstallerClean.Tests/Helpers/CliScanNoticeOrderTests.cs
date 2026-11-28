@@ -302,16 +302,13 @@ public class CliScanNoticeOrderTests
         var reboot = Substitute.For<IPendingRebootService>();
         reboot.Check().Returns(PendingRebootResult.Clean);
 
-        var reverifier = Substitute.For<IRemovableReverifier>();
-        reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .Returns(new ReverifyResult(result.RemovableFiles.Select(f => f.FullPath).ToList(), Array.Empty<string>()));
+        var batchCheck = CliRunFixtures.BatchCheckStandingOverEverything();
 
         var deleter = Substitute.For<IDeleteFilesService>();
-        deleter.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+        deleter.DeleteFilesAsync(Arg.Any<StandingCheck>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
 
-        var services = CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier, delete: deleter);
+        var services = CliRunFixtures.Services(scan, reboot: reboot, batchCheck: batchCheck, delete: deleter);
 
         var invocation = arg == "/d"
             ? new CliInvocation(CliCommand.Delete, null, null)

@@ -48,6 +48,20 @@ internal static class TestWalkPause
 }
 
 /// <summary>
+/// No test waits out the pauses a Move or Delete makes after a put-back and before its
+/// second try at a file in use (<see cref="InstallerClean.Services.BatchRun"/>): for the
+/// whole run they return at once. A test that reads those pauses sets a pause of its own
+/// and puts this one back.
+/// </summary>
+internal static class TestBatchPause
+{
+    internal static readonly Func<TimeSpan, CancellationToken, Task> AtOnce = (_, _) => Task.CompletedTask;
+
+    [ModuleInitializer]
+    internal static void Skip() => InstallerClean.Services.BatchRun.PauseForTests = AtOnce;
+}
+
+/// <summary>
 /// Every test that writes the crash log writes it to a folder of this run's own under the
 /// temp folder, never to the log of the PC running the suite. The folder is set before any
 /// test runs, so a test reaching the log by a path nobody planned for is covered too. Each

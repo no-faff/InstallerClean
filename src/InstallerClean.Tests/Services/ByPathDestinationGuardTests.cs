@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 using NSubstitute;
 
 namespace InstallerClean.Tests.Services;
@@ -232,8 +233,9 @@ public class ByPathDestinationGuardTests
     {
         _file.Exists(_copy).Returns(false);
         _directory.Exists(_copy).Returns(false);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.True(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.True(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(0, failureCode);
         _file.Received(1).Exists(_copy);
@@ -247,8 +249,9 @@ public class ByPathDestinationGuardTests
     {
         _file.Exists(_copy).Returns(false);
         _directory.Exists(_copy).Returns(true);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(Kernel32.ERROR_DIRECTORY_NOT_SUPPORTED, failureCode);
         _file.DidNotReceive().Delete(Arg.Any<string>());
@@ -260,8 +263,9 @@ public class ByPathDestinationGuardTests
     {
         _file.Exists(_copy).Returns(true);
         _file.GetAttributes(_copy).Returns(FileAttributes.Archive);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.True(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.True(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(0, failureCode);
         _file.Received(1).Delete(_copy);
@@ -273,8 +277,9 @@ public class ByPathDestinationGuardTests
     {
         _file.Exists(_copy).Returns(true);
         _file.GetAttributes(_copy).Returns(FileAttributes.ReadOnly | FileAttributes.Archive);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.True(_guard.TryDiscardCopy(_copy, out _));
+        Assert.True(_guard.DiscardAt(_copy, out _));
 
         Received.InOrder(() =>
         {
@@ -291,8 +296,9 @@ public class ByPathDestinationGuardTests
         _file.Exists(_copy).Returns(true);
         _file.GetAttributes(_copy).Returns(FileAttributes.ReadOnly);
         _file.When(f => f.SetAttributes(_copy, Arg.Any<FileAttributes>())).Do(_ => throw refusal);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(RecordedCodes[refusalName], failureCode);
         _file.DidNotReceive().Delete(Arg.Any<string>());
@@ -304,8 +310,9 @@ public class ByPathDestinationGuardTests
         var refusal = new UnauthorizedAccessException("refused");
         _file.Exists(_copy).Returns(true);
         _file.GetAttributes(_copy).Returns(_ => throw refusal);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(Kernel32.ERROR_ACCESS_DENIED, failureCode);
         _file.DidNotReceive().Delete(Arg.Any<string>());
@@ -316,8 +323,9 @@ public class ByPathDestinationGuardTests
     {
         var refusal = new IOException("refused", Win32HResult(Kernel32.ERROR_SHARING_VIOLATION));
         _file.Exists(_copy).Returns(_ => throw refusal);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION, failureCode);
         _file.DidNotReceive().Delete(Arg.Any<string>());
@@ -331,8 +339,9 @@ public class ByPathDestinationGuardTests
         _file.Exists(_copy).Returns(true);
         _file.GetAttributes(_copy).Returns(FileAttributes.Archive);
         _file.When(f => f.Delete(_copy)).Do(_ => throw refusal);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(RecordedCodes[refusalName], failureCode);
         _file.DidNotReceive().SetAttributes(Arg.Any<string>(), Arg.Any<FileAttributes>());
@@ -345,8 +354,9 @@ public class ByPathDestinationGuardTests
         _file.Exists(_copy).Returns(true);
         _file.GetAttributes(_copy).Returns(FileAttributes.ReadOnly | FileAttributes.Archive);
         _file.When(f => f.Delete(_copy)).Do(_ => throw refusal);
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION, failureCode);
         Received.InOrder(() =>
@@ -366,8 +376,9 @@ public class ByPathDestinationGuardTests
         _file.When(f => f.Delete(_copy)).Do(_ => throw refusal);
         _file.When(f => f.SetAttributes(_copy, FileAttributes.ReadOnly))
             .Do(_ => throw new UnauthorizedAccessException("restore refused"));
+        _directory.Exists(_folder).Returns(true);
 
-        Assert.False(_guard.TryDiscardCopy(_copy, out var failureCode));
+        Assert.False(_guard.DiscardAt(_copy, out var failureCode));
 
         Assert.Equal(Kernel32.ERROR_SHARING_VIOLATION, failureCode);
     }

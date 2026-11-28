@@ -440,10 +440,6 @@ const MAP = {
   'Error.ScanCacheRootUnresolved': `InstallerClean не смог получить от Windows настоящий путь к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был включён в список тех, которые можно безопасно удалить. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста.`,
   'Automation.Scroll.ProductDetails': `Сведения о продукте`,
   'Body.PendingReboot.Other': `У Windows Installer есть что-то незавершённое, поэтому «Переместить» и «Удалить» приостановлены, а InstallerClean не будет трогать {InstallerFolder}. Когда это разрешится, повторите сканирование, и они вернутся.`,
-  'Error.InstallerLockUnavailableTitle': `Ничего не удалено`,
-  'Error.MoveInstallerLockUnavailableTitle': `Ничего не перемещено`,
-  'Error.InstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
-  'Error.MoveInstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен.`,
   'Error.ScanInstallerFolderElsewhere': `InstallerClean не может просканировать {InstallerFolder} на этом ПК. Windows сообщает, что эта папка находится в {0}, а InstallerClean сканирует папку Installer, только если Windows указывает для неё её собственный путь.`,
   'Completion.NothingOffered': `Ни один файл нельзя удалить`,
@@ -457,8 +453,6 @@ const MAP = {
   'Error.ScanStoppedDetails': `Это также записывается в {0}.`,
   'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean не смог прочитать один из параметров Windows, которые проверяет перед тем, как трогать {InstallerFolder}, поэтому не может определить, занят ли Windows Installer или есть ли у него работа, ожидающая перезагрузки. «Переместить» и «Удалить» приостановлены. Перезагрузите Windows. InstallerClean проверит снова, когда вы в следующий раз его запустите. Если параметр по-прежнему не читается, это не та машина, которую InstallerClean может очистить.`,
   'Completion.MoveCancelledRestoreHint': `Это легко отменить. Переместите их обратно в {InstallerFolder}, и всё вернётся как было.`,
-  'Error.InstallerLockAccessRefused': `Windows отказал InstallerClean в праве проверить, занят ли Windows Installer, поэтому он не смог исключить, что файл понадобится в процессе, и ничего не было удалено.`,
-  'Error.MoveInstallerLockAccessRefused': `Windows отказал InstallerClean в праве проверить, занят ли Windows Installer, поэтому он не смог исключить, что файл понадобится в процессе, и ничего не было перемещено.`,
   'Error.MoveStoppedTitle': `Перемещение остановлено`,
   'Field.NoNamedProduct': `(нет программы)`,
   'Summary.RegisteredWindow.Missing.Plural': `{0} отсутствуют`,
@@ -552,6 +546,14 @@ const MAP = {
   'About.Link.WhatsNew': `Что нового в этой версии`,
   'Automation.About.WhatsNew.HelpText': `Открывает страницу этой версии на github в вашем браузере.`,
   'Body.PendingReboot.InstallerServiceRunning': `Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. Move and Delete are paused until it has stopped, so InstallerClean won't touch {InstallerFolder}. Then Re-scan and they come back.`,
+  'Error.FileLeftInHand': `This file could not be put back in its place. It is whole, in {0}.`,
+  'Status.WaitingForInstaller': `Waiting for Windows Installer to finish...`,
+  'Status.CheckingAgain': `Checking the remaining files again...`,
+  'Error.DeleteStoppedTitle': `Delete stopped`,
+  'Error.BatchEnded.RecordsKeptChanging': `InstallerClean stopped because Windows Installer's records kept changing while it checked the files, which happens while programs are being installed or updated. Files already moved or deleted stay so. The rest were not touched.`,
+  'Error.BatchEnded.WatchUnavailable': `InstallerClean stopped because Windows would not let it watch the registry keys where Windows Installer keeps its records, so it cannot tell whether they change while it works. Files already moved or deleted stay so. The rest were not touched.`,
+  'Error.BatchEnded.InHandFolderUnavailable': `InstallerClean could not make its own folder, {0}, inside the Installer folder (Windows error {1}), so it did not move or delete anything.`,
+  'Status.WaitingForUnfinishedInstall': `Waiting for an installation that has not finished. If nothing is being installed, cancel and restart Windows.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -679,8 +681,6 @@ const CLI = {
   'Cli.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку резервных копий и остановился. Проверьте {0}, затем запустите команду снова.`,
   'Cli.Help.Summary': `Убирает .msi и .msp из кэша, не нужные ни одной установленной программе.`,
   'Cli.Help.Elevation': `Нужна командная строка администратора; без неё сканирования не будет.`,
-  'Cli.InstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
-  'Cli.MoveInstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   // The per-file forms of the pair above.
   // The four per-file arms. Each names a different cause and the four have to stay
   // four and distinct once translated:
@@ -733,6 +733,13 @@ const CLI = {
   'Cli.Help.Notices': `  installerclean-cli --notices    Показать уведомления третьих сторон`,
   'Cli.ReportCancelledWhileSending': `Отменено во время отправки отчёта. Он всё равно мог дойти.`,
   'Cli.PendingRebootBlocked.InstallerServiceRunning': `Error: Windows Installer is still running, as it does for a few minutes after a program has been installed, updated or removed, and for as long as an installer's window is left open. /m and /d are blocked until it has stopped. Try again in a few minutes.`,
+  'Cli.WaitingForInstaller': `Waiting for Windows Installer to finish. InstallerClean carries on by itself when it has.`,
+  'Cli.CheckingAgain': `Checking the remaining files again.`,
+  'Cli.BatchEnded.WaitBoundReached': `Error: Windows Installer stayed busy for 30 minutes, so InstallerClean stopped. Files already moved or deleted stay so. The rest were not touched. Run the command again later to carry on.`,
+  'Cli.BatchEnded.RecordsKeptChanging': `Error: Windows Installer's records kept changing while InstallerClean checked the files, which happens while programs are being installed or updated, so it stopped. Files already moved or deleted stay so. The rest were not touched. Try again once the installations have finished.`,
+  'Cli.BatchEnded.WatchUnavailable': `Error: Windows would not let InstallerClean watch the registry keys where Windows Installer keeps its records, so it cannot tell whether they change while it works, and it stopped. Files already moved or deleted stay so. The rest were not touched.`,
+  'Cli.BatchEnded.InHandFolderUnavailable': `Error: InstallerClean could not make its own folder, {0}, inside {InstallerFolder} (Windows error {1}), so it did not move or delete anything.`,
+  'Cli.BatchEnded.AccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it stopped. Files already moved or deleted stay so. The rest were not touched.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

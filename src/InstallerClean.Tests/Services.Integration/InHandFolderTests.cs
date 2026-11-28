@@ -31,6 +31,34 @@ public sealed class InHandFolderTests : IDisposable
         return path;
     }
 
+    /// <summary>
+    /// A rename moves a file's change time, which is why a check made straight after a
+    /// put-back waits first (<see cref="BatchRun.PauseAfterAPutBack"/>): the full check
+    /// passes a file no record names only where its change time is before the check's
+    /// clock.
+    /// </summary>
+    [Fact]
+    public void A_file_taken_out_and_put_back_carries_a_later_change_time()
+    {
+        var path = Cached("put-back.msi");
+        var times = new FileTimesReader();
+        Assert.Equal(FileTimesRead.Read, times.ReadOutcome(path, out var before));
+        Thread.Sleep(50);
+
+        using (var batch = OpenBatch())
+        {
+            var held = Held(batch, path);
+            Assert.True(held.TakeOut(out _));
+            Assert.True(held.PutBack(out _));
+            held.Dispose();
+        }
+
+        Assert.Equal(FileTimesRead.Read, times.ReadOutcome(path, out var after));
+        Assert.True(after.ChangeUtc > before.ChangeUtc, $"change time {after.ChangeUtc:O} is not after {before.ChangeUtc:O}");
+        Assert.Equal(before.LastWriteUtc, after.LastWriteUtc);
+        Assert.Equal(before.CreationUtc, after.CreationUtc);
+    }
+
     private IInHandBatch OpenBatch()
     {
         var batch = _hand.OpenBatch(_installer, out var code);

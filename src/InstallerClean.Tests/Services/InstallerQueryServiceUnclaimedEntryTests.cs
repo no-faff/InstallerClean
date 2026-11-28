@@ -600,7 +600,7 @@ public class InstallerQueryServiceUnclaimedEntryTests
         var fallback = UnlistedProgramFallback(
             new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]));
         var path = Row(await Scan(msi, fallback)).LocalPackagePath;
-        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, (_, _) => fallback), msi);
+        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, (_, _) => fallback));
 
         var result = await reverifier.ReverifyAsync([path]);
 
