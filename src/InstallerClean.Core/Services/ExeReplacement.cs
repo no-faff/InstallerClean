@@ -788,7 +788,7 @@ internal static class ExeReplacement
 
     /// <summary>
     /// Deletes <paramref name="path"/> where it is a plain file, through
-    /// <see cref="DirectoryGuard.TryDiscardChildCopy"/>: a link is never followed, and a
+    /// <see cref="DirectoryGuard.TryDiscardChildCopy(string, string, out int)"/>: a link is never followed, and a
     /// read-only file goes without its attributes being changed where the system allows it,
     /// so the exe's second name, where it is a link, goes without touching the exe. Answers
     /// whether nothing is there now, its folder included, with the error Windows gave in
