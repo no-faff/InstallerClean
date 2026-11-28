@@ -326,6 +326,28 @@ internal enum CliEventClass
     /// fell short of nothing.
     /// </summary>
     ScanPutBackNotice,
+
+    /// <summary>
+    /// Notice: a scan left where they lie, in the app's own folder inside the Installer
+    /// folder, files an earlier Move or Delete had left there, and every later scan tries
+    /// again to put them back. The entry names them. Written by whichever process made the
+    /// scan, the window's among them, on every scan that leaves them. It shares Event ID
+    /// 3009 with <see cref="ScanLeftAsSourceNotice"/>, so one filter sees every file left.
+    /// WARNING, on the rule at <see cref="CliContract.EntryTypeFor"/>: the run fell short
+    /// of putting those files back, and they are neither listed nor freed meanwhile.
+    /// </summary>
+    ScanLeftInHandNotice,
+
+    /// <summary>
+    /// Notice: a scan left where they lie, in the app's own folder inside the Installer
+    /// folder, files an earlier Move or Delete had left there, because a program or a patch
+    /// has been installed from them there, and leaves them for good. The entry names them.
+    /// Written on every scan that finds them, as <see cref="ScanLeftInHandNotice"/> is, with
+    /// whose Event ID it shares. INFORMATION, on the rule at
+    /// <see cref="CliContract.EntryTypeFor"/>: it is true on every run for as long as that
+    /// program's record names the folder.
+    /// </summary>
+    ScanLeftAsSourceNotice,
 }
 
 /// <summary>The exit code and Event-log class chosen for a finished file operation.</summary>
@@ -562,6 +584,7 @@ internal static class CliContract
         CliEventClass.UpdateFailedNotice or CliEventClass.UpdateNotPossibleNotice => 3006,
         CliEventClass.UpdateNotInstalledNotice => 3007,
         CliEventClass.ScanPutBackNotice => 3008,
+        CliEventClass.ScanLeftInHandNotice or CliEventClass.ScanLeftAsSourceNotice => 3009,
         _ => 0,
     };
 
@@ -593,12 +616,15 @@ internal static class CliContract
     /// update to it for a reason true on every run, since a Warning there would post nightly
     /// on a healthy PC. A run that did not run it for a reason that can pass did its job with
     /// an older version than it set out to use, and one where Ctrl+C came did not do it, so
-    /// those notices are Warning. The two classes sharing 3006 differ in it.
+    /// those notices are Warning. The two classes sharing 3006 differ in it, and so do the
+    /// two sharing 3009: files a later scan tries again with are a run that fell short of
+    /// putting them back, and files left for good as a program's source are true on every run.
     /// </summary>
     internal static EventLogEntryType EntryTypeFor(CliEventClass outcome) => outcome switch
     {
         CliEventClass.Ok or CliEventClass.ScanMissingFilesNotice or CliEventClass.UpdatedNotice
             or CliEventClass.UpdateNotPossibleNotice or CliEventClass.ScanPutBackNotice
+            or CliEventClass.ScanLeftAsSourceNotice
             => EventLogEntryType.Information,
         _ => EventLogEntryType.Warning,
     };

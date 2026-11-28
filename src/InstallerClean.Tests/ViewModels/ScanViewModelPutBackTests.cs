@@ -42,6 +42,15 @@ public class ScanViewModelPutBackTests
                 return Task.FromResult(ending());
             });
 
+    /// <summary>The next scan reports <paramref name="recovery"/> and then returns a result.</summary>
+    private void ScanReports(InHandRecoveryResult recovery) =>
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                call.Arg<IProgress<ScanProgressUpdate>?>()!.Report(ScanProgressUpdate.ForPutBack(recovery));
+                return Task.FromResult(Result());
+            });
+
     private async Task RescanAsync(ScanViewModel vm)
     {
         var scan = Task.CompletedTask;
@@ -150,5 +159,67 @@ public class ScanViewModelPutBackTests
         await RescanAsync(vm);
 
         Assert.Equal(string.Format(Strings.Summary_PutBack, "a.msi"), vm.PutBackText);
+    }
+
+    [Fact]
+    public async Task Files_a_scan_left_are_named_under_the_files_it_put_back_those_for_a_later_scan_first()
+    {
+        ScanReports(new InHandRecoveryResult(
+            [A], LeftAsSource: 1, LeftNameTaken: 1, LeftForALaterScan: ["c.msi"], LeftAsSourceNames: ["d.msi"]));
+        var vm = NewViewModel();
+
+        await RescanAsync(vm);
+
+        Assert.Equal(
+            string.Join(Environment.NewLine,
+                string.Format(Strings.Summary_PutBack, "a.msi"),
+                string.Format(Strings.Summary_LeftInHand, "c.msi"),
+                string.Format(Strings.Summary_LeftAsSource, "d.msi")),
+            vm.PutBackText);
+    }
+
+    [Fact]
+    public async Task Files_left_by_a_scan_that_put_nothing_back_show_on_their_own()
+    {
+        ScanReports(new InHandRecoveryResult([], LeftInstallerBusy: 1, LeftForALaterScan: ["c.msi"]));
+        var vm = NewViewModel();
+
+        await RescanAsync(vm);
+
+        Assert.True(vm.HasPutBack);
+        Assert.Equal(string.Format(Strings.Summary_LeftInHand, "c.msi"), vm.PutBackText);
+    }
+
+    [Fact]
+    public async Task Files_left_are_said_by_each_scan_for_itself_and_go_with_a_scan_that_left_none()
+    {
+        ScanReports(new InHandRecoveryResult([], LeftInstallerBusy: 1, LeftForALaterScan: ["c.msi"]));
+        var vm = NewViewModel();
+        await RescanAsync(vm);
+        Assert.True(vm.HasPutBack);
+
+        ScanPutsBack([], Result);
+        await RescanAsync(vm);
+
+        Assert.False(vm.HasPutBack);
+    }
+
+    [Fact]
+    public async Task A_cancelled_scans_files_left_are_not_carried_to_the_next_result()
+    {
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                call.Arg<IProgress<ScanProgressUpdate>?>()!.Report(ScanProgressUpdate.ForPutBack(
+                    new InHandRecoveryResult([], LeftInstallerBusy: 1, LeftForALaterScan: ["c.msi"])));
+                return Task.FromException<ScanResult>(new OperationCanceledException());
+            });
+        var vm = NewViewModel();
+        await RescanAsync(vm);
+
+        ScanPutsBack([], Result);
+        await RescanAsync(vm);
+
+        Assert.False(vm.HasPutBack);
     }
 }

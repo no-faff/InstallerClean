@@ -622,7 +622,8 @@ public class FileSystemScanServiceAgeCheckTests
         try
         {
             await Scan(new[] { $@"{Folder}\old.msi" }, times,
-                recovery: new ScriptedRecovery(new InHandRecoveryResult([], LeftRecordsUnread: 1), new FixedClock(Now)));
+                recovery: new ScriptedRecovery(
+                    new InHandRecoveryResult([], LeftRecordsUnread: 1, LeftForALaterScan: ["left.msi"]), new FixedClock(Now)));
         }
         finally
         {
@@ -633,19 +634,35 @@ public class FileSystemScanServiceAgeCheckTests
     }
 
     [Fact]
-    public async Task A_scan_that_put_nothing_back_reports_no_put_back_whatever_it_left()
+    public async Task A_scan_that_left_files_and_put_none_back_reports_them_first()
     {
-        // Files left where they lie are counted in the result and are no news to the person.
+        var times = new ScriptedFileTimes();
+        times.Reads($@"{Folder}\old.msi", Old, Old, Old);
+        var progress = new RecordedProgress();
+        var left = new InHandRecoveryResult([], LeftInstallerBusy: 1, LeftForALaterScan: ["left.msi"]);
+
+        var result = await Scan(new[] { $@"{Folder}\old.msi" }, times,
+            recovery: new ScriptedRecovery(left, new FixedClock(Now)), progress: progress);
+
+        Assert.Same(left, progress.Updates[0].PutBack);
+        Assert.Single(progress.Updates, u => u.PutBack is not null);
+        Assert.Same(left, result.PutBack);
+    }
+
+    [Fact]
+    public async Task A_scan_whose_recovery_named_no_file_reports_nothing_whatever_it_counted()
+    {
+        // The app's own empty probe file, refused, is counted and named nowhere.
         var times = new ScriptedFileTimes();
         times.Reads($@"{Folder}\old.msi", Old, Old, Old);
         var progress = new RecordedProgress();
 
         var result = await Scan(new[] { $@"{Folder}\old.msi" }, times,
-            recovery: new ScriptedRecovery(new InHandRecoveryResult([], LeftInstallerBusy: 1), new FixedClock(Now)),
+            recovery: new ScriptedRecovery(new InHandRecoveryResult([], LeftRefused: 1), new FixedClock(Now)),
             progress: progress);
 
         Assert.DoesNotContain(progress.Updates, u => u.PutBack is not null);
-        Assert.Equal(1, result.PutBack.LeftInstallerBusy);
+        Assert.Equal(1, result.PutBack.LeftRefused);
     }
 
     [Fact]

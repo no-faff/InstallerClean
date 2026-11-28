@@ -63,6 +63,34 @@ public class CliScanNoticeOrderTests
         Assert.Single(lines, l => l.StartsWith(Opening(Strings.Cli_ScanPutBack), StringComparison.Ordinal));
     }
 
+    [Theory]
+    [InlineData("/s")]
+    [InlineData("/d")]
+    public async Task Files_the_scan_left_follow_the_put_back_line_those_for_a_later_scan_first(string arg)
+    {
+        var run = await Run(arg, EveryNotice(), recovery: new InHandRecoveryResult(
+            [@"C:\Windows\Installer\a.msi"], LeftAsSource: 1, LeftInstallerBusy: 2,
+            LeftForALaterScan: ["b.msp", "c.msi"], LeftAsSourceNames: ["d.msi"]));
+
+        var lines = run.Stdout.Split(Environment.NewLine);
+        Assert.Equal(Strings.Cli_ScanningInstaller, lines[0]);
+        Assert.Equal(string.Format(Strings.Cli_ScanPutBack, "a.msi"), lines[1]);
+        Assert.Equal(string.Format(Strings.Cli_ScanLeftInHand, "b.msp, c.msi"), lines[2]);
+        Assert.Equal(string.Format(Strings.Cli_ScanLeftAsSource, "d.msi"), lines[3]);
+    }
+
+    [Fact]
+    public async Task Files_left_by_a_scan_that_put_nothing_back_are_named_straight_after_the_scanning_line()
+    {
+        var run = await Run("/s", EveryNotice(), recovery: new InHandRecoveryResult(
+            [], LeftRecordsUnread: 1, LeftForALaterScan: ["b.msp"]));
+
+        var lines = run.Stdout.Split(Environment.NewLine);
+        Assert.Equal(string.Format(Strings.Cli_ScanLeftInHand, "b.msp"), lines[1]);
+        Assert.DoesNotContain(Opening(Strings.Cli_ScanPutBack), run.Stdout, StringComparison.Ordinal);
+        Assert.DoesNotContain(Opening(Strings.Cli_ScanLeftAsSource), run.Stdout, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task A_scan_that_put_nothing_back_prints_no_such_line()
     {
@@ -340,17 +368,18 @@ public class CliScanNoticeOrderTests
 
     /// <param name="putBack">Where given, the files the scan reports as put back before it does anything else.</param>
     /// <param name="scanFails">Where given, what the scan ends in after that report.</param>
+    /// <param name="recovery">Where given, the whole of what the scan reports it put back and left, in place of <paramref name="putBack"/>.</param>
     private static async Task<RunResult> Run(
         string arg, ScanResult result, StringWriter? console = null,
-        string[]? putBack = null, Exception? scanFails = null)
+        string[]? putBack = null, Exception? scanFails = null, InHandRecoveryResult? recovery = null)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
-                if (putBack is not null)
-                    call.Arg<IProgress<ScanProgressUpdate>?>()?.Report(
-                        ScanProgressUpdate.ForPutBack(new InHandRecoveryResult(putBack)));
+                var reported = recovery ?? (putBack is null ? null : new InHandRecoveryResult(putBack));
+                if (reported is not null)
+                    call.Arg<IProgress<ScanProgressUpdate>?>()?.Report(ScanProgressUpdate.ForPutBack(reported));
                 return scanFails is null ? Task.FromResult(result) : Task.FromException<ScanResult>(scanFails);
             });
 

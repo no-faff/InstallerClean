@@ -1392,12 +1392,15 @@ internal static class Program
             var scanTimer = Stopwatch.StartNew();
             // A FILE THE SCAN PUT BACK IS SAID AS IT GOES BACK, IN A LINE OF ITS OWN, ahead
             // of everything the scan finds and of any error it ends in: the scan reports
-            // it before it reads anything else. The scan writes the Application log's
-            // entry for it itself (Event ID 3008).
+            // it before it reads anything else. So are the files it left where they lie,
+            // a line for those a later scan tries again and one for those left as a
+            // program's source. The scan writes the Application log's entry for a file put
+            // back itself (Event ID 3008).
             var scanResult = await scanService.ScanAsync(
                 new SynchronousProgress<ScanProgressUpdate>(update =>
                 {
-                    if (update.PutBack is { } putBack) Console.WriteLine(PutBackReport.CommandLine(putBack));
+                    if (update.PutBack is not { } putBack) return;
+                    foreach (var line in PutBackReport.CommandLines(putBack)) Console.WriteLine(line);
                 }),
                 workToken);
             var scanDurationMs = scanTimer.ElapsedMilliseconds;

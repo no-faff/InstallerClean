@@ -290,12 +290,16 @@ public partial class ScanViewModel : ObservableObject
     /// <summary>
     /// The line naming the files a scan put back into the Installer folder, which an
     /// earlier Move or Delete had left in the app's own folder there
-    /// (<see cref="PutBackReport.WindowLine"/>), shown under the left-alone line. Empty
-    /// where none was, which collapses the line.
+    /// (<see cref="PutBackReport.WindowLine"/>), shown under the left-alone line, then the
+    /// lines naming the files the scan of the result on screen left there
+    /// (<see cref="PutBackReport.WindowLeftLines"/>). Empty where neither has a file, which
+    /// collapses the line.
     ///
-    /// IT IS SHOWN WITH THE FIRST RESULT AFTER THE FILES WENT BACK, which is the result of
-    /// the scan that put them back unless that scan was cancelled. A scan that fails says
-    /// it in its message (<see cref="WithWhatWasPutBack"/>). Either way it is said once.
+    /// THE FILES PUT BACK ARE SHOWN WITH THE FIRST RESULT AFTER THEY WENT BACK, which is the
+    /// result of the scan that put them back unless that scan was cancelled. A scan that
+    /// fails says it in its message (<see cref="WithWhatWasPutBack"/>). Either way it is said
+    /// once. THE FILES LEFT ARE THOSE THE SCAN OF THE RESULT LEFT: every scan finds them
+    /// again, so each result says them for itself.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasPutBack))]
@@ -310,6 +314,13 @@ public partial class ScanViewModel : ObservableObject
     /// anything else (<see cref="ScanProgressUpdate.PutBack"/>).
     /// </summary>
     private readonly List<string> _putBackNotYetSaid = [];
+
+    /// <summary>
+    /// What the scan running now left where it lies, from its report before anything else
+    /// (<see cref="ScanProgressUpdate.PutBack"/>). Null until it reports; a scan that left
+    /// nothing reports nothing about it.
+    /// </summary>
+    private InHandRecoveryResult? _leftByThisScan;
 
     /// <summary>The line for the files in <see cref="_putBackNotYetSaid"/>, which it empties.</summary>
     private string TakePutBackLine()
@@ -450,10 +461,12 @@ public partial class ScanViewModel : ObservableObject
             // observable property, so a throw or a cancel leaves every property
             // as this method found it. Which endings keep that earlier result on
             // screen is the callers' decision, each in its own catch.
+            Volatile.Write(ref _leftByThisScan, null);
             var result = await _scanService.ScanAsync(
                 new PutBackTap(progress, putBack =>
                 {
                     lock (_putBackNotYetSaid) _putBackNotYetSaid.AddRange(putBack.PutBack);
+                    Volatile.Write(ref _leftByThisScan, putBack);
                 }),
                 cancellationToken);
             // Sample reboot after the scan; ordering matters. An MSI install
@@ -480,7 +493,11 @@ public partial class ScanViewModel : ObservableObject
                 MissingFilesReport.Products(result.RegisteredPackages));
             var sourcesGivenUp = SourcesGivenUpReport.WindowLine(result.SourceRootsGivenUpKeepingFiles);
             var scanSignal = ScanSignalReport.WindowLine(result);
-            var putBackLine = TakePutBackLine();
+            var putBackLine = string.Join(Environment.NewLine, new[]
+            {
+                TakePutBackLine(),
+                Volatile.Read(ref _leftByThisScan) is { } left ? PutBackReport.WindowLeftLines(left) : string.Empty,
+            }.Where(line => line.Length > 0));
 
             PendingRebootResult = pendingRebootResult;
             LastScanResult = result;

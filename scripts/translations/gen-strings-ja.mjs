@@ -597,6 +597,10 @@ const MAP = {
   'Status.WaitingForUnfinishedInstall': `Waiting for an installation that has not finished. If nothing is being installed, cancel and restart Windows.`,
   'Cli.ScanPutBack': `This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
   'Summary.PutBack': `A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
+  'Summary.LeftInHand': `This scan couldn't put back into {InstallerFolder} these files an earlier Move or Delete had left in InstallerClean's own folder there: {0}. InstallerClean tries again each time it scans.`,
+  'Summary.LeftAsSource': `Files an earlier Move or Delete had left in InstallerClean's own folder inside {InstallerFolder} stay there, because a program or update was installed from them where they are: {0}`,
+  'Cli.ScanLeftInHand': `This scan couldn't put back into {InstallerFolder} these files an earlier Move or Delete had left in InstallerClean's own folder there: {0}. InstallerClean tries again each time it scans.`,
+  'Cli.ScanLeftAsSource': `Files an earlier Move or Delete had left in InstallerClean's own folder inside {InstallerFolder} stay there, because a program or update was installed from them where they are: {0}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,
@@ -698,6 +702,8 @@ const STRIPPED = new Set([
   'Cli.EventLogEndedPartial',
   'Cli.EventLogEndedNoWork',
   'Cli.EventLogScanPutBack',
+  'Cli.EventLogScanLeftInHand',
+  'Cli.EventLogScanLeftAsSource',
   // The update notices' machine Cli keys, which postdate the PR, by the same rule: the 3005,
   // and the 3006 for each reason an update was not made, with its Ctrl+C twin.
   'Cli.EventLogUpdated',

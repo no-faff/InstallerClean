@@ -147,7 +147,7 @@ public sealed class InHandRecoveryTests : IDisposable
         Assert.Single(TestCrashLog.Entries(), e => e.Contains("2 files", StringComparison.Ordinal));
         Assert.Equal(0, _records.ReadCount);
         Assert.Equal(["open", "hold a.msi", "hold b.msp", "let-go a.msi", "let-go b.msp", "close"], _hand.Steps);
-        Assert.Empty(EventLogRecorder.Entries);
+        Assert.DoesNotContain(EventLogRecorder.Entries, e => e.Class == CliEventClass.ScanPutBackNotice);
     }
 
     [Fact]
@@ -226,6 +226,105 @@ public sealed class InHandRecoveryTests : IDisposable
         Assert.Contains("a.msi", TestCrashLog.Text(), StringComparison.Ordinal);
     }
 
+    // The names of the files left, for the lines the person reads (PutBackReport).
+
+    [Fact]
+    public void Files_left_while_Windows_Installer_is_busy_are_named_for_a_later_scan()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).Batch(BatchB, ("b.msp", 7));
+        _signals.Busy(PendingRebootResult.Block(PendingRebootReason.InstallerServiceRunning));
+
+        var result = Recover();
+
+        Assert.Equal(["a.msi", "b.msp"], result.LeftForALaterScan);
+        Assert.Empty(result.LeftAsSourceNames);
+        Assert.True(result.SaysAnything);
+    }
+
+    [Fact]
+    public void Files_left_because_the_records_did_not_all_read_are_named_for_a_later_scan()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5));
+        _records.Reads = false;
+
+        var result = Recover();
+
+        Assert.Equal(["a.msi"], result.LeftForALaterScan);
+        Assert.Empty(result.LeftAsSourceNames);
+    }
+
+    [Fact]
+    public void A_file_left_as_a_source_is_named_apart_from_the_files_for_a_later_scan()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).Batch(BatchB, ("b.msp", 7)).PutBackRefused("b.msp", Kernel32.ERROR_ALREADY_EXISTS);
+        _records.Naming(BatchA);
+
+        var result = Recover();
+
+        Assert.Equal(["a.msi"], result.LeftAsSourceNames);
+        Assert.Equal(["b.msp"], result.LeftForALaterScan);
+        Assert.Empty(result.PutBack);
+    }
+
+    [Fact]
+    public void A_rename_refused_for_another_reason_is_named_for_a_later_scan()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).PutBackRefused("a.msi", Kernel32.ERROR_ACCESS_DENIED);
+
+        var result = Recover();
+
+        Assert.Equal(["a.msi"], result.LeftForALaterScan);
+    }
+
+    [Theory]
+    [InlineData(HoldOutcome.Refused)]
+    [InlineData(HoldOutcome.NotAPlainFile)]
+    public void A_file_that_will_not_open_is_named_for_a_later_scan(HoldOutcome outcome)
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).HoldAnswers("a.msi", outcome);
+
+        var result = Recover();
+
+        Assert.Equal(["a.msi"], result.LeftForALaterScan);
+    }
+
+    [Fact]
+    public void The_apps_own_probe_that_will_not_open_is_counted_and_not_named()
+    {
+        var probe = InHandFolders.NewProbeName();
+        _hand.Batch(BatchA, (probe, 0)).HoldAnswers(probe, HoldOutcome.Refused);
+
+        var result = Recover();
+
+        Assert.Equal(1, result.LeftRefused);
+        Assert.Empty(result.LeftForALaterScan);
+        Assert.False(result.SaysAnything);
+    }
+
+    [Fact]
+    public void A_file_in_use_is_neither_counted_nor_named()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).HoldAnswers("a.msi", HoldOutcome.InUse);
+
+        var result = Recover();
+
+        Assert.Empty(result.LeftForALaterScan);
+        Assert.False(result.SaysAnything);
+    }
+
+    [Fact]
+    public void Files_put_back_are_not_named_as_left()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5));
+
+        var result = Recover();
+
+        Assert.Equal([Installer + @"\a.msi"], result.PutBack);
+        Assert.Empty(result.LeftForALaterScan);
+        Assert.Empty(result.LeftAsSourceNames);
+        Assert.True(result.SaysAnything);
+    }
+
     [Fact]
     public void The_apps_own_empty_probe_is_removed_and_never_put_in_the_Installer_folder()
     {
@@ -276,6 +375,60 @@ public sealed class InHandRecoveryTests : IDisposable
         Assert.Equal(3008, CliContract.EventIdFor(entry.Class));
         Assert.Equal(System.Diagnostics.EventLogEntryType.Information, CliContract.EntryTypeFor(entry.Class));
         Assert.Contains("a.msi, b.msp", entry.Text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Files_left_for_a_later_scan_are_written_to_the_Application_log_as_a_warning_naming_each()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).Batch(BatchB, ("b.msp", 7));
+        _signals.Busy(PendingRebootResult.Block(PendingRebootReason.InstallerServiceRunning));
+
+        Recover();
+
+        var entry = Assert.Single(EventLogRecorder.Entries);
+        Assert.Equal(CliEventClass.ScanLeftInHandNotice, entry.Class);
+        Assert.Equal(3009, CliContract.EventIdFor(entry.Class));
+        Assert.Equal(System.Diagnostics.EventLogEntryType.Warning, CliContract.EntryTypeFor(entry.Class));
+        Assert.Contains("a.msi, b.msp", entry.Text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Files_left_as_a_source_are_written_to_the_Application_log_as_information_apart_from_the_rest()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5)).Batch(BatchB, ("b.msp", 7)).PutBackRefused("b.msp", Kernel32.ERROR_ALREADY_EXISTS);
+        _records.Naming(BatchA);
+
+        Recover();
+
+        Assert.Equal(2, EventLogRecorder.Entries.Count);
+        var later = Assert.Single(EventLogRecorder.Entries, e => e.Class == CliEventClass.ScanLeftInHandNotice);
+        Assert.Contains("b.msp", later.Text, StringComparison.Ordinal);
+        var source = Assert.Single(EventLogRecorder.Entries, e => e.Class == CliEventClass.ScanLeftAsSourceNotice);
+        Assert.Equal(3009, CliContract.EventIdFor(source.Class));
+        Assert.Equal(System.Diagnostics.EventLogEntryType.Information, CliContract.EntryTypeFor(source.Class));
+        Assert.Contains("a.msi", source.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain("b.msp", source.Text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_scan_that_put_every_file_back_writes_no_entry_for_files_left()
+    {
+        _hand.Batch(BatchA, ("a.msi", 5));
+
+        Recover();
+
+        Assert.Equal(CliEventClass.ScanPutBackNotice, Assert.Single(EventLogRecorder.Entries).Class);
+    }
+
+    [Fact]
+    public void The_apps_own_probe_refused_writes_no_entry()
+    {
+        var probe = InHandFolders.NewProbeName();
+        _hand.Batch(BatchA, (probe, 0)).HoldAnswers(probe, HoldOutcome.Refused);
+
+        Recover();
+
+        Assert.Empty(EventLogRecorder.Entries);
     }
 
     [Fact]

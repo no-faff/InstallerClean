@@ -1126,6 +1126,19 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        message of a scan that failed after putting them back. One sentence for one
        file or several. -->
   <data name="Summary.PutBack" xml:space="preserve"><value>A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}</value></data>
+  <!-- 0 = the names of the files, separated by a comma and a space. A line under the
+       put-back line in the main window, shown with the result of the scan that left
+       them: files an earlier Move or Delete had left in the app's own folder that this
+       scan did not put back, because Windows Installer was busy, the records of where
+       programs were installed from did not all read, another file has the name, or
+       Windows refused. Every later scan tries again. One sentence for one file or
+       several. -->
+  <data name="Summary.LeftInHand" xml:space="preserve"><value>This scan couldn't put back into {InstallerFolder} these files an earlier Move or Delete had left in InstallerClean's own folder there: {0}. InstallerClean tries again each time it scans.</value></data>
+  <!-- 0 = the names of the files, separated by a comma and a space. A line under the
+       put-back line in the main window: files an earlier Move or Delete had left in the
+       app's own folder that a program or update has since been installed from where
+       they lie, so they stay there. One sentence for one file or several. -->
+  <data name="Summary.LeftAsSource" xml:space="preserve"><value>Files an earlier Move or Delete had left in InstallerClean's own folder inside {InstallerFolder} stay there, because a program or update was installed from them where they are: {0}</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} de {1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1755,6 +1768,19 @@ Execute o InstallerClean novamente como administrador.</value></data>
        files an earlier Move or Delete had left in the app's own folder inside
        the Installer folder. One sentence for one file or several. -->
   <data name="Cli.ScanPutBack" xml:space="preserve"><value>This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}</value></data>
+  <!-- 0 = the names of the files, separated by a comma and a space. Printed after the
+       put-back line, or after the scanning line where nothing was put back, by /s, /d
+       and /m: files an earlier Move or Delete had left in the app's own folder that this
+       scan did not put back, because Windows Installer was busy, the records of where
+       programs were installed from did not all read, another file has the name, or
+       Windows refused. Every later scan tries again. One sentence for one file or
+       several. -->
+  <data name="Cli.ScanLeftInHand" xml:space="preserve"><value>This scan couldn't put back into {InstallerFolder} these files an earlier Move or Delete had left in InstallerClean's own folder there: {0}. InstallerClean tries again each time it scans.</value></data>
+  <!-- 0 = the names of the files, separated by a comma and a space. Printed after the
+       line above by /s, /d and /m: files an earlier Move or Delete had left in the app's
+       own folder that a program or update has since been installed from where they lie,
+       so they stay there. One sentence for one file or several. -->
+  <data name="Cli.ScanLeftAsSource" xml:space="preserve"><value>Files an earlier Move or Delete had left in InstallerClean's own folder inside {InstallerFolder} stay there, because a program or update was installed from them where they are: {0}</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
        a count of zero: that run prints another line instead, so this one does not
        have to read sensibly at "0 ... (0 B)". -->
@@ -2289,6 +2315,12 @@ Execute o InstallerClean novamente como administrador.</value></data>
   <!-- 0 = the names of the files put back, separated by a comma and a space.
        Written by the scan as the files go back, in the window as on the command
        line (Event ID 3008). -->
+  <!-- 0 = the names of the files, separated by a comma and a space. Written by the
+       scan on every scan that leaves such files, in the window as on the command line
+       (Event ID 3009, Warning). -->
+  <!-- 0 = the names of the files, separated by a comma and a space. Written by the
+       scan on every scan that finds such files, in the window as on the command line
+       (Event ID 3009, Information). -->
   <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
        cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
        for every run, not only the ones that committed work. -->

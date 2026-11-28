@@ -208,13 +208,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     _installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder, cancellationToken)
                 .ConfigureAwait(false);
 
+        // Said to the host now and not left to the result: a scan that stops or is
+        // cancelled further down returns none, and the files are back all the same. It is
+        // said before the wait, which a cancel ends, and also where files were only left.
+        if (putBack.SaysAnything) progress?.Report(ScanProgressUpdate.ForPutBack(putBack));
+
         if (putBack.PutBack.Count > 0)
         {
-            // Said to the host now and not left to the result: a scan that stops or is
-            // cancelled further down returns none, and the files are back all the same.
-            // It is said before the wait, which a cancel ends.
-            progress?.Report(ScanProgressUpdate.ForPutBack(putBack));
-
             // See InHandPause.AfterAPutBack: the clock read below must be in a later
             // step of the system clock than the rename was.
             await InHandPause.SinceAsync(Stopwatch.GetTimestamp(), InHandPause.AfterAPutBack, cancellationToken)

@@ -37,8 +37,8 @@ namespace InstallerClean.Models;
 ///
 /// <see cref="PutBack"/> marks the fourth kind, of which a scan reports at most one, and
 /// before any other update: the scan has put back into the Installer folder files an
-/// earlier Move or Delete had left in the app's own folder there
-/// (<see cref="Services.IInHandRecovery"/>). It is neither a milestone nor a line of the
+/// earlier Move or Delete had left in the app's own folder there, or left such files where
+/// they lie, or both (<see cref="Services.IInHandRecovery"/>). It is neither a milestone nor a line of the
 /// ticker and carries no message. A host tells the person from it and not from the scan's
 /// result, so that a scan which then fails or is cancelled has still said what it did.
 /// </summary>

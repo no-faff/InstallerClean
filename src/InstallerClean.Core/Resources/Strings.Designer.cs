@@ -226,6 +226,8 @@ public static class Strings
     public static string Cli_EventLogReason_PendingRenameUnresolved => Get("Cli.EventLogReason.PendingRenameUnresolved");
     public static string Cli_EventLogReason_RegistryCheckUnreadable => Get("Cli.EventLogReason.RegistryCheckUnreadable");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
+    public static string Cli_EventLogScanLeftAsSource => Get("Cli.EventLogScanLeftAsSource");
+    public static string Cli_EventLogScanLeftInHand => Get("Cli.EventLogScanLeftInHand");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_EventLogScanPutBack => Get("Cli.EventLogScanPutBack");
     public static string Cli_EventLogScanWithheld_Plural => Get("Cli.EventLogScanWithheld.Plural");
@@ -325,6 +327,8 @@ public static class Strings
     public static string Cli_ReportPrompt => Get("Cli.ReportPrompt");
     public static string Cli_ReportSent => Get("Cli.ReportSent");
     public static string Cli_ReportWaiting => Get("Cli.ReportWaiting");
+    public static string Cli_ScanLeftAsSource => Get("Cli.ScanLeftAsSource");
+    public static string Cli_ScanLeftInHand => Get("Cli.ScanLeftInHand");
     public static string Cli_ScanPutBack => Get("Cli.ScanPutBack");
     public static string Cli_ScanSignal_AccessRefused => Get("Cli.ScanSignal.AccessRefused");
     public static string Cli_ScanSignal_Busy => Get("Cli.ScanSignal.Busy");
@@ -557,6 +561,8 @@ public static class Strings
     public static string Status_WaitingForInstaller => Get("Status.WaitingForInstaller");
     public static string Status_WaitingForPath => Get("Status.WaitingForPath");
     public static string Status_WaitingForUnfinishedInstall => Get("Status.WaitingForUnfinishedInstall");
+    public static string Summary_LeftAsSource => Get("Summary.LeftAsSource");
+    public static string Summary_LeftInHand => Get("Summary.LeftInHand");
     public static string Summary_MissingFromDisk_OtherPrograms_Plural => Get("Summary.MissingFromDisk.OtherPrograms.Plural");
     public static string Summary_MissingFromDisk_OtherPrograms_Singular => Get("Summary.MissingFromDisk.OtherPrograms.Singular");
     public static string Summary_MissingFromDisk_Plural => Get("Summary.MissingFromDisk.Plural");

@@ -555,6 +555,8 @@ const MAP = {
   'Error.BatchEnded.InHandFolderUnavailable': `InstallerClean could not make its own folder, {0}, inside the Installer folder (Windows error {1}), so it did not move or delete anything.`,
   'Status.WaitingForUnfinishedInstall': `Waiting for an installation that has not finished. If nothing is being installed, cancel and restart Windows.`,
   'Summary.PutBack': `A scan has put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
+  'Summary.LeftInHand': `This scan couldn't put back into {InstallerFolder} these files an earlier Move or Delete had left in InstallerClean's own folder there: {0}. InstallerClean tries again each time it scans.`,
+  'Summary.LeftAsSource': `Files an earlier Move or Delete had left in InstallerClean's own folder inside {InstallerFolder} stay there, because a program or update was installed from them where they are: {0}`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -742,6 +744,8 @@ const CLI = {
   'Cli.BatchEnded.InHandFolderUnavailable': `Error: InstallerClean could not make its own folder, {0}, inside {InstallerFolder} (Windows error {1}), so it did not move or delete anything.`,
   'Cli.BatchEnded.AccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it stopped. Files already moved or deleted stay so. The rest were not touched.`,
   'Cli.ScanPutBack': `This scan put back into {InstallerFolder} files an earlier Move or Delete had left in InstallerClean's own folder there: {0}`,
+  'Cli.ScanLeftInHand': `This scan couldn't put back into {InstallerFolder} these files an earlier Move or Delete had left in InstallerClean's own folder there: {0}. InstallerClean tries again each time it scans.`,
+  'Cli.ScanLeftAsSource': `Files an earlier Move or Delete had left in InstallerClean's own folder inside {InstallerFolder} stay there, because a program or update was installed from them where they are: {0}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -42,16 +42,35 @@ public interface IInHandRecovery
 /// Files left because Windows refused the open or the rename for a reason other than the
 /// file being in use or its name being taken.
 /// </param>
+/// <param name="LeftForALaterScan">
+/// The names of the files counted in <paramref name="LeftNameTaken"/>,
+/// <paramref name="LeftRecordsUnread"/>, <paramref name="LeftInstallerBusy"/> and
+/// <paramref name="LeftRefused"/>, each without its folder: files every later scan tries
+/// to put back again. The app's own empty file a batch makes to try a rename
+/// (<see cref="LeftFile.IsProbe"/>), refused, is counted there and not named here.
+/// </param>
+/// <param name="LeftAsSourceNames">The names of the files counted in <paramref name="LeftAsSource"/>, each without its folder.</param>
 public sealed record InHandRecoveryResult(
     IReadOnlyList<string> PutBack,
     int LeftAsSource = 0,
     int LeftNameTaken = 0,
     int LeftRecordsUnread = 0,
     int LeftInstallerBusy = 0,
-    int LeftRefused = 0)
+    int LeftRefused = 0,
+    IReadOnlyList<string>? LeftForALaterScan = null,
+    IReadOnlyList<string>? LeftAsSourceNames = null)
 {
     /// <summary>Nothing was put back and nothing was left.</summary>
     public static InHandRecoveryResult None { get; } = new(Array.Empty<string>());
+
+    /// <summary>Never null: an absent list reads as no file left for a later scan.</summary>
+    public IReadOnlyList<string> LeftForALaterScan { get; init; } = LeftForALaterScan ?? Array.Empty<string>();
+
+    /// <summary>Never null: an absent list reads as no file left as a source.</summary>
+    public IReadOnlyList<string> LeftAsSourceNames { get; init; } = LeftAsSourceNames ?? Array.Empty<string>();
+
+    /// <summary>Whether the scan put back or left any file, which its host is then told (<see cref="ScanProgressUpdate.PutBack"/>).</summary>
+    public bool SaysAnything => PutBack.Count > 0 || LeftForALaterScan.Count > 0 || LeftAsSourceNames.Count > 0;
 }
 
 /// <summary>
@@ -98,8 +117,11 @@ internal sealed class InHandRecovery : IInHandRecovery
     private InHandRecoveryResult Recover(string installerFolder, CancellationToken cancellationToken)
     {
         var putBack = new List<string>();
+        var forALaterScan = new List<string>();
+        var asSourceNames = new List<string>();
         int asSource = 0, nameTaken = 0, recordsUnread = 0, installerBusy = 0, refused = 0;
-        InHandRecoveryResult Result() => new(putBack, asSource, nameTaken, recordsUnread, installerBusy, refused);
+        InHandRecoveryResult Result() =>
+            new(putBack, asSource, nameTaken, recordsUnread, installerBusy, refused, forALaterScan, asSourceNames);
 
         try
         {
@@ -133,6 +155,9 @@ internal sealed class InHandRecovery : IInHandRecovery
                                 break;
                             default:
                                 refused++;
+                                // The app's own empty file was never in the Installer folder,
+                                // so it is not one a person is told could not go back there.
+                                if (!file.IsProbe) forALaterScan.Add(file.Name);
                                 CrashLog.TryWrite(new IOException(
                                     $"A file an earlier Move or Delete left in '{InHandFolders.FolderName}\\{file.Batch}' inside the Installer folder, '{file.Name}', is left where it is: "
                                     + (hold.Outcome == HoldOutcome.NotAPlainFile
@@ -152,6 +177,7 @@ internal sealed class InHandRecovery : IInHandRecovery
                 if (InstallerIsBusy())
                 {
                     installerBusy = held.Count;
+                    forALaterScan.AddRange(held.Select(h => h.File.Name));
                     CrashLog.TryWrite(new IOException(
                         $"{Left(held.Count)} was not put back by this scan, because Windows Installer was busy. A scan made while it is not puts it back."));
                     return Result();
@@ -161,6 +187,7 @@ internal sealed class InHandRecovery : IInHandRecovery
                 if (!records.Read)
                 {
                     recordsUnread = held.Count;
+                    forALaterScan.AddRange(held.Select(h => h.File.Name));
                     CrashLog.TryWrite(new IOException(
                         $"{Left(held.Count)} was not put back by this scan, because Windows Installer's records of where programs were installed from did not all read. An account that is signed out, with a program installed for that account alone, is one cause: a scan made while it is signed in can read them."));
                     return Result();
@@ -171,6 +198,7 @@ internal sealed class InHandRecovery : IInHandRecovery
                     if (records.Names(file.Batch))
                     {
                         asSource++;
+                        asSourceNames.Add(file.Name);
                         CrashLog.TryWrite(new IOException(
                             $"A file an earlier Move or Delete left in '{InHandFolders.FolderName}\\{file.Batch}' inside the Installer folder, '{file.Name}', is left where it is: Windows Installer's records name that folder as the place a program or a patch was installed from."));
                     }
@@ -181,12 +209,14 @@ internal sealed class InHandRecovery : IInHandRecovery
                     else if (code == Kernel32.ERROR_ALREADY_EXISTS)
                     {
                         nameTaken++;
+                        forALaterScan.Add(file.Name);
                         CrashLog.TryWrite(new IOException(
                             $"A file an earlier Move or Delete left in '{InHandFolders.FolderName}\\{file.Batch}' inside the Installer folder was not put back: another file now has its name, '{file.Name}', in the Installer folder. It is left where it is."));
                     }
                     else
                     {
                         refused++;
+                        forALaterScan.Add(file.Name);
                         CrashLog.TryWrite(new IOException(
                             $"A file an earlier Move or Delete left in '{InHandFolders.FolderName}\\{file.Batch}' inside the Installer folder, '{file.Name}', was not put back: Windows refused the rename. It is left where it is.",
                             new Win32Exception(code)));
@@ -208,17 +238,32 @@ internal sealed class InHandRecovery : IInHandRecovery
         {
             // Written here, by whichever process scanned, so that a scan cancelled or
             // stopped after this point has still said what it did.
-            if (putBack.Count > 0)
-            {
-                var names = PutBackReport.Names(putBack);
-                EventLogWriter.Write(
-                    CliEventClass.ScanPutBackNotice,
-                    () => MachineCulture.English(() => string.Format(Strings.Cli_EventLogScanPutBack, names)));
-            }
+            Notice(CliEventClass.ScanPutBackNotice, putBack);
+            Notice(CliEventClass.ScanLeftInHandNotice, forALaterScan);
+            Notice(CliEventClass.ScanLeftAsSourceNotice, asSourceNames);
         }
 
         return Result();
     }
+
+    /// <summary>
+    /// Writes the Application log's entry of <paramref name="kind"/> naming the files in
+    /// <paramref name="files"/>, in English, where there is one.
+    /// </summary>
+    private static void Notice(CliEventClass kind, IReadOnlyCollection<string> files)
+    {
+        if (files.Count == 0) return;
+        var names = PutBackReport.Names(files);
+        EventLogWriter.Write(kind, () => MachineCulture.English(() => string.Format(FormatFor(kind), names)));
+    }
+
+    /// <summary>The English resource for <paramref name="kind"/>'s entry, read inside the English scope.</summary>
+    private static string FormatFor(CliEventClass kind) => kind switch
+    {
+        CliEventClass.ScanPutBackNotice => Strings.Cli_EventLogScanPutBack,
+        CliEventClass.ScanLeftInHandNotice => Strings.Cli_EventLogScanLeftInHand,
+        _ => Strings.Cli_EventLogScanLeftAsSource,
+    };
 
     /// <summary>The opening of a crash-log entry about <paramref name="count"/> files let go where they lie.</summary>
     private static string Left(int count) =>
