@@ -9,11 +9,10 @@ namespace InstallerClean.Tests.Services.Integration;
 /// machine running the suite holds them.
 ///
 /// AN INTEGRATION TEST BECAUSE THE FACT IT TURNS ON IS THE MACHINE'S. The system account's
-/// profile is listed in <c>ProfileList</c> and its hive loaded under <c>HKEY_USERS</c> on
-/// every Windows, and Windows Installer refuses a per-user walk for it with
-/// ERROR_INVALID_PARAMETER. An account list holding it would make every stopped per-user
-/// walk end in a refusal, so the test first shows the machine holds the profile and the hive,
-/// which is what lets it fail.
+/// hive is loaded under <c>HKEY_USERS</c> on every Windows, and Windows Installer refuses a
+/// per-user walk for it with ERROR_INVALID_PARAMETER. An account list holding it would make
+/// every stopped per-user walk end in a refusal, so the test first shows the machine holds
+/// the hive, which is what lets it fail.
 /// </summary>
 public class RegistryProductListsTests
 {
@@ -22,9 +21,6 @@ public class RegistryProductListsTests
     [Fact]
     public void The_system_account_is_never_an_account_whose_own_list_is_walked()
     {
-        using (var machine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
-        using (var profile = machine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" + LocalSystem))
-            Assert.NotNull(profile);
         using (var users = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64))
         using (var hive = users.OpenSubKey(LocalSystem))
             Assert.NotNull(hive);
@@ -35,5 +31,24 @@ public class RegistryProductListsTests
             Assert.NotNull(accounts);
             Assert.DoesNotContain(accounts!, a => string.Equals(a, LocalSystem, StringComparison.OrdinalIgnoreCase));
         }
+    }
+
+    [Fact]
+    public void Every_hive_loaded_under_an_accounts_name_but_the_systems_is_an_account_whose_own_list_is_walked()
+    {
+        // The account running the suite has its hive loaded, so the machine holds at least one
+        // such hive and the test can fail.
+        using var users = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
+        var hives = users.GetSubKeyNames()
+            .Where(name => InstallerQueryService.IsAccount(name)
+                           && !string.Equals(name, LocalSystem, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        Assert.NotEmpty(hives);
+
+        var accounts = RegistryProductLists.Instance.Accounts(MsiInstallContext.UserUnmanaged, CancellationToken.None);
+
+        Assert.NotNull(accounts);
+        foreach (var hive in hives)
+            Assert.Contains(accounts!, a => string.Equals(a, hive, StringComparison.OrdinalIgnoreCase));
     }
 }

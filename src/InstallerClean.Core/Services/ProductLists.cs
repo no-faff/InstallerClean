@@ -53,7 +53,6 @@ internal sealed class RegistryProductLists : IProductLists
     private const string InstallerKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer";
     private const string MachineList = @"SOFTWARE\Classes\Installer\Products";
     private const string UserList = @"Software\Microsoft\Installer\Products";
-    private const string ProfileList = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList";
 
     public IReadOnlyList<string>? Accounts(MsiInstallContext context, CancellationToken ct)
     {
@@ -65,32 +64,36 @@ internal sealed class RegistryProductLists : IProductLists
         };
         if (parent is null) return null;
 
-        // The system account is never one: its records under UserData are the per-machine
-        // installations', which are walked in their own context, and Windows Installer
-        // refuses a per-user walk for it with ERROR_INVALID_PARAMETER. Its hive is loaded
-        // and its profile listed on every machine, so it is left out of both sources.
         var names = Read(RegistryHive.LocalMachine, parent, ct);
         if (names is null) return null;
+        if (context != MsiInstallContext.UserUnmanaged) return AccountsOf(names, []);
+
+        var loaded = LoadedHives(RecordsWatchFactory.LoadedHiveNames, RegistryNames.Pause(ct));
+        return loaded is null ? null : AccountsOf(names, loaded);
+    }
+
+    /// <summary>
+    /// The accounts of <paramref name="listed"/>, the subkeys of the <c>Managed</c> or
+    /// <c>UserData</c> key, and of <paramref name="loadedHives"/>, the subkeys of
+    /// <c>HKEY_USERS</c>, each once, in that order.
+    ///
+    /// AN UNMANAGED ACCOUNT'S OWN LIST IS IN ITS HIVE, so every hive loaded under an
+    /// account's name is walked as well, whether or not the account has records under
+    /// <c>UserData</c>. A hive whose name is not an account, the default user's and each
+    /// account's classes hive among them, holds no such list.
+    ///
+    /// THE SYSTEM ACCOUNT IS NEVER ONE: its records under <c>UserData</c> are the per-machine
+    /// installations', which are walked in their own context, and Windows Installer refuses a
+    /// per-user walk for it with ERROR_INVALID_PARAMETER. Its hive is loaded on every
+    /// machine, so it is left out of both sources.
+    /// </summary>
+    internal static IReadOnlyList<string> AccountsOf(IEnumerable<string> listed, IEnumerable<string> loadedHives)
+    {
         var accounts = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { InstallerQueryService.LocalSystemAccount };
-        foreach (var name in names)
+        foreach (var name in listed.Concat(loadedHives))
             if (InstallerQueryService.IsAccount(name) && seen.Add(name))
                 accounts.Add(name);
-
-        // An unmanaged account's own list is in its hive, so every profile whose hive is
-        // loaded is walked as well, records under UserData or none.
-        if (context == MsiInstallContext.UserUnmanaged)
-        {
-            var profiles = Read(RegistryHive.LocalMachine, ProfileList, ct);
-            if (profiles is null) return null;
-            foreach (var sid in profiles)
-            {
-                if (!InstallerQueryService.IsAccount(sid) || seen.Contains(sid)) continue;
-                var loaded = HiveLoaded(sid);
-                if (loaded is null) return null;
-                if (loaded.Value && seen.Add(sid)) accounts.Add(sid);
-            }
-        }
 
         return accounts;
     }
@@ -149,20 +152,33 @@ internal sealed class RegistryProductLists : IProductLists
         }
     }
 
-    // Whether the account's own hive is loaded under HKEY_USERS; null where that would not
-    // read.
-    private static bool? HiveLoaded(string sid)
+    // How many listings of HKEY_USERS are made before one whose readings keep disagreeing
+    // is taken as a list that would not read, and the pause before each after the second.
+    internal const int HiveReadings = 4;
+    internal static readonly TimeSpan[] HivePauseBefore = [Durations.FromMilliseconds(50), Durations.FromMilliseconds(250)];
+
+    /// <summary>
+    /// The names of the hives loaded under <c>HKEY_USERS</c>, as <paramref name="list"/>
+    /// gives them, taken where two listings in a row agree, as
+    /// <see cref="RegistryNames.SubKeysOf"/> takes a key's names; null where no two of
+    /// <see cref="HiveReadings"/> did, or a listing would not read. A hive loads and unloads
+    /// as an account signs in and out, and a listing made across that can leave one out.
+    /// <paramref name="pause"/> waits before each listing after the second.
+    /// </summary>
+    internal static string[]? LoadedHives(Func<string[]?> list, Action<TimeSpan> pause)
     {
-        try
+        var last = list();
+        if (last is null) return null;
+        for (var reading = 1; reading < HiveReadings; reading++)
         {
-            using var users = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
-            using var hive = users.OpenSubKeyEarned(sid);
-            return hive is not null;
+            if (reading > 1) pause(HivePauseBefore[Math.Min(reading - 2, HivePauseBefore.Length - 1)]);
+            var next = list();
+            if (next is null) return null;
+            if (next.SequenceEqual(last, StringComparer.Ordinal)) return next;
+            last = next;
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return null;
-        }
+
+        return null;
     }
 
     private static IReadOnlyList<string>? Read(RegistryHive root, string path, CancellationToken ct)
